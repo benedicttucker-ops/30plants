@@ -1,0 +1,1823 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F1F3EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111512" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Batch-prep meal planner: 30 plants a week, oily fish, a fermented portion a day, 1,800 kcal.">
+<title>Thirty Plants</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Big+Shoulders+Display:wght@700;800&family=Permanent+Marker&display=swap">
+<style>
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+[hidden] { display: none !important; }
+img { max-width: 100%; }
+/* Layout: single phone column (max 560px), sticky header, fixed bottom tab bar; prep labels styled as masking tape on a lunchbox lid */
+:root {
+  --bg: #F1F3EE;
+  --surface: #FFFFFF;
+  --surface-2: #E6EAE2;
+  --ink: #1B211D;
+  --muted: #5B655E;
+  --line: #D3D9CE;
+  --accent: #9A2B57;
+  --accent-soft: #F3E1E8;
+  --accent-ink: #FFFFFF;
+  --leaf: #3C7A2C;
+  --leaf-soft: #E1EEDA;
+  --warn: #A9601A;
+  --warn-soft: #F6E7D6;
+  --tape: #EFE0A2;
+  --tape-ink: #2C2717;
+  --c-red: #D0453A;
+  --c-orange: #E58A2C;
+  --c-yellow: #E3BE2A;
+  --c-green: #4A9A39;
+  --c-purple: #6F3A90;
+  --c-white: #CDBB98;
+  --shadow: 0 10px 30px rgba(20, 30, 22, .14);
+  --f-display: "Big Shoulders Display", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --f-body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-label: "Permanent Marker", "Comic Sans MS", cursive;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111512; --surface: #191E1A; --surface-2: #222924; --ink: #E5EAE3; --muted: #9AA59C; --line: #2E3631;
+    --accent: #E57AA4; --accent-soft: #3A1D29; --accent-ink: #1E0E15; --leaf: #8BC870; --leaf-soft: #1F3019;
+    --warn: #E6A866; --warn-soft: #36271A; --tape: #5B5233; --tape-ink: #F4ECCD;
+    --c-red: #E5675C; --c-orange: #EE9D4B; --c-yellow: #EBCB4B; --c-green: #6FB85D; --c-purple: #A276C2; --c-white: #B7A887;
+    --shadow: 0 10px 30px rgba(0,0,0,.5); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111512; --surface: #191E1A; --surface-2: #222924; --ink: #E5EAE3; --muted: #9AA59C; --line: #2E3631;
+  --accent: #E57AA4; --accent-soft: #3A1D29; --accent-ink: #1E0E15; --leaf: #8BC870; --leaf-soft: #1F3019;
+  --warn: #E6A866; --warn-soft: #36271A; --tape: #5B5233; --tape-ink: #F4ECCD;
+  --c-red: #E5675C; --c-orange: #EE9D4B; --c-yellow: #EBCB4B; --c-green: #6FB85D; --c-purple: #A276C2; --c-white: #B7A887;
+  --shadow: 0 10px 30px rgba(0,0,0,.5); color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--ink); }
+body { margin: 0; font-family: var(--f-body); font-size: 15px; line-height: 1.45; -webkit-tap-highlight-color: transparent; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.app { max-width: 560px; margin: 0 auto; padding-inline: 16px; padding-block: 0 calc(84px + env(safe-area-inset-bottom, 0px)); }
+
+/* header */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); margin-inline: -16px; padding: 12px 16px 10px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); }
+.brand { font-family: var(--f-display); font-weight: 800; font-size: 26px; white-space: nowrap; letter-spacing: .02em; text-transform: uppercase; line-height: 1; margin: 0; flex: 1; min-width: 0; }
+.brand span { color: var(--leaf); }
+.plantpill { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 13px; background: var(--leaf-soft); color: var(--leaf); padding: 5px 10px 5px 6px; border-radius: 999px; border: 0; font-variant-numeric: tabular-nums; }
+.plantpill svg { width: 22px; height: 22px; }
+.iconbtn { border: 0; background: transparent; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; color: var(--ink); }
+.iconbtn:hover { background: var(--surface-2); }
+.iconbtn svg { width: 22px; height: 22px; }
+
+/* bottom nav */
+.nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.nav-in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
+.nav button { border: 0; background: none; padding: 8px 0 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11.5px; font-weight: 700; color: var(--muted); letter-spacing: .02em; }
+.nav button svg { width: 24px; height: 24px; }
+.nav button[aria-current="page"] { color: var(--accent); }
+
+/* type */
+h2.sec { font-family: var(--f-display); font-weight: 800; font-size: 22px; text-transform: uppercase; letter-spacing: .03em; margin: 22px 0 8px; text-wrap: balance; }
+.eyebrow { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* week nav + day strip */
+.weeknav { display: flex; align-items: center; gap: 8px; margin: 12px 0 8px; }
+.weeknav .lbl { flex: 1; text-align: center; font-weight: 700; }
+.strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.strip button { border: 1px solid transparent; background: var(--surface); border-radius: 12px; padding: 6px 0 7px; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
+.strip .dw { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.strip .dn { font-family: var(--f-display); font-size: 22px; font-weight: 800; line-height: 1; }
+.strip .dots { display: flex; gap: 2px; height: 5px; }
+.strip .dots i { width: 5px; height: 5px; border-radius: 50%; }
+.strip button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.strip button.today .dn { color: var(--accent); }
+
+/* summary */
+.summary { margin-top: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: grid; gap: 12px; }
+.sum-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.bignum { font-family: var(--f-display); font-weight: 800; font-size: 56px; line-height: .85; font-variant-numeric: tabular-nums; }
+.bignum small { font-family: var(--f-body); font-size: 14px; font-weight: 700; color: var(--muted); margin-left: 4px; letter-spacing: 0; }
+.bignum.over { color: var(--warn); }
+.targetbtn { border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 700; display: inline-flex; gap: 6px; align-items: center; }
+.targetbtn svg { width: 14px; height: 14px; }
+.bar { position: relative; height: 10px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.bar > i { position: absolute; inset: 0 auto 0 0; border-radius: 999px; }
+.bar .plan { background: var(--line); }
+.bar .eat { background: var(--accent); }
+.bar.leaf .eat { background: var(--leaf); }
+.barrow { display: grid; gap: 5px; }
+.barlbl { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); gap: 8px; }
+.barlbl b { color: var(--ink); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 700; background: var(--surface-2); color: var(--ink); border: 1px solid transparent; }
+.chip.good { background: var(--leaf-soft); color: var(--leaf); }
+.chip.bad { background: var(--warn-soft); color: var(--warn); }
+.chip svg { width: 14px; height: 14px; }
+.cdots { display: inline-flex; gap: 3px; }
+.cdots i { width: 9px; height: 9px; border-radius: 50%; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); }
+.c-red { background: var(--c-red) !important; box-shadow: none !important; }
+.c-orange { background: var(--c-orange) !important; box-shadow: none !important; }
+.c-yellow { background: var(--c-yellow) !important; box-shadow: none !important; }
+.c-green { background: var(--c-green) !important; box-shadow: none !important; }
+.c-purple { background: var(--c-purple) !important; box-shadow: none !important; }
+.c-white { background: var(--c-white) !important; box-shadow: none !important; }
+
+/* meal list */
+.meals { margin-top: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.meal { display: grid; grid-template-columns: 44px 1fr auto; align-items: center; border-top: 1px solid var(--line); min-height: 64px; }
+.meal:first-child { border-top: 0; }
+.tick { width: 44px; height: 100%; min-height: 64px; border: 0; background: none; display: grid; place-items: center; }
+.tick span { width: 24px; height: 24px; border-radius: 8px; border: 2px solid var(--line); display: grid; place-items: center; background: var(--surface); }
+.tick span svg { width: 16px; height: 16px; opacity: 0; color: var(--accent-ink); }
+.tick[aria-checked="true"] span { background: var(--accent); border-color: var(--accent); }
+.tick[aria-checked="true"] span svg { opacity: 1; }
+.tick:disabled { opacity: .35; cursor: default; }
+.mealbody { border: 0; background: none; text-align: left; padding: 10px 4px 10px 0; min-width: 0; display: grid; gap: 1px; }
+.mealbody .slot { font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.mealbody .nm { font-weight: 700; font-size: 15.5px; line-height: 1.3; }
+.mealbody .mt { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.meal.done .nm { color: var(--muted); }
+.meal .go { border: 0; background: none; width: 40px; height: 100%; color: var(--muted); display: grid; place-items: center; }
+.meal .go svg { width: 18px; height: 18px; }
+.addslot { color: var(--accent); }
+.tape { font-family: var(--f-label); font-size: 11px; letter-spacing: .03em; text-transform: none; color: var(--tape-ink); background: var(--tape); padding: 1px 7px 0; transform: rotate(-1.5deg); display: inline-block; font-weight: 400; }
+
+/* extras */
+.extras { margin-top: 10px; display: grid; gap: 6px; }
+.xrow { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px 8px 8px 12px; }
+.xrow .nm { flex: 1; min-width: 0; font-weight: 700; }
+.xrow .mt { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 12px; padding: 10px 14px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; }
+.btn svg { width: 18px; height: 18px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.ghost { background: transparent; }
+.btn.danger { color: var(--warn); }
+.btn.sm { min-height: 36px; padding: 6px 12px; font-size: 13.5px; }
+.btnrow { display: flex; gap: 8px; flex-wrap: wrap; }
+.btnrow .btn { flex: 1 1 auto; }
+
+/* week stats */
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin-top: 10px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px; display: grid; gap: 6px; min-width: 0; }
+.stat .v { font-family: var(--f-display); font-weight: 800; font-size: 34px; line-height: .9; font-variant-numeric: tabular-nums; }
+.stat .v small { font-size: 18px; color: var(--muted); }
+.stat.wide { grid-column: 1 / -1; }
+.stat .bar { height: 8px; }
+
+/* day cards in week view */
+.days { display: grid; gap: 10px; margin-top: 14px; }
+.daycard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.daycard header { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.daycard header .d { font-family: var(--f-display); font-weight: 800; font-size: 20px; text-transform: uppercase; letter-spacing: .03em; flex: 1; }
+.daycard header .k { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.daycard.today header { background: var(--accent-soft); }
+.drow { display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 8px; padding: 7px 12px; border: 0; border-top: 1px solid var(--line); background: none; width: 100%; text-align: left; }
+.drow:first-of-type { border-top: 0; }
+.drow .s { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .06em; }
+.drow .n { font-size: 14px; min-width: 0; overflow-wrap: anywhere; }
+.drow .n.empty { color: var(--accent); font-weight: 700; }
+.drow .tag { display: inline-flex; gap: 4px; }
+.drow .tag svg { width: 15px; height: 15px; color: var(--muted); }
+.drow.done .n { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
+.plantgrid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.pchip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px 4px 7px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-size: 12.5px; }
+.pchip i { width: 9px; height: 9px; border-radius: 50%; background: var(--surface-2); }
+.pchip.q { color: var(--muted); }
+.pchip.eaten { border-color: var(--leaf); }
+.pchip.on { background: var(--leaf-soft); border-color: var(--leaf); color: var(--leaf); font-weight: 700; }
+
+/* prep */
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--surface-2); border-radius: 12px; padding: 3px; gap: 3px; margin-top: 12px; }
+.seg button { border: 0; background: none; border-radius: 9px; padding: 8px 6px; font-weight: 700; font-size: 13.5px; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.callout { margin-top: 10px; background: var(--leaf-soft); color: var(--ink); border-radius: 12px; padding: 10px 12px; font-size: 14px; display: flex; gap: 10px; }
+.callout svg { width: 20px; height: 20px; flex: none; color: var(--leaf); margin-top: 1px; }
+.callout.warn { background: var(--warn-soft); }
+.callout.warn svg { color: var(--warn); }
+.session { margin-top: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.session > header { padding: 14px 14px 12px; border-bottom: 1px solid var(--line); display: grid; gap: 4px; }
+.session > header .d { font-family: var(--f-display); font-weight: 800; font-size: 26px; text-transform: uppercase; line-height: 1; }
+.batch { padding: 14px; border-top: 1px solid var(--line); display: grid; gap: 10px; }
+.batch:first-of-type { border-top: 0; }
+.batch h3 { margin: 0; font-size: 17px; line-height: 1.3; }
+.labels { display: flex; flex-wrap: wrap; gap: 8px 6px; }
+.label { font-family: var(--f-label); font-size: 13px; background: var(--tape); color: var(--tape-ink); padding: 3px 9px 2px; line-height: 1.25; }
+.label:nth-child(odd) { transform: rotate(-1.2deg); }
+.label:nth-child(even) { transform: rotate(1deg); }
+.label.frz { background: var(--surface-2); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--c-white); }
+.label.bad { background: var(--warn-soft); color: var(--warn); }
+.ilist { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.ilist li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-top: 1px dashed var(--line); font-size: 14px; }
+.ilist li:first-child { border-top: 0; }
+.ilist .q { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; text-align: right; }
+details.more > summary { cursor: pointer; font-weight: 700; color: var(--accent); list-style: none; padding: 4px 0; }
+details.more > summary::-webkit-details-marker { display: none; }
+ol.steps { margin: 8px 0 0; padding-left: 22px; display: grid; gap: 8px; }
+ol.steps li { padding-left: 2px; }
+
+/* shop */
+.aisle { margin-top: 16px; }
+.aisle h3 { font-family: var(--f-display); font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; margin: 0 0 6px; display: flex; justify-content: space-between; align-items: baseline; }
+.aisle h3 small { font-family: var(--f-body); font-size: 12px; color: var(--muted); letter-spacing: 0; text-transform: none; font-weight: 700; }
+.shoplist { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.sitem { display: grid; grid-template-columns: 40px 1fr auto; align-items: start; gap: 4px; padding: 9px 12px 9px 4px; border-top: 1px solid var(--line); width: 100%; background: none; border-left: 0; border-right: 0; border-bottom: 0; text-align: left; }
+.sitem:first-child { border-top: 0; }
+.sitem .box { width: 22px; height: 22px; border: 2px solid var(--line); border-radius: 7px; margin: 1px auto 0; display: grid; place-items: center; }
+.sitem .box svg { width: 14px; height: 14px; opacity: 0; color: var(--accent-ink); }
+.sitem[aria-checked="true"] .box { background: var(--leaf); border-color: var(--leaf); }
+.sitem[aria-checked="true"] .box svg { opacity: 1; }
+.sitem[aria-checked="true"] .n { text-decoration: line-through; color: var(--muted); }
+.sitem .n { font-weight: 700; font-size: 14.5px; min-width: 0; }
+.sitem .h { display: block; font-weight: 400; font-size: 12.5px; color: var(--muted); margin-top: 1px; }
+.sitem .q { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 14px; text-align: right; white-space: nowrap; }
+.sitem .q small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+
+/* recipes */
+.search { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 11px 14px; margin-top: 12px; min-height: 46px; }
+.filters { display: flex; gap: 6px; overflow-x: auto; padding: 10px 0 2px; scrollbar-width: none; margin-inline: -16px; padding-inline: 16px; }
+.filters::-webkit-scrollbar { display: none; }
+.fchip { flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 700; color: var(--muted); }
+.fchip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.rlist { display: grid; gap: 8px; margin-top: 12px; }
+.rcard { border: 1px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 12px 14px; text-align: left; display: grid; gap: 4px; width: 100%; }
+.rcard .t { display: flex; gap: 8px; align-items: flex-start; justify-content: space-between; }
+.rcard .nm { font-weight: 700; font-size: 15.5px; line-height: 1.3; }
+.rcard .mt { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.badges { display: flex; flex-wrap: wrap; gap: 4px; }
+.badge { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: var(--surface-2); color: var(--muted); letter-spacing: .02em; }
+.badge.oily { background: #DCEAF2; color: #1F5878; }
+.badge.ferm { background: var(--accent-soft); color: var(--accent); }
+.badge.red { background: var(--warn-soft); color: var(--warn); }
+.badge.veg { background: var(--leaf-soft); color: var(--leaf); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .badge.oily { background: #18303D; color: #8CC3E3; } }
+:root[data-theme="dark"] .badge.oily { background: #18303D; color: #8CC3E3; }
+.star { color: var(--c-yellow); }
+.star svg { width: 18px; height: 18px; }
+
+/* sheet */
+.scrim { position: fixed; inset: 0; background: rgba(10, 14, 11, .45); z-index: 50; display: flex; align-items: flex-end; justify-content: center; }
+.sheet { background: var(--surface); width: 100%; max-width: 560px; max-height: 92%; overflow-y: auto; border-radius: 20px 20px 0 0; padding: 8px 16px calc(20px + env(safe-area-inset-bottom, 0px)); box-shadow: var(--shadow); overscroll-behavior: contain; }
+.sheet .grab { width: 40px; height: 4px; border-radius: 4px; background: var(--line); margin: 4px auto 10px; }
+.sheet h2 { font-family: var(--f-display); font-weight: 800; font-size: 28px; line-height: 1; text-transform: uppercase; margin: 0; text-wrap: balance; }
+.sheethead { display: flex; gap: 8px; align-items: flex-start; }
+.sheethead > div { flex: 1; min-width: 0; display: grid; gap: 6px; }
+.sheet section { margin-top: 16px; }
+.sheet h4 { margin: 0 0 6px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); }
+.nutri { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 6px; }
+.nutri div { background: var(--bg); border-radius: 10px; padding: 8px; text-align: center; }
+.nutri b { display: block; font-family: var(--f-display); font-size: 24px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.nutri span { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.stepper { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.stepper button { border: 0; background: var(--bg); width: 40px; height: 38px; font-size: 20px; font-weight: 700; }
+.stepper span { min-width: 92px; text-align: center; font-weight: 700; font-size: 14px; }
+.field { display: grid; gap: 4px; margin-top: 10px; }
+.field label { font-size: 13px; font-weight: 700; }
+.field input, .field select, .field textarea { border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 10px 12px; min-height: 44px; width: 100%; }
+.field textarea { min-height: 120px; font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+.fieldrow { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+.fieldrow.three { grid-template-columns: repeat(3, minmax(0,1fr)); }
+.check { display: flex; gap: 10px; align-items: center; margin-top: 12px; font-weight: 700; }
+.check input { width: 20px; height: 20px; accent-color: var(--accent); }
+.plist { display: grid; gap: 4px; margin-top: 8px; }
+.pick { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 10px 12px; text-align: left; display: grid; gap: 2px; width: 100%; }
+.pick .nm { font-weight: 700; }
+.pick .mt { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pick .gain { color: var(--leaf); font-weight: 700; }
+.pick.cur { border-color: var(--accent); background: var(--accent-soft); }
+.toast { position: fixed; left: 50%; bottom: calc(92px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 999px; font-weight: 700; font-size: 14px; z-index: 60; box-shadow: var(--shadow); max-width: calc(100% - 32px); }
+.empty { text-align: center; padding: 30px 10px; color: var(--muted); }
+hr.rule { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }
+.help { font-size: 14px; display: grid; gap: 6px; }
+.help ol { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .sheet { animation: rise .22s ease-out; }
+  @keyframes rise { from { transform: translateY(24px); opacity: .6; } to { transform: none; opacity: 1; } }
+}
+@media (max-width: 400px) { .brand { font-size: 22px; } .plantpill { font-size: 12px; } }
+@media (max-width: 380px) {
+  .bignum { font-size: 48px; }
+  .strip .dn { font-size: 19px; }
+  .nutri b { font-size: 20px; }
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <h1 class="brand">Thirty <span>Plants</span></h1>
+    <button class="plantpill" id="pill" data-a="tab" data-v="week" aria-label="Plants this week"></button>
+    <button class="iconbtn" data-a="settings" aria-label="Settings" id="gear"></button>
+  </header>
+  <main id="main"></main>
+</div>
+<nav class="nav" aria-label="Sections"><div class="nav-in" id="nav"></div></nav>
+<div id="sheet-root"></div>
+<div id="toast-root" aria-live="polite"></div>
+
+<script>
+/* Thirty Plants: ingredient, plant and recipe data.
+   Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
+   Recipes list grams for ONE portion. The app scales portions to each day's calorie budget. */
+
+const PLANTS = {
+  // fruit
+  apple:['Apple',1,'red'], pear:['Pear',1,'green'], banana:['Banana',1,'yellow'], blueberry:['Blueberries',1,'purple'],
+  raspberry:['Raspberries',1,'red'], strawberry:['Strawberries',1,'red'], blackberry:['Blackberries',1,'purple'],
+  blackcurrant:['Blackcurrants',1,'purple'], redcurrant:['Redcurrants',1,'red'], cherry:['Cherries',1,'red'],
+  mango:['Mango',1,'orange'], kiwi:['Kiwi',1,'green'], orange:['Orange',1,'orange'], clementine:['Clementine',1,'orange'],
+  lemon:['Lemon',1,'yellow'], lime:['Lime',1,'green'], pomegranate:['Pomegranate',1,'red'], peach:['Peach & nectarine',1,'orange'],
+  apricot:['Apricots',1,'orange'], date:['Dates',1,'white'], grape:['Red grapes',1,'purple'], avocado:['Avocado',1,'green'],
+  coconut:['Coconut',1,'white'], olive:['Olives',1,'purple'], tomato:['Tomato',1,'red'],
+  // veg
+  onion:['Onion',1,'white'], redonion:['Red onion',1,'purple'], springonion:['Spring onion',1,'green'], leek:['Leek',1,'green'],
+  celery:['Celery',1,'green'], carrot:['Carrot',1,'orange'], redpepper:['Red pepper',1,'red'], yellowpepper:['Yellow pepper',1,'yellow'],
+  greenpepper:['Green pepper',1,'green'], courgette:['Courgette',1,'green'], aubergine:['Aubergine',1,'purple'],
+  mushroom:['Chestnut mushrooms',1,'white'], shiitake:['Shiitake',1,'white'], spinach:['Spinach',1,'green'],
+  kale:['Kale / cavolo nero',1,'green'], broccoli:['Broccoli',1,'green'], cauliflower:['Cauliflower',1,'white'],
+  redcabbage:['Red cabbage',1,'purple'], cabbage:['Green cabbage',1,'green'], napacabbage:['Chinese leaf',1,'white'],
+  pakchoi:['Pak choi',1,'green'], greenbean:['Green beans',1,'green'], sugarsnap:['Sugar snaps',1,'green'],
+  fennel:['Fennel',1,'white'], beetroot:['Beetroot',1,'purple'], squash:['Butternut squash',1,'orange'],
+  sweetpotato:['Sweet potato',1,'orange'], potato:['Potato',1,'white'], sweetcorn:['Sweetcorn',1,'yellow'],
+  cucumber:['Cucumber',1,'green'], radish:['Radish',1,'red'], rocket:['Rocket',1,'green'], lettuce:['Lettuce',1,'green'],
+  watercress:['Watercress',1,'green'], beansprout:['Beansprouts',1,'white'], waterchestnut:['Water chestnut',1,'white'],
+  pea:['Peas',1,'green'], broadbean:['Broad beans',1,'green'],
+  // pulses
+  chickpea:['Chickpeas',1,'white'], butterbean:['Butter beans',1,'white'], cannellini:['Cannellini beans',1,'white'],
+  blackbean:['Black beans',1,'purple'], kidneybean:['Kidney beans',1,'red'], borlotti:['Borlotti beans',1,'white'],
+  redlentil:['Red lentils',1,'orange'], greenlentil:['Green / puy lentils',1,'green'], soya:['Soya (edamame, tofu, miso)',1,'green'],
+  // grains
+  oats:['Oats',1,'white'], wheat:['Wholewheat',1,'white'], rye:['Rye',1,'white'], barley:['Barley',1,'white'],
+  spelt:['Spelt',1,'white'], quinoa:['Quinoa',1,'white'], buckwheat:['Buckwheat',1,'white'], brownrice:['Brown rice',1,'white'],
+  amaranth:['Amaranth',1,'white'],
+  // nuts & seeds
+  almond:['Almonds',1,'white'], walnut:['Walnuts',1,'white'], hazelnut:['Hazelnuts',1,'white'], peanut:['Peanuts',1,'white'],
+  cashew:['Cashews',1,'white'], pistachio:['Pistachios',1,'green'], pinenut:['Pine nuts',1,'white'],
+  pumpkinseed:['Pumpkin seeds',1,'green'], sunflowerseed:['Sunflower seeds',1,'white'], sesame:['Sesame',1,'white'],
+  linseed:['Linseed',1,'white'], chia:['Chia',1,'white'],
+  // herbs & spices (quarter points)
+  basil:['Basil',.25], parsley:['Parsley',.25], corianderleaf:['Coriander leaf',.25], mint:['Mint',.25], dill:['Dill',.25],
+  chives:['Chives',.25], thyme:['Thyme',.25], rosemary:['Rosemary',.25], oregano:['Oregano',.25], bayleaf:['Bay',.25],
+  garlic:['Garlic',.25], ginger:['Ginger',.25], chilli:['Chilli',.25], paprika:['Paprika',.25], cumin:['Cumin',.25],
+  corianderseed:['Ground coriander',.25], turmeric:['Turmeric',.25], garammasala:['Garam masala',.25], curry:['Curry powder',.25],
+  cinnamon:['Cinnamon',.25], nutmeg:['Nutmeg',.25], cardamom:['Cardamom',.25], vanilla:['Vanilla',.25], fennelseed:['Fennel seed',.25],
+  sumac:['Sumac',.25], lemongrass:['Lemongrass',.25], fivespice:['Five spice',.25], zaatar:["Za'atar",.25], rasel:['Ras el hanout',.25],
+  cacao:['Cacao',.25], tea:['Matcha',.25], caper:['Capers',.25], horseradish:['Horseradish',.25]
+};
+
+/* [id, name, kcal, protein, fibre, aisle, plants[], opts]
+   opts: fe = grams that make a fermented portion · u/uw = unit name & grams · sp = grams per teaspoon
+         ml = show in ml · pantry = cupboard staple · sb = Sainsbury's pointer */
+const ING_ROWS = [
+  // dairy & eggs
+  ['milk','Semi-skimmed milk',46,3.6,0,'dairy',[],{ml:1}],
+  ['fage0','Fage Total 0% Greek yoghurt',54,10.3,0,'dairy',[],{fe:80,sb:'Fage Total 0%, the 1kg tub is best value'}],
+  ['kefir','Kefir drink, plain',55,3.4,0,'dairy',[],{fe:100,ml:1,sb:"by Sainsbury's Kefir Drink Natural, or Biotiful"}],
+  ['skyr','Skyr, plain',64,11,0,'dairy',[],{fe:80}],
+  ['cottage','Cottage cheese, reduced fat',72,12,0,'dairy',[]],
+  ['ricotta','Ricotta',140,9.5,0,'dairy',[]],
+  ['feta','Feta',270,16,0,'dairy',[]],
+  ['parmesan','Parmesan',392,33,0,'dairy',[]],
+  ['mozz','Light mozzarella',165,18,0,'dairy',[]],
+  ['halloumi','Light halloumi',245,24,0,'dairy',[]],
+  ['cheddar','Mature cheddar',416,25,0,'dairy',[]],
+  ['cremef','Half-fat crème fraîche',162,3,0,'dairy',[]],
+  ['egg','Eggs',131,12.6,0,'dairy',[],{u:'egg',uw:50}],
+  ['butter','Butter',744,0.6,0,'dairy',[],{sp:5}],
+  // chilled & fermented
+  ['kimchi','Kimchi (live)',25,1.5,2.4,'chilled',['napacabbage','chilli'],{fe:30,sb:'The Cultured Collective Original Kimchi in larger stores; any unpasteurised kimchi'}],
+  ['kombucha','Kombucha, no sugar',2,0,0,'drinks',[],{fe:200,ml:1,sb:'Remedy Kombucha, 4 × 330ml'}],
+  ['miso','White miso paste',199,12,5,'world',['soya'],{fe:15,sp:6}],
+  ['tofu','Firm tofu',120,13,1,'chilled',['soya']],
+  ['hummus','Reduced-fat hummus',200,7,6,'chilled',['chickpea','sesame']],
+  ['gnocchi','Fresh gnocchi',150,3.5,1.5,'chilled',['potato']],
+  // fish
+  ['salmon','Salmon fillet',200,20.5,0,'fish',[],{u:'fillet',uw:120,sb:'frozen fillets keep the fish fresh for later in the week'}],
+  ['mackerel','Mackerel fillet',205,19,0,'fish',[],{u:'fillet',uw:80}],
+  ['smokedmack','Smoked mackerel',310,19,0,'fish',[],{u:'fillet',uw:75}],
+  ['sardines','Sardines in olive oil (tin, drained)',220,24,0,'tins',[],{u:'tin',uw:90}],
+  ['trout','Trout fillet',135,20,0,'fish',[],{u:'fillet',uw:120}],
+  ['bream','Sea bream fillet',100,20,0,'fish',[],{u:'fillet',uw:100}],
+  ['cod','Cod loin',80,18,0,'fish',[],{u:'loin',uw:125}],
+  ['prawns','Raw king prawns',65,15,0,'fish',[],{sb:'frozen raw king prawns are cheaper and keep'}],
+  ['tuna','Tuna in spring water (tin, drained)',110,25,0,'tins',[],{u:'tin',uw:110}],
+  // meat
+  ['chicken','Chicken breast',106,24,0,'meat',[],{u:'breast',uw:150}],
+  ['thigh','Chicken thigh fillets, skinless',145,19,0,'meat',[]],
+  ['turkeymince','Turkey breast mince (2% fat)',105,23,0,'meat',[]],
+  ['beefmince','Beef mince (5% fat)',137,21,0,'meat',[]],
+  ['steak','Beef sirloin steak, trimmed',160,23,0,'meat',[]],
+  ['porkmince','Pork mince (5% fat)',125,21,0,'meat',[]],
+  // bakery
+  ['sourdough','Wholemeal sourdough',235,9.5,6,'bakery',['wheat'],{u:'slice',uw:40}],
+  ['rye','Dark rye bread',220,6,7,'bakery',['rye'],{u:'slice',uw:35}],
+  ['pitta','Wholemeal pitta',255,9,6,'bakery',['wheat'],{u:'pitta',uw:60}],
+  ['wrap','Wholemeal tortilla wrap',300,9,5,'bakery',['wheat'],{u:'wrap',uw:62}],
+  ['croissant','All-butter croissant',410,8,2,'bakery',[],{u:'croissant',uw:45}],
+  // pasta, rice, grains
+  ['pasta','Dried pasta',355,12.5,3,'dry',[]],
+  ['wwpasta','Wholewheat pasta',340,13.5,9,'dry',['wheat'],{sb:"Sainsbury's Wholewheat Penne or Fusilli"}],
+  ['lentilpasta','Red lentil penne',335,25,7,'dry',['redlentil'],{sb:"Sainsbury's Red Lentil Penne, 250g"}],
+  ['orzo','Orzo',355,12.5,3,'dry',[]],
+  ['brownrice','Brown basmati rice',350,8,3,'dry',['brownrice']],
+  ['quinoa','Quinoa',368,14,7,'dry',['quinoa']],
+  ['bulgur','Bulgur wheat',342,12,12,'dry',['wheat']],
+  ['barley','Pearl barley',352,10,15,'dry',['barley']],
+  ['spelt','Pearled spelt (farro)',340,14,10,'dry',['spelt']],
+  ['couscous','Wholewheat couscous',355,13,9,'dry',['wheat']],
+  ['oats','Porridge oats',375,11,9,'dry',['oats']],
+  ['grainpouch','Mixed grains pouch',167,6,4,'dry',['wheat','quinoa','barley','greenlentil','amaranth'],{u:'pouch',uw:250,sb:"Sainsbury's Gorgeous Grains (bulgur, quinoa, barley, lentils, amaranth)"}],
+  ['redlentils','Red lentils (dried)',320,24,8,'dry',['redlentil']],
+  ['soba','Soba noodles',335,14,4,'world',['buckwheat']],
+  ['wwnoodles','Wholewheat noodles',340,13,8,'world',['wheat']],
+  ['ricenoodles','Rice noodles',360,6,1,'world',[]],
+  ['cornflour','Cornflour',355,0.6,0.1,'baking',[],{pantry:1,sp:3}],
+  ['bakingpowder','Baking powder',50,0,0,'baking',[],{pantry:1,sp:4}],
+  // tins & jars
+  ['chickpeas','Chickpeas (tin, drained)',120,7.2,5,'tins',['chickpea'],{u:'tin',uw:240}],
+  ['butterbeans','Butter beans (tin, drained)',95,6.5,5,'tins',['butterbean'],{u:'tin',uw:235}],
+  ['cannellini','Cannellini beans (tin, drained)',95,7,6,'tins',['cannellini'],{u:'tin',uw:240}],
+  ['blackbeans','Black beans (tin, drained)',105,7,7,'tins',['blackbean'],{u:'tin',uw:240}],
+  ['kidneybeans','Kidney beans (tin, drained)',100,7,6,'tins',['kidneybean'],{u:'tin',uw:240}],
+  ['puy','Puy lentils (ready-cooked pouch)',140,9.5,5,'tins',['greenlentil'],{u:'pouch',uw:250}],
+  ['choptom','Chopped tomatoes',22,1.2,1,'tins',['tomato'],{u:'tin',uw:400}],
+  ['passata','Passata',30,1.3,1,'tins',['tomato']],
+  ['tompuree','Tomato purée',80,4.5,3,'tins',['tomato'],{sp:5}],
+  ['roastpep','Roasted red peppers (jar)',30,1,1.6,'tins',['redpepper']],
+  ['olives','Kalamata olives',145,1,3,'tins',['olive']],
+  ['capers','Capers',25,2,3,'tins',['caper'],{sp:4}],
+  ['pesto','Green pesto',420,5,2,'tins',['basil'],{sp:5}],
+  ['coconutmilk','Reduced-fat coconut milk',73,0.6,0,'world',['coconut'],{ml:1}],
+  ['stock','Stock (from cube or pot)',5,0.3,0,'tins',[],{ml:1,pantry:1}],
+  // frozen
+  ['berrymix','Frozen berry mix',40,1,4.5,'frozen',['blackberry','strawberry','blackcurrant','redcurrant'],{sb:'Stamford Street Co. Berry Mix: blackberry, strawberry, blackcurrant, redcurrant'}],
+  ['strawblue','Frozen strawberries & blueberries',45,0.8,2,'frozen',['strawberry','blueberry'],{sb:"Sainsbury's Frozen Strawberries & Blueberries, 360g"}],
+  ['frozmango','Frozen mango chunks',60,0.7,1.6,'frozen',['mango']],
+  ['frozcherry','Frozen dark cherries',60,1,2,'frozen',['cherry']],
+  ['frozpeach','Frozen peach & nectarine slices',40,0.9,1.5,'frozen',['peach'],{sb:"Sainsbury's Frozen Peach & Nectarine Slices, 450g"}],
+  ['peas','Frozen peas',66,5.5,5,'frozen',['pea']],
+  ['edamame','Frozen edamame beans',121,12,5,'frozen',['soya'],{sb:"Sainsbury's Edamame Beans, 500g"}],
+  ['broadbeans','Frozen broad beans',80,7.5,6,'frozen',['broadbean'],{sb:"Sainsbury's Broad Beans, 650g"}],
+  ['sweetcorn','Frozen sweetcorn',86,3.2,2.7,'frozen',['sweetcorn']],
+  ['stirfrymix','Frozen stir-fry vegetables',59,1.7,2.5,'frozen',['carrot','beansprout','broccoli','redpepper','yellowpepper','redonion','sweetcorn','waterchestnut'],{sb:"Sainsbury's Stir Fry Vegetables, 500g: eight veg in one bag"}],
+  ['ttdgreens','Chilli, ginger & soy stir-fry greens',72,3,3,'frozen',['pakchoi','broccoli','sugarsnap','soya','garlic','chilli','ginger'],{sb:"Sainsbury's Taste the Difference Chilli Ginger Soy Stir Fry Greens, 600g"}],
+  ['greensgrains','Greens & grains mix',117,5,4,'frozen',['quinoa','wheat','courgette','broccoli','pea','soya','kale','onion','greenlentil','mint','lemon'],{sb:"Sainsbury's Taste the Difference Greens & Grains Mix, 600g"}],
+  // produce
+  ['onion','Onion',36,1.2,1.4,'veg',['onion'],{u:'onion',uw:150,sb:"Sainsbury's frozen Chopped Onions skip the chopping"}],
+  ['redonion','Red onion',37,1.1,1.7,'veg',['redonion'],{u:'onion',uw:150}],
+  ['springonion','Spring onions',25,1.8,1.6,'veg',['springonion'],{u:'spring onion',uw:15}],
+  ['garlic','Garlic',98,7.9,4.1,'veg',['garlic'],{u:'clove',uw:5}],
+  ['ginger','Fresh ginger',80,1.8,2,'veg',['ginger'],{sp:3}],
+  ['chilli','Fresh red chilli',40,2,1.5,'veg',['chilli'],{u:'chilli',uw:10}],
+  ['leek','Leek',30,1.6,2.2,'veg',['leek'],{u:'leek',uw:200}],
+  ['celery','Celery',8,0.5,1.6,'veg',['celery'],{u:'stick',uw:40}],
+  ['carrot','Carrots',34,0.6,2.4,'veg',['carrot'],{u:'carrot',uw:80}],
+  ['redpepper','Red pepper',30,1,2,'veg',['redpepper'],{u:'pepper',uw:150}],
+  ['yellowpepper','Yellow pepper',27,1,1.7,'veg',['yellowpepper'],{u:'pepper',uw:150}],
+  ['courgette','Courgette',18,1.8,1.2,'veg',['courgette'],{u:'courgette',uw:250}],
+  ['aubergine','Aubergine',20,0.9,3,'veg',['aubergine'],{u:'aubergine',uw:300}],
+  ['tomato','Tomatoes',18,0.9,1.2,'veg',['tomato'],{u:'tomato',uw:85}],
+  ['cherrytom','Cherry tomatoes',20,0.9,1.5,'veg',['tomato']],
+  ['mushroom','Chestnut mushrooms',22,3.1,1,'veg',['mushroom']],
+  ['shiitake','Shiitake mushrooms',40,2.2,2.5,'veg',['shiitake']],
+  ['spinach','Baby spinach',25,2.8,2.2,'veg',['spinach']],
+  ['kale','Cavolo nero or kale',33,3,4,'veg',['kale']],
+  ['broccoli','Broccoli or Tenderstem',34,3.7,2.6,'veg',['broccoli']],
+  ['cauli','Cauliflower',30,2.4,2,'veg',['cauliflower']],
+  ['redcabbage','Red cabbage',25,1.4,2.5,'veg',['redcabbage']],
+  ['pakchoi','Pak choi',13,1.5,1,'veg',['pakchoi'],{u:'head',uw:120}],
+  ['greenbeans','Green beans',25,1.8,3,'veg',['greenbean']],
+  ['fennel','Fennel',30,1.2,3,'veg',['fennel'],{u:'bulb',uw:250}],
+  ['squash','Butternut squash',40,1,2,'veg',['squash']],
+  ['sweetpotato','Sweet potato',86,1.6,3,'veg',['sweetpotato']],
+  ['potato','New potatoes',70,1.7,1.4,'veg',['potato']],
+  ['cucumber','Cucumber',12,0.7,0.6,'veg',['cucumber']],
+  ['rocket','Rocket',25,2.6,1.6,'veg',['rocket']],
+  ['lettuce','Little Gem lettuce',15,1,1.3,'veg',['lettuce'],{u:'head',uw:90}],
+  ['watercress','Watercress',22,3,1.5,'veg',['watercress']],
+  ['beansprouts','Beansprouts',30,3,1.5,'veg',['beansprout']],
+  ['beetroot','Cooked beetroot (not in vinegar)',45,1.7,2,'veg',['beetroot']],
+  ['avocado','Avocado',180,1.9,6.7,'veg',['avocado'],{u:'avocado',uw:120}],
+  ['apple','Apples',50,0.4,2.2,'veg',['apple'],{u:'apple',uw:150}],
+  ['pear','Pears',45,0.3,3,'veg',['pear'],{u:'pear',uw:160}],
+  ['banana','Bananas',95,1.2,2.6,'veg',['banana'],{u:'banana',uw:110}],
+  ['blueberries','Blueberries',57,0.7,2.4,'veg',['blueberry']],
+  ['raspberries','Raspberries',32,1.3,6.5,'veg',['raspberry']],
+  ['strawberries','Strawberries',32,0.7,2,'veg',['strawberry']],
+  ['kiwi','Kiwi',61,1.1,3,'veg',['kiwi'],{u:'kiwi',uw:75}],
+  ['orange','Oranges',40,1,2,'veg',['orange'],{u:'orange',uw:130}],
+  ['clementine','Clementines',40,0.9,1.3,'veg',['clementine'],{u:'clementine',uw:60}],
+  ['lemon','Lemons',25,0.5,1,'veg',['lemon'],{u:'lemon',uw:80}],
+  ['lime','Limes',25,0.5,1,'veg',['lime'],{u:'lime',uw:60}],
+  ['pomegranate','Pomegranate seeds',80,1.7,4,'veg',['pomegranate']],
+  ['basil','Fresh basil',23,3,1.6,'veg',['basil']],
+  ['parsley','Fresh flat-leaf parsley',36,3,3.3,'veg',['parsley']],
+  ['coriander','Fresh coriander',23,2,2.8,'veg',['corianderleaf']],
+  ['mint','Fresh mint',44,3.8,6.8,'veg',['mint']],
+  ['dill','Fresh dill',43,3.5,2.1,'veg',['dill']],
+  ['chives','Chives',30,3,2.5,'veg',['chives']],
+  ['rosemary','Fresh rosemary',130,3,14,'veg',['rosemary']],
+  // nuts, seeds, dried fruit
+  ['mixednuts','Unsalted mixed nuts',653,21.4,5.7,'nuts',['almond','peanut','walnut','hazelnut'],{sb:"Sainsbury's Unsalted Mixed Nuts: almonds, peanuts, walnuts, hazelnuts"}],
+  ['seedmix','Four-seed mix',614,26.7,10.3,'nuts',['pumpkinseed','sunflowerseed','sesame','linseed'],{sp:4,sb:"Sainsbury's Seed Mix: pumpkin, sunflower, sesame, linseed"}],
+  ['groundalm','Ground almonds',620,21,7,'baking',['almond']],
+  ['almonds','Almonds',600,21,10,'nuts',['almond']],
+  ['walnuts','Walnuts',690,15,6,'nuts',['walnut']],
+  ['cashews','Cashews',573,18,3,'nuts',['cashew']],
+  ['peanuts','Unsalted peanuts',590,26,8,'nuts',['peanut']],
+  ['pistachios','Shelled pistachios',590,20,10,'nuts',['pistachio']],
+  ['pinenuts','Pine nuts',690,14,4,'nuts',['pinenut']],
+  ['pb','Peanut butter (100% nuts)',610,25,7,'nuts',['peanut'],{sp:5}],
+  ['tahini','Tahini',600,17,9,'world',['sesame'],{sp:5}],
+  ['chia','Chia seeds',486,17,34,'nuts',['chia'],{sp:4}],
+  ['sesame','Sesame seeds',600,18,8,'nuts',['sesame'],{sp:3}],
+  ['dates','Medjool dates',280,2,7,'nuts',['date'],{u:'date',uw:20}],
+  ['apricots','Dried apricots',180,3.4,6,'nuts',['apricot']],
+  ['darkchoc','Dark chocolate, 85%',600,10,12,'baking',['cacao']],
+  ['cocoa','Cocoa powder',350,21,30,'baking',['cacao'],{sp:3}],
+  ['matcha','Matcha powder',300,30,35,'world',['tea'],{sp:2,sb:'plain matcha, not a sweetened latte mix'}],
+  ['erythritol','Erythritol',0,0,0,'baking',[],{sp:4,pantry:1}],
+  ['vanilla','Vanilla extract',290,0,0,'baking',['vanilla'],{sp:5,pantry:1}],
+  ['espresso','Espresso or strong coffee',2,0.1,0,'drinks',[],{ml:1,pantry:1}],
+  // cupboard: oils, sauces, spices
+  ['oil','Extra virgin olive oil',824,0,0,'oils',[],{sp:4.5,pantry:1}],
+  ['sesameoil','Toasted sesame oil',824,0,0,'oils',[],{sp:4.5,pantry:1}],
+  ['soy','Reduced-salt soy sauce',60,8,0,'world',[],{sp:5,pantry:1}],
+  ['fishsauce','Fish sauce',35,5,0,'world',[],{sp:5,pantry:1}],
+  ['ricevin','Rice vinegar',20,0,0,'world',[],{sp:5,pantry:1}],
+  ['balsamic','Balsamic vinegar',90,0.5,0,'oils',[],{sp:5,pantry:1}],
+  ['rwvin','Red wine vinegar',20,0,0,'oils',[],{sp:5,pantry:1}],
+  ['dijon','Dijon mustard',150,7,3,'oils',[],{sp:5,pantry:1}],
+  ['horseradish','Hot horseradish',100,1.5,2,'oils',['horseradish'],{sp:5,pantry:1}],
+  ['gochujang','Gochujang',220,5,2,'world',['chilli'],{sp:6,pantry:1}],
+  ['harissa','Rose harissa',120,2,3,'world',['chilli'],{sp:5,pantry:1}],
+  ['thaipaste','Thai red curry paste',120,2,4,'world',['lemongrass','chilli'],{sp:5,pantry:1}],
+  ['greenpaste','Thai green curry paste',120,2,4,'world',['lemongrass','chilli'],{sp:5,pantry:1}],
+  ['smokedpap','Smoked paprika',290,14,35,'spices',['paprika'],{sp:2,pantry:1}],
+  ['cajun','Cajun seasoning',300,10,20,'spices',['paprika','cumin'],{sp:2,pantry:1}],
+  ['cumin','Ground cumin',375,18,11,'spices',['cumin'],{sp:2,pantry:1}],
+  ['groundcor','Ground coriander',300,12,40,'spices',['corianderseed'],{sp:2,pantry:1}],
+  ['turmeric','Ground turmeric',310,10,21,'spices',['turmeric'],{sp:3,pantry:1}],
+  ['garam','Garam masala',380,15,15,'spices',['garammasala'],{sp:2,pantry:1}],
+  ['curry','Medium curry powder',320,13,30,'spices',['curry'],{sp:2,pantry:1}],
+  ['chilliflakes','Chilli flakes',300,12,30,'spices',['chilli'],{sp:1.5,pantry:1}],
+  ['cinnamon','Ground cinnamon',250,4,50,'spices',['cinnamon'],{sp:2.5,pantry:1}],
+  ['nutmeg','Ground nutmeg',525,6,20,'spices',['nutmeg'],{sp:2,pantry:1}],
+  ['cardamom','Ground cardamom',310,11,28,'spices',['cardamom'],{sp:2,pantry:1}],
+  ['fennelseed','Fennel seeds',345,16,40,'spices',['fennelseed'],{sp:2,pantry:1}],
+  ['oregano','Dried oregano',265,9,42,'spices',['oregano'],{sp:1,pantry:1}],
+  ['thyme','Dried thyme',275,9,37,'spices',['thyme'],{sp:1,pantry:1}],
+  ['bay','Bay leaves',310,8,26,'spices',['bayleaf'],{u:'leaf',uw:0.3,pantry:1}],
+  ['sumac','Sumac',240,5,20,'spices',['sumac'],{sp:2,pantry:1}],
+  ['zaatar',"Za'atar",300,10,25,'spices',['zaatar'],{sp:2,pantry:1}],
+  ['rasel','Ras el hanout',320,12,30,'spices',['rasel'],{sp:2,pantry:1}]
+];
+
+/* Recipe rows: [id, name, slots, meta, 'ingredient grams, …', 'step|step|…']
+   slots: b breakfast · l lunch · s snack · d dinner · p pudding
+   meta: c cuisine · t minutes · g tags · fr fridge days · fz freezes · prep batch-cookable · treat (never auto-picked) · n note · mk portions a batch makes */
+const RECIPE_ROWS = [
+// ───────── BREAKFASTS (the latte is logged separately)
+['b_matcha','Matcha chia yoghurt pots','b',{c:'Breakfast pot',t:10,g:'quick',fr:4,prep:1},
+ 'fage0 130, chia 10, milk 30, matcha 2, erythritol 6, vanilla 1, kiwi 45',
+ 'Whisk the matcha with a splash of the milk until there are no lumps.|Stir in the yoghurt, the rest of the milk, chia, erythritol and vanilla.|Spoon into jars, lid and chill overnight.|Slice the kiwi over the top on the day.'],
+['b_kefiroats','Berry kefir overnight oats','b',{c:'Breakfast pot',t:5,g:'quick',fr:3,prep:1},
+ 'oats 20, kefir 100, fage0 40, berrymix 50, chia 5, cinnamon 0.5',
+ 'Mix the oats, chia and cinnamon with the kefir and yoghurt.|Spoon into jars with the frozen berries on top; they thaw overnight.|Keeps 3 days in the fridge.'],
+['b_eggmuffin','Spinach, pepper & feta egg muffins','b',{c:'Breakfast bake',t:30,g:'bake',fr:4,fz:1,prep:1,n:'Good with a spoon of kimchi on top for your fermented portion.'},
+ 'egg 100, spinach 25, redpepper 30, springonion 10, feta 12, smokedpap 0.5',
+ 'Heat the oven to 180°C fan and oil a muffin tin or use silicone cases.|Divide the chopped spinach, pepper, spring onion and crumbled feta between the holes.|Beat the eggs with the paprika and a pinch of salt, pour over and bake 18–20 min until set.|Cool on a rack. Two per breakfast; reheat 40 seconds in the microwave.'],
+['b_bakedoats','Blueberry & banana baked oats','b',{c:'Breakfast bake',t:35,g:'bake',fr:4,fz:1,prep:1},
+ 'oats 25, egg 25, milk 40, banana 30, blueberries 30, fage0 30, erythritol 3, cinnamon 0.5, bakingpowder 1',
+ 'Heat the oven to 180°C fan and line a small baking dish.|Mash the banana, then mix in the egg, milk, yoghurt, erythritol, cinnamon, baking powder and oats.|Fold through the blueberries, spread in the dish and bake 25 min until golden and set.|Cool, cut into squares, box them up.'],
+['b_pancakes','Banana oat pancakes with yoghurt','b',{c:'Breakfast bake',t:25,g:'',fr:3,fz:1,prep:1},
+ 'banana 40, egg 50, oats 15, cinnamon 0.5, fage0 50, strawblue 40',
+ 'Mash the banana well, then beat in the egg, oats and cinnamon. Rest 5 min.|Cook small pancakes in a lightly oiled non-stick pan, 2 min a side.|Cool and stack with baking paper between; they freeze well.|Reheat in the toaster or microwave, top with yoghurt and the fruit.'],
+['b_mangochia','Mango & coconut chia pots','b',{c:'Breakfast pot',t:5,g:'quick',fr:4,prep:1},
+ 'chia 15, coconutmilk 50, fage0 80, frozmango 50, lime 5',
+ 'Stir the chia into the coconut milk and yoghurt with the lime zest.|Spoon into jars with the frozen mango on top.|Chill overnight; the mango thaws as it sits.'],
+['b_bircher','Apple Bircher with kefir & seeds','b',{c:'Breakfast pot',t:5,g:'quick',fr:3,prep:1},
+ 'oats 18, apple 50, kefir 100, fage0 35, seedmix 4, cinnamon 0.5',
+ 'Grate the apple (skin on) straight into a bowl.|Mix with the oats, kefir, yoghurt and cinnamon.|Jar it up and chill overnight. Scatter the seeds on just before eating.'],
+['b_frittata','Courgette, pea & mint frittata squares','b',{c:'Breakfast bake',t:30,g:'bake',fr:4,fz:1,prep:1},
+ 'egg 100, courgette 40, peas 25, mint 2, parmesan 5, springonion 10',
+ 'Heat the oven to 180°C fan and line a small tin.|Grate the courgette and squeeze out the water. Mix with the peas, spring onion and mint.|Beat the eggs with the parmesan and some pepper, stir in the veg and pour into the tin.|Bake 20–22 min until just set. Cool and cut into squares.'],
+['b_chocpb','Chocolate peanut butter overnight oats','b',{c:'Breakfast pot',t:5,g:'quick',fr:3,prep:1},
+ 'oats 20, milk 60, fage0 60, cocoa 4, pb 6, erythritol 5, raspberries 30',
+ 'Whisk the cocoa and erythritol into the milk, then stir in the oats and yoghurt.|Spoon into jars and swirl the peanut butter through the top.|Chill overnight; add the raspberries on the day.'],
+['b_carrotcake','Carrot cake overnight oats','b',{c:'Breakfast pot',t:8,g:'quick',fr:3,prep:1},
+ 'oats 20, carrot 30, milk 50, fage0 60, walnuts 5, cinnamon 1, nutmeg 0.3, erythritol 5, vanilla 1',
+ 'Finely grate the carrot.|Mix with the oats, milk, yoghurt, spices, erythritol and vanilla.|Jar it, top with chopped walnuts and chill overnight.'],
+['b_tiramisu','Tiramisu breakfast pots','b',{c:'Breakfast pot',t:8,g:'quick',fr:3,prep:1},
+ 'fage0 120, oats 15, espresso 30, cocoa 3, erythritol 6, vanilla 1, darkchoc 5',
+ 'Pour the cooled espresso over the oats and leave 2 min to soak.|Beat the yoghurt with the erythritol and vanilla.|Layer the soaked oats and yoghurt in jars, dust with cocoa and grate over the chocolate.|Chill overnight.'],
+['b_yogberry','Greek yoghurt, berries & seeds','b',{c:'Breakfast pot',t:2,g:'quick',fr:3,prep:1},
+ 'fage0 170, berrymix 70, seedmix 6',
+ 'Spoon the yoghurt into jars with the frozen berries on top.|Add the seeds on the day so they stay crunchy.'],
+['b_cottage','Cottage cheese & tomato rye toast','b',{c:'Breakfast',t:5,g:'quick'},
+ 'rye 35, cottage 80, cherrytom 50, springonion 5, seedmix 3',
+ 'Toast the rye.|Top with cottage cheese, halved tomatoes, spring onion, seeds and black pepper.'],
+['b_kimchieggs','Kimchi scrambled eggs on rye','b',{c:'Breakfast',t:8,g:'quick'},
+ 'egg 100, rye 35, kimchi 30, springonion 5',
+ 'Toast the rye.|Scramble the eggs gently in a non-stick pan.|Pile onto the toast and top with cold kimchi and spring onion.'],
+['b_croissant','Croissant & clementine','b',{c:'Breakfast',t:2,g:'quick',treat:1},
+ 'croissant 45, clementine 60',
+ 'Warm the croissant in the oven for 3 min if you like.'],
+
+// ───────── LUNCHES (batch-prepped unless marked fresh)
+['l_harissachick','Harissa chicken & chickpea traybake with bulgur','l',{c:'North African',t:40,g:'tray grain',fr:4,fz:1,prep:1},
+ 'chicken 120, chickpeas 70, redpepper 80, courgette 80, redonion 40, harissa 12, oil 5, bulgur 35, fage0 40, parsley 3, lemon 10',
+ 'Heat the oven to 200°C fan. Toss the chicken, chickpeas and chopped veg with the harissa, oil and salt on a big tray.|Roast 25–30 min, turning once, until the chicken is cooked through.|Meanwhile cover the bulgur with boiling water (about double its volume), cover for 15 min, then fluff with lemon and parsley.|Box the bulgur and traybake together; keep the yoghurt in a small pot to add after reheating.'],
+['l_prawnbean','Prawn, butter bean & roasted veg bowl','l',{c:'Mediterranean',t:35,g:'tray pasta',fr:3,prep:1,n:'Cheddar works fine in place of feta here.'},
+ 'prawns 120, butterbeans 100, cherrytom 80, courgette 80, redonion 40, cheddar 15, oil 6, spinach 30, orzo 40, pesto 8, lemon 10',
+ 'Heat the oven to 200°C fan. Roast the courgette, onion and tomatoes with the oil for 20 min.|Add the prawns and butter beans to the tray and roast 6–8 min more until the prawns are pink.|Cook the orzo, drain and stir through the pesto, lemon and spinach so it wilts.|Combine, top with the grated cheddar and box up. Prawns: eat within 3 days.'],
+['l_turkeychilli','Turkey & black bean chilli with brown rice','l',{c:'Mexican',t:45,g:'onepot rice',fz:1,prep:1},
+ 'turkeymince 110, blackbeans 70, kidneybeans 40, choptom 130, redpepper 60, onion 50, sweetcorn 30, garlic 5, cumin 2, smokedpap 2, chilliflakes 0.5, oil 4, brownrice 40, fage0 30, coriander 3',
+ 'Soften the onion and pepper in the oil in a big pan, 8 min. Add the garlic and spices for 1 min.|Brown the turkey mince, then add the tomatoes, beans and sweetcorn. Simmer 20 min until thick.|Cook the rice, then spread it out to cool fast (within an hour).|Box rice and chilli together. Yoghurt and coriander go on after reheating.'],
+['l_lemonorzo','Lemony chicken orzo with spinach & peas','ld',{c:'Greek',t:30,g:'onepot pasta',fr:4,fz:1,prep:1},
+ 'chicken 120, orzo 55, peas 50, spinach 40, onion 40, garlic 5, stock 200, lemon 15, parmesan 10, oil 4, dill 3',
+ 'Brown the diced chicken in the oil in a deep pan, then lift out.|Soften the onion and garlic, add the orzo and stock, and simmer 8 min, stirring.|Return the chicken with the peas and cook 3 min more, then stir in the spinach, lemon zest and juice, parmesan and dill.|Loosen with a splash of water when reheating.'],
+['l_peanutsoba','Peanut chicken soba noodle salad','l',{c:'Japanese',t:25,g:'noodles salad',fr:3,prep:1},
+ 'chicken 110, soba 50, edamame 40, redcabbage 50, carrot 40, springonion 10, cucumber 40, pb 15, soy 10, lime 10, ricevin 5, ginger 3, chilliflakes 0.3, sesame 3',
+ 'Poach or pan-fry the chicken until cooked, then slice.|Cook the soba with the edamame for the last 2 min; rinse under cold water.|Whisk the peanut butter, soy, lime, vinegar, grated ginger and chilli with a splash of hot water.|Toss everything with the shredded veg, top with sesame. Eat cold.'],
+['l_dal','Chicken & red lentil dal with spinach','l',{c:'Indian',t:40,g:'onepot curry',fr:4,fz:1,prep:1},
+ 'thigh 100, redlentils 55, onion 50, choptom 100, spinach 50, garlic 5, ginger 5, turmeric 1, cumin 2, garam 2, oil 5, coconutmilk 40, coriander 3, fage0 40',
+ 'Fry the onion in the oil until golden, then the garlic, ginger and spices for 1 min.|Add the diced chicken, lentils, tomatoes, coconut milk and about 250ml water per portion.|Simmer 25 min, stirring, until the lentils collapse. Stir in the spinach.|Box up; add yoghurt and coriander after reheating.'],
+['l_shawarma','Chicken shawarma bulgur bowls with tahini yoghurt','l',{c:'Middle Eastern',t:35,g:'tray grain salad',fr:4,prep:1},
+ 'thigh 110, bulgur 40, cucumber 50, redcabbage 40, tomato 60, redonion 20, fage0 50, tahini 8, lemon 10, cumin 2, smokedpap 1, groundcor 1, cinnamon 0.3, garlic 4, oil 4, parsley 4',
+ 'Toss the chicken with the spices, garlic, half the lemon and the oil. Roast at 200°C fan for 22–25 min, then slice.|Soak the bulgur in boiling water for 15 min and fluff.|Chop the cucumber, cabbage, tomato and onion. Mix the yoghurt, tahini and remaining lemon.|Pack the salad and sauce separately from the chicken and bulgur so you can reheat just the warm part.'],
+['l_meatballorzo','Turkey meatballs in tomato orzo','ld',{c:'Italian',t:40,g:'onepot pasta',fr:4,fz:1,prep:1},
+ 'turkeymince 120, orzo 45, passata 150, onion 40, garlic 5, courgette 60, oregano 1, basil 3, parmesan 10, oil 4, kale 30',
+ 'Season the mince with oregano and roll into small meatballs. Brown in the oil in a deep pan.|Add the onion, garlic and diced courgette for 3 min, then the passata, orzo and 150ml water per portion.|Simmer 12 min, stirring so the orzo doesn\'t catch, adding the kale for the last 4.|Finish with parmesan and basil.'],
+['l_tunapasta','Tuna, white bean & roasted pepper pasta salad','l',{c:'Italian',t:20,g:'pasta salad',fr:3,prep:1},
+ 'tuna 100, wwpasta 60, cannellini 70, roastpep 60, cherrytom 60, rocket 20, redonion 15, olives 15, capers 5, oil 6, rwvin 5, basil 3',
+ 'Cook the pasta, drain and rinse under cold water.|Whisk the oil and vinegar with salt and pepper.|Toss with the beans, tuna, sliced peppers, tomatoes, onion, olives and capers.|Add the rocket and basil on the day so they stay fresh.'],
+['l_burrito','Chicken burrito bowl with sweet potato & black beans','l',{c:'Mexican',t:40,g:'tray rice',fz:1,prep:1},
+ 'chicken 110, brownrice 35, blackbeans 60, sweetpotato 80, sweetcorn 30, redpepper 50, redonion 20, lime 10, cumin 2, smokedpap 2, oil 5, fage0 30, coriander 3, chilliflakes 0.3',
+ 'Roast the cubed sweet potato, pepper and onion with half the oil and spices at 200°C fan for 25 min.|Pan-fry the spiced chicken in the rest of the oil and slice.|Cook the rice, cool it quickly, then mix with the beans, corn and lime.|Box up; yoghurt and coriander go on after reheating.'],
+['l_greencurry','Thai green chicken & veg curry with brown rice','ld',{c:'Thai',t:35,g:'onepot curry rice',fz:1,prep:1},
+ 'chicken 110, greenpaste 20, coconutmilk 80, greenbeans 50, courgette 50, peas 30, spinach 30, fishsauce 4, lime 8, brownrice 50, coriander 3, cashews 10',
+ 'Fry the curry paste in a dry pan for 1 min, then add the coconut milk and 50ml water per portion.|Add the sliced chicken and simmer 8 min, then the beans, courgette and peas for 4 min.|Stir in the spinach, fish sauce and lime.|Cook and quickly cool the rice. Top with cashews and coriander.'],
+['l_barleyrisotto','Chicken, mushroom & kale barley risotto','ld',{c:'Italian',t:50,g:'onepot grain',fr:4,fz:1,prep:1},
+ 'thigh 100, barley 55, mushroom 100, kale 40, onion 50, garlic 5, thyme 0.5, stock 300, parmesan 12, oil 5',
+ 'Brown the diced chicken and mushrooms in the oil, then add the onion, garlic and thyme for 3 min.|Stir in the barley and the stock. Simmer 35–40 min, stirring now and then, until tender.|Add the shredded kale for the last 5 min, then the parmesan.|Barley soaks up liquid; add a splash of water before reheating.'],
+['l_pestopasta','Pesto chicken pasta with broccoli & peas','ld',{c:'Italian',t:25,g:'pasta',fr:4,fz:1,prep:1},
+ 'chicken 110, wwpasta 65, broccoli 70, peas 40, pesto 15, fage0 30, lemon 5, parmesan 5',
+ 'Pan-fry the chicken and slice.|Boil the pasta, adding the broccoli and peas for the last 3 min.|Drain, keeping a splash of water. Stir in the pesto, yoghurt and lemon off the heat.|Toss with the chicken and parmesan.'],
+['l_turkeyragu','Turkey & lentil ragù with wholewheat spaghetti','l',{c:'Italian',t:45,g:'pasta onepot',fr:4,fz:1,prep:1},
+ 'turkeymince 80, puy 60, passata 120, onion 40, carrot 40, celery 30, garlic 5, oregano 0.5, wwpasta 60, parmesan 8, oil 4',
+ 'Finely chop the onion, carrot and celery and soften in the oil for 10 min.|Add the garlic and mince and brown, then the lentils, passata and oregano.|Simmer 20 min until rich.|Cook the pasta just short of al dente, toss with the sauce and box with parmesan.'],
+['l_gochujang','Gochujang chicken rice bowl with kimchi','l',{c:'Korean',t:35,g:'rice',fz:1,prep:1,n:'Pack the kimchi separately and add it cold; heating kills the live cultures.'},
+ 'thigh 110, brownrice 50, gochujang 12, soy 8, sesameoil 3, garlic 4, ginger 3, broccoli 60, carrot 40, edamame 30, springonion 10, kimchi 40, sesame 2',
+ 'Mix the gochujang, soy, sesame oil, garlic and ginger. Toss the chicken through it.|Roast at 200°C fan for 20 min, or pan-fry until sticky and cooked.|Steam the broccoli, carrot and edamame. Cook the rice and cool it quickly.|Box rice, chicken and veg; kimchi goes in its own pot.'],
+['l_nicoise','Niçoise-style tuna & new potato salad','l',{c:'French',t:25,g:'salad',fr:3,prep:1},
+ 'tuna 100, potato 150, greenbeans 70, egg 50, cherrytom 60, olives 15, lettuce 50, cannellini 60, dijon 5, rwvin 5, oil 7, chives 2',
+ 'Boil the potatoes 15 min, adding the green beans for the last 4. Boil the eggs 8 min.|Whisk the mustard, vinegar, oil and chives.|Toss the warm potatoes and beans in half the dressing so they soak it up.|Box with the tuna, beans, tomatoes, olives and halved egg; lettuce and the rest of the dressing on the day.'],
+['l_tikkatray','Chicken tikka traybake with chickpeas & cauliflower','l',{c:'Indian',t:40,g:'tray rice',fz:1,prep:1},
+ 'chicken 110, chickpeas 60, cauli 120, redonion 40, fage0 40, garam 2, turmeric 1, cumin 1, smokedpap 1, garlic 4, ginger 4, oil 6, spinach 30, coriander 3, brownrice 35',
+ 'Mix the yoghurt with the spices, garlic and ginger. Coat the chicken.|Toss the cauliflower, chickpeas and onion with the oil on a tray, add the chicken and roast at 200°C fan for 25 min.|Stir the spinach through the hot tray to wilt.|Cook and cool the rice quickly, then box up.'],
+['l_teriyakitofu','Teriyaki tofu & edamame noodles','ld',{c:'Japanese',t:30,g:'noodles',fr:4,prep:1},
+ 'tofu 150, wwnoodles 55, edamame 50, broccoli 60, redpepper 50, springonion 10, soy 15, ricevin 5, erythritol 5, ginger 4, garlic 4, cornflour 3, sesameoil 3, sesame 3',
+ 'Press the tofu with kitchen paper, cube it, toss in half the cornflour and fry in the sesame oil until crisp.|Mix the soy, vinegar, erythritol, ginger, garlic, the rest of the cornflour and 2 tbsp water.|Stir-fry the broccoli and pepper 3 min, add the sauce and tofu and toss until glossy.|Cook the noodles with the edamame, drain and toss everything together.'],
+['l_greekorzo','Greek chicken orzo with peppers, olives & feta','ld',{c:'Greek',t:30,g:'onepot pasta',fr:4,fz:1,prep:1},
+ 'chicken 110, orzo 50, redpepper 60, yellowpepper 40, redonion 30, cherrytom 60, olives 15, feta 20, oregano 1, lemon 10, garlic 4, stock 150, oil 4, spinach 30',
+ 'Brown the chicken in the oil, then add the onion, peppers and garlic for 4 min.|Add the orzo, oregano, tomatoes and stock and simmer 10 min, stirring.|Stir in the spinach, olives and lemon.|Crumble the feta over before boxing.'],
+['l_quinoapot','Mexican chicken & quinoa one-pot','ld',{c:'Mexican',t:35,g:'onepot grain',fr:4,fz:1,prep:1},
+ 'chicken 100, quinoa 45, blackbeans 50, choptom 100, sweetcorn 30, redpepper 50, onion 40, cumin 2, smokedpap 2, chilliflakes 0.5, stock 120, lime 10, avocado 30, coriander 3, oil 4',
+ 'Brown the diced chicken with the onion and pepper in the oil.|Add the spices, then the quinoa, tomatoes, beans, corn and stock.|Cover and simmer 18–20 min until the quinoa is cooked.|Finish with lime. Add avocado and coriander on the day.'],
+['l_leekstew','Chicken, leek & white bean stew with farro','l',{c:'French',t:50,g:'onepot grain',fr:4,fz:1,prep:1},
+ 'thigh 100, cannellini 70, leek 80, carrot 50, celery 30, kale 30, garlic 4, thyme 0.5, stock 200, spelt 45, dijon 5, oil 5',
+ 'Brown the chicken in the oil, then add the sliced leek, carrot and celery for 8 min.|Add the garlic, thyme, spelt and stock and simmer 25 min.|Stir in the beans, kale and mustard for 5 min more.|Thick and stew-like; add water when reheating if needed.'],
+['l_halloumilentil','Roast veg, halloumi & puy lentil salad','l',{c:'Middle Eastern',t:35,g:'tray salad',fr:4,prep:1},
+ 'halloumi 60, puy 100, squash 80, redonion 30, redpepper 60, rocket 20, pomegranate 20, mint 2, balsamic 8, oil 5, seedmix 8',
+ 'Roast the squash, onion and pepper with the oil at 200°C fan for 25 min.|Griddle or pan-fry the sliced halloumi until golden.|Mix the lentils with the balsamic and roast veg.|Box with the halloumi; rocket, pomegranate, mint and seeds go on the day. Good cold or warm.'],
+['l_cajun','Cajun chicken, sweet potato & slaw','l',{c:'American',t:35,g:'tray salad',fr:4,prep:1},
+ 'chicken 120, sweetpotato 150, cajun 3, oil 6, redcabbage 50, carrot 40, springonion 10, fage0 40, lime 8, sweetcorn 30, blackbeans 60',
+ 'Toss the sweet potato wedges in half the oil and seasoning and roast at 200°C fan for 30 min.|Coat the chicken in the rest and roast alongside for the last 20 min.|Shred the cabbage and carrot and mix with the yoghurt, lime, corn and beans for the slaw.|Pack the slaw separately.'],
+['l_moroccan','Moroccan turkey meatballs with chickpea couscous','ld',{c:'North African',t:40,g:'onepot grain',fr:4,fz:1,prep:1},
+ 'turkeymince 110, couscous 40, chickpeas 50, apricots 15, rasel 3, onion 30, garlic 4, choptom 120, spinach 30, mint 2, fage0 30, oil 4',
+ 'Mix the mince with half the ras el hanout and roll into meatballs. Brown in the oil.|Add the onion, garlic and the rest of the spice, then the tomatoes, chickpeas and chopped apricots. Simmer 15 min.|Stir in the spinach.|Pour boiling water over the couscous, cover 5 min, fluff. Yoghurt and mint on top.'],
+['l_friedrice','Chicken & veg egg-fried brown rice','ld',{c:'Chinese',t:30,g:'rice onepot',fz:1,prep:1},
+ 'chicken 90, brownrice 50, egg 50, peas 40, edamame 30, carrot 40, springonion 15, soy 12, sesameoil 4, garlic 4, ginger 3, beansprouts 40',
+ 'Cook the rice ahead and cool it fast. Cold rice fries best.|Stir-fry the diced chicken in the sesame oil, then the carrot, garlic and ginger.|Add the rice, peas and edamame and fry hard for 4 min. Push aside, scramble in the egg.|Toss through the beansprouts, soy and spring onion. Cool quickly before boxing.'],
+['l_smokystew','Smoky chicken, butter bean & pepper stew','ld',{c:'Spanish',t:45,g:'onepot',fr:4,fz:1,prep:1},
+ 'thigh 100, butterbeans 90, redpepper 60, yellowpepper 50, onion 50, choptom 120, smokedpap 3, garlic 4, oil 5, spinach 30, sourdough 40',
+ 'Brown the chicken in the oil, then soften the onion and peppers for 8 min.|Add the garlic and paprika for 1 min, then the tomatoes and beans.|Simmer 20 min until thick, then stir in the spinach.|Bread on the side, kept out of the box so it doesn\'t go soggy.'],
+['l_beefnoodles','Beef & broccoli wholewheat noodles','ld',{c:'Chinese',t:25,g:'noodles',fr:3,prep:1},
+ 'steak 100, wwnoodles 55, broccoli 80, redpepper 50, edamame 30, springonion 10, soy 12, garlic 4, ginger 4, cornflour 3, sesameoil 3, erythritol 3, chilliflakes 0.3',
+ 'Slice the steak thinly and toss in half the cornflour.|Mix the soy, erythritol, the rest of the cornflour and 3 tbsp water.|Sear the beef in the sesame oil in batches, then stir-fry the broccoli, pepper, garlic and ginger. Add the sauce and beef.|Toss with the cooked noodles and edamame.'],
+['l_squashsoup','Spiced squash, chickpea & lentil soup','ld',{c:'Moroccan',t:40,g:'soup onepot',fr:4,fz:1,prep:1},
+ 'squash 150, chickpeas 80, redlentils 30, onion 50, carrot 40, curry 3, stock 300, coconutmilk 40, spinach 30, fage0 50, seedmix 6, sourdough 40',
+ 'Soften the onion and carrot, then add the curry powder for 1 min.|Add the squash, lentils, chickpeas, coconut milk and stock. Simmer 25 min.|Mash roughly with a potato masher (no blender needed) and stir in the spinach.|Yoghurt and seeds on top, sourdough on the side.'],
+// fresh lunches (weekends)
+['l_avokimchi','Avocado, eggs & kimchi on sourdough','l',{c:'Brunch',t:10,g:'quick'},
+ 'sourdough 80, avocado 60, egg 100, kimchi 40, rocket 20, seedmix 5, chilliflakes 0.3, springonion 5',
+ 'Toast the sourdough and poach or fry the eggs.|Smash the avocado onto the toast with salt and chilli.|Top with the eggs, cold kimchi, spring onion and seeds. Rocket on the side.'],
+['l_shakshuka','Shakshuka with white beans & feta','ld',{c:'Middle Eastern',t:25,g:'onepot',fr:0},
+ 'egg 100, cannellini 80, choptom 200, redpepper 80, onion 50, garlic 4, cumin 1, smokedpap 1, oil 6, feta 20, parsley 3, sourdough 40',
+ 'Soften the onion and pepper in the oil in a frying pan, 8 min. Add the garlic and spices.|Tip in the tomatoes and beans and simmer 8 min until thick.|Make two wells, crack in the eggs, cover and cook 5–6 min.|Crumble over the feta and parsley; sourdough for dipping.'],
+['l_tunapitta','Smashed chickpea & tuna pittas','l',{c:'Mediterranean',t:10,g:'quick',fr:2},
+ 'tuna 80, chickpeas 60, fage0 30, lemon 10, redonion 15, cucumber 50, cherrytom 50, pitta 90, lettuce 30, dill 2, avocado 30',
+ 'Roughly mash the chickpeas with the tuna, yoghurt, lemon, dill and finely chopped onion.|Warm and split the pittas.|Stuff with the lettuce, filling, cucumber, tomato and sliced avocado.'],
+['l_misosoup','Miso noodle soup with tofu & egg','ld',{c:'Japanese',t:15,g:'soup noodles quick',n:'Stir the miso in off the boil to keep it live.'},
+ 'soba 50, miso 20, egg 50, tofu 80, pakchoi 100, shiitake 50, springonion 10, ginger 3, edamame 40, stock 400',
+ 'Boil the egg for 6.5 min, then cool and peel.|Simmer the stock with the ginger and sliced mushrooms for 5 min. Add the noodles, edamame and pak choi for 4 min.|Take off the heat, then whisk the miso into a ladle of broth and stir it back in.|Add the cubed tofu, halved egg and spring onion.'],
+['l_caesarwrap','Chicken Caesar-ish wrap','l',{c:'American',t:15,g:'quick',fr:2},
+ 'chicken 100, wrap 62, lettuce 60, parmesan 10, fage0 40, dijon 3, lemon 5, garlic 2, cherrytom 50, avocado 40',
+ 'Pan-fry the chicken and slice.|Mix the yoghurt, half the parmesan, mustard, lemon and grated garlic.|Fill the wrap with lettuce, chicken, tomatoes and avocado, drizzle the dressing and add the rest of the parmesan.'],
+
+// ───────── DINNERS · oily fish
+['d_salmonbeans','Salmon, cherry tomato & butter bean traybake','d',{c:'Italian',t:30,g:'tray'},
+ 'salmon 130, butterbeans 120, cherrytom 120, redonion 50, courgette 100, pesto 12, oil 5, lemon 10, rocket 20, basil 3, sourdough 40',
+ 'Heat the oven to 200°C fan. Roast the courgette, onion and tomatoes with the oil for 12 min.|Stir in the beans, sit the salmon on top, spread with pesto and roast 12–14 min.|Squeeze over the lemon and scatter the basil. Rocket and sourdough on the side.'],
+['d_misosalmon','Miso-glazed salmon with soba, pak choi & edamame','d',{c:'Japanese',t:25,g:'noodles'},
+ 'salmon 130, miso 10, soy 5, erythritol 3, ginger 3, soba 60, pakchoi 120, edamame 50, springonion 10, sesame 2, lime 5, chilliflakes 0.3',
+ 'Mix the miso, soy, erythritol and ginger. Spread over the salmon.|Grill or roast at 220°C fan for 10–12 min until caramelised.|Cook the soba, adding the edamame and pak choi for the last 2 min. Drain.|Top with the salmon, spring onion, sesame, lime and chilli.'],
+['d_harissasalmon','Harissa salmon with roast veg & bulgur','d',{c:'North African',t:35,g:'tray grain'},
+ 'salmon 130, harissa 12, redpepper 80, aubergine 100, redonion 40, chickpeas 50, bulgur 40, oil 5, fage0 40, mint 2, lemon 10',
+ 'Roast the aubergine, pepper, onion and chickpeas with the oil at 200°C fan for 15 min.|Spread the harissa over the salmon, add to the tray and roast 12 min more.|Soak the bulgur in boiling water for 15 min and fluff with lemon.|Serve with yoghurt and mint.'],
+['d_salmonpenne','Creamy salmon, spinach & lemon penne','d',{c:'Italian',t:20,g:'pasta onepot'},
+ 'salmon 120, wwpasta 70, spinach 60, peas 50, cremef 40, lemon 10, garlic 4, dill 3, parmesan 8, oil 3',
+ 'Boil the pasta, adding the peas for the last 3 min.|Meanwhile pan-fry the salmon skin-side down 4 min, flip for 2, then flake into chunks.|Soften the garlic in the pan, add the crème fraîche, lemon and a ladle of pasta water, then wilt in the spinach.|Toss in the pasta, peas and salmon. Finish with dill and parmesan.'],
+['d_teriyakisalmon','Teriyaki salmon rice bowl with kimchi','d',{c:'Japanese',t:30,g:'rice'},
+ 'salmon 130, brownrice 55, edamame 50, cucumber 50, springonion 10, soy 12, erythritol 5, ginger 3, garlic 3, ricevin 5, kimchi 40, sesame 2',
+ 'Cook the rice.|Simmer the soy, erythritol, ginger, garlic and vinegar for 2 min until syrupy.|Pan-fry the salmon 4 min skin-side down, 2 min on the other side, then spoon over the glaze.|Serve over rice with edamame, cucumber, spring onion, sesame and cold kimchi.'],
+['d_mackerelbeet','Mackerel with beetroot, puy lentils & horseradish yoghurt','d',{c:'British',t:20,g:'quick'},
+ 'mackerel 130, puy 125, beetroot 100, watercress 40, redonion 20, fage0 50, horseradish 8, dill 2, oil 4, lemon 10, walnuts 10',
+ 'Warm the lentils with half the oil, lemon and the finely sliced onion.|Pan-fry the mackerel skin-side down 3 min until crisp, then 1 min on the flesh side.|Mix the yoghurt with the horseradish and dill.|Plate the lentils with the beetroot wedges and watercress, top with the fish, yoghurt and walnuts.'],
+['d_sardinepasta','Sardine, lemon & chilli spaghetti with cavolo nero','d',{c:'Italian',t:20,g:'pasta quick'},
+ 'sardines 90, wwpasta 80, kale 80, garlic 8, chilliflakes 0.5, lemon 15, oil 6, capers 8, parsley 4, cherrytom 60, pinenuts 8',
+ 'Boil the pasta, adding the shredded cavolo nero for the last 4 min.|Gently fry the garlic, chilli and capers in the oil, add the halved tomatoes for 2 min.|Add the sardines in chunks with the lemon zest and juice.|Toss with the drained pasta and a splash of its water. Top with toasted pine nuts and parsley.'],
+['d_kedgeree','Smoked mackerel kedgeree','d',{c:'British-Indian',t:35,g:'onepot rice'},
+ 'smokedmack 75, brownrice 60, egg 50, peas 60, onion 50, curry 3, turmeric 1, spinach 40, parsley 3, lemon 10, fage0 30, oil 4',
+ 'Soften the onion in the oil, add the curry powder and turmeric for 1 min.|Add the rice and about 3 times its volume of water. Simmer covered 25 min.|Boil the egg for 7 min. Stir the peas and spinach into the rice for the last 3 min.|Fold in the flaked mackerel, top with the egg, parsley, lemon and yoghurt.'],
+['d_goancurry','Goan-style mackerel curry with brown rice','d',{c:'Indian',t:35,g:'curry rice'},
+ 'mackerel 120, coconutmilk 80, choptom 100, onion 50, garlic 4, ginger 4, turmeric 1, cumin 2, groundcor 2, chilliflakes 0.5, spinach 40, brownrice 45, oil 4, coriander 3, lime 5',
+ 'Start the rice.|Fry the onion in the oil until soft, then the garlic, ginger and spices for 1 min.|Add the tomatoes and coconut milk and simmer 10 min.|Lay the mackerel in, skin up, and poach 5 min. Stir in the spinach. Lime and coriander to finish.'],
+['d_sardinetoast','Sardines on sourdough with white bean & tomato salad','d',{c:'Spanish',t:15,g:'quick'},
+ 'sardines 90, sourdough 80, cherrytom 100, cannellini 80, rocket 30, redonion 20, oil 6, rwvin 5, basil 3, garlic 2, olives 15',
+ 'Toast the sourdough and rub with the cut garlic.|Toss the beans, halved tomatoes, sliced onion, olives and basil with the oil and vinegar.|Pile the sardines on the toast, with the salad and rocket alongside.'],
+['d_trout','Trout with crushed potatoes, peas & dill yoghurt','d',{c:'British',t:30,g:''},
+ 'trout 140, potato 250, peas 80, broadbeans 60, spinach 40, fage0 50, dill 3, lemon 10, butter 5, chives 2',
+ 'Boil the potatoes 15 min, adding the peas and broad beans for the last 3. Drain and crush with the butter.|Pan-fry the trout skin-side down 4 min, then 1 min on the other side.|Wilt the spinach in the hot pan.|Mix the yoghurt with dill, chives and lemon to serve.'],
+['d_salmonbroth','Thai salmon noodle broth','d',{c:'Thai',t:25,g:'soup noodles onepot'},
+ 'salmon 120, ricenoodles 50, coconutmilk 80, thaipaste 15, stock 300, pakchoi 100, mushroom 60, beansprouts 40, lime 10, fishsauce 5, coriander 3, chilli 5',
+ 'Fry the curry paste in a deep pan for 1 min, then add the stock and coconut milk.|Add the sliced mushrooms and simmer 5 min, then lower in the salmon in chunks and poach 5 min.|Add the noodles and pak choi for 3 min.|Season with fish sauce and lime; top with beansprouts, chilli and coriander.'],
+['d_salmongnocchi','Salmon & broccoli gnocchi traybake','d',{c:'Italian',t:30,g:'tray'},
+ 'salmon 120, gnocchi 160, broccoli 100, cherrytom 80, redonion 30, pesto 10, oil 5, lemon 10, parmesan 8',
+ 'Heat the oven to 210°C fan. Toss the gnocchi, broccoli, onion and tomatoes in the oil and roast 15 min.|Nestle in the salmon, spread with pesto and roast 12 min more.|Finish with lemon and parmesan.'],
+['d_sardineorzo','Sardine puttanesca orzo','d',{c:'Italian',t:25,g:'onepot pasta'},
+ 'sardines 90, orzo 70, passata 150, olives 20, capers 8, garlic 6, chilliflakes 0.5, oregano 0.5, spinach 50, parsley 3, oil 4',
+ 'Fry the garlic, chilli and capers in the oil for 1 min.|Add the passata, orzo, oregano and 200ml water. Simmer 10 min, stirring.|Stir in the olives, spinach and sardines in chunks and warm through.|Parsley on top.'],
+['d_mackerelfennel','Mackerel, fennel & orange traybake','d',{c:'Mediterranean',t:40,g:'tray'},
+ 'mackerel 130, potato 200, fennel 120, redonion 40, orange 80, olives 15, oil 5, thyme 0.5, rocket 20, cannellini 60',
+ 'Roast the halved potatoes, sliced fennel and onion with the oil and thyme at 200°C fan for 25 min.|Add the beans, orange slices and olives, lay the mackerel on top and roast 8–10 min.|Serve with rocket.'],
+['d_gochujangsalmon','Sticky gochujang salmon with sesame greens','d',{c:'Korean',t:25,g:'rice'},
+ 'salmon 130, gochujang 12, soy 6, erythritol 3, brownrice 50, ttdgreens 150, sesame 2, springonion 10',
+ 'Cook the rice.|Mix the gochujang, soy and erythritol, brush over the salmon and roast at 220°C fan for 10–12 min.|Stir-fry the greens from frozen for 6–8 min.|Serve with sesame and spring onion.'],
+['d_trouttikka','Trout tikka with spiced chickpeas & raita','d',{c:'Indian',t:30,g:''},
+ 'trout 140, fage0 60, garam 2, turmeric 1, chickpeas 100, choptom 80, onion 40, spinach 40, cumin 1, oil 5, cucumber 50, mint 2, lemon 10, pitta 60',
+ 'Coat the trout in half the yoghurt with the garam masala and turmeric. Grill 8–10 min.|Fry the onion and cumin in the oil, add the chickpeas and tomatoes and simmer 8 min, then wilt in the spinach.|Grate the cucumber into the rest of the yoghurt with mint and lemon.|Serve with warm pitta.'],
+// ───────── DINNERS · everything else
+['d_prawnarrabbiata','Prawn arrabbiata with red lentil penne','d',{c:'Italian',t:20,g:'pasta quick'},
+ 'prawns 150, lentilpasta 90, passata 150, cherrytom 60, garlic 6, chilliflakes 1, basil 4, oil 6, spinach 40, parmesan 10',
+ 'Boil the pasta (lentil pasta cooks fast, so check it early).|Fry the garlic and chilli in the oil, add the passata and halved tomatoes and simmer 8 min.|Add the prawns for 3 min until pink, then the spinach.|Toss with the pasta, basil and parmesan.'],
+['d_chickenorzo','One-pot chicken, mushroom & spinach orzo','d',{c:'Italian',t:30,g:'onepot pasta'},
+ 'chicken 130, orzo 70, mushroom 120, spinach 60, onion 50, garlic 5, thyme 0.5, stock 250, cremef 30, parmesan 10, oil 5',
+ 'Brown the chicken pieces in the oil, then add the mushrooms until golden.|Add the onion, garlic and thyme for 3 min, then the orzo and stock.|Simmer 10 min, stirring, until the orzo is tender.|Stir through the spinach, crème fraîche and parmesan.'],
+['d_turkeyragu','Turkey ragù with wholewheat spaghetti','d',{c:'Italian',t:40,g:'pasta onepot'},
+ 'turkeymince 130, wwpasta 80, passata 150, onion 50, carrot 50, celery 40, garlic 5, oregano 0.5, basil 3, parmesan 10, oil 5, redlentils 15',
+ 'Soften the finely chopped onion, carrot and celery in the oil, 10 min.|Brown the mince with the garlic, then add the passata, lentils, oregano and 100ml water.|Simmer 20 min.|Toss with the spaghetti, basil and parmesan.'],
+['d_beefragu','Beef ragù with pappardelle','d',{c:'Italian',t:60,g:'pasta onepot'},
+ 'beefmince 120, pasta 80, choptom 150, onion 50, carrot 50, celery 30, garlic 5, rosemary 1, bay 0.3, stock 100, parmesan 10, oil 4',
+ 'Soften the onion, carrot and celery in the oil for 10 min.|Brown the mince well, then add the garlic, rosemary, bay, tomatoes and stock.|Simmer gently 40 min, lid ajar.|Toss with the pappardelle and parmesan. Makes a good batch to freeze.'],
+['d_beefbroccoli','Ginger beef & broccoli rice noodles','d',{c:'Chinese',t:25,g:'noodles'},
+ 'steak 120, ricenoodles 60, broccoli 100, redpepper 60, springonion 15, soy 15, ginger 6, garlic 5, cornflour 4, sesameoil 4, erythritol 4, chilli 5, cashews 10',
+ 'Slice the steak thin and toss with half the cornflour.|Mix the soy, erythritol, the rest of the cornflour and 3 tbsp water.|Sear the beef in the sesame oil, lift out, then stir-fry the veg, ginger, garlic and chilli.|Return the beef with the sauce and soaked noodles; toss and top with cashews.'],
+['d_porkfennel','Pork & fennel ragù with rigatoni','d',{c:'Italian',t:40,g:'pasta onepot'},
+ 'porkmince 120, wwpasta 80, passata 150, fennel 80, onion 40, garlic 5, fennelseed 1.5, chilliflakes 0.5, parmesan 10, oil 4, kale 40',
+ 'Brown the pork in the oil with the crushed fennel seeds and chilli.|Add the sliced fennel, onion and garlic for 6 min.|Add the passata and simmer 15 min, adding the kale for the last 5.|Toss with the rigatoni and parmesan.'],
+['d_steak','Steak with salsa verde, sweet potato & greens','d',{c:'British',t:35,g:'tray'},
+ 'steak 160, sweetpotato 200, broccoli 100, spinach 50, parsley 8, capers 5, dijon 3, oil 8, lemon 5, garlic 2',
+ 'Roast the sweet potato wedges with a little of the oil at 200°C fan for 30 min.|Chop the parsley, capers and garlic and mix with the mustard, lemon and most of the oil.|Sear the steak 2–3 min a side and rest 5 min.|Steam the broccoli and wilt the spinach. Spoon the salsa verde over the sliced steak.'],
+['d_padthai','Chicken pad Thai','d',{c:'Thai',t:25,g:'noodles'},
+ 'chicken 120, ricenoodles 65, egg 50, beansprouts 60, springonion 15, carrot 40, peanuts 15, fishsauce 8, lime 15, erythritol 5, chilliflakes 0.5, soy 5, oil 5, coriander 3',
+ 'Soak the noodles in boiling water for 5 min and drain.|Mix the fish sauce, lime, erythritol, soy and chilli.|Stir-fry the chicken in the oil, add the carrot, push aside and scramble the egg.|Add the noodles, sauce and beansprouts and toss 2 min. Top with peanuts, spring onion and coriander.'],
+['d_prawnrice','Prawn & veg egg-fried rice','d',{c:'Chinese',t:20,g:'rice onepot quick'},
+ 'prawns 150, brownrice 65, egg 50, peas 60, stirfrymix 120, soy 12, sesameoil 5, garlic 4, ginger 4, springonion 15, chilli 5',
+ 'Use rice cooked earlier and chilled, or a cooked brown rice pouch.|Stir-fry the frozen veg in the sesame oil with the garlic, ginger and chilli for 4 min.|Add the prawns until pink, then the rice and peas, and fry hard.|Scramble in the egg, then add the soy and spring onion.'],
+['d_laksa','Chicken laksa-style noodle soup','d',{c:'Malaysian',t:25,g:'soup noodles onepot'},
+ 'chicken 120, ricenoodles 50, coconutmilk 100, thaipaste 20, stock 300, beansprouts 50, pakchoi 80, springonion 10, lime 10, fishsauce 5, coriander 3, chilli 5, egg 50',
+ 'Fry the paste in a deep pan for 1 min, add the stock and coconut milk and bring to a simmer.|Poach the sliced chicken for 8 min. Boil the egg for 7 min.|Add the noodles and pak choi for 3 min.|Season with fish sauce and lime; top with the halved egg, beansprouts, chilli and herbs.'],
+['d_tofucurry','Tofu & veg red Thai curry','d',{c:'Thai',t:30,g:'curry rice'},
+ 'tofu 180, thaipaste 20, coconutmilk 100, redpepper 70, greenbeans 60, aubergine 80, spinach 40, soy 5, lime 10, basil 3, brownrice 50',
+ 'Start the rice. Cube the tofu and pan-fry until golden, then lift out.|Fry the paste 1 min, add the coconut milk and 100ml water.|Simmer the aubergine 8 min, then the pepper and beans for 4.|Return the tofu, wilt in the spinach, finish with soy, lime and basil.'],
+['d_sweetpotatocurry','Sweet potato, chickpea & spinach curry','d',{c:'Indian',t:35,g:'curry onepot'},
+ 'sweetpotato 150, chickpeas 120, choptom 150, onion 60, coconutmilk 60, curry 4, garam 1, ginger 4, garlic 4, spinach 60, oil 5, fage0 80, cucumber 40, mint 2, pitta 60',
+ 'Soften the onion in the oil, add the ginger, garlic and spices for 1 min.|Add the cubed sweet potato, chickpeas, tomatoes and coconut milk. Simmer 20 min until tender.|Stir in the spinach.|Grate the cucumber into the yoghurt with mint for raita. Pitta on the side.'],
+['d_fajita','Chicken fajita traybake with black beans','d',{c:'Mexican',t:30,g:'tray'},
+ 'chicken 130, redpepper 80, yellowpepper 70, redonion 60, blackbeans 80, cumin 2, smokedpap 3, oil 6, wrap 62, fage0 40, avocado 40, lime 10, coriander 3',
+ 'Heat the oven to 210°C fan. Toss the sliced chicken, peppers and onion with the spices and oil.|Roast 20 min, adding the beans for the last 5.|Warm the wrap.|Fill with the traybake, yoghurt, avocado, lime and coriander.'],
+['d_turkeychilli','Turkey chilli with avocado & yoghurt','d',{c:'Mexican',t:40,g:'onepot rice'},
+ 'turkeymince 130, kidneybeans 80, blackbeans 50, choptom 200, redpepper 70, onion 60, garlic 5, cumin 2, smokedpap 3, chilliflakes 0.5, cocoa 2, oil 5, fage0 40, avocado 50, coriander 3, lime 5, brownrice 30',
+ 'Soften the onion and pepper in the oil, then add the garlic and spices.|Brown the mince, then add the tomatoes, beans and cocoa. Simmer 25 min.|Cook the rice.|Serve with avocado, yoghurt, lime and coriander.'],
+['d_cassoulet','Chicken & white bean cassoulet','d',{c:'French',t:50,g:'onepot'},
+ 'thigh 130, cannellini 120, choptom 150, onion 60, carrot 50, celery 30, garlic 6, thyme 0.5, smokedpap 2, stock 100, kale 50, sourdough 30, parsley 3, oil 5',
+ 'Brown the chicken in an ovenproof pan, then soften the onion, carrot and celery.|Add the garlic, thyme, paprika, tomatoes, stock and beans. Simmer 20 min.|Stir in the kale, scatter over the sourdough torn into crumbs and bake at 200°C fan for 15 min until crisp.|Parsley to finish.'],
+['d_codolives','Cod with tomatoes, olives & butter beans','d',{c:'Spanish',t:25,g:'onepot'},
+ 'cod 150, butterbeans 120, cherrytom 150, redonion 40, olives 20, capers 5, garlic 4, oil 8, basil 4, spinach 50, sourdough 60',
+ 'Soften the onion and garlic in the oil in a lidded frying pan.|Add the tomatoes, beans, olives and capers and cook 8 min until the tomatoes burst.|Sit the cod on top, cover and cook 8 min until it flakes.|Wilt the spinach around it, scatter the basil and serve with sourdough.'],
+['d_bream','Sea bream with roast broccoli, new potatoes & salsa verde','d',{c:'Mediterranean',t:40,g:'tray',n:'The flesh side needs less time than the skin side. Give the broccoli the full 25 min, not 15.'},
+ 'bream 200, potato 220, broccoli 120, cannellini 80, almonds 8, parsley 6, basil 3, capers 5, lemon 10, oil 10, garlic 2, dijon 3',
+ 'Heat the oven to 200°C fan. Roast the halved potatoes and broccoli with a little of the oil for 25 min, adding the beans for the last 5.|Chop the herbs, capers and garlic and mix with the mustard, lemon and most of the oil.|Pan-fry the bream skin-side down 3 min until crisp, then just 1 min on the flesh side.|Serve with the salsa verde and chopped almonds.'],
+['d_barlotto','Prawn, pea & lemon barley risotto','d',{c:'Italian',t:45,g:'onepot grain'},
+ 'prawns 150, barley 70, peas 70, onion 50, garlic 5, stock 350, lemon 15, parmesan 12, spinach 40, oil 5, cremef 20',
+ 'Soften the onion and garlic in the oil, add the barley and stir 1 min.|Add the stock and simmer 35–40 min, stirring now and then, adding water if it dries.|Add the prawns and peas for 4 min, then the spinach.|Stir in the lemon, crème fraîche and parmesan.'],
+['d_gnocchibake','Chicken, tomato & mozzarella gnocchi bake','d',{c:'Italian',t:30,g:'bake onepot'},
+ 'chicken 120, gnocchi 180, cherrytom 120, passata 100, mozz 50, spinach 50, basil 4, garlic 4, oil 4',
+ 'Brown the chicken pieces in the oil in an ovenproof pan.|Add the garlic, tomatoes, passata and gnocchi and simmer 5 min, then stir in the spinach.|Tear over the mozzarella and grill 5–6 min until bubbling.|Scatter with basil.'],
+['d_pestognocchi','Pesto gnocchi with prawns & peas','d',{c:'Italian',t:15,g:'onepot quick'},
+ 'prawns 140, gnocchi 180, peas 70, pesto 15, courgette 80, lemon 10, parmesan 8, rocket 20, pinenuts 8',
+ 'Pan-fry the gnocchi in a dry non-stick pan until golden, about 8 min.|Add the diced courgette and peas for 3 min, then the prawns until pink.|Take off the heat and stir through the pesto and lemon.|Top with parmesan, pine nuts and rocket.'],
+['d_shawarmatray','Chicken shawarma traybake with flatbread & tahini yoghurt','d',{c:'Middle Eastern',t:35,g:'tray'},
+ 'thigh 140, redonion 60, redpepper 80, cauli 100, cumin 2, smokedpap 2, groundcor 2, cinnamon 0.5, oil 6, pitta 60, fage0 50, tahini 8, lemon 10, parsley 4, cucumber 50',
+ 'Toss the chicken, onion, pepper and cauliflower with the spices and oil.|Roast at 210°C fan for 25 min.|Mix the yoghurt, tahini and lemon.|Pile into the warm pitta with cucumber and parsley.'],
+['d_bibimbap','Korean chicken bibimbap bowl','d',{c:'Korean',t:35,g:'rice'},
+ 'chicken 120, brownrice 60, egg 50, spinach 60, carrot 50, beansprouts 50, shiitake 50, gochujang 15, sesameoil 4, soy 5, garlic 3, kimchi 50, sesame 2',
+ 'Cook the rice.|Stir-fry the chicken in half the sesame oil with the garlic and soy, then lift out. Quickly cook the mushrooms, carrot, spinach and beansprouts in turn.|Fry the egg.|Arrange everything on the rice with the gochujang loosened with a little water, cold kimchi and sesame.'],
+['d_ramen','Miso mushroom & tofu ramen','d',{c:'Japanese',t:25,g:'soup noodles onepot',n:'Stir the miso in off the boil to keep it live.'},
+ 'tofu 150, wwnoodles 60, miso 20, shiitake 80, mushroom 60, pakchoi 100, egg 50, springonion 15, ginger 4, garlic 4, soy 8, stock 450, sesameoil 3, chilliflakes 0.5',
+ 'Boil the egg 6.5 min, cool and peel.|Fry the mushrooms in the sesame oil with the garlic and ginger, then add the stock and soy and simmer 8 min.|Add the noodles and pak choi for 4 min, then take off the heat.|Whisk the miso into a ladle of broth and stir back in. Add the tofu, egg, spring onion and chilli.'],
+['d_prawnlinguine','Lemon, prawn & courgette linguine','d',{c:'Italian',t:20,g:'pasta quick'},
+ 'prawns 150, wwpasta 85, courgette 150, cherrytom 80, peas 50, garlic 6, chilliflakes 0.5, lemon 15, oil 8, parsley 4, parmesan 8',
+ 'Boil the linguine, adding the peas for the last 2 min.|Fry the grated courgette with the garlic and chilli in the oil for 4 min.|Add the tomatoes and prawns until pink.|Toss with the pasta, lemon, parsley, parmesan and a splash of pasta water.'],
+['d_tikkamasala','Lighter chicken tikka masala','d',{c:'Indian',t:40,g:'curry rice'},
+ 'chicken 140, fage0 60, garam 3, turmeric 1, cumin 1, smokedpap 1, onion 70, garlic 5, ginger 5, choptom 150, tompuree 10, cremef 30, spinach 40, brownrice 55, oil 6, coriander 3',
+ 'Coat the chicken in half the yoghurt and spices; grill or pan-fry until charred.|Fry the onion in the oil until golden, then the garlic, ginger and the rest of the spices.|Add the tomatoes and purée and simmer 10 min, then the chicken, crème fraîche and spinach.|Serve with rice, the rest of the yoghurt and coriander.'],
+['d_lentilragu','Lentil & mushroom ragù with tagliatelle','d',{c:'Italian',t:35,g:'pasta onepot'},
+ 'puy 125, mushroom 150, wwpasta 70, passata 150, onion 50, carrot 40, garlic 5, thyme 0.5, balsamic 5, parmesan 12, oil 5, kale 40',
+ 'Fry the finely chopped mushrooms in the oil until dark and dry, about 10 min.|Add the onion, carrot, garlic and thyme for 5 min, then the lentils, passata and balsamic. Simmer 15 min.|Add the kale for 4 min.|Toss with the pasta and parmesan.'],
+['d_teriyakichicken','Teriyaki chicken & greens soba','d',{c:'Japanese',t:20,g:'noodles quick'},
+ 'chicken 130, soba 70, ttdgreens 150, edamame 40, soy 12, erythritol 4, ricevin 5, ginger 3, garlic 3, cornflour 3, sesame 3',
+ 'Mix the soy, erythritol, vinegar, ginger, garlic, cornflour and 3 tbsp water.|Pan-fry the sliced chicken until cooked, then add the sauce until sticky.|Stir-fry the greens from frozen with the edamame for 6 min.|Toss with the cooked soba and top with sesame.'],
+['d_tagine','Chicken & chickpea tagine with couscous','d',{c:'North African',t:45,g:'onepot grain'},
+ 'thigh 130, chickpeas 100, onion 60, carrot 60, squash 100, apricots 15, rasel 3, cinnamon 0.5, choptom 120, stock 150, couscous 30, coriander 3, oil 4',
+ 'Brown the chicken in the oil, add the onion and spices for 3 min.|Add the carrot, squash, chickpeas, apricots, tomatoes and stock.|Cover and simmer 25 min until tender.|Pour boiling water over the couscous, cover 5 min, fluff. Coriander on top.'],
+['d_halloumitray','Halloumi, chickpea & roast veg traybake','d',{c:'Middle Eastern',t:35,g:'tray'},
+ 'halloumi 80, chickpeas 100, courgette 120, redpepper 80, redonion 50, cherrytom 80, oil 6, zaatar 2, lemon 10, fage0 50, mint 2, bulgur 30',
+ 'Roast the veg and chickpeas with the oil and za\'atar at 200°C fan for 20 min.|Add the sliced halloumi and roast 10 min more.|Soak the bulgur in boiling water 15 min.|Serve with yoghurt, lemon and mint.'],
+['d_periperirice','Peri-peri chicken with spicy rice & peas','d',{c:'Portuguese',t:40,g:'onepot rice'},
+ 'chicken 140, brownrice 60, peas 60, sweetcorn 40, redpepper 70, onion 50, smokedpap 3, chilliflakes 1, garlic 5, oregano 0.5, lemon 10, stock 180, oil 6, tompuree 10',
+ 'Rub the chicken with half the paprika, chilli, garlic, lemon and oil. Sear in a deep pan and lift out.|Soften the onion and pepper, add the rest of the spices, tomato purée, rice and stock.|Sit the chicken on top, cover and simmer 25 min.|Stir in the peas and corn for the last 5 min.'],
+['d_krapow','Thai basil chicken with a fried egg','d',{c:'Thai',t:20,g:'rice quick'},
+ 'thigh 130, brownrice 55, egg 50, greenbeans 80, redpepper 50, garlic 6, chilli 6, basil 5, soy 8, fishsauce 6, erythritol 3, oil 6',
+ 'Cook the rice.|Finely chop the chicken. Pound or chop the garlic and chilli.|Stir-fry the garlic and chilli in most of the oil, add the chicken, then the beans and pepper.|Add the soy, fish sauce and erythritol, then the basil. Fry the egg in the rest of the oil and serve on top.'],
+['d_tuscansoup','Tuscan bean, kale & chicken soup','d',{c:'Italian',t:40,g:'soup onepot'},
+ 'chicken 120, cannellini 120, kale 80, carrot 50, celery 40, onion 60, garlic 5, choptom 120, stock 400, rosemary 1, parmesan 12, oil 5, sourdough 50',
+ 'Soften the onion, carrot and celery in the oil, 8 min.|Add the garlic, rosemary, diced chicken, tomatoes, beans and stock. Simmer 20 min.|Add the kale for 5 min. Mash a few beans against the side to thicken.|Parmesan on top, sourdough on the side.'],
+['d_larb','Turkey larb with brown rice','d',{c:'Thai',t:20,g:'rice quick'},
+ 'turkeymince 140, brownrice 55, lettuce 90, cucumber 60, redonion 30, mint 4, coriander 4, lime 15, fishsauce 8, chilli 5, garlic 4, oil 4, peanuts 10, edamame 50',
+ 'Cook the rice.|Fry the mince in the oil with the garlic and chilli until cooked and a bit crisp.|Take off the heat and stir in the fish sauce, lime, sliced onion, edamame and herbs.|Spoon into lettuce cups with cucumber and peanuts; rice on the side.'],
+
+// ───────── PUDDINGS
+['p_fageberry','Fage, berry mix & seeds','p',{c:'Pudding',t:2,g:'quick'},
+ 'fage0 170, berrymix 100, seedmix 8',
+ 'Thaw the berries in the microwave for 40 seconds, or overnight in the fridge.|Spoon over the yoghurt and finish with seeds.'],
+['p_compote','Warm berry compote with yoghurt & toasted oats','p',{c:'Pudding',t:10,g:'quick'},
+ 'berrymix 120, erythritol 5, fage0 120, oats 15, cinnamon 0.5, walnuts 5',
+ 'Simmer the berries with the erythritol for 5 min until jammy.|Toast the oats and walnuts in a dry pan with the cinnamon.|Spoon the warm compote over the yoghurt and scatter the crunch on top.'],
+['p_bakedapple','Baked apple with cinnamon walnuts','p',{c:'Pudding',t:35,g:'bake',fr:3,mk:3},
+ 'apple 180, walnuts 8, cinnamon 1, oats 5, erythritol 4, fage0 100',
+ 'Core the apple and score round its middle.|Stuff with the chopped walnuts, oats, cinnamon and erythritol.|Bake at 180°C fan for 25–30 min until soft.|Serve warm with the yoghurt. Bake three at once; they reheat well.'],
+['p_crumble','Berry & apple oat crumble','p',{c:'Pudding',t:40,g:'bake',fr:4,fz:1,mk:4},
+ 'apple 80, berrymix 70, erythritol 8, cinnamon 0.5, oats 15, groundalm 8, butter 4, fage0 50',
+ 'Chop the apple and mix with the frozen berries, half the erythritol and cinnamon in a dish.|Rub the butter into the oats, almonds and the rest of the erythritol.|Scatter over the fruit and bake at 180°C fan for 30 min.|Serve with yoghurt. Makes four portions; reheat in the microwave.'],
+['p_chocchia','Chocolate chia pudding with raspberries','p',{c:'Pudding',t:5,g:'quick',fr:4,mk:3},
+ 'chia 15, milk 120, cocoa 6, erythritol 8, vanilla 1, raspberries 50, fage0 50',
+ 'Whisk the cocoa, erythritol and vanilla into the milk until smooth.|Stir in the chia, stir again after 10 min, then chill at least 2 hours.|Top with yoghurt and raspberries.'],
+['p_pears','Poached pears with cardamom & skyr','p',{c:'Pudding',t:25,g:'',fr:4,mk:3},
+ 'pear 160, erythritol 8, cardamom 0.5, cinnamon 0.3, vanilla 1, skyr 120, pistachios 8',
+ 'Peel and halve the pears and scoop out the cores.|Simmer in enough water to cover with the erythritol, spices and vanilla for 15–20 min until tender.|Serve warm or cold with skyr and chopped pistachios. Keep extra pears in their syrup.'],
+['p_bark','Frozen yoghurt bark','p',{c:'Pudding',t:10,g:'',fz:1,mk:4,n:'Keeps for weeks in the freezer.'},
+ 'fage0 120, strawblue 50, darkchoc 8, seedmix 4, erythritol 6, vanilla 1',
+ 'Beat the yoghurt with the erythritol and vanilla.|Spread 1cm thick on a lined tray.|Scatter over the fruit, chopped chocolate and seeds.|Freeze 3 hours, then snap into shards and keep in a freezer bag.'],
+['p_pbchoc','Peanut butter chocolate yoghurt bowl','p',{c:'Pudding',t:3,g:'quick'},
+ 'fage0 150, cocoa 5, erythritol 6, pb 10, banana 40',
+ 'Beat the cocoa and erythritol into the yoghurt.|Top with sliced banana and the peanut butter, warmed for 10 seconds so it drizzles.'],
+['p_tiramisu','Tiramisu pots','p',{c:'Pudding',t:10,g:'',fr:3,mk:3},
+ 'fage0 100, ricotta 40, espresso 30, cocoa 3, erythritol 8, vanilla 1, oats 10, darkchoc 4',
+ 'Soak the oats in the cooled espresso.|Beat the yoghurt, ricotta, erythritol and vanilla until smooth.|Layer in glasses, dust with cocoa and grate over the chocolate. Chill.'],
+['p_peaches','Roast peaches with ricotta & pistachios','p',{c:'Pudding',t:20,g:'',fr:4},
+ 'frozpeach 150, cinnamon 0.5, vanilla 1, erythritol 4, ricotta 60, fage0 40, pistachios 8',
+ 'Roast the frozen peach slices with the cinnamon, vanilla and erythritol at 200°C fan for 15 min.|Beat the ricotta with the yoghurt.|Spoon the warm peaches over and add the pistachios.'],
+['p_matcha','Matcha yoghurt with kiwi & pistachio','p',{c:'Pudding',t:3,g:'quick'},
+ 'fage0 150, matcha 2, erythritol 6, kiwi 75, pistachios 6',
+ 'Whisk the matcha with a teaspoon of hot water until smooth, then beat into the yoghurt with the erythritol.|Top with sliced kiwi and pistachios.'],
+['p_mugcake','Chocolate almond mug cake','p',{c:'Pudding',t:5,g:'quick'},
+ 'groundalm 15, egg 50, cocoa 6, erythritol 12, bakingpowder 1, milk 15, fage0 40',
+ 'Beat everything except the yoghurt in a large mug with a fork.|Microwave 70–90 seconds until just set in the middle.|Serve with the yoghurt.'],
+['p_mangoskyr','Mango & lime skyr with seeds','p',{c:'Pudding',t:2,g:'quick'},
+ 'skyr 150, frozmango 100, lime 5, seedmix 6',
+ 'Thaw the mango (40 seconds in the microwave or overnight).|Spoon over the skyr with lime zest and seeds.'],
+['p_blackforest','Black Forest yoghurt pot','p',{c:'Pudding',t:3,g:'quick'},
+ 'fage0 150, frozcherry 80, darkchoc 8, erythritol 4',
+ 'Warm the cherries with the erythritol for 2 min until juicy.|Spoon over the yoghurt and grate over the dark chocolate.'],
+['p_cheesecake','Ricotta & berry cheesecake pots','p',{c:'Pudding',t:10,g:'',fr:3,mk:3},
+ 'ricotta 50, fage0 80, erythritol 8, lemon 5, vanilla 1, oats 10, walnuts 5, berrymix 60',
+ 'Toast the oats and walnuts and press into the bottom of glasses.|Beat the ricotta, yoghurt, erythritol, lemon zest and vanilla until smooth.|Spoon over the base and top with the berries. Chill.'],
+['p_strawberries','Dark chocolate strawberries with vanilla yoghurt','p',{c:'Pudding',t:10,g:'quick'},
+ 'strawberries 120, darkchoc 12, fage0 80, vanilla 1, pistachios 5',
+ 'Melt the chocolate in short bursts in the microwave.|Dip the strawberries and set them on baking paper in the fridge for 10 min.|Serve with the yoghurt beaten with vanilla, and the chopped pistachios.'],
+
+// ───────── SNACKS
+['s_kombucha','Kombucha & mixed nuts','s',{c:'Snack',t:0,g:'quick'}, 'kombucha 330, mixednuts 18', 'Open the can.'],
+['s_kefir','Glass of kefir','s',{c:'Snack',t:0,g:'quick'}, 'kefir 200', 'Pour and drink.'],
+['s_applepb','Apple & peanut butter','s',{c:'Snack',t:2,g:'quick'}, 'apple 150, pb 10', 'Slice the apple and dip.'],
+['s_hummus','Veg sticks & hummus','s',{c:'Snack',t:5,g:'quick'}, 'carrot 60, cucumber 60, redpepper 50, hummus 40', 'Cut the veg into sticks.'],
+['s_edamame','Chilli-salt edamame','s',{c:'Snack',t:5,g:'quick'}, 'edamame 100, chilliflakes 0.3, lime 5', 'Boil from frozen for 3 min, drain and toss with chilli, salt and lime.'],
+['s_kimchiegg','Kimchi & boiled eggs','s',{c:'Snack',t:10,g:'quick',fr:3}, 'egg 100, kimchi 40', 'Boil the eggs 8 min, cool and peel. Batch-boil a few for the week.|Eat with cold kimchi.'],
+['s_skyr','Skyr & clementine','s',{c:'Snack',t:1,g:'quick'}, 'skyr 150, clementine 60', 'Peel and eat.'],
+['s_pistachio','Pistachios & clementines','s',{c:'Snack',t:0,g:'quick'}, 'pistachios 15, clementine 120', 'Weigh out the nuts so the bag doesn\'t vanish.'],
+['s_crispbread','Rye, cottage cheese & tomato','s',{c:'Snack',t:3,g:'quick'}, 'rye 25, cottage 60, cherrytom 50', 'Top the rye with cottage cheese, tomatoes and black pepper.'],
+['s_chickpeas','Crunchy roast chickpeas','s',{c:'Snack',t:35,g:'',fr:5,mk:5}, 'chickpeas 80, smokedpap 1, cumin 1, oil 3', 'Dry the chickpeas well, toss with the oil and spices.|Roast at 200°C fan for 30 min, shaking halfway. Cool fully before boxing.'],
+['s_kefirberry','Kefir with berries','s',{c:'Snack',t:2,g:'quick'}, 'kefir 150, strawblue 60', 'Pour the kefir over the thawed berries.'],
+['s_dates','Medjool date & walnuts','s',{c:'Snack',t:0,g:'quick'}, 'dates 20, walnuts 10', 'Split the date and stuff with walnut.']
+];
+
+</script>
+<script>
+(function () {
+'use strict';
+
+/* ───────────── data prep ───────────── */
+const ING = {};
+for (const r of ING_ROWS) ING[r[0]] = Object.assign({ id: r[0], n: r[1], k: r[2], p: r[3], f: r[4], a: r[5], pl: r[6] }, r[7] || {});
+const OILY = new Set(['salmon', 'mackerel', 'smokedmack', 'sardines', 'trout']);
+const RED = new Set(['beefmince', 'steak', 'porkmince']);
+const ANIMAL = new Set(['chicken', 'thigh', 'turkeymince', 'beefmince', 'steak', 'porkmince', 'salmon', 'mackerel', 'smokedmack', 'sardines', 'trout', 'bream', 'cod', 'prawns', 'tuna']);
+const R = {}, RL = [];
+function isFerm(r, m) { return r.items.some(it => { const g = ING[it.i]; return g.fe && it.g * m >= g.fe * 0.9; }); }
+for (const row of RECIPE_ROWS) {
+  const [id, n, slots, m, ings, steps] = row;
+  const items = ings.split(',').map(s => { const [i, g] = s.trim().split(/\s+/); return { i, g: +g }; });
+  let k = 0, p = 0, f = 0; const pl = new Set();
+  items.forEach(it => { const g = ING[it.i]; k += g.k * it.g / 100; p += g.p * it.g / 100; f += g.f * it.g / 100; g.pl.forEach(x => pl.add(x)); });
+  const r = { id, n, slots: slots.split(''), c: m.c || '', t: m.t || 0, tags: (m.g || '').split(/\s+/).filter(Boolean), fr: m.fr || 0, fz: !!m.fz, prep: !!m.prep, treat: !!m.treat, note: m.n || '', mk: m.mk || 0, items, steps: steps.split('|'), k, p, f, plants: [...pl] };
+  r.oily = items.some(it => OILY.has(it.i));
+  r.red = items.some(it => RED.has(it.i));
+  r.veg = !items.some(it => ANIMAL.has(it.i));
+  r.rice = items.some(it => it.i === 'brownrice');
+  if (r.prep && r.slots.includes('l') && !m.fr && !r.rice) r.fr = 4;
+  r.pts = r.plants.reduce((a, x) => a + PLANTS[x][1], 0);
+  r.fermBase = isFerm(r, 1);
+  R[id] = r; RL.push(r);
+}
+const fridgeLife = r => r.rice ? 1 : r.fr;
+const SLOTS = ['b', 'l', 's', 'd', 'p'];
+const SLOTNAME = { b: 'Breakfast', l: 'Lunch', s: 'Snack', d: 'Dinner', p: 'Pudding' };
+const COLOURS = ['red', 'orange', 'yellow', 'green', 'purple', 'white'];
+const COLOURNAME = { red: 'red', orange: 'orange', yellow: 'yellow', green: 'green', purple: 'purple/blue', white: 'white/tan' };
+
+/* ───────────── dates ───────────── */
+const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DOWL = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const MONS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const pad = n => String(n).padStart(2, '0');
+const dkey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parse = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (k, n) => { const d = parse(k); d.setDate(d.getDate() + n); return dkey(d); };
+const dayIndex = k => (parse(k).getDay() + 6) % 7;
+const mondayOf = k => addDays(k, -dayIndex(k));
+const weekDays = mon => [0, 1, 2, 3, 4, 5, 6].map(i => addDays(mon, i));
+const todayKey = () => dkey(new Date());
+const fmtDay = k => { const d = parse(k); return `${DOW[dayIndex(k)]} ${d.getDate()} ${MONS[d.getMonth()]}`; };
+const fmtRange = mon => { const a = parse(mon), b = parse(addDays(mon, 6)); return a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()} ${MONS[b.getMonth()]}` : `${a.getDate()} ${MONS[a.getMonth()]} – ${b.getDate()} ${MONS[b.getMonth()]}`; };
+const dayList = ks => { if (!ks.length) return ''; const is = ks.map(dayIndex); return is.length > 2 && is[is.length - 1] - is[0] === is.length - 1 ? `${DOW[is[0]]}–${DOW[is[is.length - 1]]}` : is.map(i => DOW[i]).join(', '); };
+
+/* ───────────── state ───────────── */
+const KEY = 'thirtyplants.v1';
+const DEF = { target: 1800, latteK: 150, latteP: 11, latteMl: 300, latteOn: true, bud: { b: 175, l: 525, s: 125, d: 625, p: 200 }, plantGoal: 30, colourGoal: 5, oilyGoal: 2, redMax: 1, protGoal: 120, weekendBatch: false, adapt: true };
+function fresh() { return { v: 1, set: {}, days: {}, weeks: {}, favs: {} }; }
+function normalise(s) {
+  if (!s || s.v !== 1) s = fresh();
+  const bud = Object.assign({}, DEF.bud, (s.set && s.set.bud) || {});
+  s.set = Object.assign({}, DEF, s.set || {}); s.set.bud = bud;
+  s.days = s.days || {}; s.weeks = s.weeks || {}; s.favs = s.favs || {};
+  return s;
+}
+function load() { let s = null; try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) { s = null; } return normalise(s); }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } }
+let S = load();
+const UI = { tab: 'today', day: todayKey(), week: mondayOf(todayKey()), rq: '', rslot: 'all', rtag: '', trip: 1 };
+try { const t = sessionStorage.getItem('tp.tab'); if (t) UI.tab = t; } catch (e) { /* ignore */ }
+
+const emptyDay = () => ({ sl: {}, cu: {}, t: null, done: {}, x: [] });
+const D = k => S.days[k] || (S.days[k] = emptyDay());
+const peekD = k => S.days[k] || emptyDay();
+const W = mon => S.weeks[mon] || (S.weeks[mon] = { mode: 'auto', shop: {} });
+
+/* ───────────── portions & budgets ───────────── */
+const clampM = m => Math.max(0.5, Math.min(1.8, isFinite(m) ? m : 1));
+const isBatchLunchDay = k => dayIndex(k) < 5 || S.set.weekendBatch;
+const prepped = (k, s, r) => !!(r && r.prep && (s === 'b' || (s === 'l' && isBatchLunchDay(k))));
+
+function dayCalc(k) {
+  const d = peekD(k), st = S.set;
+  const T = d.t || st.target;
+  const latte = st.latteOn ? st.latteK : 0, latteP = st.latteOn ? st.latteP : 0;
+  const budSum = SLOTS.reduce((a, s) => a + st.bud[s], 0);
+  const sc = (T - latte) / budSum;
+  const out = {}, flex = [];
+  let fixed = latte;
+  for (const s of SLOTS) {
+    const v = d.sl[s];
+    const o = { s, v, base: st.bud[s] * sc, done: !!d.done[s] };
+    if (!v) o.kind = 'empty';
+    else if (v === '@skip') { o.kind = 'skip'; o.k = 0; o.p = 0; }
+    else if (v === '@c') { const c = d.cu[s] || { n: 'Something else', k: 0, p: 0 }; o.kind = 'custom'; o.c = c; o.k = +c.k || 0; o.p = +c.p || 0; fixed += o.k; }
+    else if (R[v]) {
+      const r = R[v]; o.kind = 'recipe'; o.r = r; o.prepped = prepped(k, s, r);
+      if (o.done && d.done[s].m) { o.m = d.done[s].m; fixed += r.k * o.m; }
+      else if (o.prepped || !st.adapt) { o.m = clampM(o.base / r.k); fixed += r.k * o.m; }
+      else flex.push(o);
+    } else o.kind = 'empty';
+    out[s] = o;
+  }
+  const xk = d.x.reduce((a, x) => a + (+x.k || 0), 0);
+  fixed += xk;
+  if (flex.length) {
+    const rem = T - fixed, fb = flex.reduce((a, o) => a + o.base, 0);
+    flex.forEach(o => { o.m = clampM((rem * o.base / fb) / o.r.k); });
+  }
+  let planK = latte, planP = latteP, eatK = d.done.latte ? latte : 0, eatP = d.done.latte ? latteP : 0;
+  let fermPlan = false, fermEat = false;
+  const plants = new Set(), plantsEaten = new Set(), colours = new Set();
+  for (const s of SLOTS) {
+    const o = out[s];
+    if (o.kind === 'recipe') { o.k = o.r.k * o.m; o.p = o.r.p * o.m; o.ferm = isFerm(o.r, o.m); }
+    if (o.kind === 'recipe' || o.kind === 'custom') {
+      planK += o.k; planP += o.p;
+      if (o.done) { eatK += o.k; eatP += o.p; }
+    }
+    if (o.kind === 'recipe') {
+      if (o.ferm) { fermPlan = true; if (o.done) fermEat = true; }
+      o.r.plants.forEach(x => { plants.add(x); if (o.done) plantsEaten.add(x); if (PLANTS[x][2]) colours.add(PLANTS[x][2]); });
+    }
+  }
+  for (const x of d.x) {
+    planK += +x.k || 0; planP += +x.p || 0; eatK += +x.k || 0; eatP += +x.p || 0;
+    if (x.fe) { fermPlan = true; fermEat = true; }
+    (x.pl || []).forEach(p => { if (!PLANTS[p]) return; plants.add(p); plantsEaten.add(p); if (PLANTS[p][2]) colours.add(PLANTS[p][2]); });
+  }
+  return { k, T, custom: !!d.t, latte, latteP, slots: out, planK, planP, eatK, eatP, fermPlan, fermEat, plants, plantsEaten, colours, hasPlan: SLOTS.some(s => out[s].kind !== 'empty') };
+}
+const ptsOf = set => [...set].reduce((a, x) => a + PLANTS[x][1], 0);
+
+function weekCalc(mon) {
+  const days = weekDays(mon), dc = days.map(dayCalc);
+  const plan = new Set(), eat = new Set();
+  let oilyP = 0, oilyE = 0, redP = 0, redE = 0, fermDays = 0, colourDays = 0, k = 0, p = 0, n = 0;
+  dc.forEach(c => {
+    c.plants.forEach(x => plan.add(x)); c.plantsEaten.forEach(x => eat.add(x));
+    for (const s of SLOTS) { const o = c.slots[s]; if (o.kind !== 'recipe') continue; if (o.r.oily) { oilyP++; if (o.done) oilyE++; } if (o.r.red) { redP++; if (o.done) redE++; } }
+    if (c.fermPlan) fermDays++;
+    if (c.colours.size >= S.set.colourGoal) colourDays++;
+    if (c.hasPlan) { k += c.planK; p += c.planP; n++; }
+  });
+  return { days, dc, plan, eat, ptsPlan: ptsOf(plan), ptsEat: ptsOf(eat), oilyP, oilyE, redP, redE, fermDays, colourDays, avgK: n ? k / n : 0, avgP: n ? p / n : 0, planned: n };
+}
+
+/* ───────────── batches ───────────── */
+function sessions(mon, mode) {
+  const days = weekDays(mon), lunchDays = days.filter(isBatchLunchDay), sun = addDays(mon, -1);
+  if (mode === 'one') return [{ key: 'A', date: sun, idx: -1, lunch: lunchDays, bfast: days }];
+  return [
+    { key: 'A', date: sun, idx: -1, lunch: lunchDays.filter(d => dayIndex(d) <= 3), bfast: days.slice(0, 4) },
+    { key: 'B', date: days[3], idx: 3, lunch: lunchDays.filter(d => dayIndex(d) >= 4), bfast: days.slice(4) }
+  ];
+}
+const sessDays = (se, s) => s === 'b' ? se.bfast : se.lunch;
+function storageFor(r, off) { if (off <= fridgeLife(r)) return 'fridge'; if (r.fz) return 'freezer'; return 'over'; }
+function suggestMode(mon) {
+  const one = sessions(mon, 'one')[0], problems = [];
+  for (const s of ['b', 'l']) for (const k of sessDays(one, s)) {
+    const r = R[peekD(k).sl[s]];
+    if (!r || !r.prep) continue;
+    if (storageFor(r, dayIndex(k) + 1) === 'over') problems.push(r);
+  }
+  if (!problems.length) return { mode: 'one', why: 'Everything this week keeps in the fridge or freezes, so one Sunday session covers it.' };
+  const r = problems[0], life = fridgeLife(r);
+  return { mode: 'two', why: `${r.n} keeps ${life} day${life === 1 ? '' : 's'} and doesn't freeze, so a Thursday session covers the end of the week.` };
+}
+function weekMode(mon) { const w = S.weeks[mon]; return w && w.mode && w.mode !== 'auto' ? w.mode : suggestMode(mon).mode; }
+function batchName(k, s, r) {
+  if (!prepped(k, s, r)) return '';
+  const mon = mondayOf(k), se = sessions(mon, weekMode(mon)).find(x => sessDays(x, s).includes(k));
+  return se ? (se.key === 'A' ? 'Sunday batch' : 'Thursday batch') : '';
+}
+
+/* ───────────── auto planner ───────────── */
+const pool = (slot, pred) => RL.filter(r => r.slots.includes(slot) && !r.treat && (!pred || pred(r)));
+function argmax(arr, f) { let best = null, bv = -Infinity; for (const x of arr) { const v = f(x); if (v > bv) { bv = v; best = x; } } return best; }
+const feasible = (r, offs) => offs.every(o => storageFor(r, o) !== 'over');
+
+function candidate(mon, days) {
+  const cur = days.map(k => Object.assign({}, peekD(k).sl));
+  const w = S.weeks[mon];
+  const mode = w && w.mode !== 'auto' ? w.mode : (Math.random() < 0.5 ? 'one' : 'two');
+  const sess = sessions(mon, mode);
+  const used = new Set();
+  cur.forEach(sl => Object.values(sl).forEach(v => { if (R[v]) used.add(v); }));
+  const plants = new Set();
+  const addPlants = r => r.plants.forEach(x => plants.add(x));
+  cur.forEach(sl => Object.values(sl).forEach(v => { if (R[v]) addPlants(R[v]); }));
+  const gain = r => r.plants.reduce((a, x) => a + (plants.has(x) ? 0 : PLANTS[x][1]), 0);
+  const fav = r => S.favs[r.id] ? 3 : 0;
+
+  for (const s of ['b', 'l']) {
+    let prev = null;
+    for (const se of sess) {
+      const ds = sessDays(se, s).filter(k => !cur[days.indexOf(k)][s]);
+      if (!ds.length) continue;
+      const offs = ds.map(k => dayIndex(k) - se.idx);
+      let opts = pool(s, r => r.prep && feasible(r, offs) && r.id !== prev && !used.has(r.id));
+      if (!opts.length) opts = pool(s, r => r.prep && r.id !== prev);
+      const r = argmax(opts, r => gain(r) * 0.6 + fav(r) + Math.random() * 6);
+      if (!r) continue;
+      ds.forEach(k => { cur[days.indexOf(k)][s] = r.id; });
+      used.add(r.id); addPlants(r); prev = r.id;
+    }
+  }
+  days.forEach((k, i) => {
+    if (cur[i].l) return;
+    let opts = pool('l', r => (!r.prep || (r.slots.includes('d') && r.t <= 30)) && !used.has(r.id));
+    if (!opts.length) opts = pool('l', r => !r.prep);
+    const r = argmax(opts, r => gain(r) + fav(r) + Math.random() * 5);
+    cur[i].l = r.id; used.add(r.id); addPlants(r);
+  });
+
+  let oily = 0, red = 0;
+  cur.forEach(sl => Object.values(sl).forEach(v => { const r = R[v]; if (r && r.oily) oily++; if (r && r.red) red++; }));
+  let redLeft = red < S.set.redMax && Math.random() < 0.75;
+  for (const i of [0, 3, 5, 1, 4, 2, 6]) {
+    if (cur[i].d) continue;
+    let want = 'other';
+    if (oily < S.set.oilyGoal) want = 'oily';
+    else if (redLeft && i >= 4) want = 'red';
+    const nb = [cur[i - 1] && R[cur[i - 1].d], cur[i + 1] && R[cur[i + 1].d]].filter(Boolean).map(r => r.c);
+    const okType = r => want === 'oily' ? r.oily : want === 'red' ? r.red : (!r.oily && !r.red);
+    let opts = pool('d', r => !used.has(r.id) && okType(r));
+    if (!opts.length) opts = pool('d', r => !used.has(r.id) && !r.red);
+    const r = argmax(opts, r => gain(r) * 1.2 + fav(r) + Math.random() * 5 - (nb.includes(r.c) ? 3 : 0) - (r.slots[0] === 'l' ? 1.5 : 0));
+    cur[i].d = r.id; used.add(r.id); addPlants(r);
+    if (r.oily) oily++;
+    if (r.red) { red++; redLeft = false; }
+  }
+
+  const pudUsed = new Set();
+  cur.forEach(sl => { if (R[sl.p]) pudUsed.add(sl.p); });
+  for (let i = 0; i < 7; i++) {
+    if (cur[i].p) continue;
+    let opts = pool('p', r => !pudUsed.has(r.id));
+    if (!opts.length) opts = pool('p');
+    const r = argmax(opts, r => gain(r) + fav(r) + Math.random() * 5);
+    cur[i].p = r.id; pudUsed.add(r.id); addPlants(r);
+    if (r.mk >= 3 && i < 6 && !cur[i + 1].p && Math.random() < 0.6) { cur[i + 1].p = r.id; i++; }
+  }
+
+  const snackN = {}, sm = snackMult();
+  for (let i = 0; i < 7; i++) {
+    if (cur[i].s) continue;
+    const fermNow = ['b', 'l', 'd', 'p'].some(s => { const r = R[cur[i][s]]; return r && r.fermBase; });
+    const need = S.set.protGoal - estProtein(cur[i]);
+    let opts = pool('s', r => (snackN[r.id] || 0) < 2 && (fermNow || r.fermBase));
+    if (!opts.length) opts = pool('s');
+    const r = argmax(opts, r => gain(r) * 1.5 + fav(r) + Math.random() * 3 + (need > 0 ? Math.min(need, r.p * sm(r)) * 0.5 : 0));
+    cur[i].s = r.id; snackN[r.id] = (snackN[r.id] || 0) + 1; addPlants(r);
+  }
+  return cur;
+}
+function slotScale() { const st = S.set, sum = SLOTS.reduce((a, s) => a + st.bud[s], 0); return (st.target - (st.latteOn ? st.latteK : 0)) / sum; }
+function snackMult() { const sc = slotScale(); return r => clampM(S.set.bud.s * sc / r.k); }
+function estProtein(sl) {
+  const st = S.set, sc = slotScale(); let p = st.latteOn ? st.latteP : 0;
+  for (const s of SLOTS) { const r = R[sl[s]]; if (r) p += r.p * clampM(st.bud[s] * sc / r.k); }
+  return p;
+}
+function scoreCand(c) {
+  const pl = new Set(); let ferm = 0, colours = 0, oily = 0, short = 0;
+  c.forEach(sl => {
+    short += Math.max(0, S.set.protGoal - estProtein(sl));
+    const day = new Set(); let f = false;
+    Object.values(sl).forEach(v => { const r = R[v]; if (!r) return; r.plants.forEach(x => { pl.add(x); if (PLANTS[x][2]) day.add(PLANTS[x][2]); }); if (r.fermBase) f = true; if (r.oily) oily++; });
+    if (f) ferm++;
+    if (day.size >= S.set.colourGoal) colours++;
+  });
+  return Math.min(ptsOf(pl), 45) + ferm * 2 + colours * 0.7 + Math.min(oily, S.set.oilyGoal) * 3 - short * 0.25 + Math.random();
+}
+function planWeek(mon, replan) {
+  const days = weekDays(mon);
+  if (replan) days.forEach(k => { const d = D(k); SLOTS.forEach(s => { if (!d.done[s] && d.sl[s] !== '@c') delete d.sl[s]; }); });
+  let best = null;
+  for (let a = 0; a < 40; a++) { const c = candidate(mon, days); const sc = scoreCand(c); if (!best || sc > best.sc) best = { c, sc }; }
+  days.forEach((k, i) => { const d = D(k); SLOTS.forEach(s => { if (!d.sl[s] && best.c[i][s]) d.sl[s] = best.c[i][s]; }); });
+  save();
+}
+
+/* ───────────── formatting ───────────── */
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmtN = n => Math.round(n).toLocaleString('en-GB');
+const FR = { 0.25: '¼', 0.5: '½', 0.75: '¾' };
+function frac(x, step) { const r = Math.max(step, Math.round(x / step) * step); const w = Math.floor(r + 1e-9); const f = +(r - w).toFixed(2); return `${w || ''}${FR[f] || ''}` || '0'; }
+const fmtPts = x => frac(x, 0.25);
+const IRR = { leaf: 'leaves', pouch: 'pouches', tomato: 'tomatoes', chilli: 'chillies' };
+const plural = (u, n) => n <= 1 ? u : (IRR[u] || u + 's');
+function fmtG(g) { if (g < 10) return `${Math.max(1, Math.round(g))}g`; if (g < 1000) return `${Math.round(g / 5) * 5}g`; return `${(g / 1000).toFixed(2).replace(/\.?0+$/, '')}kg`; }
+function fmtMl(g) { if (g < 1000) return `${Math.max(5, Math.round(g / 5) * 5)}ml`; return `${(g / 1000).toFixed(2).replace(/\.?0+$/, '')} litres`; }
+function fmtQ(id, g, shop) {
+  const ing = ING[id];
+  if (ing.u && ing.uw < 4) { const n = Math.max(1, Math.round(g / ing.uw)); return `${n} ${plural(ing.u, n)}`; }
+  if (ing.u) {
+    const n = g / ing.uw;
+    const tail = ing.uw >= 20 && id !== 'egg' ? ` · ${fmtG(g)}` : '';
+    if (shop) { const c = ing.uw >= 60 ? Math.ceil(n * 2) / 2 : Math.ceil(n - 0.05); return `${frac(c, 0.5)} ${plural(ing.u, c)}${tail}`; }
+    const step = n < 1 ? 0.25 : 0.5, r = Math.max(step, Math.round(n / step) * step);
+    return `${frac(n, step)} ${plural(ing.u, r)}${tail}`;
+  }
+  if (ing.sp && g < ing.sp * 9) { const t = g / ing.sp; if (t < 0.2) return 'pinch'; if (t >= 2.75) return `${frac(t / 3, 0.5)} tbsp`; return `${frac(t, 0.25)} tsp`; }
+  if (ing.ml) return fmtMl(g);
+  return fmtG(g);
+}
+const pct = x => `${Math.max(0, Math.min(100, x * 100)).toFixed(1)}%`;
+
+/* ───────────── icons ───────────── */
+const P = {
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>', chev: '<path d="M9 5l7 7-7 7"/>', left: '<path d="M15 5l-7 7 7 7"/>',
+  gear: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>', x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  star: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.9z"/>',
+  fish: '<path d="M3 12c3-4 7-6 11-6 3 0 5 2 7 6-2 4-4 6-7 6-4 0-8-2-11-6z"/><path d="M16 11v.01"/>',
+  jar: '<path d="M8 3h8v3H8z"/><path d="M7 6h10l1 3v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9z"/><path d="M9 13h6"/>',
+  today: '<path d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M9 7c0-2 1-3 2-4M13 7c0-2 1-3 2-4"/>',
+  week: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  prep: '<rect x="3" y="9" width="18" height="11" rx="2"/><path d="M5 9V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2M3 13h18"/>',
+  shop: '<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+  book: '<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/>',
+  edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/>', copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 0 1 2-2h10"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/>', warn: '<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.01"/>',
+  leaf: '<path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15"/><path d="M5 19c3-4 6-7 10-9"/>', trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>'
+};
+const ic = (n, fill) => `<svg viewBox="0 0 24 24" fill="${fill ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]}</svg>`;
+const ring = (frac, colour) => { const c = 2 * Math.PI * 8; return `<svg viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="8" fill="none" stroke="currentColor" stroke-opacity=".22" stroke-width="3"/><circle cx="11" cy="11" r="8" fill="none" stroke="${colour}" stroke-width="3" stroke-linecap="round" stroke-dasharray="${(Math.min(1, frac) * c).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 11 11)"/></svg>`; };
+const cdots = set => `<span class="cdots" aria-hidden="true">${COLOURS.map(c => `<i class="${set.has(c) ? 'c-' + c : ''}"></i>`).join('')}</span>`;
+function badges(r) {
+  const b = [];
+  if (r.oily) b.push('<span class="badge oily">Oily fish</span>');
+  if (r.fermBase) b.push('<span class="badge ferm">Fermented</span>');
+  if (r.red) b.push('<span class="badge red">Red meat</span>');
+  if (r.veg) b.push('<span class="badge veg">Veggie</span>');
+  if (r.tags.includes('onepot')) b.push('<span class="badge">One pot</span>');
+  if (r.tags.includes('tray')) b.push('<span class="badge">Traybake</span>');
+  if (r.prep) b.push('<span class="badge">Batch</span>');
+  if (r.fz) b.push('<span class="badge">Freezes</span>');
+  return `<div class="badges">${b.join('')}</div>`;
+}
+
+/* ───────────── views ───────────── */
+const $ = id => document.getElementById(id);
+
+function weekNav(mon) {
+  const cur = mondayOf(todayKey());
+  const back = mon !== cur ? `<button class="btn sm ghost" data-a="gotoday">This week</button>` : '';
+  return `<div class="weeknav"><button class="iconbtn" data-a="wk" data-v="-1" aria-label="Previous week">${ic('left')}</button><div class="lbl">${fmtRange(mon)}</div>${back}<button class="iconbtn" data-a="wk" data-v="1" aria-label="Next week">${ic('chev')}</button></div>`;
+}
+
+function vToday() {
+  const k = UI.day, mon = mondayOf(k), c = dayCalc(k), wc = weekCalc(mon), tk = todayKey();
+  const strip = weekDays(mon).map((d, i) => {
+    const dc = wc.dc[i];
+    return `<button data-a="day" data-v="${d}" aria-pressed="${d === k}" class="${d === tk ? 'today' : ''}" aria-label="${DOWL[i]} ${parse(d).getDate()}"><span class="dw">${DOW[i].slice(0, 2)}</span><span class="dn">${parse(d).getDate()}</span><span class="dots">${COLOURS.filter(x => dc.colours.has(x)).map(x => `<i class="c-${x}"></i>`).join('')}</span></button>`;
+  }).join('');
+  const rem = c.T - c.eatK;
+  const pg = S.set.protGoal;
+  const ferm = c.fermEat ? `<span class="chip good">${ic('jar')}Fermented portion eaten</span>` : c.fermPlan ? `<span class="chip">${ic('jar')}Fermented portion planned</span>` : `<span class="chip bad">${ic('jar')}No fermented portion yet</span>`;
+  const col = `<span class="chip ${c.colours.size >= S.set.colourGoal ? 'good' : ''}">${cdots(c.colours)} ${c.colours.size} colour${c.colours.size === 1 ? '' : 's'} · goal ${S.set.colourGoal}</span>`;
+  const summary = `<section class="summary" aria-label="Day summary">
+    <div class="sum-head"><div><div class="eyebrow">${k === tk ? 'Today · ' : ''}${fmtDay(k)}</div><div class="bignum ${rem < 0 ? 'over' : ''}">${fmtN(Math.abs(rem))}<small>${rem < 0 ? 'kcal over' : 'kcal left'}</small></div></div>
+    <button class="targetbtn" data-a="target">${ic('edit')}${fmtN(c.T)} kcal${c.custom ? ' · today only' : ''}</button></div>
+    <div class="barrow"><div class="bar"><i class="plan" style="width:${pct(c.planK / c.T)}"></i><i class="eat" style="width:${pct(c.eatK / c.T)}"></i></div>
+    <div class="barlbl"><span>Eaten <b>${fmtN(c.eatK)}</b></span><span>Planned ${fmtN(c.planK)} of ${fmtN(c.T)}</span></div></div>
+    <div class="barrow"><div class="bar leaf"><i class="plan" style="width:${pct(c.planP / pg)}"></i><i class="eat" style="width:${pct(c.eatP / pg)}"></i></div>
+    <div class="barlbl"><span>Protein <b>${fmtN(c.eatP)}g</b></span><span>Planned ${fmtN(c.planP)}g · goal ${pg}g</span></div></div>
+    <div class="chips">${ferm}${col}</div></section>`;
+
+  const d = peekD(k);
+  const rows = [];
+  if (S.set.latteOn) rows.push(mealRow({ tick: 'latte', on: !!d.done.latte, slot: 'Morning', nm: 'Latte', mt: `${S.set.latteK} kcal · ${S.set.latteP}g protein · ${S.set.latteMl}ml semi-skimmed`, open: '' }));
+  for (const s of SLOTS) {
+    const o = c.slots[s];
+    if (o.kind === 'empty') rows.push(mealRow({ tick: s, disabled: true, slot: SLOTNAME[s], nm: `<span class="addslot">+ Add ${SLOTNAME[s].toLowerCase()}</span>`, open: `data-a="pick" data-k="${k}" data-s="${s}"` }));
+    else if (o.kind === 'skip') rows.push(mealRow({ tick: s, disabled: true, slot: SLOTNAME[s], nm: '<span class="muted">Skipped</span>', open: `data-a="pick" data-k="${k}" data-s="${s}"` }));
+    else if (o.kind === 'custom') rows.push(mealRow({ tick: s, on: o.done, slot: SLOTNAME[s], nm: esc(o.c.n), mt: `${fmtN(o.k)} kcal · ${fmtN(o.p)}g protein`, open: `data-a="custom" data-k="${k}" data-s="${s}"` }));
+    else {
+      const r = o.r, bn = batchName(k, s, r);
+      const extra = [r.oily ? ' · oily fish' : '', o.ferm ? ' · fermented' : ''].join('');
+      const scale = Math.abs(o.m - 1) > 0.08 ? ` · ${o.m.toFixed(2).replace(/0$/, '')}× portion` : '';
+      rows.push(mealRow({ tick: s, on: o.done, slot: `${SLOTNAME[s]}${bn ? ` <span class="tape">${bn}</span>` : ''}`, nm: esc(r.n), mt: `${fmtN(o.k)} kcal · ${fmtN(o.p)}g protein · ${fmtPts(r.pts)} plants${extra}${scale}`, open: `data-a="open" data-r="${r.id}" data-k="${k}" data-s="${s}"`, done: o.done }));
+    }
+  }
+  const extras = d.x.map((x, i) => `<div class="xrow"><div class="nm">${esc(x.n)}<div class="mt">${fmtN(x.k)} kcal · ${fmtN(x.p || 0)}g protein${x.fe ? ' · fermented' : ''}${x.pl && x.pl.length ? ` · ${x.pl.length} plant${x.pl.length > 1 ? 's' : ''}` : ''}</div></div><button class="iconbtn" data-a="xdel" data-i="${i}" aria-label="Remove ${esc(x.n)}">${ic('trash')}</button></div>`).join('');
+  const g = S.set.plantGoal;
+  const mini = `<section class="summary" style="margin-top:14px" aria-label="This week">
+    <div class="barrow"><div class="barlbl"><span><b>${fmtPts(wc.ptsEat)}</b> plants eaten this week</span><span>${fmtPts(wc.ptsPlan)} planned · goal ${g}</span></div>
+    <div class="bar leaf"><i class="plan" style="width:${pct(wc.ptsPlan / g)}"></i><i class="eat" style="width:${pct(wc.ptsEat / g)}"></i></div></div>
+    <div class="chips"><span class="chip ${wc.oilyP >= S.set.oilyGoal ? 'good' : 'bad'}">${ic('fish')}Oily fish ${wc.oilyE}/${S.set.oilyGoal} eaten · ${wc.oilyP} planned</span><span class="chip ${wc.redP > S.set.redMax ? 'bad' : ''}">Red meat ${wc.redP}/${S.set.redMax}</span><span class="chip ${wc.fermDays === 7 ? 'good' : ''}">${ic('jar')}${wc.fermDays}/7 fermented days</span></div></section>`;
+  const empty = !c.hasPlan ? `<div class="callout">${ic('info')}<div>Nothing planned for this day yet. <button class="btn sm primary" data-a="fill" style="margin-top:8px">Plan the week</button></div></div>` : '';
+  return `${weekNav(mon)}<div class="strip">${strip}</div>${summary}${empty}<div class="meals">${rows.join('')}</div>
+    <div class="extras">${extras}<button class="btn ghost" data-a="xadd">${ic('plus')}Log something else</button></div>${mini}`;
+}
+function mealRow(o) {
+  return `<div class="meal ${o.done ? 'done' : ''}"><button class="tick" role="checkbox" aria-checked="${!!o.on}" aria-label="Mark ${o.nm.replace(/<[^>]+>/g, '')} eaten" ${o.disabled ? 'disabled' : `data-a="tick" data-s="${o.tick}"`}><span>${ic('check')}</span></button>
+  ${o.open ? `<button class="mealbody" ${o.open}>` : '<div class="mealbody">'}<span class="slot">${o.slot}</span><span class="nm">${o.nm}</span>${o.mt ? `<span class="mt">${o.mt}</span>` : ''}${o.open ? '</button>' : '</div>'}
+  ${o.open ? `<button class="go" ${o.open} aria-hidden="true" tabindex="-1">${ic('chev')}</button>` : '<span></span>'}</div>`;
+}
+
+function vWeek() {
+  const mon = UI.week, wc = weekCalc(mon), tk = todayKey(), g = S.set.plantGoal;
+  if (!wc.planned) return `${weekNav(mon)}<div class="empty"><p>Nothing planned for ${fmtRange(mon)} yet.</p><button class="btn primary" data-a="fill">${ic('leaf')}Plan this week</button></div>`;
+  const stats = `<div class="stats">
+    <div class="stat wide"><div class="eyebrow">Plants this week</div><div class="v">${fmtPts(wc.ptsPlan)}<small> / ${g} planned</small></div>
+      <div class="bar leaf"><i class="plan" style="width:${pct(wc.ptsPlan / g)}"></i><i class="eat" style="width:${pct(wc.ptsEat / g)}"></i></div><div class="small muted">${fmtPts(wc.ptsEat)} eaten so far. Herbs and spices count ¼.</div></div>
+    <div class="stat"><div class="eyebrow">Oily fish</div><div class="v">${wc.oilyP}<small> / ${S.set.oilyGoal}</small></div><div class="small muted">${wc.oilyE} eaten</div></div>
+    <div class="stat"><div class="eyebrow">Red meat</div><div class="v">${wc.redP}<small> / ${S.set.redMax}</small></div><div class="small muted">${wc.redP > S.set.redMax ? 'Over your weekly limit' : 'Within your limit'}</div></div>
+    <div class="stat"><div class="eyebrow">Fermented days</div><div class="v">${wc.fermDays}<small> / 7</small></div><div class="small muted">A portion planned</div></div>
+    <div class="stat"><div class="eyebrow">${S.set.colourGoal}-colour days</div><div class="v">${wc.colourDays}<small> / 7</small></div><div class="small muted">Plant colours per day</div></div>
+    <div class="stat wide"><div class="eyebrow">Daily average planned</div><div class="v">${fmtN(wc.avgK)}<small> kcal · ${fmtN(wc.avgP)}g protein</small></div></div></div>
+    <div class="btnrow" style="margin-top:10px"><button class="btn primary" data-a="fill">${ic('leaf')}Fill empty slots</button><button class="btn" data-a="replan">Re-plan week</button></div>`;
+  const cards = wc.days.map((k, i) => {
+    const c = wc.dc[i], d = peekD(k);
+    const rows = SLOTS.map(s => {
+      const o = c.slots[s];
+      const lab = `<span class="s">${s.toUpperCase()}</span>`;
+      if (o.kind === 'empty') return `<button class="drow" data-a="pick" data-k="${k}" data-s="${s}">${lab}<span class="n empty">+ Add ${SLOTNAME[s].toLowerCase()}</span><span></span></button>`;
+      if (o.kind === 'skip') return `<button class="drow" data-a="pick" data-k="${k}" data-s="${s}">${lab}<span class="n muted">Skipped</span><span></span></button>`;
+      if (o.kind === 'custom') return `<button class="drow ${o.done ? 'done' : ''}" data-a="custom" data-k="${k}" data-s="${s}">${lab}<span class="n">${esc(o.c.n)}</span><span class="small muted num">${fmtN(o.k)}</span></button>`;
+      const tags = `${o.r.oily ? ic('fish') : ''}${o.ferm ? ic('jar') : ''}`;
+      return `<button class="drow ${o.done ? 'done' : ''}" data-a="open" data-r="${o.r.id}" data-k="${k}" data-s="${s}">${lab}<span class="n">${esc(o.r.n)}</span><span class="tag">${tags}</span></button>`;
+    }).join('');
+    return `<article class="daycard ${k === tk ? 'today' : ''}"><header><span class="d">${DOW[i]} ${parse(k).getDate()}</span>${cdots(c.colours)}${c.fermPlan ? `<span title="Fermented portion" style="color:var(--accent);display:inline-flex;width:18px">${ic('jar')}</span>` : ''}<span class="k">${fmtN(c.planK)} kcal${d.t ? ' *' : ''}</span></header>${rows}</article>`;
+  }).join('');
+  const pl = [...wc.plan].sort((a, b) => (PLANTS[b][1] - PLANTS[a][1]) || COLOURS.indexOf(PLANTS[a][2]) - COLOURS.indexOf(PLANTS[b][2]) || PLANTS[a][0].localeCompare(PLANTS[b][0]));
+  const chips = pl.map(x => `<span class="pchip ${PLANTS[x][1] < 1 ? 'q' : ''} ${wc.eat.has(x) ? 'eaten' : ''}">${PLANTS[x][2] ? `<i class="c-${PLANTS[x][2]}"></i>` : ''}${esc(PLANTS[x][0])}${PLANTS[x][1] < 1 ? ' ¼' : ''}</span>`).join('');
+  return `${weekNav(mon)}${stats}<div class="days">${cards}</div><h2 class="sec">Plants in this plan</h2><p class="small muted" style="margin:0">Outlined in green once eaten.</p><div class="plantgrid">${chips}</div>`;
+}
+
+function prepGroups(mon, se) {
+  const groups = [];
+  for (const s of ['l', 'b']) {
+    const map = new Map();
+    for (const k of sessDays(se, s)) {
+      const c = dayCalc(k), o = c.slots[s];
+      if (o.kind !== 'recipe' || !o.prepped || o.done) continue;
+      if (!map.has(o.r.id)) map.set(o.r.id, { r: o.r, s, entries: [] });
+      map.get(o.r.id).entries.push({ k, m: o.m, off: dayIndex(k) - se.idx, store: storageFor(o.r, dayIndex(k) - se.idx), done: o.done });
+    }
+    groups.push(...map.values());
+  }
+  return groups;
+}
+function vPrep() {
+  const mon = UI.week, w = S.weeks[mon] || { mode: 'auto' }, sug = suggestMode(mon), mode = weekMode(mon);
+  const seg = `<div class="seg" role="group" aria-label="Batch plan">${[['auto', 'Suggested'], ['one', 'One batch'], ['two', 'Two batches']].map(([v, l]) => `<button data-a="mode" data-v="${v}" aria-pressed="${(w.mode || 'auto') === v}">${l}</button>`).join('')}</div>`;
+  let note;
+  if ((w.mode || 'auto') === 'auto') note = `<div class="callout">${ic('info')}<div><b>${sug.mode === 'one' ? 'One Sunday session' : 'Sunday plus a Thursday top-up'}.</b> ${esc(sug.why)}</div></div>`;
+  else if (w.mode === 'one' && sug.mode === 'two') note = `<div class="callout warn">${ic('warn')}<div>${esc(sug.why.replace(', so a Thursday session covers the end of the week.', '.'))} Swap it for something that freezes, or switch to two batches.</div></div>`;
+  else note = `<div class="callout">${ic('info')}<div>${mode === 'one' ? 'One Sunday session covers the week.' : 'Sunday covers Mon–Thu; Thursday after work covers the rest.'}</div></div>`;
+  const sess = sessions(mon, mode);
+  const body = sess.map(se => {
+    const groups = prepGroups(mon, se);
+    const mins = groups.reduce((a, g) => a + g.r.t, 0);
+    const covers = [se.lunch.length ? `lunches ${dayList(se.lunch)}` : '', `breakfasts ${dayList(se.bfast)}`].filter(Boolean).join(' · ');
+    const inner = groups.length ? groups.map(g => {
+      const tot = {}; g.entries.forEach(e => g.r.items.forEach(it => { tot[it.i] = (tot[it.i] || 0) + it.g * e.m; }));
+      const n = g.entries.length;
+      const labels = g.entries.map(e => {
+        const day = DOW[dayIndex(e.k)], sl = SLOTNAME[g.s].toLowerCase();
+        if (e.store === 'fridge') return `<span class="label">${day} ${sl} · fridge</span>`;
+        if (e.store === 'freezer') return `<span class="label frz">${day} ${sl} · freeze, defrost ${DOW[(dayIndex(e.k) + 6) % 7]} night</span>`;
+        return `<span class="label bad">${day} ${sl} · past its fridge life</span>`;
+      }).join('');
+      const list = Object.entries(tot).map(([i, gr]) => `<li><span>${esc(ING[i].n)}</span><span class="q">${fmtQ(i, gr)}</span></li>`).join('');
+      return `<div class="batch"><div><div class="eyebrow">${SLOTNAME[g.s]} × ${n} · about ${g.r.t} min</div><h3>${esc(g.r.n)}</h3></div>
+        <div class="labels">${labels}</div>
+        ${g.r.rice ? `<div class="small muted">Cooked rice: cool within an hour, keep in the fridge no more than a day, freeze the rest. Reheat once, until piping hot.</div>` : ''}
+        <details class="more" open><summary>Ingredients for ${n} portion${n > 1 ? 's' : ''}</summary><ul class="ilist">${list}</ul></details>
+        <details class="more"><summary>Method</summary><ol class="steps">${g.r.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>${g.r.note ? `<p class="small muted">${esc(g.r.note)}</p>` : ''}</details>
+        <div class="btnrow"><button class="btn sm" data-a="bswap" data-key="${se.key}" data-s="${g.s}">${ic('edit')}Swap ${SLOTNAME[g.s].toLowerCase()}</button></div></div>`;
+    }).join('') : `<div class="batch"><p class="muted" style="margin:0">Nothing to batch-cook in this session.</p><div class="btnrow"><button class="btn sm" data-a="bswap" data-key="${se.key}" data-s="l">Choose a lunch</button><button class="btn sm" data-a="bswap" data-key="${se.key}" data-s="b">Choose a breakfast</button></div></div>`;
+    return `<section class="session"><header><span class="eyebrow">${se.key === 'A' ? 'Before the week' : 'After work'}</span><span class="d">${fmtDay(se.date)}</span><span class="small muted">Covers ${covers}${mins ? ` · roughly ${mins >= 60 ? `${Math.floor(mins / 60)} h ` : ''}${mins % 60 ? `${mins % 60} min` : ''} of cooking` : ''}</span></header>${inner}</section>`;
+  }).join('');
+  const wk = S.set.weekendBatch ? '' : `<p class="small muted">Weekend lunches are cooked fresh. You can include them in the batch in Settings.</p>`;
+  return `${weekNav(mon)}${seg}${note}${body}${wk}`;
+}
+
+const AISLES = [['veg', 'Fruit, veg & herbs'], ['meat', 'Meat'], ['fish', 'Fish'], ['dairy', 'Dairy & eggs'], ['chilled', 'Chilled'], ['bakery', 'Bakery'], ['frozen', 'Frozen'], ['dry', 'Pasta, rice & grains'], ['tins', 'Tins & jars'], ['world', 'World foods'], ['nuts', 'Nuts, seeds & dried fruit'], ['baking', 'Baking'], ['drinks', 'Drinks'], ['oils', 'Oils & sauces'], ['spices', 'Herbs & spices']];
+function shopTotals(mon, trip) {
+  const mode = weekMode(mon), sess = sessions(mon, mode), tot = {};
+  const add = (i, g) => { tot[i] = (tot[i] || 0) + g; };
+  for (const k of weekDays(mon)) {
+    const c = dayCalc(k), di = dayIndex(k);
+    for (const s of SLOTS) {
+      const o = c.slots[s];
+      if (o.kind !== 'recipe' || o.done) continue;
+      let t = 1;
+      if (mode === 'two') t = o.prepped ? (sessDays(sess[1], s).includes(k) ? 2 : 1) : (di <= 2 ? 1 : 2);
+      if (trip && t !== trip) continue;
+      o.r.items.forEach(it => add(it.i, it.g * o.m));
+    }
+    if (S.set.latteOn && !peekD(k).done.latte) { const t = mode === 'two' ? (di <= 2 ? 1 : 2) : 1; if (!trip || t === trip) add('milk', S.set.latteMl); }
+  }
+  return tot;
+}
+function vShop() {
+  const mon = UI.week, mode = weekMode(mon), w = W(mon);
+  const trip = mode === 'two' ? UI.trip : 0;
+  const tot = shopTotals(mon, trip);
+  const ids = Object.keys(tot);
+  if (!ids.length) return `${weekNav(mon)}<div class="empty"><p>Nothing to buy for ${fmtRange(mon)} yet.</p><button class="btn primary" data-a="fill">Plan this week</button></div>`;
+  const seg = mode === 'two' ? `<div class="seg">${[[1, 'Weekend shop'], [2, 'Thursday shop']].map(([v, l]) => `<button data-a="trip" data-v="${v}" aria-pressed="${UI.trip === v}">${l}</button>`).join('')}</div><p class="small muted">${UI.trip === 1 ? 'For the Sunday prep plus fresh meals Mon–Wed.' : 'For the Thursday prep plus fresh meals Thu–Sun.'}</p>` : `<p class="small muted" style="margin-top:12px">One shop for the whole week, before Sunday's prep.</p>`;
+  const key = i => `${trip}:${i}`;
+  const item = i => {
+    const ing = ING[i], on = !!w.shop[key(i)];
+    return `<button class="sitem" role="checkbox" aria-checked="${on}" data-a="shopck" data-i="${i}"><span class="box">${ic('check')}</span><span class="n">${esc(ing.n)}${ing.sb ? `<span class="h">${esc(ing.sb)}</span>` : ''}</span><span class="q">${fmtQ(i, tot[i], true)}</span></button>`;
+  };
+  const main = ids.filter(i => !ING[i].pantry), pantry = ids.filter(i => ING[i].pantry);
+  const done = ids.filter(i => w.shop[key(i)]).length;
+  const aisles = AISLES.map(([a, name]) => {
+    const its = main.filter(i => ING[i].a === a).sort((x, y) => ING[x].n.localeCompare(ING[y].n));
+    if (!its.length) return '';
+    return `<div class="aisle"><h3>${name}<small>${its.length}</small></h3>${a === 'fish' ? '<p class="small muted" style="margin:0 0 6px">Freeze any fish you won\'t cook within two days; defrost in the fridge overnight.</p>' : ''}<div class="shoplist">${its.map(item).join('')}</div></div>`;
+  }).join('');
+  const cup = pantry.length ? `<details class="more aisle"><summary>Cupboard check · ${pantry.length} staples</summary><div class="shoplist" style="margin-top:6px">${pantry.sort((x, y) => ING[x].n.localeCompare(ING[y].n)).map(item).join('')}</div></details>` : '';
+  return `${weekNav(mon)}${seg}<div class="barlbl" style="margin-top:6px"><span><b>${done}</b> of ${ids.length} ticked</span></div>${aisles}${cup}
+    <div class="btnrow" style="margin-top:16px"><button class="btn" data-a="copyshop">${ic('copy')}Copy list</button><button class="btn ghost" data-a="untick">Untick all</button></div>`;
+}
+
+const RTAGS = [['fav', 'Favourites'], ['onepot', 'One pot'], ['pasta', 'Pasta'], ['noodles', 'Noodles'], ['rice', 'Rice'], ['tray', 'Traybake'], ['oily', 'Oily fish'], ['veggie', 'Veggie'], ['freezes', 'Freezes'], ['ferm', 'Fermented'], ['quick', 'Quick'], ['soup', 'Soup'], ['curry', 'Curry'], ['red', 'Red meat']];
+function tagMatch(r, t) {
+  if (!t) return true;
+  if (t === 'fav') return !!S.favs[r.id];
+  if (t === 'oily') return r.oily; if (t === 'veggie') return r.veg; if (t === 'freezes') return r.fz; if (t === 'ferm') return r.fermBase; if (t === 'red') return r.red;
+  if (t === 'rice') return r.rice || r.tags.includes('rice');
+  if (t === 'quick') return r.tags.includes('quick') || r.t <= 20;
+  return r.tags.includes(t);
+}
+function recipeMatches() {
+  const q = UI.rq.trim().toLowerCase();
+  return RL.filter(r => (UI.rslot === 'all' || r.slots.includes(UI.rslot)) && tagMatch(r, UI.rtag) &&
+    (!q || r.n.toLowerCase().includes(q) || r.c.toLowerCase().includes(q) || r.items.some(it => ING[it.i].n.toLowerCase().includes(q))));
+}
+function rCard(r) {
+  return `<button class="rcard" data-a="open" data-r="${r.id}"><span class="t"><span class="nm">${esc(r.n)}</span>${S.favs[r.id] ? `<span class="star">${ic('star', true)}</span>` : ''}</span>
+  <span class="mt">${r.slots.map(s => SLOTNAME[s]).join(' / ')} · ${esc(r.c)} · ${r.t} min · ${fmtN(r.k)} kcal · ${fmtN(r.p)}g protein · ${fmtPts(r.pts)} plants</span>${badges(r)}</button>`;
+}
+function rListHtml() { const list = recipeMatches(); return `<p class="small muted" style="margin:10px 0 0">${list.length} recipe${list.length === 1 ? '' : 's'}</p><div class="rlist">${list.map(rCard).join('') || '<div class="empty">No recipes match.</div>'}</div>`; }
+function vRecipes() {
+  const slots = [['all', 'All'], ['b', 'Breakfast'], ['l', 'Lunch'], ['d', 'Dinner'], ['p', 'Pudding'], ['s', 'Snack']];
+  return `<input class="search" id="rq" type="search" placeholder="Search recipes or ingredients" value="${esc(UI.rq)}" aria-label="Search recipes">
+  <div class="filters">${slots.map(([v, l]) => `<button class="fchip" data-a="rslot" data-v="${v}" aria-pressed="${UI.rslot === v}">${l}</button>`).join('')}</div>
+  <div class="filters" style="padding-top:4px">${RTAGS.map(([v, l]) => `<button class="fchip" data-a="rtag" data-v="${v}" aria-pressed="${UI.rtag === v}">${l}</button>`).join('')}</div>
+  <div id="rlist">${rListHtml()}</div>`;
+}
+
+/* ───────────── sheets ───────────── */
+let SH = null, pending = null;
+function openSheet(o) { SH = o; renderSheet(true); }
+function closeSheet() { SH = null; pending = null; $('sheet-root').innerHTML = ''; document.body.style.overflow = ''; }
+function renderSheet(fresh) {
+  const root = $('sheet-root');
+  if (!SH) { root.innerHTML = ''; return; }
+  const old = root.querySelector('.sheet'), top = old && !fresh ? old.scrollTop : 0;
+  const html = ({ recipe: shRecipe, pick: shPick, xadd: shAdd, custom: shCustom, target: shTarget, settings: shSettings, confirm: shConfirm, backup: shBackup })[SH.type]();
+  root.innerHTML = `<div class="scrim" data-scrim="1"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(SH.title || 'Details')}"><div class="grab"></div>${html}</div></div>`;
+  document.body.style.overflow = 'hidden';
+  const sh = root.querySelector('.sheet'); sh.scrollTop = top;
+  if (fresh) { const f = sh.querySelector('[autofocus]'); if (f) f.focus(); }
+}
+const closeBtn = `<button class="iconbtn" data-a="close" aria-label="Close">${ic('x')}</button>`;
+
+function shRecipe() {
+  const r = R[SH.r]; SH.title = r.n;
+  let m = 1, o = null;
+  if (SH.k && SH.s) { const c = dayCalc(SH.k); const x = c.slots[SH.s]; if (x.kind === 'recipe' && x.r.id === r.id) { o = x; m = x.m; } }
+  const n = SH.n || 1, mm = m * n;
+  const ings = r.items.map(it => `<li><span>${esc(ING[it.i].n)}</span><span class="q">${fmtQ(it.i, it.g * mm)}</span></li>`).join('');
+  const plants = r.plants.slice().sort((a, b) => PLANTS[b][1] - PLANTS[a][1]).map(x => `<span class="pchip ${PLANTS[x][1] < 1 ? 'q' : ''}">${PLANTS[x][2] ? `<i class="c-${PLANTS[x][2]}"></i>` : ''}${esc(PLANTS[x][0])}${PLANTS[x][1] < 1 ? ' ¼' : ''}</span>`).join('');
+  const keeps = [];
+  if (r.rice) keeps.push('Rice: fridge 1 day, freeze the rest, reheat once until piping hot');
+  else if (r.fr) keeps.push(`Fridge ${r.fr} day${r.fr > 1 ? 's' : ''}`);
+  if (r.fz) keeps.push('freezes well'); else if (r.prep) keeps.push("doesn't freeze");
+  if (r.mk) keeps.push(`one batch makes ${r.mk}`);
+  let ctx = '';
+  if (o) {
+    const bn = batchName(SH.k, SH.s, r);
+    ctx = `<div class="callout">${ic('info')}<div>${SLOTNAME[SH.s]} on ${fmtDay(SH.k)}${bn ? `, from the ${bn}` : ''}. Portion scaled to <b>${fmtN(o.k)} kcal</b> (${m.toFixed(2)}× the base recipe) to fit the day.</div></div>
+    <div class="btnrow" style="margin-top:10px"><button class="btn sm" data-a="pick" data-k="${SH.k}" data-s="${SH.s}">${ic('edit')}Swap</button><button class="btn sm" data-a="custom" data-k="${SH.k}" data-s="${SH.s}">Eat something else</button><button class="btn sm ghost" data-a="skip" data-k="${SH.k}" data-s="${SH.s}">Skip</button></div>`;
+  } else {
+    const days = weekDays(UI.week);
+    ctx = `<section><h4>Add to plan</h4><div class="fieldrow"><div class="field" style="margin:0"><label for="ap-day">Day</label><select id="ap-day">${days.map(k => `<option value="${k}" ${k === UI.day ? 'selected' : ''}>${fmtDay(k)}</option>`).join('')}</select></div>
+      <div class="field" style="margin:0"><label for="ap-slot">Meal</label><select id="ap-slot">${r.slots.map(s => `<option value="${s}">${SLOTNAME[s]}</option>`).join('')}</select></div></div>
+      <button class="btn primary" style="margin-top:10px;width:100%" data-a="addplan">${ic('plus')}Add to plan</button></section>`;
+  }
+  return `<div class="sheethead"><div><span class="eyebrow">${r.slots.map(s => SLOTNAME[s]).join(' / ')} · ${esc(r.c)} · ${r.t} min</span><h2>${esc(r.n)}</h2>${badges(r)}</div>
+    <button class="iconbtn star" data-a="fav" aria-pressed="${!!S.favs[r.id]}" aria-label="${S.favs[r.id] ? 'Remove from favourites' : 'Add to favourites'}">${ic('star', !!S.favs[r.id])}</button>${closeBtn}</div>
+    <section><div class="nutri"><div><b>${fmtN(r.k * m)}</b><span>kcal</span></div><div><b>${fmtN(r.p * m)}g</b><span>protein</span></div><div><b>${fmtN(r.f * m)}g</b><span>fibre</span></div><div><b>${fmtPts(r.pts)}</b><span>plants</span></div></div></section>
+    ${ctx}
+    <section><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h4 style="margin:0">Ingredients</h4><div class="stepper"><button data-a="serv" data-v="-1" aria-label="Fewer portions">−</button><span>${n} portion${n > 1 ? 's' : ''}</span><button data-a="serv" data-v="1" aria-label="More portions">+</button></div></div>
+    <ul class="ilist" style="margin-top:8px">${ings}</ul></section>
+    <section><h4>Method</h4><ol class="steps">${r.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>${r.note ? `<p class="small muted">${esc(r.note)}</p>` : ''}</section>
+    ${keeps.length ? `<section><h4>Keeps</h4><p style="margin:0">${keeps.join(' · ').replace(/^./, c => c.toUpperCase())}.</p></section>` : ''}
+    <section><h4>Plants</h4><div class="plantgrid">${plants}</div></section>`;
+}
+
+function batchContext(k, s) {
+  const mon = mondayOf(k), se = sessions(mon, weekMode(mon)).find(x => sessDays(x, s).includes(k));
+  return se ? { se, mon } : null;
+}
+function shPick() {
+  const { k, s } = SH, mon = SH.mon || mondayOf(k);
+  SH.title = `Choose ${SLOTNAME[s].toLowerCase()}`;
+  const wc = weekCalc(mon), q = (SH.q || '').toLowerCase();
+  const cur = k ? peekD(k).sl[s] : null;
+  let batchNote = '';
+  if (SH.bkey) {
+    const se = sessions(mon, weekMode(mon)).find(x => x.key === SH.bkey);
+    batchNote = `<p class="small muted">Sets ${SLOTNAME[s].toLowerCase()} for ${dayList(sessDays(se, s))} (${se.key === 'A' ? 'Sunday' : 'Thursday'} batch).</p>`;
+  } else if ((s === 'b' || (s === 'l' && isBatchLunchDay(k))) && batchContext(k, s)) {
+    const bc = batchContext(k, s);
+    if (SH.all === undefined) SH.all = true;
+    batchNote = `<label class="check"><input type="checkbox" id="pk-all" ${SH.all ? 'checked' : ''} data-a="pkall"> Apply to every ${SLOTNAME[s].toLowerCase()} in the ${bc.se.key === 'A' ? 'Sunday' : 'Thursday'} batch (${dayList(sessDays(bc.se, s))})</label>`;
+  }
+  const opts = RL.filter(r => r.slots.includes(s) && (!q || r.n.toLowerCase().includes(q) || r.c.toLowerCase().includes(q) || r.items.some(it => ING[it.i].n.toLowerCase().includes(q))))
+    .map(r => ({ r, g: r.plants.reduce((a, x) => a + (wc.plan.has(x) ? 0 : PLANTS[x][1]), 0) }))
+    .sort((a, b) => (b.r.id === cur) - (a.r.id === cur) || (!!S.favs[b.r.id] - !!S.favs[a.r.id]) || (b.g - a.g) || a.r.n.localeCompare(b.r.n));
+  const list = opts.map(({ r, g }) => `<button class="pick ${r.id === cur ? 'cur' : ''}" data-a="choose" data-r="${r.id}"><span class="nm">${S.favs[r.id] ? '★ ' : ''}${esc(r.n)}</span><span class="mt">${esc(r.c)} · ${r.t} min · ${fmtN(r.k)} kcal · ${fmtN(r.p)}g protein${g ? ` · <span class="gain">+${fmtPts(g)} new plant${g === 1 ? '' : 's'}</span>` : ''}${r.oily ? ' · oily fish' : ''}${r.fermBase ? ' · fermented' : ''}${r.prep ? ' · batch' : ''}</span></button>`).join('');
+  const extra = k ? `<div class="btnrow" style="margin-top:10px"><button class="btn sm" data-a="custom" data-k="${k}" data-s="${s}">Eat something else</button><button class="btn sm ghost" data-a="skip" data-k="${k}" data-s="${s}">Skip</button>${cur ? `<button class="btn sm ghost" data-a="clearslot" data-k="${k}" data-s="${s}">Clear</button>` : ''}</div>` : '';
+  return `<div class="sheethead"><div><span class="eyebrow">${k ? fmtDay(k) : fmtRange(mon)}</span><h2>${SLOTNAME[s]}</h2></div>${closeBtn}</div>
+    ${batchNote}<input class="search" id="pq" type="search" placeholder="Search" value="${esc(SH.q || '')}" aria-label="Search recipes">${extra}
+    <p class="small muted">Sorted by new plants for this week.</p><div class="plist" id="plist">${list || '<div class="empty">No matches.</div>'}</div>`;
+}
+function shAdd() {
+  SH.title = 'Log something else'; SH.pl = SH.pl || [];
+  const q = (SH.plq || '').toLowerCase();
+  const all = Object.keys(PLANTS).sort((a, b) => PLANTS[a][0].localeCompare(PLANTS[b][0]));
+  const shown = all.filter(x => SH.pl.includes(x) || (q && PLANTS[x][0].toLowerCase().includes(q)));
+  const chips = shown.map(x => `<button class="pchip ${SH.pl.includes(x) ? 'on' : ''}" data-a="xpl" data-v="${x}">${PLANTS[x][2] ? `<i class="c-${PLANTS[x][2]}"></i>` : ''}${esc(PLANTS[x][0])}</button>`).join('');
+  return `<div class="sheethead"><div><span class="eyebrow">${fmtDay(UI.day)}</span><h2>Log something else</h2></div>${closeBtn}</div>
+    <div class="field"><label for="x-n">What was it?</label><input id="x-n" autofocus value="${esc(SH.n || '')}" placeholder="e.g. Pret flat white, office cake"></div>
+    <div class="fieldrow"><div class="field"><label for="x-k">Calories</label><input id="x-k" type="number" inputmode="numeric" value="${esc(SH.k || '')}"></div><div class="field"><label for="x-p">Protein (g)</label><input id="x-p" type="number" inputmode="numeric" value="${esc(SH.p || '')}"></div></div>
+    <label class="check"><input type="checkbox" id="x-fe" ${SH.fe ? 'checked' : ''}> Counts as a fermented portion</label>
+    <div class="field"><label for="plq">Plants in it (optional)</label><input id="plq" type="search" placeholder="Type to find a plant, e.g. fig" value="${esc(SH.plq || '')}"></div>
+    <div class="plantgrid" id="plchips">${chips}</div>
+    <button class="btn primary" style="width:100%;margin-top:16px" data-a="xsave">Add to ${fmtDay(UI.day)}</button>`;
+}
+function shCustom() {
+  SH.title = 'Something else';
+  const c = peekD(SH.k).cu[SH.s] || {};
+  return `<div class="sheethead"><div><span class="eyebrow">${SLOTNAME[SH.s]} · ${fmtDay(SH.k)}</span><h2>Something else</h2></div>${closeBtn}</div>
+  <p class="small muted">Eating out or improvising. Unticked meals later in the day shrink or grow to keep you on target.</p>
+  <div class="field"><label for="c-n">What</label><input id="c-n" autofocus value="${esc(c.n || '')}" placeholder="e.g. Dinner at Mum's"></div>
+  <div class="fieldrow"><div class="field"><label for="c-k">Calories (estimate)</label><input id="c-k" type="number" inputmode="numeric" value="${esc(c.k || '')}"></div><div class="field"><label for="c-p">Protein (g)</label><input id="c-p" type="number" inputmode="numeric" value="${esc(c.p || '')}"></div></div>
+  <div class="btnrow" style="margin-top:14px"><button class="btn primary" data-a="csave">Save</button><button class="btn ghost" data-a="pick" data-k="${SH.k}" data-s="${SH.s}">Pick a recipe instead</button></div>`;
+}
+function shTarget() {
+  SH.title = 'Calorie target';
+  const d = peekD(UI.day), v = d.t || S.set.target;
+  return `<div class="sheethead"><div><span class="eyebrow">${fmtDay(UI.day)}</span><h2>Calorie target</h2></div>${closeBtn}</div>
+  <p class="small muted">Change it for this day only, e.g. a long run or a dinner out. Every recipe portion that day rescales to fit.</p>
+  <div class="field"><label for="t-v">Target for ${fmtDay(UI.day)} (kcal)</label><input id="t-v" type="number" inputmode="numeric" value="${v}" autofocus></div>
+  <div class="chips" style="margin-top:10px">${[1600, 1800, 2000, 2200, 2500, 2800].map(x => `<button class="chip" data-a="tpreset" data-v="${x}">${fmtN(x)}</button>`).join('')}</div>
+  <div class="btnrow" style="margin-top:14px"><button class="btn primary" data-a="tsave">Save</button>${d.t ? `<button class="btn ghost" data-a="treset">Back to default (${fmtN(S.set.target)})</button>` : ''}</div>`;
+}
+function shSettings() {
+  SH.title = 'Settings';
+  const st = S.set, b = st.bud, sum = st.latteK * (st.latteOn ? 1 : 0) + SLOTS.reduce((a, s) => a + b[s], 0);
+  const num = (id, label, v) => `<div class="field"><label for="${id}">${label}</label><input id="${id}" type="number" inputmode="numeric" value="${v}"></div>`;
+  return `<div class="sheethead"><div><span class="eyebrow">Thirty Plants</span><h2>Settings</h2></div>${closeBtn}</div>
+  <section><h4>Daily targets</h4><div class="fieldrow">${num('s-target', 'Calories (kcal)', st.target)}${num('s-prot', 'Protein (g)', st.protGoal)}</div></section>
+  <section><h4>Morning latte</h4><label class="check"><input type="checkbox" id="s-latte" ${st.latteOn ? 'checked' : ''}> Include a latte every day</label>
+    <div class="fieldrow three">${num('s-lk', 'kcal', st.latteK)}${num('s-lp', 'Protein (g)', st.latteP)}${num('s-lml', 'Milk (ml)', st.latteMl)}</div></section>
+  <section><h4>Meal budgets (kcal)</h4><div class="fieldrow three">${num('s-bb', 'Breakfast', b.b)}${num('s-bl', 'Lunch', b.l)}${num('s-bs', 'Snack', b.s)}${num('s-bd', 'Dinner', b.d)}${num('s-bp', 'Pudding', b.p)}</div>
+    <p class="small muted">Latte plus these currently add up to ${fmtN(sum)} kcal. They're shares: each day scales them to fit its target.</p></section>
+  <section><h4>Weekly goals</h4><div class="fieldrow">${num('s-plants', 'Plant points', st.plantGoal)}${num('s-col', 'Colours per day', st.colourGoal)}${num('s-oily', 'Oily fish meals', st.oilyGoal)}${num('s-red', 'Red meat (max)', st.redMax)}</div></section>
+  <section><h4>Planning</h4>
+    <label class="check"><input type="checkbox" id="s-wkb" ${st.weekendBatch ? 'checked' : ''}> Weekend lunches come from the batch too</label>
+    <label class="check"><input type="checkbox" id="s-adapt" ${st.adapt ? 'checked' : ''}> Adapt portions through the day</label>
+    <p class="small muted" style="margin-left:30px">When you tick a meal, log a snack or eat out, the meals you haven't eaten yet resize to land on target. Batch-cooked meals stay as prepped.</p></section>
+  <button class="btn primary" style="width:100%;margin-top:14px" data-a="setsave">Save settings</button>
+  <hr class="rule">
+  <section class="help"><h4>Put it on your Android home screen</h4><ol><li>Open this app's web address in Chrome on your phone.</li><li>Tap the ⋮ menu, then <b>Add to Home screen</b> (or <b>Install app</b>).</li><li>It opens full screen with its own icon and works offline. Your plans stay on the phone.</li></ol></section>
+  <section><h4>Backup</h4><p class="small muted" style="margin:0 0 8px">Everything lives on this device. Export now and then, or before switching phones.</p><div class="btnrow"><button class="btn sm" data-a="backup" data-v="export">Export</button><button class="btn sm" data-a="backup" data-v="import">Import</button></div></section>
+  <section><h4>Start again</h4><button class="btn sm danger" data-a="resetall">Clear all data</button></section>`;
+}
+function shBackup() {
+  SH.title = 'Backup';
+  if (SH.mode === 'export') {
+    return `<div class="sheethead"><div><span class="eyebrow">Backup</span><h2>Export</h2></div>${closeBtn}</div>
+    <p class="small muted">Copy this text somewhere safe (Notes, an email to yourself)${window.TP_PREVIEW ? '' : ', or download it as a file'}.</p>
+    <div class="field"><label for="bk">Your data</label><textarea id="bk" readonly>${esc(JSON.stringify(S))}</textarea></div>
+    <div class="btnrow" style="margin-top:10px"><button class="btn primary" data-a="bkcopy">${ic('copy')}Copy</button>${window.TP_PREVIEW ? '' : '<button class="btn" data-a="bkdl">Download file</button>'}</div>`;
+  }
+  return `<div class="sheethead"><div><span class="eyebrow">Backup</span><h2>Import</h2></div>${closeBtn}</div>
+  <p class="small muted">Paste an export, or choose a backup file. This replaces everything on this device.</p>
+  <div class="field"><label for="bk-file">Backup file</label><input id="bk-file" type="file" accept=".json,application/json,text/plain"></div>
+  <div class="field"><label for="bk">Or paste it here</label><textarea id="bk"></textarea></div>
+  <button class="btn primary" style="width:100%;margin-top:10px" data-a="bkimport">Replace my data</button>`;
+}
+function shConfirm() {
+  SH.title = SH.head;
+  return `<div class="sheethead"><div><h2>${esc(SH.head)}</h2></div>${closeBtn}</div><p>${esc(SH.msg)}</p>
+  <div class="btnrow"><button class="btn ${SH.danger ? 'danger' : 'primary'}" data-a="confirmyes">${esc(SH.yes)}</button><button class="btn ghost" data-a="close">Cancel</button></div>`;
+}
+function ask(head, msg, yes, fn, danger) { pending = fn; openSheet({ type: 'confirm', head, msg, yes, danger }); }
+
+/* ───────────── toast & clipboard ───────────── */
+let toastT = null;
+function toast(msg) { const r = $('toast-root'); r.innerHTML = `<div class="toast">${esc(msg)}</div>`; clearTimeout(toastT); toastT = setTimeout(() => { r.innerHTML = ''; }, 2000); }
+function copyText(text, el) {
+  const fallback = () => { if (el) { el.focus(); el.select(); } toast('Select and copy the text'); };
+  try { navigator.clipboard.writeText(text).then(() => toast('Copied'), fallback); } catch (e) { fallback(); }
+}
+
+/* ───────────── actions ───────────── */
+function setSlot(k, s, v) { const d = D(k); d.sl[s] = v; delete d.done[s]; if (v !== '@c') delete d.cu[s]; save(); }
+function applyBatch(mon, key, s, rid) {
+  const se = sessions(mon, weekMode(mon)).find(x => x.key === key);
+  sessDays(se, s).forEach(k => { const d = D(k); if (d.done[s] || d.sl[s] === '@c' || d.sl[s] === '@skip') return; d.sl[s] = rid; });
+  save();
+}
+const ACT = {
+  tab(d) { UI.tab = d.v; try { sessionStorage.setItem('tp.tab', d.v); } catch (e) { /* ignore */ } if (d.v === 'today') UI.week = mondayOf(UI.day); render(); window.scrollTo(0, 0); },
+  wk(d) { const n = +d.v; UI.week = addDays(UI.week, 7 * n); UI.day = addDays(UI.day, 7 * n); render(); },
+  gotoday() { UI.day = todayKey(); UI.week = mondayOf(UI.day); render(); },
+  day(d) { UI.day = d.v; render(); },
+  tick(d) {
+    const day = D(UI.day);
+    if (d.s === 'latte') { if (day.done.latte) delete day.done.latte; else day.done.latte = true; }
+    else {
+      const o = dayCalc(UI.day).slots[d.s];
+      if (day.done[d.s]) delete day.done[d.s]; else day.done[d.s] = o.kind === 'recipe' ? { m: +o.m.toFixed(3) } : { c: 1 };
+    }
+    save(); render();
+  },
+  open(d) { openSheet({ type: 'recipe', r: d.r, k: d.k, s: d.s, n: 1 }); },
+  pick(d) { openSheet({ type: 'pick', k: d.k, s: d.s, q: '' }); },
+  bswap(d) { openSheet({ type: 'pick', mon: UI.week, bkey: d.key, s: d.s, q: '' }); },
+  pkall(d, el) { SH.all = el.checked; },
+  choose(d) {
+    if (SH.bkey) { applyBatch(SH.mon, SH.bkey, SH.s, d.r); toast('Batch updated'); }
+    else {
+      const bc = batchContext(SH.k, SH.s);
+      if (SH.all && bc && prepped(SH.k, SH.s, R[d.r])) { applyBatch(bc.mon, bc.se.key, SH.s, d.r); toast(`Batch updated`); }
+      else setSlot(SH.k, SH.s, d.r);
+    }
+    closeSheet(); render();
+  },
+  custom(d) { openSheet({ type: 'custom', k: d.k, s: d.s }); },
+  csave() {
+    const n = $('c-n').value.trim() || 'Something else', k = +$('c-k').value || 0, p = +$('c-p').value || 0;
+    const day = D(SH.k); const wasDone = day.done[SH.s];
+    day.sl[SH.s] = '@c'; day.cu[SH.s] = { n, k, p }; if (!wasDone || !wasDone.c) delete day.done[SH.s];
+    save(); closeSheet(); render();
+  },
+  skip(d) { setSlot(d.k, d.s, '@skip'); closeSheet(); render(); },
+  clearslot(d) { const day = D(d.k); delete day.sl[d.s]; delete day.cu[d.s]; delete day.done[d.s]; save(); closeSheet(); render(); },
+  fav() { if (S.favs[SH.r]) delete S.favs[SH.r]; else S.favs[SH.r] = 1; save(); renderSheet(); render(); },
+  serv(d) { SH.n = Math.max(1, Math.min(12, (SH.n || 1) + +d.v)); renderSheet(); },
+  addplan() { const k = $('ap-day').value, s = $('ap-slot').value; setSlot(k, s, SH.r); UI.day = k; closeSheet(); toast(`Added to ${fmtDay(k)}`); render(); },
+  xadd() { openSheet({ type: 'xadd', pl: [] }); },
+  xpl(d) { keepAddFields(); const i = SH.pl.indexOf(d.v); if (i >= 0) SH.pl.splice(i, 1); else SH.pl.push(d.v); renderSheet(); },
+  xsave() {
+    keepAddFields();
+    if (!SH.n && !SH.k) { toast('Add a name or calories'); return; }
+    D(UI.day).x.push({ n: SH.n || 'Extra', k: +SH.k || 0, p: +SH.p || 0, fe: !!SH.fe, pl: SH.pl.slice() });
+    save(); closeSheet(); render();
+  },
+  xdel(d) { D(UI.day).x.splice(+d.i, 1); save(); render(); },
+  target() { openSheet({ type: 'target' }); },
+  tpreset(d) { $('t-v').value = d.v; },
+  tsave() { const v = Math.round(+$('t-v').value); if (v < 800 || v > 6000) { toast('Pick something between 800 and 6,000'); return; } D(UI.day).t = v === S.set.target ? null : v; save(); closeSheet(); render(); },
+  treset() { D(UI.day).t = null; save(); closeSheet(); render(); },
+  fill() { const mon = UI.tab === 'today' ? mondayOf(UI.day) : UI.week; planWeek(mon, false); toast('Week planned'); render(); },
+  replan() { const mon = UI.week; ask('Re-plan this week?', 'Every meal you haven\'t ticked off or set yourself will be replaced with a fresh plan.', 'Re-plan', () => { planWeek(mon, true); toast('New plan ready'); }); },
+  mode(d) { W(UI.week).mode = d.v; save(); render(); },
+  trip(d) { UI.trip = +d.v; render(); },
+  shopck(d) { const w = W(UI.week), key = `${weekMode(UI.week) === 'two' ? UI.trip : 0}:${d.i}`; if (w.shop[key]) delete w.shop[key]; else w.shop[key] = 1; save(); render(); },
+  untick() { W(UI.week).shop = {}; save(); render(); },
+  copyshop() {
+    const mon = UI.week, mode = weekMode(mon), trip = mode === 'two' ? UI.trip : 0, tot = shopTotals(mon, trip), w = W(mon);
+    const lines = [`Thirty Plants · shopping for ${fmtRange(mon)}${trip ? (trip === 1 ? ' (weekend shop)' : ' (Thursday shop)') : ''}`];
+    AISLES.forEach(([a, name]) => {
+      const its = Object.keys(tot).filter(i => ING[i].a === a && !ING[i].pantry && !w.shop[`${trip}:${i}`]);
+      if (!its.length) return;
+      lines.push('', name.toUpperCase()); its.forEach(i => lines.push(`- ${ING[i].n}: ${fmtQ(i, tot[i], true)}`));
+    });
+    copyText(lines.join('\n'));
+  },
+  rslot(d) { UI.rslot = d.v; render(); },
+  rtag(d) { UI.rtag = UI.rtag === d.v ? '' : d.v; render(); },
+  settings() { openSheet({ type: 'settings' }); },
+  setsave() {
+    const g = id => +$(id).value, st = S.set;
+    const pos = (v, f) => isFinite(v) && v > 0 ? v : f;
+    st.target = pos(g('s-target'), st.target); st.protGoal = pos(g('s-prot'), st.protGoal);
+    st.latteOn = $('s-latte').checked; st.latteK = pos(g('s-lk'), st.latteK); st.latteP = Math.max(0, g('s-lp') || 0); st.latteMl = pos(g('s-lml'), st.latteMl);
+    st.bud = { b: pos(g('s-bb'), st.bud.b), l: pos(g('s-bl'), st.bud.l), s: Math.max(0, g('s-bs') || 0) || 1, d: pos(g('s-bd'), st.bud.d), p: Math.max(0, g('s-bp') || 0) || 1 };
+    st.plantGoal = pos(g('s-plants'), st.plantGoal); st.colourGoal = Math.min(6, pos(g('s-col'), st.colourGoal)); st.oilyGoal = Math.max(0, g('s-oily') || 0); st.redMax = Math.max(0, g('s-red') || 0);
+    st.weekendBatch = $('s-wkb').checked; st.adapt = $('s-adapt').checked;
+    save(); closeSheet(); toast('Settings saved'); render();
+  },
+  backup(d) { openSheet({ type: 'backup', mode: d.v }); },
+  bkcopy() { copyText($('bk').value, $('bk')); },
+  bkdl() {
+    try {
+      const blob = new Blob([JSON.stringify(S)], { type: 'application/json' }), a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = `thirty-plants-backup-${todayKey()}.json`; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    } catch (e) { toast('Download not available here; use Copy'); }
+  },
+  bkimport() {
+    const f = $('bk-file').files && $('bk-file').files[0];
+    const finish = txt => {
+      let s; try { s = JSON.parse(txt); } catch (e) { toast("That isn't a valid backup"); return; }
+      if (!s || s.v !== 1 || !s.days) { toast("That isn't a Thirty Plants backup"); return; }
+      S = normalise(s); save(); closeSheet(); toast('Backup restored'); render();
+    };
+    if (f) { const rd = new FileReader(); rd.onload = () => finish(rd.result); rd.readAsText(f); }
+    else finish($('bk').value);
+  },
+  resetall() { ask('Clear all data?', 'Plans, ticks, favourites and settings on this device will be deleted. Export a backup first if you might want them.', 'Clear everything', () => { S = normalise(null); save(); planWeek(mondayOf(todayKey()), false); UI.day = todayKey(); UI.week = mondayOf(UI.day); toast('Started fresh'); }, true); },
+  confirmyes() { const fn = pending; closeSheet(); if (fn) fn(); render(); },
+  close() { closeSheet(); }
+};
+function keepAddFields() { if (!SH || SH.type !== 'xadd') return; SH.n = $('x-n').value.trim(); SH.k = $('x-k').value; SH.p = $('x-p').value; SH.fe = $('x-fe').checked; SH.plq = $('plq').value; }
+
+document.addEventListener('click', e => {
+  if (e.target.dataset && e.target.dataset.scrim) { closeSheet(); return; }
+  const t = e.target.closest('[data-a]');
+  if (!t || t.disabled) return;
+  const fn = ACT[t.dataset.a];
+  if (fn) fn(t.dataset, t, e);
+});
+document.addEventListener('input', e => {
+  const id = e.target.id;
+  if (id === 'rq') { UI.rq = e.target.value; $('rlist').innerHTML = rListHtml(); }
+  else if (id === 'pq' && SH) { SH.q = e.target.value; const pos = e.target.selectionStart; renderSheet(); const el = $('pq'); el.focus(); try { el.setSelectionRange(pos, pos); } catch (er) { /* ignore */ } }
+  else if (id === 'plq' && SH) { keepAddFields(); const pos = e.target.selectionStart; renderSheet(); const el = $('plq'); el.focus(); try { el.setSelectionRange(pos, pos); } catch (er) { /* ignore */ } }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && SH) closeSheet(); });
+
+/* ───────────── shell ───────────── */
+const TABS = [['today', 'Today', 'today'], ['week', 'Week', 'week'], ['prep', 'Prep', 'prep'], ['shop', 'Shop', 'shop'], ['recipes', 'Recipes', 'book']];
+function render() {
+  const mon = UI.tab === 'today' ? mondayOf(UI.day) : UI.week;
+  const wc = weekCalc(mon), g = S.set.plantGoal;
+  $('pill').innerHTML = `${ring(wc.ptsPlan / g, 'currentColor')}<span>${fmtPts(wc.ptsPlan)}/${g} plants</span>`;
+  $('gear').innerHTML = ic('gear');
+  $('nav').innerHTML = TABS.map(([v, l, i]) => `<button data-a="tab" data-v="${v}" ${UI.tab === v ? 'aria-current="page"' : ''}>${ic(i)}<span>${l}</span></button>`).join('');
+  const views = { today: vToday, week: vWeek, prep: vPrep, shop: vShop, recipes: vRecipes };
+  $('main').innerHTML = (views[UI.tab] || vToday)();
+}
+
+// first run: plan the current week so the app opens on a working plan
+(function init() {
+  const mon = mondayOf(todayKey());
+  if (!weekDays(mon).some(k => S.days[k] && Object.keys(S.days[k].sl || {}).length)) planWeek(mon, false);
+  render();
+})();
+
+window.ThirtyPlants = { R, ING, dayCalc, weekCalc, planWeek, suggestMode, shopTotals, sessions, state: () => S };
+})();
+
+</script>
+<script>
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('./sw.js').catch(function () {}); });
+}
+</script>
+</body>
+</html>
