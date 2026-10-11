@@ -933,6 +933,13 @@ body.rvon .scrim { z-index: 80; }
 .rvnr { display: flex; align-items: center; justify-content: space-between; gap: 6px 10px; flex-wrap: wrap; border-top: 1px dashed var(--line); padding-top: 10px; margin-top: 2px; }
 .rvnr .small { flex: 1 1 160px; }
 .rvnrc .rvnr { border-top: 0; padding-top: 0; margin-top: 0; }
+/* calories on ingredient lines */
+.ilist.kc li { align-items: flex-start; }
+.ilist.kc .in { min-width: 0; text-align: left; }
+.ilist.kc .in small, .ilist.kc .q small { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-top: 1px; }
+.ilist.kc .q small { font-variant-numeric: tabular-nums; }
+.ilist.kc .for { font-size: 12.5px; }
+.ilist.kc .itot { border-top: 1px solid var(--line); font-weight: 800; padding-top: 8px; margin-top: 2px; }
 
 </style>
 </head>
@@ -957,7 +964,7 @@ body.rvon .scrim { z-index: 80; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '1.12.1';</script>
+<script>window.TP_VERSION = '1.13.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -2655,6 +2662,16 @@ function fmtQ(id, g, shop) {
   return fmtG(g);
 }
 const pct = x => `${Math.max(0, Math.min(100, x * 100)).toFixed(1)}%`;
+/* ingredient lines with calories: kcal for the amount, and kcal per 100g (or 100ml) to check against the pack's label */
+const per100 = id => `${fmtN(ING[id].k)} kcal per 100${ING[id].ml ? 'ml' : 'g'}`;
+function ingRows(list, totLabel) {
+  let tot = 0;
+  const rows = list.map(([id, g, extra]) => {
+    const kc = ING[id].k * g / 100, q = fmtQ(id, g), w = /\d(k?g|ml)\b|litres/.test(q) ? '' : `${ING[id].ml ? fmtMl(g) : fmtG(g)} · `; // spoons and counts get their weight too
+    tot += kc; return `<li><span class="in">${esc(ING[id].n)}${extra || ''}<small>${per100(id)}</small></span><span class="q">${q}<small>${w}${fmtN(kc)} kcal</small></span></li>`;
+  }).join('');
+  return `${rows}<li class="itot"><span>${totLabel || 'Total'}</span><span class="q">${fmtN(tot)} kcal</span></li>`;
+}
 
 /* ───────────── icons ───────────── */
 const P = {
@@ -3559,7 +3576,7 @@ function vPrep() {
       return `<div class="batch"><div class="bhead">${art(gr.r, 52)}<div><div class="eyebrow">${SLOTNAME[gr.s]} × ${n} · ${gr.r.t} min</div><h3>${esc(gr.r.n)}</h3></div></div>
         <div class="labels">${boxLabels(gr)}</div>
         ${gr.r.rice ? '<div class="small muted">Cool the rice within an hour, keep it in the fridge no more than a day, and freeze the rest. Reheat once, until piping hot.</div>' : ''}
-        <details class="more"><summary>Ingredients for ${n} portion${n > 1 ? 's' : ''}${ic('chev')}</summary><ul class="ilist">${Object.entries(tot).map(([i, g]) => `<li><span>${esc(ING[i].n)}</span><span class="q">${fmtQ(i, g)}</span></li>`).join('')}</ul></details>
+        <details class="more"><summary>Ingredients for ${n} portion${n > 1 ? 's' : ''}${ic('chev')}</summary><ul class="ilist kc">${ingRows(Object.entries(tot), `Total for ${n} portion${n > 1 ? 's' : ''}`)}</ul></details>
         <details class="more"><summary>Method${ic('chev')}</summary><ol class="steps">${gr.r.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>${gr.r.note ? `<p class="small muted">${esc(gr.r.note)}</p>` : ''}</details>
         <div><button class="btn sm" data-a="bswap" data-key="${se.key}" data-s="${gr.s}">${ic('edit')}Swap ${sl}</button></div></div>`;
     }).join('') : M.ps.fin ? `<div class="batch"><p class="muted" style="margin:0">Everything from this batch has been eaten.</p></div>`
@@ -3747,7 +3764,7 @@ function stepHtml(M, s, i, cur) {
   else if (s.kind === 'get') {
     const tot = {}; s.gr.entries.forEach(e => s.gr.r.items.forEach(it => { tot[it.i] = (tot[it.i] || 0) + it.g * e.m; }));
     title = 'Get the ingredients out';
-    body = `<p class="psub">${M.cook ? `${M.k === todayKey() ? "Today's" : `The ${fmtDay(M.k)}`} portion, ${fmtN(M.o.k)} kcal` : `For ${s.gr.n} portion${s.gr.n > 1 ? 's' : ''}`}</p><ul class="ilist pings">${Object.entries(tot).map(([id, g]) => `<li><span>${esc(ING[id].n)}</span><span class="q">${fmtQ(id, g)}</span></li>`).join('')}</ul>`;
+    body = `<p class="psub">${M.cook ? `${M.k === todayKey() ? "Today's" : `The ${fmtDay(M.k)}`} portion, ${fmtN(M.o.k)} kcal` : `For ${s.gr.n} portion${s.gr.n > 1 ? 's' : ''}`}</p><ul class="ilist kc pings">${ingRows(Object.entries(tot), M.cook ? 'Total' : `Total for ${s.gr.n} portion${s.gr.n > 1 ? 's' : ''}`)}</ul>`;
   } else if (s.kind === 'do') {
     title = s.text;
     if (s.tm.length) body = `<div class="tbtns">${s.tm.map((_, j) => tbtnHtml(M, s, j)).join('')}</div>${isCur && M.left > 1 && s.tm.some((_, j) => !TM.some(t => t.id === `${M.st}|${M.key}|${s.id}|${j}`)) ? '<p class="psub">Start the timer and carry on. It keeps counting at the top.</p>' : ''}`;
@@ -4155,7 +4172,7 @@ function shRecipe() {
     ${ctx}
     <section><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h4 style="margin:0">Ingredients</h4><div class="stepper"><button data-a="serv" data-v="-1" aria-label="Fewer portions">−</button><span>${n} portion${n > 1 ? 's' : ''}</span><button data-a="serv" data-v="1" aria-label="More portions">+</button></div></div>
       ${swapped.length ? `<div class="callout" style="margin-top:8px">${ic('swap')}<div>This week: ${esc(swapped.join('; '))}. Follow the method with the swap.</div></div>` : ''}
-      <ul class="ilist" style="margin-top:8px">${r.items.map(it => `<li><span>${esc(ING[it.i].n)}${it.from ? ` <small class="muted">for ${esc(shortN(it.from))}</small>` : ''}</span><span class="q">${fmtQ(it.i, it.g * mm)}</span></li>`).join('')}</ul></section>
+      <ul class="ilist kc" style="margin-top:8px">${ingRows(r.items.map(it => [it.i, it.g * mm, it.from ? ` <span class="muted for">for ${esc(shortN(it.from))}</span>` : '']), n > 1 ? `Total for ${n} portions` : 'Total')}</ul></section>
     <section><h4>Method</h4><ol class="steps">${r.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>${r.note ? `<p class="small muted">${esc(r.note)}</p>` : ''}</section>
     <section><details class="more"><summary>Plants & storage${ic('chev')}</summary>${keeps.length ? `<p style="margin:8px 0">${keeps.join(' · ').replace(/^./, c => c.toUpperCase())}.</p>` : ''}<div class="plantgrid">${plants}</div></details></section>`;
 }
