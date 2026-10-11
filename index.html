@@ -957,6 +957,7 @@ body.rvon .scrim { z-index: 80; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
+<script>window.TP_VERSION = '1.12.1';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -2185,6 +2186,7 @@ function eff(r, st) {
 const ctxOf = r => new Set([r.id, ...r.slots, ...r.tags, dishType(r)]);
 const fridgeLife = r => r.rice ? 1 : r.fr;
 const SLOTS = ['b', 'l', 's', 'd', 'p'];
+const VER = window.TP_VERSION ? ` · version ${window.TP_VERSION}` : ''; // shown at the top of Settings
 const SLOTNAME = { b: 'Breakfast', l: 'Lunch', s: 'Snack', d: 'Dinner', p: 'Pudding' };
 const COLOURS = ['red', 'orange', 'yellow', 'green', 'purple', 'white'];
 const COLOURNAME = { red: 'red', orange: 'orange', yellow: 'yellow', green: 'green', purple: 'purple/blue', white: 'white/tan' };
@@ -3505,7 +3507,7 @@ function shWGoal() {
   const w = WT(), u = w.unit, rates = u === 'lb' ? [0.5, 1, 1.5, 2] : [0.25, 0.5, 0.75, 1];
   const curRate = +toU(w.rate).toFixed(2), opt = (name, v, label, on) => `<button class="opt" role="radio" data-a="wgset" data-f="${name}" data-v="${v}" aria-checked="${on}"><span class="rd"></span><b>${label}</b></button>`;
   const kp = SH.keep || null, uu = kp ? kp.u : u, wd = kp ? +kp.day : w.waistDay;
-  return `<div class="sheethead"><div><span class="eyebrow">Check-in</span><h2>Settings</h2></div>${closeBtn}</div>
+  return `<div class="sheethead"><div><span class="eyebrow">Check-in${VER}</span><h2>Settings</h2></div>${closeBtn}</div>
     <button class="btn setrow" data-a="ckitems">${ic('check')}<span>Daily checks<small>${S.ckItems.length ? esc(S.ckItems.map(x => x.n).join(', ')) : 'None set up'}</small></span>${ic('chev')}</button>
     <h4 style="margin-top:14px">Weight aim</h4><div class="opts">${opt('goal', 'lose', 'Lose weight', w.goal === 'lose')}${opt('goal', 'maintain', 'Hold steady', w.goal === 'maintain')}${opt('goal', 'gain', 'Gain weight', w.goal === 'gain')}</div>
     ${w.goal === 'maintain' ? '' : `<h4 style="margin-top:14px">Pace</h4><div class="chips">${rates.map(r => `<button class="chip" data-a="wgset" data-f="rate" data-v="${r}" aria-pressed="${Math.abs(curRate - r) < 0.01}">${r} ${u} a week</button>`).join('')}</div><p class="small muted" style="margin:6px 0 0">${w.goal === 'lose' ? 'Around half to one per cent of your body weight a week is a steady pace that keeps muscle.' : 'Slow gains keep most of it as muscle.'}</p>`}
@@ -4303,7 +4305,7 @@ function shSettings() {
   SH.title = 'Settings';
   const st = S.set, b = st.bud, sum = (st.latteOn ? st.latteK : 0) + SLOTS.reduce((a, s) => a + b[s], 0);
   const num = (id, label, v) => `<div class="field"><label for="${id}">${label}</label><input id="${id}" type="number" inputmode="numeric" value="${v}"></div>`;
-  return `<div class="sheethead"><div><span class="eyebrow">Thirty Plants</span><h2>Settings</h2></div>${closeBtn}</div>
+  return `<div class="sheethead"><div><span class="eyebrow">Thirty Plants${VER}</span><h2>Settings</h2></div>${closeBtn}</div>
   <button class="btn setrow" data-a="recipes">${ic('book')}<span>Browse recipes<small>All ${RL.length}, with search and filters</small></span>${ic('chev')}</button>
   <section><h4>Daily targets</h4><div class="fieldrow three">${num('s-target', 'Calories (kcal)', st.target)}${num('s-prot', 'Protein (g)', st.protGoal)}${num('s-fib', 'Fibre (g)', st.fibreGoal)}</div></section>
   <details class="more"><summary>Sugar, salt and fat limits${ic('chev')}</summary>
