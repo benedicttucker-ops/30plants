@@ -115,6 +115,7 @@ button.chip { cursor: pointer; }
 .c-red { background: var(--c-red) !important; box-shadow: none !important; }
 .c-orange { background: var(--c-orange) !important; box-shadow: none !important; }
 .c-yellow { background: var(--c-yellow) !important; box-shadow: none !important; }
+.c-oy { background: linear-gradient(135deg, var(--c-orange) 50%, var(--c-yellow) 50%) !important; box-shadow: none !important; }
 .c-green { background: var(--c-green) !important; box-shadow: none !important; }
 .c-purple { background: var(--c-purple) !important; box-shadow: none !important; }
 .c-white { background: var(--c-white) !important; box-shadow: none !important; }
@@ -843,6 +844,96 @@ button.crow:first-child { border-top: 0; }
 .wrow.na .wval input, .wrow.na .wval > span { display: none; }
 .wrow.na .wna { display: block; width: 100%; border: 0; background: none; font-family: var(--f-display); font-weight: 800; font-size: 40px; line-height: 1.1; color: var(--muted); padding: 0; text-align: center; }
 
+/* week review */
+body.rvon .scrim { z-index: 80; }
+.rvwk { display: flex; align-items: center; gap: 2px; min-width: 0; }
+.rvwk > span { flex: 1; min-width: 0; text-align: center; display: grid; gap: 2px; }
+.rvwk > span b { font-size: 15px; }
+.rvwk .iconbtn[disabled] { opacity: .25; }
+.rv .wz-head { margin: 10px 0 2px; }
+.rv .wz-head h2 { font-size: 28px; }
+.rv .wsum { margin-top: 10px; }
+.rvslot { gap: 0; }
+.rvslot .eyebrow { margin-bottom: 2px; }
+.rvgrp { display: grid; gap: 6px; padding: 9px 0; border-top: 1px solid var(--line); }
+.rvslot .eyebrow + .rvgrp { border-top: 0; padding-top: 4px; }
+.rvgn { font-weight: 700; font-size: 14.5px; }
+.rvgd { display: flex; flex-wrap: wrap; gap: 5px; }
+.rvdy { min-width: 42px; height: 36px; padding: 0 8px; border-radius: 10px; border: 1px solid var(--leaf); background: var(--leaf-soft); color: var(--leaf); font-weight: 800; font-size: 13px; }
+.rvdy.off { border: 1px dashed var(--line); background: none; color: var(--muted); text-decoration: line-through; }
+.rvstat { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.rvstat > div { background: var(--bg); border-radius: 12px; padding: 9px 11px; display: grid; gap: 4px; align-content: start; min-width: 0; }
+.rvstat b { font-family: var(--f-display); font-weight: 800; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }
+.rvstat b small { font-size: 16px; color: var(--muted); }
+.rvstat b.rvst { font-family: inherit; font-size: 15px; display: flex; align-items: center; gap: 7px; min-height: 30px; }
+.rvstat span { font-size: 12px; color: var(--muted); font-weight: 700; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.rvrows { display: grid; gap: 2px; }
+.rvrow { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 50px; }
+.rvdl { display: flex; align-items: center; gap: 6px 8px; flex-wrap: wrap; font-size: 14px; min-width: 0; }
+.rvdl b { min-width: 52px; }
+.rvstep { display: flex; align-items: center; gap: 6px; flex: none; }
+.rvstep input { width: 62px; height: 40px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); text-align: center; font-family: var(--f-display); font-weight: 800; font-size: 20px; font-variant-numeric: tabular-nums; padding: 0 4px; }
+.rvstep input:focus { outline: none; border-color: var(--accent); }
+.rvstep input::placeholder { color: var(--muted); opacity: .6; }
+.rvrow.unk .rvstep input { border-style: dashed; border-color: var(--st-mid); }
+.stepbtn.sm { width: 40px; height: 40px; font-size: 20px; }
+.rv7 { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
+.rvdc { justify-content: center; min-height: 40px; padding: 4px 0; }
+.rvd { display: grid; justify-items: center; gap: 3px; padding: 8px 0 7px; border-radius: 12px; border: 1px dashed var(--line); background: none; color: var(--muted); min-height: 72px; }
+.rvd small { font-size: 11px; font-weight: 800; }
+.rvd b { font-size: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.rvd svg { width: 16px; height: 16px; }
+.rvd i { width: 16px; height: 16px; }
+.rvd.y { background: var(--leaf-soft); border: 1px solid var(--leaf); color: var(--leaf); }
+.rvd.n { border-style: solid; background: var(--bg); }
+.rvgrid { gap: 5px; }
+.rvgh span { display: grid; justify-items: center; font-size: 11px; color: var(--muted); font-weight: 800; }
+.rvgh b { font-size: 14px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.rvgl { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-top: 6px; font-size: 13px; font-weight: 700; }
+.rvgl small { color: var(--muted); font-weight: 700; font-size: 12px; white-space: nowrap; }
+.rvc { height: 40px; border-radius: 10px; border: 1px dashed var(--line); background: none; display: grid; place-items: center; color: var(--muted); font-weight: 800; font-size: 13px; font-variant-numeric: tabular-nums; padding: 0; min-width: 0; }
+.rvc svg { width: 16px; height: 16px; }
+.rvc.y { background: var(--leaf-soft); border: 1px solid var(--leaf); color: var(--leaf); }
+.rvc.n { border-style: solid; background: var(--bg); }
+.rvc.sl.y { background: var(--bg); border: 1px solid var(--line); color: var(--ink); }
+.rvc.sel { outline: 2px solid var(--accent); outline-offset: 1px; }
+.rvsl { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; background: var(--bg); border-radius: 12px; padding: 8px 10px; margin-top: 4px; }
+.rvxs { display: grid; }
+.rvx { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; border-top: 1px solid var(--line); }
+.rvx:first-child { border-top: 0; }
+.rvx > span { min-width: 0; font-size: 14px; }
+.rvx > span b { margin-right: 6px; }
+.rvx small { display: block; color: var(--muted); font-size: 12px; font-weight: 700; }
+.rvnum { width: 100%; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 12px; padding: 8px 12px; min-height: 48px; font-family: var(--f-display); font-weight: 800; font-size: 22px; }
+.rvnum::placeholder { font-family: var(--f-body, inherit); font-weight: 400; font-size: 15px; color: var(--muted); }
+.seg.rvseg { margin: 0; }
+.rvsum { gap: 0; }
+.rvsum .eyebrow { margin-bottom: 4px; }
+.rvsr { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.25fr); align-items: center; gap: 10px; min-height: 40px; padding: 6px 0; font-size: 14px; border-top: 1px solid var(--line); }
+.rvsum .eyebrow + .rvsr { border-top: 0; }
+.rvsr > span { font-weight: 700; }
+.rvsr b { text-align: right; font-size: 13.5px; font-weight: 600; }
+.rvban { grid-template-columns: minmax(0, 1fr) auto; align-items: center; border-color: var(--accent); }
+.rvban > div { display: grid; gap: 2px; }
+.rhead .rvbtn { margin-left: auto; }
+.rv .wz-foot .btn.primary svg { width: 16px; height: 16px; }
+.rvc.pl { border: 0; font-size: 10.5px; font-weight: 700; color: var(--muted); opacity: .7; }
+.gapcard { gap: 10px; }
+.gaplist { display: grid; }
+.gaprow { display: flex; align-items: center; gap: 4px; border-top: 1px solid var(--line); min-height: 56px; }
+.gaplist .gaprow:first-child { border-top: 0; }
+.gapopen { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 0; background: none; color: var(--ink); text-align: left; padding: 8px 0; }
+.gapopen > span, .gaprow.aside > span { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.gapopen b, .gaprow.aside b { font-size: 14.5px; }
+.gaprow small { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.gapopen svg { width: 18px; height: 18px; color: var(--muted); flex: none; }
+.gaprow .iconbtn svg { width: 18px; height: 18px; color: var(--muted); }
+.gaprow.aside { padding: 6px 0; }
+.gaplink { justify-self: start; padding-left: 0; }
+.rvnr { display: flex; align-items: center; justify-content: space-between; gap: 6px 10px; flex-wrap: wrap; border-top: 1px dashed var(--line); padding-top: 10px; margin-top: 2px; }
+.rvnr .small { flex: 1 1 160px; }
+.rvnrc .rvnr { border-top: 0; padding-top: 0; margin-top: 0; }
+
 </style>
 </head>
 <body>
@@ -860,6 +951,7 @@ button.crow:first-child { border-top: 0; }
 <nav class="nav" aria-label="Sections"><div class="nav-in" id="nav"></div></nav>
 <div id="sheet-root"></div>
 <div id="wz-root"></div>
+<div id="rv-root"></div>
 <div id="prep-root"></div>
 <div id="tmr-root"></div>
 <div id="fx" aria-hidden="true"></div>
@@ -2096,6 +2188,10 @@ const SLOTS = ['b', 'l', 's', 'd', 'p'];
 const SLOTNAME = { b: 'Breakfast', l: 'Lunch', s: 'Snack', d: 'Dinner', p: 'Pudding' };
 const COLOURS = ['red', 'orange', 'yellow', 'green', 'purple', 'white'];
 const COLOURNAME = { red: 'red', orange: 'orange', yellow: 'yellow', green: 'green', purple: 'purple/blue', white: 'white/tan' };
+// the 5 colour groups the weekly goal counts: orange and yellow are one group
+const GROUPS = ['red', 'oy', 'green', 'purple', 'white'];
+const GROUPNAME = { red: 'red', oy: 'orange/yellow', green: 'green', purple: 'purple/blue', white: 'white/tan' };
+const CG = c => (c === 'orange' || c === 'yellow' ? 'oy' : c);
 
 /* ───────────── dates ───────────── */
 const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -2134,6 +2230,7 @@ function normalise(s) {
   }
   const bud = Object.assign({}, DEF.bud, (s.set && s.set.bud) || {});
   s.set = Object.assign({}, DEF, s.set || {}); s.set.bud = bud;
+  if (s.set.colourGoal > 5) s.set.colourGoal = 5; // 5 colour groups a week
   s.wt = Object.assign({ log: {}, waist: {}, unit: 'lb', goal: 'lose', rate: 0.45, waistDay: s.set.weekStart || 0, target: null }, s.wt || {});
   s.days = s.days || {}; s.weeks = s.weeks || {}; s.favs = s.favs || {}; s.nope = s.nope || {}; s.stock = s.stock || {};
   s.ck = s.ck && typeof s.ck === 'object' ? s.ck : {};
@@ -2148,7 +2245,9 @@ function normalise(s) {
   }
   s.alc = s.alc && typeof s.alc === 'object' ? s.alc : {}; // units drunk, by the day they were drunk
   s.run = s.run && typeof s.run === 'object' ? s.run : {}; // 1 = ran or did cardio that day
-  s.hist = Object.assign({ d: {}, w: {} }, s.hist || {}); // food history brought in from the old tracker
+  s.rev = s.rev && typeof s.rev === 'object' ? s.rev : {}; s.gapsOk = s.gapsOk && typeof s.gapsOk === 'object' ? s.gapsOk : {}; // weeks set aside from the still-to-fill-in list // weeks reviewed: week start -> the day it was done
+  s.hist = Object.assign({ d: {}, w: {}, wc: {} }, s.hist || {}); // food history brought in from the old tracker
+  Object.values(s.hist.d).forEach(e => { if (e) delete e.col; }); // colours are counted by week now (wc)
   // drop swaps that point at recipes or ingredients no longer in the data
   Object.values(s.weeks).forEach(w => {
     if (!w || !w.swaps) return;
@@ -2270,7 +2369,7 @@ function dayCalc(k) {
     if (o.kind === 'recipe' || o.kind === 'custom') { planK += o.k; planP += o.p; if (o.done) { eatK += o.k; eatP += o.p; } }
     if (o.kind === 'recipe') {
       if (o.ferm) { fermPlan = true; fermSrc.push(o.r.n); if (o.done) fermEat = true; }
-      o.r.plants.forEach(x => { plants.add(x); if (o.done) plantsEaten.add(x); if (PLANTS[x][2]) colours.add(PLANTS[x][2]); });
+      o.r.plants.forEach(x => { plants.add(x); if (o.done) plantsEaten.add(x); if (PLANTS[x][2]) colours.add(CG(PLANTS[x][2])); });
     }
   }
   for (const x of d.x) {
@@ -2278,24 +2377,24 @@ function dayCalc(k) {
     const xf = +x.f || 0, xna = +x.na || 0, xfs = +x.fs || 0, xsf = +x.sf || 0;
     planF += xf; eatF += xf; planNa += xna; eatNa += xna; planFS += xfs; eatFS += xfs; planSF += xsf; eatSF += xsf;
     if (x.fe) { fermPlan = true; fermEat = true; fermSrc.push(x.n); }
-    (x.pl || []).forEach(p => { if (!PLANTS[p]) return; plants.add(p); plantsEaten.add(p); if (PLANTS[p][2]) colours.add(PLANTS[p][2]); });
+    (x.pl || []).forEach(p => { if (!PLANTS[p]) return; plants.add(p); plantsEaten.add(p); if (PLANTS[p][2]) colours.add(CG(PLANTS[p][2])); });
   }
   return { k, T, B, share, night, dK, custom: !!d.t, latte, latteP, slots: out, planK, planP, eatK, eatP, planF, eatF, planNa, eatNa, loNa, latteNa, planFS, eatFS, planSF, eatSF, fermPlan, fermEat, fermSrc, plants, plantsEaten, colours, hasPlan: SLOTS.some(s => out[s].kind !== 'empty') };
 }
 const ptsOf = set => [...set].reduce((a, x) => a + PLANTS[x][1], 0);
 function weekCalc(st) {
-  const days = weekDays(st), dc = days.map(dayCalc), plan = new Set(), eat = new Set();
-  let fb = 0, na = 0, fs = 0, sf = 0, naOver = 0, fsOver = 0, sfOver = 0, oilyP = 0, oilyE = 0, redP = 0, redE = 0, fermDays = 0, fermEatDays = 0, colourDays = 0, k = 0, p = 0, n = 0;
+  const days = weekDays(st), dc = days.map(dayCalc), plan = new Set(), eat = new Set(), cols = new Set();
+  let fb = 0, na = 0, fs = 0, sf = 0, naOver = 0, fsOver = 0, sfOver = 0, oilyP = 0, oilyE = 0, redP = 0, redE = 0, fermDays = 0, fermEatDays = 0, k = 0, p = 0, n = 0;
   dc.forEach(c => {
     c.plants.forEach(x => plan.add(x)); c.plantsEaten.forEach(x => eat.add(x));
     for (const s of SLOTS) { const o = c.slots[s]; if (o.kind !== 'recipe') continue; if (o.r.oily) { oilyP++; if (o.done) oilyE++; } if (o.r.red) { redP++; if (o.done) redE++; } }
     if (c.fermPlan) fermDays++;
     if (c.fermEat) fermEatDays++;
-    if (c.colours.size >= S.set.colourGoal) colourDays++;
+    c.colours.forEach(x => cols.add(x));
     if (c.hasPlan) { k += c.planK; p += c.planP; fb += c.planF; na += c.planNa; fs += c.planFS; sf += c.planSF; n++; if (c.planNa > S.set.naMax + 0.05) naOver++; if (c.planFS > S.set.fsMax + 0.5) fsOver++; if (c.planSF > S.set.sfMax + 0.5) sfOver++; }
   });
   const drinks = dc.reduce((a, c) => a + c.dK, 0), nights = dc.filter(c => c.night).length;
-  return { days, dc, plan, eat, ptsPlan: ptsOf(plan), ptsEat: ptsOf(eat), oilyP, oilyE, redP, redE, fermDays, fermEatDays, colourDays, avgK: n ? k / n : 0, avgP: n ? p / n : 0, avgF: n ? fb / n : 0, avgNa: n ? na / n : 0, avgFS: n ? fs / n : 0, avgSF: n ? sf / n : 0, naOver, fsOver, sfOver, planned: n, drinks, nights };
+  return { days, dc, plan, eat, ptsPlan: ptsOf(plan), ptsEat: ptsOf(eat), oilyP, oilyE, redP, redE, fermDays, fermEatDays, cols, avgK: n ? k / n : 0, avgP: n ? p / n : 0, avgF: n ? fb / n : 0, avgNa: n ? na / n : 0, avgFS: n ? fs / n : 0, avgSF: n ? sf / n : 0, naOver, fsOver, sfOver, planned: n, drinks, nights };
 }
 
 /* ───────────── batches ───────────── */
@@ -2503,16 +2602,15 @@ function candidate(st, days, prefs, carry) {
   return cur;
 }
 function scoreCand(c, carry) {
-  const pl = new Set(); let ferm = 0, colours = 0, oily = 0, short = 0, over = 0;
+  const pl = new Set(), cols = new Set(); let ferm = 0, oily = 0, short = 0, over = 0;
   c.forEach(sl => {
     short += Math.max(0, S.set.protGoal - estProtein(sl)) + Math.max(0, S.set.fibreGoal - estFibre(sl)) * 2;
     const [na, fs, sf] = estNaFs(sl); over += Math.max(0, na - S.set.naMax) * 8 + Math.max(0, fs - S.set.fsMax) * 0.5 + Math.max(0, sf - S.set.sfMax) * 1.2;
-    const day = new Set(); let f = false;
-    Object.values(sl).forEach(v => { const r = R[v]; if (!r) return; r.plants.forEach(x => { pl.add(x); if (PLANTS[x][2]) day.add(PLANTS[x][2]); }); if (r.fermBase) f = true; if (r.oily) oily++; });
+    let f = false;
+    Object.values(sl).forEach(v => { const r = R[v]; if (!r) return; r.plants.forEach(x => { pl.add(x); if (PLANTS[x][2]) cols.add(CG(PLANTS[x][2])); }); if (r.fermBase) f = true; if (r.oily) oily++; });
     if (f) ferm++;
-    if (day.size >= S.set.colourGoal) colours++;
   });
-  return Math.min(ptsOf(pl), 45) + ferm * 2 + colours * 0.7 + Math.min(oily, S.set.oilyGoal) * 3 - short * 0.25 - over - wasteOf(c, carry) * 2 + Math.random();
+  return Math.min(ptsOf(pl), 45) + ferm * 2 + Math.min(cols.size, S.set.colourGoal) * 3 + Math.min(oily, S.set.oilyGoal) * 3 - short * 0.25 - over - wasteOf(c, carry) * 2 + Math.random();
 }
 function planWeek(st, replan, prefs) {
   const days = weekDays(st);
@@ -2583,7 +2681,7 @@ const P = {
   play: '<path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/>', pause: '<path d="M9 5.5v13M15 5.5v13"/>', clock: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5"/>'
 };
 const ic = (n, fill, cls) => `<svg ${cls ? `class="${cls}"` : ''} viewBox="0 0 24 24" fill="${fill ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]}</svg>`;
-const cdots = set => `<span class="cdots" aria-hidden="true">${COLOURS.map(c => `<i class="${set.has(c) ? 'c-' + c : ''}"></i>`).join('')}</span>`;
+const cdots = set => `<span class="cdots" aria-hidden="true">${GROUPS.map(c => `<i class="${set.has(c) ? 'c-' + c : ''}"></i>`).join('')}</span>`;
 function badges(r) {
   const b = [];
   if (r.oily) b.push('<span class="badge oily">Oily fish</span>');
@@ -2732,7 +2830,7 @@ function emptyBlock(msg) {
 
 function vToday() {
   const k = UI.day, st = startOf(k), c = dayCalc(k), wc = weekCalc(st), tk = todayKey(), d = peekD(k), set = S.set, pg = set.protGoal;
-  const strip = weekDays(st).map((dd, i) => `<button data-a="day" data-v="${dd}" aria-pressed="${dd === k}" class="${dd === tk ? 'today' : ''}" aria-label="${DOWL[dayIndex(dd)]} ${parse(dd).getDate()}"><span class="dw">${DOW[dayIndex(dd)].slice(0, 2)}</span><span class="dn">${parse(dd).getDate()}</span><span class="dots">${COLOURS.filter(x => wc.dc[i].colours.has(x)).map(x => `<i class="c-${x}"></i>`).join('')}</span></button>`).join('');
+  const strip = weekDays(st).map((dd, i) => `<button data-a="day" data-v="${dd}" aria-pressed="${dd === k}" class="${dd === tk ? 'today' : ''}" aria-label="${DOWL[dayIndex(dd)]} ${parse(dd).getDate()}"><span class="dw">${DOW[dayIndex(dd)].slice(0, 2)}</span><span class="dn">${parse(dd).getDate()}</span><span class="dots">${GROUPS.filter(x => wc.dc[i].colours.has(x)).map(x => `<i class="c-${x}"></i>`).join('')}</span></button>`).join('');
   if (!c.hasPlan) return `${weekNav(st)}<div class="strip">${strip}</div>${emptyBlock(`Nothing planned for ${fmtDay(k)} yet.`)}`;
   const rem = c.T - c.eatK;
   const ferm = c.fermEat ? ['good', 'Fermented eaten'] : c.fermPlan ? ['', 'Fermented planned'] : ['bad', 'No fermented yet'];
@@ -2746,7 +2844,7 @@ function vToday() {
       <div class="row"><span>Saturated fat</span><span>${fmtN(c.eatSF)}g eaten · ${fmtN(c.planSF)}g planned · limit ${set.sfMax}g</span></div>
       <div class="row"><span>Sodium</span><span>${fmtNa(c.eatNa)} eaten · ${fmtNa(c.planNa)} planned · limit ${set.naMax}g. Planned is ${(c.planNa * 2.5).toFixed(1)}g as salt${c.loNa ? `, including ${fmtLo(set.loSalt)} of LoSalt` : ''}.</span></div>
       <div class="row"><span>Fermented</span><span>${c.fermSrc.length ? esc(c.fermSrc.join(', ')) : 'None planned'}</span></div>
-      <div class="row"><span>Colours</span><span>${c.colours.size ? COLOURS.filter(x => c.colours.has(x)).map(x => COLOURNAME[x]).join(', ') : 'None yet'} (goal ${set.colourGoal})</span></div>
+      <div class="row"><span>Colour groups</span><span>${c.colours.size ? GROUPS.filter(x => c.colours.has(x)).map(x => GROUPNAME[x]).join(', ') : 'None yet'} · ${wc.cols.size} of ${set.colourGoal} this week</span></div>
       <div class="row"><span>Plant points</span><span>${fmtPts(ptsOf(c.plants))} today</span></div>
       <div class="row"><span>Portions</span><span>${set.adapt ? 'Adapt to what you eat' : 'Fixed'}</span></div></div>` : '';
   const hero = `<section class="hero" aria-label="Day summary">
@@ -2755,7 +2853,7 @@ function vToday() {
       <div><div class="minilbl"><span>Protein</span><b>${fmtN(c.eatP)}<span class="muted"> / ${pg}g</span></b></div><div class="bar leaf">${barI('plan', 'pP', c.planP / pg)}${barI('eat', 'pE', c.eatP / pg)}</div></div>
       <div><div class="minilbl"><span>Fibre</span><b>${fmtN(c.eatF)}<span class="muted"> / ${set.fibreGoal}g</span></b></div><div class="bar leaf">${barI('plan', 'fP', c.planF / set.fibreGoal)}${barI('eat', 'fE', c.eatF / set.fibreGoal)}</div></div>
       <div class="lims" aria-label="Planned for the day"><span class="${c.planFS > set.fsMax ? 'over' : ''}">Sugar <b>${fmtFS(c.planFS)}</b><i>/${set.fsMax}g</i></span><span class="${Math.round(c.planNa * 10) / 10 > set.naMax ? 'over' : ''}">Sodium <b>${fmtNa(c.planNa)}</b><i>/${set.naMax}g</i></span><span class="${Math.round(c.planSF) > set.sfMax ? 'over' : ''}">Sat fat <b>${fmtN(c.planSF)}g</b><i>/${set.sfMax}g</i></span></div>
-      <div class="flags"><span class="flag ${ferm[0]}">${ic('jar')}${ferm[1]}</span><span class="flag ${c.colours.size >= set.colourGoal ? 'good' : ''}" aria-label="${c.colours.size} colours">${cdots(c.colours)}</span></div>
+      <div class="flags"><span class="flag ${ferm[0]}">${ic('jar')}${ferm[1]}</span><span class="flag" aria-label="${c.colours.size} colour group${c.colours.size === 1 ? '' : 's'} today">${cdots(c.colours)}</span></div>
       <button class="targetbtn" data-a="target">${fmtN(c.T)} kcal${c.dK ? ' incl. drinks' : c.custom ? ' today' : ''}${ic('edit')}</button></div>
     <button class="morebtn" data-a="heromore" aria-expanded="${UI.heroMore}">${UI.heroMore ? 'Less' : 'Day details'}${ic('down')}</button>${more}</section>`;
   const rows = [];
@@ -2824,7 +2922,7 @@ function vWeekPlan() {
   if (!wc.planned) return `${weekNav(st)}${actions}${emptyBlock(`Nothing planned for ${fmtRange(st)} yet.`)}`;
   const more = UI.weekMore ? (() => {
     const pl = [...wc.plan].sort((a, b) => (PLANTS[b][1] - PLANTS[a][1]) || COLOURS.indexOf(PLANTS[a][2]) - COLOURS.indexOf(PLANTS[b][2]) || PLANTS[a][0].localeCompare(PLANTS[b][0]));
-    return `<div class="heromore"><div class="row"><span>${set.colourGoal}-colour days</span><span>${wc.colourDays} of 7</span></div>
+    return `<div class="heromore"><div class="row"><span>Colour groups</span><span>${cdots(wc.cols)} ${wc.cols.size} of ${set.colourGoal}${wc.cols.size < GROUPS.length ? ` · no ${GROUPS.filter(x => !wc.cols.has(x)).map(x => GROUPNAME[x]).join(' or ')}` : ''}</span></div>
       <div class="row"><span>Daily average</span><span>${fmtN(wc.avgK)} kcal · ${fmtN(wc.avgP)}g protein · ${fmtN(wc.avgF)}g fibre</span></div>
       <div class="row"><span>Sugar, salt, fat</span><span>${fmtFS(wc.avgFS)} added sugar · ${fmtNa(wc.avgNa)} sodium · ${fmtN(wc.avgSF)}g sat fat a day${wc.naOver ? ` · ${wc.naOver} day${wc.naOver > 1 ? 's' : ''} over on sodium` : ''}${wc.sfOver ? ` · ${wc.sfOver} over on sat fat` : ''}${wc.fsOver ? ` · ${wc.fsOver} over on sugar` : ''}</span></div>
       ${wc.nights ? `<div class="row"><span>Drinks</span><span>${fmtN(wc.drinks)} kcal over ${wc.nights} night${wc.nights > 1 ? 's' : ''} out</span></div>` : ''}
@@ -2892,7 +2990,7 @@ function lastMonths(n) { const d = parse(todayKey()); return Array.from({ length
 /* food values for one day: the plan if there is one, otherwise the old tracker */
 const FOOD = {
   protein: c => c.planP, fibre: c => c.planF, sodium: c => c.planNa, sugar: c => c.planFS, satfat: c => c.planSF,
-  colours: c => (c.colours.size >= S.set.colourGoal ? 1 : 0), ferm: c => (c.fermPlan ? 1 : 0),
+  ferm: c => (c.fermPlan ? 1 : 0),
   fish: c => SLOTS.filter(s => c.slots[s].kind === 'recipe' && c.slots[s].r.oily).length,
   red: c => SLOTS.filter(s => c.slots[s].kind === 'recipe' && c.slots[s].r.red).length
 };
@@ -2908,9 +3006,15 @@ function weekPlants(st) {
   for (let i = 0; i < 7; i++) { const v = S.hist.w[addDays(st, i)]; if (v) return v; }
   return null;
 }
+// colour groups across a week: the plan if 4+ days are planned, otherwise the old tracker
+function weekColours(st) {
+  const wc = weekCalc(st); if (wc.planned >= 4) return wc.cols.size;
+  for (let i = 0; i < 7; i++) { const v = S.hist.wc[addDays(st, i)]; if (v !== undefined) return v; }
+  return null;
+}
 // days this week's plan misses a daily target (protein, fibre) or goes over a limit (sodium, sugar, sat fat)
-function weekMisses(id) {
-  const cur = startOf(todayKey()), set = S.set; let miss = 0, n = 0;
+function weekMisses(id, st) {
+  const cur = st || startOf(todayKey()), set = S.set; let miss = 0, n = 0;
   weekDays(cur).forEach(k => {
     const c = dcc(k); if (!c || !c.hasPlan) return; n++;
     if (id === 'protein' && Math.round(c.planP) < set.protGoal) miss++;
@@ -2929,21 +3033,22 @@ function metrics() {
   const missLight = id => () => { const m = weekMisses(id); if (!m.n) return { st: 'none', txt: 'Nothing planned this week' }; const lim = ['sodium', 'sugar', 'satfat'].includes(id); const st = !m.miss ? 'ok' : lim ? (m.miss <= 2 ? 'mid' : 'off') : (m.miss === 1 ? 'mid' : 'off'); return { st, txt: !m.miss ? (lim ? 'Every planned day under' : 'Every planned day on target') : `${m.miss} day${m.miss > 1 ? 's' : ''} ${lim ? 'over' : 'short'} in this week's plan` }; };
   const wkRate = (m) => { const r = aggWin(m, 'wk'); return r ? r.v : null; };
   const L = [];
-  L.push({ id: 'plants', n: 'Plant points', grp: 'Food', kind: 'week', wval: weekPlants, first: () => minKey(S.days, S.hist.w), fmt: v => fmtPts(Math.round(v * 4) / 4), unit: 'a week', goal: set.plantGoal, goalTxt: `${set.plantGoal} a week`,
+  L.push({ id: 'plants', n: 'Plant points', grp: 'Food', kind: 'week', end: 'week', wval: weekPlants, first: () => minKey(S.days, S.hist.w), fmt: v => fmtPts(Math.round(v * 4) / 4), unit: 'a week', goal: set.plantGoal, goalTxt: `${set.plantGoal} a week`,
     light() { const v = weekPlants(cur); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; return { st: v >= set.plantGoal ? 'ok' : v >= set.plantGoal - 5 ? 'mid' : 'off', txt: `${fmtPts(v)} in this week's plan` }; } });
   L.push(food('fish', 'Oily fish', 'rate', v => oneDp(v), `${set.oilyGoal} a week`, function () { const v = wkRate(this); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; const r = Math.round(v); return { st: r >= set.oilyGoal ? 'ok' : r >= set.oilyGoal - 1 ? 'mid' : 'off', txt: `${r} in this week's plan` }; }, { unit: 'a week', goal: set.oilyGoal }));
   L.push(food('ferm', 'Fermented days', 'rate', v => oneDp(v), 'every day', function () { const v = wkRate(this); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; const r = Math.round(v); return { st: r >= 7 ? 'ok' : r >= 5 ? 'mid' : 'off', txt: `${r} of 7 days in this week's plan` }; }, { unit: 'days a week', goal: 7 }));
   L.push(food('red', 'Red meat', 'rate', v => oneDp(v), `${set.redMax} a week at most`, function () { const v = wkRate(this); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; const r = Math.round(v); return { st: r <= set.redMax ? 'ok' : r <= set.redMax + 1 ? 'mid' : 'off', txt: `${r} in this week's plan` }; }, { unit: 'a week', goal: set.redMax, lo: true }));
   L.push(food('protein', 'Protein', 'avg', v => `${fmtN(v)}g`, `${set.protGoal}g a day`, missLight('protein'), { unit: 'a day', goal: set.protGoal }));
   L.push(food('fibre', 'Fibre', 'avg', v => `${fmtN(v)}g`, `${set.fibreGoal}g a day`, missLight('fibre'), { unit: 'a day', goal: set.fibreGoal }));
-  L.push(food('colours', `${set.colourGoal}-colour days`, 'rate', v => oneDp(v), 'every day', function () { const v = wkRate(this); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; const r = Math.round(v); return { st: r >= 7 ? 'ok' : r >= 5 ? 'mid' : 'off', txt: `${r} of 7 days in this week's plan` }; }, { unit: 'days a week', goal: 7 }));
+  L.push({ id: 'colours', n: 'Colour groups', grp: 'Food', kind: 'week', end: 'week', wval: weekColours, first: () => minKey(S.days, S.hist.wc), fmt: v => (Number.isInteger(v) ? String(v) : v.toFixed(1)), unit: `of ${set.colourGoal}`, goal: set.colourGoal, goalTxt: `all ${set.colourGoal} every week`,
+    light() { const v = weekColours(cur); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; return { st: v >= set.colourGoal ? 'ok' : v >= set.colourGoal - 1 ? 'mid' : 'off', txt: `${v} of ${set.colourGoal} in this week's plan` }; } });
   L.push(food('sodium', 'Sodium', 'avg', v => `${v.toFixed(1)}g`, `under ${set.naMax}g a day`, missLight('sodium'), { unit: 'a day', goal: set.naMax, lo: true }));
   L.push(food('sugar', 'Added sugar', 'avg', v => fmtFS(v), `under ${set.fsMax}g a day`, missLight('sugar'), { unit: 'a day', goal: set.fsMax, lo: true }));
   L.push(food('satfat', 'Saturated fat', 'avg', v => `${fmtN(v)}g`, `under ${set.sfMax}g a day`, missLight('satfat'), { unit: 'a day', goal: set.sfMax, lo: true }));
   L.push({ id: 'alcohol', n: 'Alcohol', grp: 'Drink', kind: 'day', agg: 'rate', end: 'yday', val: k => (k in S.alc ? +S.alc[k] : null), first: () => minKey(S.alc), fmt: v => fmtU(v), unit: 'units a week', goal: ALC.week, lo: true, goalTxt: `under ${ALC.week} units a week, one binge a month, no more than three 32+ weeks a year`, goalShort: `under ${ALC.week}`,
     light() { return alcLight(); } });
   L.push({ id: 'run', n: 'Cardio and running', grp: 'Activity', kind: 'day', agg: 'rate', end: 'yday', val: k => (k in S.run ? S.run[k] : null), first: () => minKey(S.run), fmt: v => oneDp(v), unit: 'a week', goal: 2, goalTxt: '2 a week',
-    light() { const r = aggWin(this, '4w'); if (!r) return { st: 'none', txt: 'Nothing logged yet' }; return { st: r.v >= 2 ? 'ok' : r.v >= 1 ? 'mid' : 'off', txt: `${oneDp(r.v)} a week over the last 4 weeks` }; } });
+    light() { const r = aggWin(this, '4w'); if (!r) return { st: 'none', txt: 'Not enough logged in the last 4 weeks' }; return { st: r.v >= 2 ? 'ok' : r.v >= 1 ? 'mid' : 'off', txt: `${oneDp(r.v)} a week over the last 4 weeks` }; } });
   L.push({ id: 'sleep', n: 'Sleep', grp: 'Sleep and checks', kind: 'day', agg: 'avg', end: 'today', val: k => (S.ck[k] && S.ck[k].sl ? S.ck[k].sl : null), first: () => minKey(S.ck), fmt: v => `${v.toFixed(1)} h`, unit: 'a night', goal: set.sleepGoal, goalTxt: `${set.sleepGoal} h a night`,
     light() { const a = sleepAvg(tk); if (!a) return { st: 'none', txt: 'No nights logged this week' }; const v = Math.round(a.v * 10) / 10; return { st: v >= set.sleepGoal ? 'ok' : v >= set.sleepGoal - 0.5 ? 'mid' : 'off', txt: `${v.toFixed(1)} h over the last ${a.n} night${a.n > 1 ? 's' : ''}` }; } });
   habits().forEach(h => L.push({ id: 'h:' + h.id, n: h.n, grp: 'Sleep and checks', kind: 'day', agg: 'pct', end: 'today', val: k => habitVal(h, k), first: () => minKey(S.ck), fmt: v => `${Math.round(v)}%`, unit: 'of days', goal: 100, goalTxt: h.ids.length > 1 ? 'at least one a day' : 'every day',
@@ -2956,7 +3061,7 @@ function metrics() {
 }
 function alcLight() {
   const tk = todayKey(), r = aggWin(METRIC('alcohol'), '4w'), B = alcBinges(), mo = B.months[tk.slice(0, 7)] || 0, bigs = (B.bigs[tk.slice(0, 4)] || []).length;
-  if (!r) return { st: 'none', txt: 'Nothing logged yet', parts: [] };
+  if (!r) return { st: 'none', txt: 'Not enough logged in the last 4 weeks', parts: [] };
   const wk = r.v < ALC.week ? 'ok' : r.v <= ALC.week * 1.5 ? 'mid' : 'off', ms = mo === 0 ? 'ok' : mo === 1 ? 'mid' : 'off', ys = bigs <= 2 ? 'ok' : bigs <= 5 ? 'mid' : 'off';
   const parts = [
     { st: wk, txt: `${fmtU(r.v)} units a week over the last 4 weeks`, rule: `Under ${ALC.week} a week` },
@@ -2988,7 +3093,7 @@ function aggWin(m, w) {
   }
   let t = 0, n = 0;
   eachDay(a, b, k => { const v = m.val(k); if (v !== null && v !== undefined) { t += v; n++; } });
-  if (!n) return null;
+  if (!n || (m.agg === 'rate' && w !== 'wk' && n < 14)) return null; // a weekly rate from a few days is mostly noise
   const mean = t / n; return { v: m.agg === 'rate' ? (w === 'wk' ? t : mean * 7) : m.agg === 'pct' ? mean * 100 : mean, n };
 }
 // weekly series for the charts, oldest first
@@ -3017,6 +3122,7 @@ function trSummary(L, lights) {
   const rn = y('run'); if (rn) long.push(`cardio ${oneDp(rn.v)} a week${rn.since}`);
   const fi = y('fish'); if (fi) long.push(`oily fish ${oneDp(fi.v)} a week${fi.since}`);
   const pl = y('plants'); if (pl) long.push(`${fmtPts(Math.round(pl.v * 4) / 4)} plant points a week${pl.since}`);
+  const co = y('colours'); if (co) { const m = g('colours'); let hit = 0, n = 0; for (let st = startOf(addDays(tk, -364)), cur = startOf(tk); st < cur; st = addDays(st, 7)) { const v = m.wval(st); if (v !== null) { n++; if (v >= m.goal) hit++; } } if (n) long.push(`all ${m.goal} colour groups in ${hit} of ${n} week${n > 1 ? 's' : ''}${co.since}`); }
   return { off, mid, ok: ok.length ? `${cap(joinAnd(ok))}.` : '', long: long.length ? `Over the last 12 months: ${joinAnd(long)}.` : '' };
 }
 
@@ -3087,7 +3193,7 @@ function trLights() {
 }
 function vTrends() {
   const L = MCACHE || (MCACHE = metrics()), lights = L.map(m => m.light()), sum = trSummary(L, lights);
-  const head = `<div class="rhead"><button class="btn sm ghost" data-a="trback">${ic('left')}Back</button><h2>Trends</h2></div>`;
+  const head = `<div class="rhead"><button class="btn sm ghost" data-a="trback">${ic('left')}Back</button><h2>Trends</h2><button class="btn sm rvbtn" data-a="review">${ic('week')}Review a week</button></div>`;
   const summary = `<section class="wsum trsum"><div class="eyebrow">Where things stand</div>
     ${sum.off.length ? `<div class="trgrp"><h3>${stDot('off')}Off track</h3>${sum.off.map(x => `<p>${esc(x)}</p>`).join('')}</div>` : ''}
     ${sum.mid.length ? `<div class="trgrp"><h3>${stDot('mid')}Close</h3>${sum.mid.map(x => `<p>${esc(x)}</p>`).join('')}</div>` : ''}
@@ -3106,7 +3212,62 @@ function vTrends() {
   const uses = {}; RL.forEach(r => r.plants.forEach(x => { uses[x] = (uses[x] || 0) + 1; }));
   const missing = Object.keys(cnt).length ? Object.keys(PLANTS).filter(x => PLANTS[x][1] >= 1 && !recent.has(x) && uses[x]).sort((a, b) => uses[b] - uses[a]).slice(0, 18) : [];
   const missHtml = missing.length ? `<section class="hsec"><h3 class="eyebrow">Not on your plan for four weeks</h3><div class="plantgrid">${missing.map(x => `<button class="pchip" data-a="plantfind" data-v="${x}">${PLANTS[x][2] ? `<i class="c-${PLANTS[x][2]}"></i>` : ''}${esc(PLANTS[x][0])}</button>`).join('')}</div><p class="small muted" style="margin:6px 0 0">Tap one to see recipes with it.</p></section>` : '';
-  return `${head}${summary}${body}${topHtml}${missHtml}`;
+  return `${head}${summary}${gapCard()}${body}${topHtml}${missHtml}`;
+}
+/* weeks with something still to fill in, from where each record starts to the end of last week */
+const GAPNAME = { plants: 'Plant points', cols: 'Colour groups', food: 'Food', alc: 'Alcohol', run: 'Cardio', ck: 'Check-ins' };
+// where each record starts: nothing before it counts as missing
+function gapFrom() {
+  let pf = '9999';
+  Object.keys(S.days).forEach(k => { const d = S.days[k]; if (k < pf && d && SLOTS.some(s => R[d.sl[s]] || d.sl[s] === '@c')) pf = k; });
+  const mn = (...xs) => xs.reduce((a, b) => (b < a ? b : a), '9999');
+  return { plants: mn(minKey(S.hist.w), pf), cols: mn(minKey(S.hist.wc), pf), food: mn(minKey(S.hist.d), pf), alc: minKey(S.alc), run: minKey(S.run), ck: minKey(S.ck) };
+}
+function weekGaps(st, from) {
+  const days = weekDays(st), end = days[6], g = {}, planned = k => { const c = dcc(k); return !!(c && c.hasPlan); }, plan = days.filter(planned).length >= 4;
+  if (end >= from.plants && !plan && !days.some(k => S.hist.w[k] > 0)) g.plants = 1;
+  if (end >= from.cols && !plan && !days.some(k => k in S.hist.wc)) g.cols = 1;
+  const cnt = (f, miss) => { const n = days.filter(k => k >= from[f] && miss(k)).length; if (n) g[f] = n; };
+  cnt('food', k => { if (planned(k)) return false; const h = S.hist.d[k]; return !h || (h.fe === undefined && h.fish === undefined); });
+  cnt('alc', k => !(k in S.alc));
+  cnt('run', k => !(k in S.run));
+  cnt('ck', k => { const e = S.ck[k]; return !e || (!e.sl && !Object.keys(e.c || {}).length); });
+  return g;
+}
+function gapWeeks() {
+  const from = gapFrom(), first = Object.values(from).reduce((a, b) => (b < a ? b : a), '9999'), cur = startOf(todayKey()), out = [];
+  out.checked = 0;
+  if (first === '9999') return out;
+  for (let st = startOf(first); st < cur; st = addDays(st, 7)) { out.checked++; const g = weekGaps(st, from); if (Object.keys(g).length) out.push({ st, g }); }
+  return out.reverse();
+}
+// things marked as not recorded: off the to-fill-in list (blanks are never counted in averages either way)
+const gapOk = (st, f) => { const o = (S.gapsOk || {})[st]; return o === 1 || !!(o && o[f]); };
+function gapMark(st, fs, undo) {
+  let o = S.gapsOk[st]; o = o === 1 ? Object.fromEntries(Object.keys(GAPNAME).map(f => [f, 1])) : Object.assign({}, o || {});
+  fs.forEach(f => { if (undo) delete o[f]; else o[f] = 1; });
+  if (Object.keys(o).length) S.gapsOk[st] = o; else delete S.gapsOk[st];
+  save();
+}
+// on a review card: mark this week's gap in these records as not recorded, or undo
+function rvNR(fs, own) {
+  const g = weekGaps(RV.st, gapFrom()), have = fs.filter(f => g[f]); if (!have.length) return '';
+  const off = have.every(f => gapOk(RV.st, f));
+  return `${own ? '<section class="wsum rvnrc">' : ''}<div class="rvnr">${off ? '<span class="small">Marked as not recorded for this week. Left off the to-fill-in list; blanks never count in averages.</span>' : `<span class="small muted">Don't have this for the week?</span>`}<button class="btn sm ghost" data-a="gapnr" data-v="${have.join(',')}" ${off ? 'data-u="1"' : ''}>${off ? 'Undo' : 'Mark as not recorded'}</button></div>${own ? '</section>' : ''}`;
+}
+const gapCardOf = g => (g.plants || g.cols || g.food ? 'plants' : g.alc ? 'alc' : g.run ? 'run' : 'checks');
+const gapDesc = g => joinAnd(Object.keys(GAPNAME).filter(f => g[f]).map(f => (f === 'plants' || f === 'cols' ? GAPNAME[f].toLowerCase() : `${g[f]} day${g[f] > 1 ? 's' : ''} of ${f === 'ck' ? 'check-ins' : GAPNAME[f].toLowerCase()}`))).replace(/^./, c => c.toUpperCase());
+function gapCard() {
+  const all = gapWeeks(); if (!all.checked) return '';
+  const rows = all.map(x => { const g = {}, off = {}; Object.keys(x.g).forEach(f => { (gapOk(x.st, f) ? off : g)[f] = x.g[f]; }); return { st: x.st, g, off }; });
+  const list = rows.filter(x => Object.keys(x.g).length), aside = rows.filter(x => Object.keys(x.off).length);
+  const tot = f => list.reduce((a, x) => a + (x.g[f] || 0), 0);
+  const parts = [['plants', 'week', 'weeks', 'of plant points'], ['cols', 'week', 'weeks', 'of colour groups'], ['food', 'day', 'days', 'of food'], ['alc', 'day', 'days', 'of alcohol'], ['run', 'day', 'days', 'of cardio'], ['ck', 'day', 'days', 'of check-ins']].map(([f, a, b, c]) => { const n = tot(f); return n ? `${n} ${n === 1 ? a : b} ${c}` : ''; }).filter(Boolean);
+  const row = x => `<div class="gaprow"><button class="gapopen" data-a="gapopen" data-v="${x.st}" data-s="${gapCardOf(x.g)}"><span><b>Week of ${fmtRange(x.st)}</b><small>${gapDesc(x.g)}</small></span>${ic('chev')}</button><button class="iconbtn" data-a="gapaside" data-v="${x.st}" aria-label="Mark the week of ${fmtRange(x.st)} as not recorded">${ic('x')}</button></div>`;
+  const N = 5, shown = UI.gapAll ? list : list.slice(0, N);
+  const asideHtml = aside.length ? `<button class="btn link sm gaplink" data-a="gapshow" aria-expanded="${!!UI.gapAside}">Not recorded: ${aside.length} week${aside.length > 1 ? 's' : ''} · ${UI.gapAside ? 'hide' : 'show'}</button>${UI.gapAside ? `<div class="gaplist">${aside.map(x => `<div class="gaprow aside"><span><b>Week of ${fmtRange(x.st)}</b><small>${gapDesc(x.off)}</small></span><button class="btn sm ghost" data-a="gapback" data-v="${x.st}">Bring back</button></div>`).join('')}</div>` : ''}` : '';
+  const body = list.length ? `<p style="margin:0">${joinAnd(parts).replace(/^./, c => c.toUpperCase())}.</p><div class="gaplist">${shown.map(row).join('')}</div>${list.length > N ? `<button class="btn sm" data-a="gapmore">${UI.gapAll ? 'Show fewer' : `Show ${list.length - N} more week${list.length - N > 1 ? 's' : ''}`}</button>` : ''}<p class="small muted" style="margin:0">Tap a week to fill it in. If you don't have a week's information, tap × and it's marked as not recorded. Blanks are never counted in averages.</p>` : `<p style="margin:0">Nothing missing. Every week has its plant points, colour groups, food, alcohol, cardio and check-ins${aside.length ? ', or is marked as not recorded' : ''}.</p>`;
+  return `<section class="wsum gapcard"><div class="eyebrow">Still to fill in</div>${body}${asideHtml}</section>`;
 }
 // the header button: plant points ring plus one dot per headline goal
 const PILL_GOALS = ['protein', 'sodium', 'sugar', 'satfat', 'ferm', 'fish', 'alcohol', 'run'];
@@ -3258,15 +3419,15 @@ function ckCard() {
   const wv = dr ? dr.w : w.log[k] ? toU(w.log[k]).toFixed(1) : '', sv = dr ? dr.sl : c.sl ? c.sl : '';
   const wNa = dr && dr.wna !== undefined ? dr.wna : saved && !w.log[k]; // a saved day without a weight shows n/a
   const due = waistDue(k) || w.waist[k] || UI.ckWaist, lastWaist = lastBefore(w.waist, k, v => v > 0);
-  const checks = items.length ? `<div class="ckf"><div class="cklbl">Checks</div>${items.map(it => { const on = dr && it.id in dr.c ? dr.c[it.id] === 1 : !!(c.c && c.c[it.id] === 1); return `<div class="ckrow"><span id="ckn-${it.id}">${esc(it.n)}</span><button class="switch" role="switch" aria-checked="${on}" aria-labelledby="ckn-${it.id}" data-a="cktog"><span></span></button><input type="hidden" data-ck="${it.id}" value="${on ? 1 : 0}"></div>`; }).join('')}</div>` : '';
+  const checks = items.length ? `<div class="ckf"><div class="cklbl">Checks</div>${items.map(it => { const orig = !!(c.c && c.c[it.id] === 1), on = dr && it.id in dr.c ? dr.c[it.id] === 1 : orig; return `<div class="ckrow"><span id="ckn-${it.id}">${esc(it.n)}</span><button class="switch" role="switch" aria-checked="${on}" aria-labelledby="ckn-${it.id}" data-a="cktog"><span></span></button><input type="hidden" data-ck="${it.id}" data-init="${orig ? 1 : 0}" value="${on ? 1 : 0}"></div>`; }).join('')}</div>` : '';
   const y = addDays(k, -1), night = outOf(S.days[y]);
-  const av = dr && dr.u !== undefined ? dr.u : y in S.alc ? +(+S.alc[y]).toFixed(1) : night ? +drinkU(night).toFixed(1) : '';
-  const ran = dr && dr.run !== undefined ? dr.run : S.run[y] === 1;
+  const av0 = y in S.alc ? +(+S.alc[y]).toFixed(1) : night ? +drinkU(night).toFixed(1) : '', av = dr && dr.u !== undefined ? dr.u : av0;
+  const ran0 = S.run[y] === 1, ran = dr && dr.run !== undefined ? dr.run : ran0;
   const usual = DR[S.set.usualDrink] || DR.lager, quick = [usual, DR.wine, DR.winel, DR.spiritdiet].filter((x, i, a) => x && a.indexOf(x) === i && x.u > 0).slice(0, 4);
   const yest = `<div class="ckf"><div class="cklbl">Yesterday${night ? ` · night out planned, ${fmtU(drinkU(night))} units` : ''}</div>
-    ${ckField('ck-u', 'Alcohol', 'units', 0.5, av, '0')}
+    ${ckField('ck-u', 'Alcohol', 'units', 0.5, av, '0').replace('id="ck-u"', `id="ck-u" data-init="${av0}"`)}
     <div class="chips ckq">${quick.map(d => `<button class="chip" data-a="ckaddu" data-v="${d.u}">+ ${esc(d.sh)} <small>${d.u}</small></button>`).join('')}<button class="chip" data-a="ckzero">None</button></div>
-    <div class="ckrow"><span id="ckn-run">Cardio or a run</span><button class="switch" role="switch" aria-checked="${ran}" aria-labelledby="ckn-run" data-a="cktog"><span></span></button><input type="hidden" data-ckrun="1" value="${ran ? 1 : 0}"></div></div>`;
+    <div class="ckrow"><span id="ckn-run">Cardio or a run</span><button class="switch" role="switch" aria-checked="${ran}" aria-labelledby="ckn-run" data-a="cktog"><span></span></button><input type="hidden" data-ckrun="1" data-init="${ran0 ? 1 : 0}" value="${ran ? 1 : 0}"></div></div>`;
   const waist = due ? `${ckField('ck-ww', 'Waist', 'in', 0.25, dr && dr.ww !== undefined ? dr.ww : w.waist[k] || '', lastWaist || 32)}<p class="small muted ckhint">${w.waist[k] ? '' : 'Weekly. '}Around the middle at the belly button, relaxed, after breathing out.</p>` : `<button class="btn link ckadd" data-a="ckwaist">${ic('plus')}Add a waist measurement</button>`;
   return `<section class="wsum ckcard">${head}
     ${ckField('ck-w', 'Weight', w.unit, 0.1, wv, lastW ? toU(lastW).toFixed(1) : '', wNa)}
@@ -3313,7 +3474,7 @@ function checksCard() {
 }
 function vWeight() {
   const tk = todayKey(), w = WT(), ks = wDays();
-  const card = ckCard();
+  const card = rvBanner() + ckCard();
   const all = [...new Set([...ks, ...Object.keys(S.ck), ...Object.keys(w.waist)])].filter(ckSaved).sort().reverse();
   const list = all.length ? `<details class="more aisle"><summary>All check-ins · ${all.length}${ic('chev')}</summary><div class="shoplist" style="margin-top:6px">${all.slice(0, 90).map(k => { const c = S.ck[k] || {}, yes = S.ckItems.filter(it => c.c && c.c[it.id] === 1).length; return `<button class="crow ckline" data-a="ckopen" data-k="${k}"><span class="n">${fmtDay(k)}<span class="h">${[w.log[k] ? fmtW(w.log[k]) : '', c.sl ? fmtH(c.sl) + ' sleep' : '', w.waist[k] ? `${w.waist[k]} in waist` : ''].filter(Boolean).join(' · ') || 'Checks only'}</span></span><span class="wlr">${S.ckItems.length && c.c ? `<b>${yes}/${S.ckItems.length}</b>` : ''}${ic('chev')}</span></button>`; }).join('')}</div></details>` : '';
   if (!ks.length) return `${card}${sleepCard()}${checksCard()}<div class="empty">${art({ type: 'calendar', main: 'green' }, 90)}<p>Check in a few mornings and your weight trend and calorie advice appear here.</p></div>${wGoalCard()}${wWaistCard()}${list}`;
@@ -3772,7 +3933,7 @@ function syncHistory() {
   if (window.TP_PREVIEW) return;
   setTimeout(() => {
     try {
-      const open = !!(SH || WZ || PM || UI.trends);
+      const open = !!(SH || WZ || PM || RV || UI.trends);
       if (open && !ARMED) { history.pushState({ tp: 1 }, ''); ARMED = true; }
       else if (!open && ARMED) { ARMED = false; SKIPPOP = true; history.back(); }
     } catch (e) { /* history unavailable */ }
@@ -3782,7 +3943,7 @@ window.addEventListener('popstate', () => {
   if (SKIPPOP) { SKIPPOP = false; return; }
   if (!ARMED) return;
   ARMED = false;
-  if (SH) closeSheet(); else if (WZ) closeWizard(); else if (PM) closePrep(); else if (UI.trends) ACT.trback();
+  if (SH) closeSheet(); else if (RV) closeReview(); else if (WZ) closeWizard(); else if (PM) closePrep(); else if (UI.trends) ACT.trback();
 });
 
 const AISLES = [['veg', 'Fruit, veg & herbs'], ['meat', 'Meat'], ['fish', 'Fish'], ['dairy', 'Dairy & eggs'], ['chilled', 'Chilled'], ['bakery', 'Bakery'], ['frozen', 'Frozen'], ['dry', 'Pasta, rice & grains'], ['tins', 'Tins & jars'], ['world', 'World foods'], ['nuts', 'Nuts, seeds & dried fruit'], ['baking', 'Baking'], ['drinks', 'Drinks'], ['oils', 'Oils & sauces'], ['spices', 'Herbs & spices']];
@@ -3946,7 +4107,7 @@ function vOut() {
 /* ───────────── sheets ───────────── */
 let SH = null, pending = null;
 function openSheet(o) { SH = o; renderSheet(true); syncHistory(); }
-function closeSheet() { SH = null; pending = null; $('sheet-root').innerHTML = ''; if (!WZ && !PM) document.body.style.overflow = ''; syncHistory(); }
+function closeSheet() { SH = null; pending = null; $('sheet-root').innerHTML = ''; if (!WZ && !PM && !RV) document.body.style.overflow = ''; syncHistory(); }
 function renderSheet(fresh) {
   const root = $('sheet-root');
   if (!SH) { root.innerHTML = ''; return; }
@@ -4154,7 +4315,7 @@ function shSettings() {
     <div class="fieldrow three">${num('s-lk', 'kcal', st.latteK)}${num('s-lp', 'Protein (g)', st.latteP)}${num('s-lml', 'Milk (ml)', st.latteMl)}</div></section>
   <details class="more"><summary>Meal budgets${ic('chev')}</summary><div class="fieldrow three">${num('s-bb', 'Breakfast', b.b)}${num('s-bl', 'Lunch', b.l)}${num('s-bs', 'Snack', b.s)}${num('s-bd', 'Dinner', b.d)}${num('s-bp', 'Pudding', b.p)}</div>
     <p class="small muted">Latte plus these add up to ${fmtN(sum)} kcal. Each day scales them to fit its target.</p></details>
-  <details class="more"><summary>Weekly goals${ic('chev')}</summary><div class="fieldrow">${num('s-plants', 'Plant points', st.plantGoal)}${num('s-col', 'Colours per day', st.colourGoal)}${num('s-oily', 'Oily fish meals', st.oilyGoal)}${num('s-red', 'Red meat (max)', st.redMax)}</div></details>
+  <details class="more"><summary>Weekly goals${ic('chev')}</summary><div class="fieldrow">${num('s-plants', 'Plant points', st.plantGoal)}${num('s-col', 'Colour groups', st.colourGoal)}${num('s-oily', 'Oily fish meals', st.oilyGoal)}${num('s-red', 'Red meat (max)', st.redMax)}</div></details>
   <section><h4>Nights out</h4><div class="fieldrow"><div class="field"><label for="s-usual">Usual drink</label><select id="s-usual">${DRINKS.filter(d => d[0] !== 'latefood').map(d => `<option value="${d[0]}" ${st.usualDrink === d[0] ? 'selected' : ''}>${esc(d[1])}</option>`).join('')}</select></div>
     <div class="field"><label for="s-dm">Drinks count</label><select id="s-dm"><option value="spread" ${st.drinkMode === 'spread' ? 'selected' : ''}>Across the week</option><option value="day" ${st.drinkMode === 'day' ? 'selected' : ''}>On the night</option></select></div></div>
     ${num('s-dok', 'Dinner out, rough kcal', st.dinnerOutK)}</section>
@@ -4188,7 +4349,11 @@ function shBackup() {
 }
 // adds days from a history file; anything already in the app wins
 function mergeHistory(h) {
-  const n = { sl: 0, c: 0, alc: 0, run: 0, d: 0, w: 0, cl: 0 }, ok = k => /^\d{4}-\d{2}-\d{2}$/.test(k);
+  const n = { sl: 0, c: 0, alc: 0, run: 0, d: 0, w: 0, wc: 0, cl: 0, fx: 0 }, ok = k => /^\d{4}-\d{2}-\d{2}$/.test(k);
+  // corrections: [was, now] pairs, applied only where the app still holds exactly what an earlier file put there
+  const fx = h.fix || {}, same = (a, b) => (a === undefined ? null : a) === b;
+  Object.entries(fx.alc || {}).forEach(([k, p]) => { if (!ok(k) || !Array.isArray(p)) return; if (same(S.alc[k], p[0])) { if (p[1] === null) delete S.alc[k]; else S.alc[k] = +p[1]; n.fx++; } });
+  Object.entries(fx.d || {}).forEach(([k, f]) => { if (!ok(k) || !f) return; const e = S.hist.d[k]; if (!e) return; Object.entries(f).forEach(([fld, p]) => { if (Array.isArray(p) && same(e[fld], p[0])) { if (p[1] === null) delete e[fld]; else e[fld] = +p[1]; n.fx++; } }); });
   // corrections: days an earlier file filled in as none that are really unknown (only removed while still 0)
   ((h.clear && h.clear.alc) || []).forEach(k => { if (ok(k) && S.alc[k] === 0) { delete S.alc[k]; n.cl++; } });
   Object.entries(h.ck || {}).forEach(([k, v]) => {
@@ -4200,9 +4365,10 @@ function mergeHistory(h) {
   Object.entries(h.run || {}).forEach(([k, v]) => { if (ok(k) && !(k in S.run)) { S.run[k] = v ? 1 : 0; n.run++; } });
   Object.entries(h.d || {}).forEach(([k, v]) => { if (!ok(k) || !v) return; const e = S.hist.d[k] || (S.hist.d[k] = {}); let any = false; ['fe', 'fish'].forEach(f => { if (v[f] !== undefined && e[f] === undefined) { e[f] = +v[f]; any = true; } }); if (any) n.d++; });
   Object.entries(h.w || {}).forEach(([k, v]) => { if (ok(k) && !S.hist.w[k] && +v > 0) { S.hist.w[k] = +v; n.w++; } });
+  Object.entries(h.wc || {}).forEach(([k, v]) => { if (ok(k) && !(k in S.hist.wc) && +v >= 0 && +v <= GROUPS.length) { S.hist.wc[k] = Math.round(+v); n.wc++; } });
   if (h.notes) S.hist.notes = Object.assign({}, S.hist.notes || {}, h.notes);
-  const parts = [[n.sl, 'nights of sleep'], [n.c, 'check answers'], [n.alc, 'days of alcohol'], [n.run, 'days of cardio'], [n.d, 'days of food history'], [n.w, 'weeks of plant points']].filter(x => x[0]).map(x => `${fmtN(x[0])} ${x[1]}`);
-  const cl = n.cl ? ` Cleared ${n.cl} day${n.cl > 1 ? 's' : ''} of alcohol marked to do.` : '';
+  const parts = [[n.sl, 'night', 'nights', 'of sleep'], [n.c, 'check answer', 'check answers', ''], [n.alc, 'day', 'days', 'of alcohol'], [n.run, 'day', 'days', 'of cardio'], [n.d, 'day', 'days', 'of food history'], [n.w, 'week', 'weeks', 'of plant points'], [n.wc, 'week', 'weeks', 'of colour groups']].filter(x => x[0]).map(x => `${fmtN(x[0])} ${x[0] === 1 ? x[1] : x[2]}${x[3] ? ' ' + x[3] : ''}`);
+  const cl = (n.cl ? ` Cleared ${n.cl} day${n.cl > 1 ? 's' : ''} of alcohol marked to do.` : '') + (n.fx ? ` Corrected ${n.fx} earlier entr${n.fx > 1 ? 'ies' : 'y'}.` : '');
   return parts.length ? `Added ${joinAnd(parts)}.${cl}` : n.cl ? cl.trim() : 'Nothing new to add: those days are already in the app.';
 }
 function shConfirm() {
@@ -4609,12 +4775,16 @@ const ACT = {
     if (wv && !(kg > 30 && kg < 300)) { toast('That weight looks off'); return; }
     if (sv && !(sl >= 0 && sl <= 16)) { toast('Sleep should be between 0 and 16 hours'); return; }
     if (ww && !(wa > 15 && wa < 80)) { toast('That waist measurement looks off'); return; }
-    const c = {}; document.querySelectorAll('#main [data-ck]').forEach(el => { c[el.dataset.ck] = +el.value ? 1 : 0; });
+    const wasSaved = ckSaved(k), prev = (S.ck[k] || {}).c || {}, c = Object.assign({}, prev); // keep answers to checks not on the form
+    // on an edit, a check that had no answer only gets one if you flip it
+    document.querySelectorAll('#main [data-ck]').forEach(el => { const id = el.dataset.ck; if (wasSaved && !(id in prev) && el.value === el.dataset.init) return; c[id] = +el.value ? 1 : 0; });
     if (kg) w.log[k] = +kg.toFixed(3); else delete w.log[k];
     if (wa) w.waist[k] = wa; else if ($('ck-ww')) delete w.waist[k];
     const e = { c }; if (sl !== null) e.sl = sl; S.ck[k] = e;
-    const yk = addDays(k, -1); S.alc[yk] = uv ? Math.round(+uv * 10) / 10 : 0;
-    const rn = document.querySelector('#main [data-ckrun]'); if (rn) S.run[yk] = +rn.value ? 1 : 0;
+    // a new check-in records yesterday's alcohol (empty = none) and cardio; editing an old one leaves them alone unless changed
+    const yk = addDays(k, -1), uEl = $('ck-u'), rn = document.querySelector('#main [data-ckrun]');
+    if (!wasSaved || !uEl || uEl.value.trim() !== (uEl.dataset.init || '')) S.alc[yk] = uv ? Math.round(+uv * 10) / 10 : 0;
+    if (rn && (!wasSaved || rn.value !== rn.dataset.init)) S.run[yk] = +rn.value ? 1 : 0;
     save(); UI.ckEdit = false; UI.ckWaist = false; UI.wsel = kg ? k : UI.wsel; ckReset(); render(); window.scrollTo(0, 0);
     toast(k === todayKey() ? 'Checked in for today' : `Saved ${fmtDay(k)}`);
   },
@@ -4653,7 +4823,7 @@ const ACT = {
     st.fsMax = pos(g('s-fs'), st.fsMax); st.naMax = pos(g('s-na'), st.naMax); st.sfMax = pos(g('s-sf'), st.sfMax); st.loSalt = Math.max(0, Math.min(1, +$('s-lo').value || 0)); st.stock = STOCKS[$('s-stock').value] ? $('s-stock').value : 'reg'; applyStock();
     st.latteOn = $('s-latte').checked; st.latteK = pos(g('s-lk'), st.latteK); st.latteP = Math.max(0, g('s-lp') || 0); st.latteMl = pos(g('s-lml'), st.latteMl);
     st.bud = { b: pos(g('s-bb'), st.bud.b), l: pos(g('s-bl'), st.bud.l), s: Math.max(1, g('s-bs') || 0), d: pos(g('s-bd'), st.bud.d), p: Math.max(1, g('s-bp') || 0) };
-    st.plantGoal = pos(g('s-plants'), st.plantGoal); st.colourGoal = Math.min(6, pos(g('s-col'), st.colourGoal)); st.oilyGoal = Math.max(0, g('s-oily') || 0); st.redMax = Math.max(0, g('s-red') || 0);
+    st.plantGoal = pos(g('s-plants'), st.plantGoal); st.colourGoal = Math.min(GROUPS.length, pos(g('s-col'), st.colourGoal)); st.oilyGoal = Math.max(0, g('s-oily') || 0); st.redMax = Math.max(0, g('s-red') || 0);
     setWeekStart(+$('s-ws').value || 0); st.weekendBatch = $('s-wkb').checked; st.adapt = $('s-adapt').checked;
     st.usualDrink = $('s-usual').value; st.drinkMode = $('s-dm').value; st.dinnerOutK = pos(g('s-dok'), st.dinnerOutK);
     UI.week = startOf(UI.day);
@@ -4752,6 +4922,275 @@ const ACT = {
   wzback() { if (WZ.step === 0) return; WZ.step--; WZ.dir = -1; WZ.anim = true; renderWZ(); }
 };
 function keepNightFields() { if (!SH || SH.type !== 'night') return; SH.o.note = $('n-note').value.trim(); if ($('n-dk')) SH.o.dinnerK = +$('n-dk').value || SH.o.dinnerK; SH.o.skipPud = $('n-skp').checked; }
+/* ───────────── week review: on the first day of the week, a run of cards to check the week before ───────────── */
+let RV = null;
+const rvPlanned = st => weekDays(st).some(k => { const d = S.days[k]; return !!d && SLOTS.some(s => R[d.sl[s]] || d.sl[s] === '@c'); });
+const rvHasData = st => rvPlanned(st) || weekDays(st).some(k => S.ck[k] || k in S.alc || k in S.run);
+const rvSteps = st => (rvPlanned(st) ? ['meals'] : []).concat(['plants', 'alc', 'run', 'checks', 'sum']);
+const rvFirst = () => { const f = minKey(S.days, S.ck, S.alc, S.run, S.hist.w); return f === '9999' ? addDays(startOf(todayKey()), -7) : startOf(f); };
+const rvHistKey = (map, st) => weekDays(st).find(k => k in map) || st;
+// the week before, on the first day of a new week, until it's been reviewed
+function rvDue() {
+  const tk = todayKey(), st = startOf(tk); if (tk !== st) return null;
+  const last = addDays(st, -7); return !S.rev[last] && rvHasData(last) ? last : null;
+}
+function openReview(st, from, card) {
+  if (SH) closeSheet();
+  RV = { st, step: Math.max(0, rvSteps(st).indexOf(card)), from: from || 'trends', was: {}, sel: null, plq: '', fresh: true, day0: UI.day, week0: UI.week };
+  renderRV(); syncHistory();
+}
+function closeReview() {
+  if (!RV) return;
+  UI.day = RV.day0; UI.week = RV.week0; RV = null; $('rv-root').innerHTML = ''; document.body.classList.remove('rvon');
+  if (!WZ && !PM && !SH) document.body.style.overflow = '';
+  // the check-in's alcohol and cardio for yesterday may have just changed: show the saved values, keep anything else typed
+  keepCk(); if (UI.ckDraft) { delete UI.ckDraft.u; delete UI.ckDraft.run; } UI.ckSkip = true;
+  syncHistory(); render();
+}
+// marks a past day's meals as eaten, at the portions they have now
+function rvFreezeDay(k) {
+  const d = S.days[k]; if (!d) return;
+  const c = dayCalc(k);
+  SLOTS.forEach(s => { if (d.done[s]) return; const o = c.slots[s]; if (o.kind === 'recipe') d.done[s] = { m: +o.m.toFixed(3), sw: Object.assign({}, o.r.swapped || {}) }; else if (o.kind === 'custom') d.done[s] = { c: 1 }; });
+}
+function rvFinish() {
+  const st = RV.st, tk = todayKey(), from = RV.from;
+  weekDays(st).forEach(k => { if (k < tk) rvFreezeDay(k); });
+  S.rev[st] = tk; save();
+  closeReview();
+  toast(st === addDays(startOf(tk), -7) ? 'Last week saved' : `Week of ${fmtRange(st)} saved`);
+  if (from !== 'trends' && UI.mode !== 'weight') { UI.mode = 'weight'; render(); }
+}
+const rvCk = k => { const e = S.ck[k] || (S.ck[k] = { c: {} }); e.c = e.c || {}; return e; };
+const rvCkTidy = k => { const e = S.ck[k]; if (e && !e.sl && !Object.keys(e.c || {}).length) delete S.ck[k]; };
+const rvExtraPlants = st => [...new Set(weekDays(st).flatMap(k => peekD(k).x.filter(x => x.rv).flatMap(x => x.pl || [])))];
+const rvHead = (h, p) => `<div class="wz-head"><div><h2>${h}</h2>${p ? `<p>${p}</p>` : ''}</div></div>`;
+const rvDayBtn = (k, cls, act, inner, label, extra) => `<button class="${cls}" data-a="${act}" data-k="${k}" aria-label="${label}" ${extra || ''}>${inner}</button>`;
+
+function rvMeals() {
+  // grouped by meal, so a batch-cooked breakfast or lunch is one row with its days
+  const days = weekDays(RV.st), groups = {};
+  days.forEach(k => {
+    const c = dayCalc(k);
+    SLOTS.forEach(s => {
+      const o = c.slots[s], w = RV.was[k + s];
+      let id, n;
+      if (w) { id = w.v === '@c' ? '@c' + w.n : w.v; n = w.n; }
+      else if (o.kind === 'recipe') { id = o.r.id; n = o.r.n; }
+      else if (o.kind === 'custom') { id = '@c' + o.c.n; n = o.c.n; }
+      else return;
+      const g = groups[s + '|' + id] || (groups[s + '|' + id] = { s, n, days: [] });
+      g.days.push({ k, off: !!w });
+    });
+  });
+  const secs = SLOTS.map(s => {
+    const gs = Object.values(groups).filter(g => g.s === s); if (!gs.length) return '';
+    return `<section class="wsum rvslot"><div class="eyebrow">${SLOTNAME[s]}</div>${gs.map(g => `<div class="rvgrp"><div class="rvgn">${esc(g.n)}</div><div class="rvgd">${g.days.map(x => `<button class="rvdy ${x.off ? 'off' : ''}" data-a="rvskip" data-k="${x.k}" data-s="${s}" aria-pressed="${!x.off}" aria-label="${esc(g.n)}, ${fmtDay(x.k)}: ${x.off ? "didn't have it" : 'had it'}">${DOW[dayIndex(x.k)].slice(0, 2)}</button>`).join('')}</div></div>`).join('')}</section>`;
+  }).join('');
+  return `${rvHead('Meals', "Tap any day you didn't have that meal. Everything left on counts as eaten when you finish.")}${secs || '<p class="small muted">Nothing planned.</p>'}<p class="small muted">Had something else instead? Add it on the next card.</p>`;
+}
+
+function rvPlStat() {
+  const wc = weekCalc(RV.st), set = S.set, miss = GROUPS.filter(x => !wc.cols.has(x));
+  return `<div class="rvstat"><div><b>${fmtPts(wc.ptsPlan)}<small>/${set.plantGoal}</small></b><span>plant points</span></div><div><b>${wc.cols.size}<small>/${set.colourGoal}</small></b><span>colour groups ${cdots(wc.cols)}</span></div></div>${miss.length ? `<p class="small" style="margin:0">No ${miss.map(x => GROUPNAME[x]).join(' or ')} this week.</p>` : ''}`;
+}
+function rvPlGrid() {
+  const st = RV.st, wc = weekCalc(st), ex = rvExtraPlants(st), q = RV.plq.trim().toLowerCase();
+  const chip = (x, on, counted) => `<button class="pchip ${on ? 'on' : ''} ${counted ? 'eaten' : ''}" data-a="rvpl" data-v="${x}" ${counted ? 'disabled' : ''} aria-pressed="${on}">${PLANTS[x][2] ? `<i class="c-${PLANTS[x][2]}"></i>` : ''}${esc(PLANTS[x][0])}${PLANTS[x][1] < 1 ? ' ¼' : ''}${counted ? ' · counted' : ''}</button>`;
+  const found = q ? Object.keys(PLANTS).filter(x => !ex.includes(x) && PLANTS[x][0].toLowerCase().includes(q)).sort((a, b) => PLANTS[a][0].localeCompare(PLANTS[b][0])).slice(0, 30) : [];
+  return ex.map(x => chip(x, true, false)).join('') + found.map(x => chip(x, false, wc.plan.has(x))).join('') + (q && !found.length ? '<span class="small muted">No plant by that name</span>' : '');
+}
+// oily fish and fermented for days with no meal plan (days with a plan count from the plan)
+function rvFoodGrid(st) {
+  const days = weekDays(st), planned = k => { const c = dcc(k); return !!(c && c.hasPlan); };
+  if (days.every(planned)) return '';
+  const head = `<div class="rv7 rvgh">${days.map(k => `<span><small>${DOW[dayIndex(k)].slice(0, 2)}</small><b>${parse(k).getDate()}</b></span>`).join('')}</div>`;
+  const row = (f, n) => {
+    const vals = days.map(k => (planned(k) ? 'plan' : S.hist.d[k] && S.hist.d[k][f] !== undefined ? S.hist.d[k][f] : null)), known = vals.filter(v => v !== null && v !== 'plan');
+    return `<div class="rvgl"><span>${n}</span><small>${known.length ? `${known.filter(v => v > 0).length} of ${known.length}` : 'Not logged'}</small></div><div class="rv7">${days.map((k, i) => { const v = vals[i]; if (v === 'plan') return `<span class="rvc pl" title="From the meal plan" aria-label="${fmtDay(k)}: from the meal plan">plan</span>`; return `<button class="rvc ${v > 0 ? 'y' : v === 0 ? 'n' : ''}" data-a="rvfood" data-k="${k}" data-v="${f}" aria-label="${n}, ${fmtDay(k)}: ${v > 0 ? 'yes' : v === 0 ? 'no' : 'not logged'}">${v === null ? '' : v > 1 ? v : ic(v ? 'check' : 'x')}</button>`; }).join('')}</div>`;
+  };
+  return `<section class="wsum rvgrid"><div class="cklbl">Food on days without a meal plan</div>${head}${row('fish', 'Oily fish')}${row('fe', 'Something fermented')}</section>`;
+}
+function rvPlants() {
+  const st = RV.st, wc = weekCalc(st);
+  if (wc.planned < 4) {
+    const pv = S.hist.w[rvHistKey(S.hist.w, st)], cv = S.hist.wc[rvHistKey(S.hist.wc, st)];
+    return `${rvHead('Plants', 'No meal plan in the app for this week. Fill in the totals if you have them.')}
+      <section class="wsum"><div class="ckf"><label class="cklbl" for="rv-pts">Plant points</label><input id="rv-pts" class="rvnum" type="number" inputmode="decimal" step="0.25" min="0" value="${pv || ''}" placeholder="Not logged"></div>
+      <div class="ckf"><span class="cklbl">Colour groups</span><div class="seg rvseg" role="group" aria-label="Colour groups">${[0, 1, 2, 3, 4, 5].map(n => `<button data-a="rvcol" data-v="${n}" aria-pressed="${cv === n}">${n}</button>`).join('')}</div><p class="small muted" style="margin:0">Red, orange/yellow, green, purple/blue, white/tan. Tap again to clear.</p></div></section>${rvFoodGrid(st)}${rvNR(['plants', 'cols', 'food'], true)}`;
+  }
+  const xs = []; weekDays(st).forEach(k => peekD(k).x.forEach((x, i) => { if (!x.rv) xs.push({ k, x, i }); }));
+  const xl = xs.length ? `<div class="rvxs">${xs.map(({ k, x, i }) => `<div class="rvx"><span><b>${DOW[dayIndex(k)]}</b> ${esc(x.n)}<small>${[x.k ? `${fmtN(x.k)} kcal` : '', (x.pl || []).length ? `${x.pl.length} plant${x.pl.length > 1 ? 's' : ''}` : ''].filter(Boolean).join(' · ')}</small></span><button class="iconbtn" data-a="rvxdel" data-k="${k}" data-i="${i}" aria-label="Remove ${esc(x.n)} on ${fmtDay(k)}">${ic('trash')}</button></div>`).join('')}</div>` : '<p class="small muted" style="margin:0">Nothing extra logged.</p>';
+  return `${rvHead('Plants and extras', "Add plants you ate that weren't in the plan, and anything else you had.")}
+    <section class="wsum" id="rv-plstat">${rvPlStat()}</section>${rvFoodGrid(st)}${rvNR(['food'], true)}
+    <section class="wsum"><div class="cklbl">Plants outside the plan</div><input id="rv-plq" class="search" type="search" placeholder="Type to find a plant" value="${esc(RV.plq)}" aria-label="Find a plant" autocomplete="off"><div class="plantgrid" id="rv-plgrid" style="margin:0">${rvPlGrid()}</div></section>
+    <section class="wsum"><div class="cklbl">Snacks, meals out and extras</div>${xl}<div class="cklbl" style="margin-top:4px">Log something on</div><div class="rv7">${weekDays(st).map(k => `<button class="chip rvdc" data-a="rvadd" data-k="${k}" aria-label="Log something on ${fmtDay(k)}">${DOW[dayIndex(k)].slice(0, 2)}</button>`).join('')}</div></section>`;
+}
+
+function rvAlcTot() {
+  const days = weekDays(RV.st), known = days.filter(k => k in S.alc), tot = known.reduce((a, k) => a + +S.alc[k], 0), unk = 7 - known.length, hi = known.filter(k => +S.alc[k] > ALC.binge).length;
+  const st = !known.length ? 'none' : tot < ALC.week ? 'ok' : tot <= ALC.week * 1.5 ? 'mid' : 'off';
+  const notes = [unk ? `${unk} day${unk > 1 ? 's' : ''} not logged` : 'Every day logged', hi ? `${hi} day${hi > 1 ? 's' : ''} over ${ALC.binge} units` : '', tot >= ALC.big ? `a ${ALC.big}+ unit week` : ''].filter(Boolean);
+  return `<div class="rvstat"><div><b>${fmtU(tot)}</b><span>units · goal under ${ALC.week}</span></div><div><b class="rvst">${stDot(st)}${TR_ST[st]}</b><span>${notes.join(' · ')}</span></div></div>`;
+}
+function rvAlc() {
+  const days = weekDays(RV.st), unk = days.some(k => !(k in S.alc));
+  const rows = days.map(k => {
+    const has = k in S.alc, night = outOf(S.days[k]), nu = night ? Math.round(drinkU(night) * 2) / 2 : 0;
+    return `<div class="rvrow ${has ? '' : 'unk'}"><span class="rvdl"><b>${DOW[dayIndex(k)]} ${parse(k).getDate()}</b>${!has && nu ? `<button class="chip" data-a="rvuset" data-k="${k}" data-v="${nu}">Planned ${fmtU(nu)}</button>` : ''}${has && +S.alc[k] > ALC.binge ? `<span class="chip bad">Over ${ALC.binge}</span>` : ''}</span>
+      <span class="rvstep"><button class="stepbtn sm" data-a="rvu" data-k="${k}" data-v="-1" aria-label="Less on ${fmtDay(k)}">−</button><input id="rv-u-${k}" type="number" inputmode="decimal" step="0.5" min="0" value="${has ? +(+S.alc[k]).toFixed(1) : ''}" placeholder="–" aria-label="Units on ${fmtDay(k)}"><button class="stepbtn sm" data-a="rvu" data-k="${k}" data-v="1" aria-label="More on ${fmtDay(k)}">+</button></span></div>`;
+  }).join('');
+  return `${rvHead('Alcohol', 'Units by the day you drank them. A blank day is not logged yet; 0 means none.')}
+    <section class="wsum"><div id="rv-atot">${rvAlcTot()}</div><div class="rvrows">${rows}</div>${unk ? '<button class="btn sm" data-a="rvanone">Set blank days to none</button>' : ''}${rvNR(['alc'])}</section>`;
+}
+
+function rvRun() {
+  const days = weekDays(RV.st), n = days.filter(k => S.run[k] === 1).length, unk = days.filter(k => !(k in S.run)).length;
+  const st = unk === 7 ? 'none' : n >= 2 ? 'ok' : n >= 1 ? 'mid' : 'off';
+  const btns = days.map(k => { const v = k in S.run ? S.run[k] : null; return rvDayBtn(k, `rvd ${v === 1 ? 'y' : v === 0 ? 'n' : ''}`, 'rvrun', `<small>${DOW[dayIndex(k)].slice(0, 2)}</small><b>${parse(k).getDate()}</b>${v === null ? '<i></i>' : ic(v ? 'check' : 'x')}`, `${fmtDay(k)}: ${v === 1 ? 'yes' : v === 0 ? 'no' : 'not logged'}`, `aria-pressed="${v === 1}"`); }).join('');
+  return `${rvHead('Cardio', 'Runs and any other cardio. Tap a day to switch it.')}
+    <section class="wsum"><div class="rvstat"><div><b>${n}</b><span>this week · goal 2</span></div><div><b class="rvst">${stDot(st)}${TR_ST[st]}</b><span>${unk ? `${unk} day${unk > 1 ? 's' : ''} not logged` : 'Every day logged'}</span></div></div>
+    <div class="rv7">${btns}</div>${unk ? '<button class="btn sm" data-a="rvrnone">Set blank days to none</button>' : ''}${rvNR(['run'])}</section>`;
+}
+
+function rvChecks() {
+  const days = weekDays(RV.st), items = S.ckItems;
+  const head = `<div class="rv7 rvgh">${days.map(k => `<span><small>${DOW[dayIndex(k)].slice(0, 2)}</small><b>${parse(k).getDate()}</b></span>`).join('')}</div>`;
+  const sl = days.map(k => (S.ck[k] || {}).sl || 0), ns = sl.filter(Boolean).length, avg = ns ? sl.reduce((a, b) => a + b, 0) / ns : 0;
+  const slRow = `<div class="rvgl"><span>Sleep, hours</span><small>${ns ? `${avg.toFixed(1)} h average` : 'Not logged'}</small></div><div class="rv7">${days.map((k, i) => rvDayBtn(k, `rvc sl ${sl[i] ? 'y' : ''} ${RV.sel === k ? 'sel' : ''}`, 'rvsel', sl[i] ? String(+sl[i].toFixed(2)) : '', `Sleep on ${fmtDay(k)}: ${sl[i] ? fmtH(sl[i]) : 'not logged'}`, `aria-pressed="${RV.sel === k}"`)).join('')}</div>`;
+  let ed = '';
+  if (RV.sel) { const v = (S.ck[RV.sel] || {}).sl; ed = `<div class="rvsl"><span class="small"><b>${fmtDay(RV.sel)}</b> · sleep</span><span class="rvstep"><button class="stepbtn sm" data-a="rvsl" data-v="-1" aria-label="Less sleep">−</button><input id="rv-sl" type="number" inputmode="decimal" step="0.25" min="0" max="16" value="${v || ''}" placeholder="–" aria-label="Hours of sleep on ${fmtDay(RV.sel)}"><button class="stepbtn sm" data-a="rvsl" data-v="1" aria-label="More sleep">+</button></span></div>`; }
+  const rows = items.map(it => {
+    const vals = days.map(k => (S.ck[k] && S.ck[k].c && it.id in S.ck[k].c ? S.ck[k].c[it.id] : null)), logged = vals.filter(v => v !== null).length, yes = vals.filter(v => v === 1).length;
+    return `<div class="rvgl"><span>${esc(it.n)}</span><small>${logged ? `${yes} of ${logged}` : 'Not logged'}</small></div><div class="rv7">${days.map((k, i) => { const v = vals[i]; return `<button class="rvc ${v === 1 ? 'y' : v === 0 ? 'n' : ''}" data-a="rvck" data-k="${k}" data-v="${esc(it.id)}" aria-label="${esc(it.n)}, ${fmtDay(k)}: ${v === 1 ? 'yes' : v === 0 ? 'no' : 'not logged'}">${v === null ? '' : ic(v ? 'check' : 'x')}</button>`; }).join('')}</div>`;
+  }).join('');
+  return `${rvHead('Sleep and checks', 'From each morning\'s check-in. Tap a sleep figure to change it; tap a box to switch between yes, no and blank.')}<section class="wsum rvgrid">${head}${slRow}${ed}${rows}${rvNR(['ck'])}</section>`;
+}
+
+// the week's results, using the same rules as the lights in Trends
+function rvReport(st) {
+  TC = null;
+  const set = S.set, days = weekDays(st), rows = [], add = (grp, n, s, txt) => rows.push({ grp, n, st: s, txt });
+  const fv = id => days.map(k => foodVal(id, k)).filter(v => v !== null && v !== undefined);
+  const pl = weekPlants(st); add('Food', 'Plant points', pl === null ? 'none' : pl >= set.plantGoal ? 'ok' : pl >= set.plantGoal - 5 ? 'mid' : 'off', pl === null ? 'Not logged' : `${fmtPts(pl)} of ${set.plantGoal}`);
+  const co = weekColours(st); add('Food', 'Colour groups', co === null ? 'none' : co >= set.colourGoal ? 'ok' : co >= set.colourGoal - 1 ? 'mid' : 'off', co === null ? 'Not logged' : `${co} of ${set.colourGoal}`);
+  const fi = fv('fish'); if (fi.length) { const n = fi.reduce((a, b) => a + b, 0); add('Food', 'Oily fish', n >= set.oilyGoal ? 'ok' : n >= set.oilyGoal - 1 ? 'mid' : 'off', `${n} of ${set.oilyGoal}`); }
+  const fe = fv('ferm'); if (fe.length) { const n = fe.reduce((a, b) => a + b, 0), r = Math.round(n / fe.length * 7); add('Food', 'Fermented', r >= 7 ? 'ok' : r >= 5 ? 'mid' : 'off', `${n} of ${fe.length} days`); }
+  const rd = fv('red'); if (rd.length) { const n = rd.reduce((a, b) => a + b, 0); add('Food', 'Red meat', n <= set.redMax ? 'ok' : n <= set.redMax + 1 ? 'mid' : 'off', `${n} · limit ${set.redMax}`); }
+  [['protein', 'Protein', v => `${fmtN(v)}g`], ['fibre', 'Fibre', v => `${fmtN(v)}g`], ['sodium', 'Sodium', v => `${v.toFixed(1)}g`], ['sugar', 'Added sugar', v => fmtFS(v)], ['satfat', 'Saturated fat', v => `${fmtN(v)}g`]].forEach(([id, n, f]) => {
+    const m = weekMisses(id, st); if (!m.n) return;
+    const vs = fv(id), avg = vs.reduce((a, b) => a + b, 0) / vs.length, lim = ['sodium', 'sugar', 'satfat'].includes(id);
+    add('Food', n, !m.miss ? 'ok' : lim ? (m.miss <= 2 ? 'mid' : 'off') : (m.miss === 1 ? 'mid' : 'off'), `${f(avg)} a day · ${!m.miss ? (lim ? 'under every day' : 'on target every day') : `${m.miss} day${m.miss > 1 ? 's' : ''} ${lim ? 'over' : 'short'}`}`);
+  });
+  const ak = days.filter(k => k in S.alc);
+  if (ak.length) { const tot = ak.reduce((a, k) => a + +S.alc[k], 0), hi = ak.filter(k => +S.alc[k] > ALC.binge).length, unk = 7 - ak.length; add('Drink', 'Alcohol', tot < ALC.week ? 'ok' : tot <= ALC.week * 1.5 ? 'mid' : 'off', [`${fmtU(tot)} units`, hi ? `${hi} day${hi > 1 ? 's' : ''} over ${ALC.binge}` : '', unk ? `${unk} not logged` : ''].filter(Boolean).join(' · ')); }
+  else add('Drink', 'Alcohol', 'none', 'Not logged');
+  const rk = days.filter(k => k in S.run);
+  if (rk.length) { const n = rk.filter(k => S.run[k] === 1).length; add('Activity', 'Cardio and running', n >= 2 ? 'ok' : n >= 1 ? 'mid' : 'off', `${n} · goal 2`); }
+  else add('Activity', 'Cardio and running', 'none', 'Not logged');
+  const sl = days.map(k => (S.ck[k] || {}).sl).filter(v => v > 0);
+  if (sl.length) { const a = Math.round(sl.reduce((x, y) => x + y, 0) / sl.length * 10) / 10; add('Sleep and checks', 'Sleep', a >= set.sleepGoal ? 'ok' : a >= set.sleepGoal - 0.5 ? 'mid' : 'off', `${a.toFixed(1)} h a night${sl.length < 7 ? ` · ${sl.length} nights logged` : ''}`); }
+  habits().forEach(h => { const vs = days.map(k => habitVal(h, k)).filter(v => v !== null); if (!vs.length) return; const y = vs.filter(v => v === 1).length, r = y / vs.length; add('Sleep and checks', h.n, r >= 0.85 ? 'ok' : r >= 0.57 ? 'mid' : 'off', `${y} of ${vs.length} days`); });
+  const wa = wAvg(addDays(st, 6)), wp = wAvg(addDays(st, -1));
+  if (wa) { const dv = wp ? wa.v - wp.v : null; add('Body', 'Weight', 'none', `${fmtW(wa.v)} average${dv === null ? '' : Math.abs(toU(dv)) < 0.05 ? ', no change' : `, ${dv < 0 ? 'down' : 'up'} ${fmtW(Math.abs(dv))}`}`); }
+  return rows;
+}
+function rvSum() {
+  const rows = rvReport(RV.st), cnt = s => rows.filter(r => r.st === s).length;
+  const head = [[cnt('ok'), 'on track'], [cnt('mid'), 'close'], [cnt('off'), 'off track']].filter(x => x[0]).map(x => `${x[0]} ${x[1]}`).join(', ');
+  return `${rvHead('Your week', head ? `${head}.` : '')}${[...new Set(rows.map(r => r.grp))].map(g => `<section class="wsum rvsum"><div class="eyebrow">${g}</div>${rows.filter(r => r.grp === g).map(r => `<div class="rvsr">${stDot(r.st)}<span>${esc(r.n)}<span class="sr-only">: ${TR_ST[r.st]}</span></span><b>${esc(r.txt)}</b></div>`).join('')}</section>`).join('')}`;
+}
+
+function renderRV() {
+  const root = $('rv-root'); if (!RV) { root.innerHTML = ''; return; }
+  TC = null; MCACHE = null;
+  const steps = rvSteps(RV.st); RV.step = Math.max(0, Math.min(RV.step, steps.length - 1));
+  const i = RV.step, id = steps[i], last = i === steps.length - 1, ob = $('rv-body'), keepTop = ob && !RV.anim ? ob.scrollTop : 0;
+  const canN = addDays(RV.st, 7) < startOf(todayKey()), canP = addDays(RV.st, -7) >= rvFirst();
+  const body = { meals: rvMeals, plants: rvPlants, alc: rvAlc, run: rvRun, checks: rvChecks, sum: rvSum }[id]();
+  root.innerHTML = `<div class="wz rv" role="dialog" aria-modal="true" aria-label="Week review" ${RV.fresh ? '' : 'style="animation:none"'}>
+    <div class="wz-top"><div class="rvwk"><button class="iconbtn" data-a="rvwk" data-v="-1" aria-label="Week before" ${canP ? '' : 'disabled'}>${ic('left')}</button><span><span class="eyebrow">Week review · ${i + 1} of ${steps.length}</span><b>Week of ${fmtRange(RV.st)}</b></span><button class="iconbtn" data-a="rvwk" data-v="1" aria-label="Week after" ${canN ? '' : 'disabled'}>${ic('chev')}</button></div><button class="iconbtn" data-a="rvclose" aria-label="Close review">${ic('x')}</button>
+    <div class="wz-prog" style="grid-template-columns:repeat(${steps.length},1fr)">${steps.map((_, j) => `<i class="${j <= i ? 'on' : ''}"></i>`).join('')}</div></div>
+    <div class="wz-body ${RV.anim ? (RV.dir > 0 ? 'in-r' : 'in-l') : ''}" id="rv-body">${body}</div>
+    <div class="wz-foot"><button class="btn" data-a="rvback" ${i === 0 ? 'disabled' : ''}>Back</button><button class="btn primary" data-a="rvnext">${last ? (RV.from === 'trends' ? 'Save the week' : 'Save and check in') : 'Next'}</button></div></div>`;
+  RV.fresh = false; RV.anim = false;
+  if (keepTop) $('rv-body').scrollTop = keepTop;
+  document.body.style.overflow = 'hidden'; document.body.classList.add('rvon');
+}
+// on the check-in page, the first day of the week
+function rvBanner() {
+  const due = rvDue(); if (!due) return '';
+  return `<section class="wsum rvban"><div><div class="eyebrow">Week review</div><b>Week of ${fmtRange(due)}</b><span class="small muted">Meals, plants, alcohol, cardio and check-ins</span></div><button class="btn primary sm" data-a="review" data-v="${due}">Review</button></section>`;
+}
+const rvStep = (v, d, step) => Math.max(0, Math.round(((v || 0) + d * step) / step) * step);
+Object.assign(ACT, {
+  review(d) { openReview(d.v || addDays(startOf(todayKey()), -7), UI.trends ? 'trends' : 'banner'); },
+  rvclose() { closeReview(); },
+  rvnext() { if (RV.step >= rvSteps(RV.st).length - 1) { rvFinish(); return; } RV.step++; RV.anim = true; RV.dir = 1; RV.sel = null; renderRV(); $('rv-body').scrollTop = 0; },
+  rvback() { if (RV.step > 0) { RV.step--; RV.anim = true; RV.dir = -1; RV.sel = null; renderRV(); $('rv-body').scrollTop = 0; } },
+  rvwk(d) {
+    const id = rvSteps(RV.st)[RV.step], st = addDays(RV.st, 7 * +d.v);
+    if (st >= startOf(todayKey()) || st < rvFirst()) return;
+    RV.st = st; RV.sel = null; RV.plq = ''; RV.step = Math.max(0, rvSteps(st).indexOf(id)); RV.anim = true; RV.dir = +d.v; renderRV();
+  },
+  rvskip(d) {
+    const k = d.k, s = d.s, key = k + s, day = D(k), w = RV.was[key];
+    if (w) { day.sl[s] = w.v; if (w.cu) day.cu[s] = w.cu; if (w.done) day.done[s] = w.done; delete RV.was[key]; }
+    else {
+      rvFreezeDay(k);
+      const o = dayCalc(k).slots[s];
+      RV.was[key] = { v: day.sl[s], cu: day.cu[s], done: day.done[s], n: o.kind === 'recipe' ? o.r.n : (o.c && o.c.n) || SLOTNAME[s] };
+      day.sl[s] = '@skip'; delete day.done[s]; delete day.cu[s];
+    }
+    save(); renderRV();
+  },
+  rvpl(d) {
+    const st = RV.st, x = d.v;
+    if (rvExtraPlants(st).includes(x)) weekDays(st).forEach(k => { const dd = S.days[k]; if (!dd) return; dd.x.forEach(e => { if (e.rv) e.pl = (e.pl || []).filter(p => p !== x); }); dd.x = dd.x.filter(e => !e.rv || e.pl.length); });
+    else { const dd = D(addDays(st, 6)); let e = dd.x.find(z => z.rv); if (!e) { e = { n: 'Plants outside the plan', k: 0, p: 0, pl: [], rv: 1 }; dd.x.push(e); } e.pl.push(x); }
+    save(); renderRV();
+  },
+  rvxdel(d) { const dd = S.days[d.k]; if (!dd) return; const x = dd.x[+d.i]; if (!x) return; dd.x.splice(+d.i, 1); save(); renderRV(); toast(`Removed ${x.n}`); },
+  rvadd(d) { UI.day = d.k; openSheet({ type: 'xadd', pl: [] }); },
+  rvcol(d) { const k = rvHistKey(S.hist.wc, RV.st), v = +d.v; if (S.hist.wc[k] === v) delete S.hist.wc[k]; else S.hist.wc[k] = v; save(); renderRV(); },
+  rvu(d) { const k = d.k, v = k in S.alc ? +S.alc[k] : null; S.alc[k] = v === null ? (+d.v > 0 ? 0.5 : 0) : rvStep(v, +d.v, 0.5); save(); renderRV(); },
+  rvuset(d) { S.alc[d.k] = +d.v; save(); renderRV(); },
+  rvanone() { weekDays(RV.st).forEach(k => { if (!(k in S.alc)) S.alc[k] = 0; }); save(); renderRV(); },
+  rvrun(d) { const k = d.k; S.run[k] = S.run[k] === 1 ? 0 : 1; save(); renderRV(); },
+  rvrnone() { weekDays(RV.st).forEach(k => { if (!(k in S.run)) S.run[k] = 0; }); save(); renderRV(); },
+  rvfood(d) {
+    const k = d.k, f = d.v, h = S.hist.d[k] || (S.hist.d[k] = {}), v = h[f];
+    if (v === undefined) h[f] = 1; else if (v > 0) h[f] = 0; else delete h[f];
+    if (!Object.keys(h).length) delete S.hist.d[k];
+    save(); renderRV();
+  },
+  gapopen(d) { openReview(d.v, 'trends', d.s); },
+  gapaside(d) { gapMark(d.v, Object.keys(weekGaps(d.v, gapFrom()))); render(); toast(`Week of ${fmtRange(d.v)} marked as not recorded`); },
+  gapnr(d) { gapMark(RV.st, d.v.split(','), !!d.u); renderRV(); },
+  gapback(d) { if (S.gapsOk) delete S.gapsOk[d.v]; save(); render(); },
+  gapmore() { UI.gapAll = !UI.gapAll; render(); },
+  gapshow() { UI.gapAside = !UI.gapAside; render(); },
+  rvsel(d) { RV.sel = RV.sel === d.k ? null : d.k; renderRV(); },
+  rvsl(d) {
+    const k = RV.sel; if (!k) return;
+    const cur = (S.ck[k] || {}).sl || (lastBefore(S.ck, k, v => v.sl > 0) || {}).sl || S.set.sleepGoal, v = Math.min(16, rvStep(cur, (S.ck[k] || {}).sl ? +d.v : 0, 0.25));
+    if (v > 0) rvCk(k).sl = v; else if (S.ck[k]) { delete S.ck[k].sl; rvCkTidy(k); }
+    save(); renderRV();
+  },
+  rvck(d) {
+    const k = d.k, id = d.v, e = S.ck[k], v = e && e.c && id in e.c ? e.c[id] : null;
+    if (v === null) rvCk(k).c[id] = 1; else if (v === 1) rvCk(k).c[id] = 0; else { delete e.c[id]; rvCkTidy(k); }
+    save(); renderRV();
+  }
+});
+function rvInput(e) {
+  const id = e.target.id, v = e.target.value;
+  if (id.startsWith('rv-u-')) { const k = id.slice(5); if (v === '') delete S.alc[k]; else if (+v >= 0) S.alc[k] = Math.round(+v * 10) / 10; save(); const t = $('rv-atot'); if (t) t.innerHTML = rvAlcTot(); const row = e.target.closest('.rvrow'); if (row) row.classList.toggle('unk', v === ''); return true; }
+  if (id === 'rv-plq') { RV.plq = v; $('rv-plgrid').innerHTML = rvPlGrid(); return true; }
+  if (id === 'rv-sl' && RV.sel) { const k = RV.sel, n = +v; if (v === '' || !(n > 0)) { if (S.ck[k]) { delete S.ck[k].sl; rvCkTidy(k); } } else rvCk(k).sl = Math.min(16, Math.round(n * 4) / 4); save(); const c = document.querySelector('.rvc.sl.sel'); if (c) { const x = (S.ck[k] || {}).sl; c.textContent = x ? String(+x.toFixed(2)) : ''; c.classList.toggle('y', !!x); } return true; }
+  if (id === 'rv-pts') { const k = rvHistKey(S.hist.w, RV.st), n = +v; if (v === '' || !(n > 0)) delete S.hist.w[k]; else S.hist.w[k] = Math.round(n * 4) / 4; save(); return true; }
+  return false;
+}
 function keepAddFields() { if (!SH || SH.type !== 'xadd') return; SH.n = $('x-n').value.trim(); SH.k = $('x-k').value; SH.p = $('x-p').value; SH.fe = $('x-fe').checked; SH.plq = $('plq').value; Object.assign(SH, readLabel('x')); }
 
 document.addEventListener('click', e => {
@@ -4763,6 +5202,7 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('input', e => {
   const id = e.target.id;
+  if (RV && rvInput(e)) return;
   if (id === 'rq') { UI.rq = e.target.value; $('rlist').innerHTML = rListHtml(); }
   else if (id === 'pq' && SH && $('pk-list')) { SH.q = e.target.value; $('pk-list').innerHTML = pickList(); }
   else if (id === 'cq' && SH && $('cq-list')) { SH.q = e.target.value; $('cq-list').innerHTML = cupList(); }
@@ -4774,7 +5214,7 @@ document.addEventListener('change', e => {
   if (e.target.id === 'ck-date' && e.target.value) { const v = e.target.value > todayKey() ? todayKey() : e.target.value; UI.ckDate = v; UI.ckEdit = !ckSaved(v); UI.ckWaist = false; ckReset(); render(); }
   if (e.target.id === 'wz-usual' && WZ) { WZ.usual = e.target.value; renderWZ(); }
 });
-document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if (SH) closeSheet(); else if (WZ) closeWizard(); else if (PM) closePrep(); });
+document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if (SH) closeSheet(); else if (RV) closeReview(); else if (WZ) closeWizard(); else if (PM) closePrep(); });
 
 /* ───────────── shell ───────────── */
 const TABS = [['today', 'Today', 'today'], ['week', 'Week', 'week'], ['out', 'Out', 'glass'], ['prep', 'Prep', 'prep'], ['shop', 'Shop', 'shop']];
@@ -4800,6 +5240,8 @@ function render() {
   if (UI.pop) { const t = document.querySelector(`.tick[data-s="${UI.pop}"]`); if (t) { t.classList.add('pop'); if (t.getAttribute('aria-checked') === 'true') burst(t); } UI.pop = null; }
   UI.anim = null;
   renderDock();
+  if (RV) renderRV();
+  else if (wm && !UI.trends && !WZ && !PM && !SH && S.revSeen !== todayKey() && !ckSaved(todayKey())) { const due = rvDue(); if (due) { S.revSeen = todayKey(); save(); openReview(due, 'auto'); } }
 }
 
 (function init() {
@@ -4810,7 +5252,7 @@ function render() {
   tloop();
 })();
 
-window.ThirtyPlants = { wAdvice, wSlope, weekUse, spareFrom, carryInto, wasteOf, R, ING, dayCalc, weekCalc, planWeek, suggestMode, shopTotals, sessions, state: () => S, art, prepModel, splitStep, stepTimers, timers: () => TM };
+window.ThirtyPlants = { trendsDebug: () => { TC = null; MCACHE = metrics(); return MCACHE.map(m => ({ id: m.id, light: m.light(), wins: Object.fromEntries(WINS.map(([w]) => [w, aggWin(m, w)])) })); }, alcBinges: () => alcBinges(), wAdvice, wSlope, weekUse, spareFrom, carryInto, wasteOf, R, ING, dayCalc, weekCalc, planWeek, suggestMode, shopTotals, sessions, state: () => S, art, prepModel, splitStep, stepTimers, timers: () => TM };
 })();
 
 </script>
