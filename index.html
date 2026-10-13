@@ -1060,7 +1060,7 @@ h1, h2, h3 { overflow-wrap: anywhere; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '2.4.0';</script>
+<script>window.TP_VERSION = '2.5.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -2235,9 +2235,9 @@ const RED = new Set(['beefmince', 'steak', 'porkmince']);
 const ANIMAL = new Set(['chicken', 'thigh', 'turkeymince', 'beefmince', 'steak', 'porkmince', 'salmon', 'mackerel', 'smokedmack', 'sardines', 'trout', 'bream', 'cod', 'prawns', 'tuna']);
 const R = {}, RL = [];
 function isFerm(r, m) { return r.items.some(it => { const g = ING[it.i]; return g.fe && it.g * m >= g.fe * 0.9; }); }
-function finish(r) {
+function finish(r, I = ING) {
   let k = 0, p = 0, f = 0, na = 0, fs = 0, sf = 0; const pl = new Set(), items = r.items;
-  items.forEach(it => { const g = ING[it.i]; k += g.k * it.g / 100; p += g.p * it.g / 100; f += g.f * it.g / 100; na += g.sa * it.g / 250; fs += g.fs * it.g / 100; sf += g.sf * it.g / 100; g.pl.forEach(x => pl.add(x)); });
+  items.forEach(it => { const g = I[it.i]; k += g.k * it.g / 100; p += g.p * it.g / 100; f += g.f * it.g / 100; na += g.sa * it.g / 250; fs += g.fs * it.g / 100; sf += g.sf * it.g / 100; g.pl.forEach(x => pl.add(x)); });
   Object.assign(r, { k, p, f, na, fs, sf, plants: [...pl] });
   r.oily = items.some(it => OILY.has(it.i));
   r.red = items.some(it => RED.has(it.i));
@@ -2454,6 +2454,8 @@ function normalise(s) {
   s.rev = s.rev && typeof s.rev === 'object' ? s.rev : {}; // weeks reviewed: week start -> the day it was done
   s.ingChk = s.ingChk && typeof s.ingChk === 'object' ? s.ingChk : {}; // ingredients checked against your packs: id -> day
   s.ingOver = s.ingOver && typeof s.ingOver === 'object' ? s.ingOver : {}; // figures per 100g from your own packs
+  s.ingPast = isObj(s.ingPast) ? s.ingPast : {}; // the figures earlier weeks used, before a label change
+  Object.keys(s.ingPast).forEach(id => { const l = Array.isArray(s.ingPast[id]) ? s.ingPast[id].filter(x => isObj(x) && DAY_KEY.test(x.until || '') && (x.v === null || isObj(x.v))) : []; if (l.length) s.ingPast[id] = l.sort((a, b) => (a.until < b.until ? -1 : 1)); else delete s.ingPast[id]; });
   s.gapsOk = s.gapsOk && typeof s.gapsOk === 'object' ? s.gapsOk : {};
   if (s.bk !== undefined && !(isObj(s.bk) && DAY_KEY.test(s.bk.at || ''))) delete s.bk; // when you last backed up // things marked as not recorded, off the still-to-fill-in list
   s.hist = Object.assign({ d: {}, w: {}, wc: {} }, isObj(s.hist) ? s.hist : {}); // food history brought in from the old tracker
@@ -2480,12 +2482,45 @@ const STOCKS = { reg: ['Stock (from cube or pot)', 0.8, 'Regular'], red: ['Reduc
 const NUTF = ['k', 'p', 'f', 'sf', 'sa', 'fs'];
 const ING_BASE = {}; for (const id in ING) { ING_BASE[id] = { n: ING[id].n }; NUTF.forEach(f => { ING_BASE[id][f] = ING[id][f]; }); }
 // applies the stock setting and any figures typed in from your own packs, then recalculates every recipe
+/* label figures count from the week you enter them; earlier weeks keep what they had (S.ingPast: id -> [{ until, v }], v null = the app's figures) */
+let ERA_B = null; const ERA_ING = {}, ERA_R = {};
+function eraReset() { ERA_B = null; for (const x in ERA_ING) delete ERA_ING[x]; for (const x in ERA_R) delete ERA_R[x]; }
+// the first label change after day k; null when day k already uses today's figures
+function eraKey(k) {
+  if (!ERA_B) ERA_B = [...new Set(Object.values(S.ingPast || {}).flatMap(l => l.map(x => x.until)))].sort();
+  return ERA_B.find(u => u > k) || null;
+}
+const baseFigs = id => { const o = Object.assign({}, ING_BASE[id]); if (id === 'stock') o.sa = (STOCKS[S.set.stock] || STOCKS.reg)[1]; return o; };
+function eraIng(key) {
+  if (ERA_ING[key]) return ERA_ING[key];
+  const I = Object.assign({}, ING);
+  Object.entries(S.ingPast || {}).forEach(([id, l]) => {
+    const rec = ING[id] && l.find(x => x.until >= key); if (!rec) return;
+    const f = rec.v || baseFigs(id); I[id] = Object.assign({}, ING[id]); NUTF.forEach(x => { if (typeof f[x] === 'number') I[id][x] = f[x]; });
+  });
+  return (ERA_ING[key] = I);
+}
+// a recipe as it was on day k (only different when a label change came after it)
+function atEra(r, k) {
+  const key = r && eraKey(k); if (!key) return r;
+  const I = eraIng(key); if (!r.items.some(it => I[it.i] !== ING[it.i])) return r;
+  const ck = `${key}|${r.id}|${JSON.stringify(r.swapped || {})}`;
+  return ERA_R[ck] || (ERA_R[ck] = finish(Object.assign({}, r), I));
+}
+// before a label change: weeks before this one keep the figures they had
+function ingKeepPast(id) {
+  const until = startOf(todayKey()), past = S.ingPast[id] = S.ingPast[id] || [];
+  if (past.some(x => x.until >= until)) return;
+  past.push({ until, v: S.ingOver[id] ? Object.assign({}, S.ingOver[id]) : null });
+  past.sort((a, b) => (a.until < b.until ? -1 : 1));
+}
 function applyStock() {
   const o = STOCKS[S.set.stock] || STOCKS.reg;
   for (const id in ING) Object.assign(ING[id], ING_BASE[id]);
   ING.stock.n = o[0]; ING.stock.sa = o[1];
   Object.entries(S.ingOver || {}).forEach(([id, v]) => { if (ING[id] && v) NUTF.forEach(f => { if (typeof v[f] === 'number' && isFinite(v[f]) && v[f] >= 0) ING[id][f] = v[f]; }); });
   RL.forEach(r => { finish(r); seasonLo(r); }); for (const key in VAR) delete VAR[key];
+  eraReset();
 }
 applyStock();
 const startOf = k => addDays(k, -((dayIndex(k) - S.set.weekStart + 7) % 7));
@@ -2579,7 +2614,7 @@ function dayCalc(k) {
     else if (R[v]) {
       // eaten meals and packed boxes keep the recipe (swaps included) and portion they had at the time
       const dn = d.done[s], pk = d.pk && d.pk[s] && d.pk[s].r === v ? d.pk[s] : null;
-      const r = dn && dn.sw ? variant(R[v], dn.sw) : pk ? variant(R[v], pk.sw) : eff(R[v], startOf(k));
+      const r = atEra(dn && dn.sw ? variant(R[v], dn.sw) : pk ? variant(R[v], pk.sw) : eff(R[v], startOf(k)), k);
       o.kind = 'recipe'; o.r = r; o.prepped = prepped(k, s, r); o.packed = !!pk;
       if (o.done && dn.m) { o.m = dn.m; fixed += r.k * o.m; }
       else if (pk) { o.m = pk.m; fixed += r.k * o.m; }
@@ -2912,25 +2947,28 @@ function fmtQ(id, g, shop) {
 const pct = x => `${Math.max(0, Math.min(100, x * 100)).toFixed(1)}%`;
 // checking one ingredient against the pack: the figures per 100g, editable
 const NUTL = [['k', 'kcal', ''], ['p', 'Protein', 'g'], ['f', 'Fibre', 'g'], ['sf', 'Sat fat', 'g'], ['sa', 'Salt', 'g'], ['fs', 'Added sugar', 'g']];
-function ingPanel(id) {
-  const g = ING[id], b = ING_BASE[id], own = !!S.ingOver[id], u = g.ml ? '100ml' : '100g', c = amtCtx(id), un = g.ml ? 'ml' : 'g';
+function ingPanel(id, I = ING, era = null) {
+  const g = I[id], b = ING_BASE[id], own = !!S.ingOver[id], u = g.ml ? '100ml' : '100g', c = amtCtx(id), un = g.ml ? 'ml' : 'g';
   const amt = c ? `<div class="ipf ipa"><label><span>In one portion of this meal (${un})</span><input id="ic-amt" type="number" inputmode="decimal" step="any" min="0" value="${+(c.g * c.m).toFixed(1)}"></label></div>
     <p class="small muted" style="margin:0">${c.own ? `The recipe has ${+(c.def * c.m).toFixed(1)}${un}. ` : ''}A new amount applies to this dish all week, including portions already packed or eaten. Portions not yet packed still scale to fit each day.</p>` : '';
+  if (era) return `<li class="ipanel">${amt}<p class="small" style="margin:0">${esc(NUTL.map(([f, l, un2]) => `${l} ${+(+g[f]).toFixed(2)}${un2}`).join(' · '))} per ${u}.</p>
+    <p class="small muted" style="margin:0">These are the figures this week used. Label changes count from the week you make them, so earlier weeks keep theirs. To change the figures, open a meal from this week.</p>
+    <div class="btnrow">${c ? `<button class="btn sm primary" data-a="ingsave" data-i="${id}">${ic('check')}Save amount</button>` : ''}${c && c.own ? `<button class="btn sm ghost" data-a="amtreset" data-i="${id}">Back to the recipe's amount</button>` : ''}<button class="btn sm ghost" data-a="ingchk" data-i="${id}">Close</button></div></li>`;
   const diff = own ? NUTL.filter(([f]) => Math.abs(g[f] - b[f]) > 1e-9).map(([f, l, un]) => `${l.toLowerCase()} ${+b[f].toFixed(2)}${un}`) : [];
   return `<li class="ipanel">${amt}<div class="ipf">${NUTL.map(([f, l, un]) => `<label><span>${l}${un ? ` (${un})` : ''}</span><input id="ic-${f}" type="number" inputmode="decimal" step="any" min="0" value="${+(+g[f]).toFixed(2)}"></label>`).join('')}</div>
-    <p class="small muted" style="margin:0">Per ${u}, as on your pack's label. ${own ? `The app's own figures were ${esc(joinAnd(diff))}.` : "These are the app's figures: change any that differ."} Added sugar is only sugar the maker put in, not what's in milk, yoghurt, fruit or veg.</p>
+    <p class="small muted" style="margin:0">Per ${u}, as on your pack's label. ${own ? `The app's own figures were ${esc(joinAnd(diff))}.` : "These are the app's figures: change any that differ."} Changes count from this week on; earlier weeks keep the figures they had. Added sugar is only sugar the maker put in, not what's in milk, yoghurt, fruit or veg.</p>
     <div class="btnrow"><button class="btn sm primary" data-a="ingsave" data-i="${id}">${ic('check')}Confirm</button>${c && c.own ? `<button class="btn sm ghost" data-a="amtreset" data-i="${id}">Back to the recipe's amount</button>` : ''}${own ? `<button class="btn sm ghost" data-a="ingreset" data-i="${id}">Back to the app's figures</button>` : S.ingChk[id] ? `<button class="btn sm ghost" data-a="ingunchk" data-i="${id}">Not checked</button>` : ''}<button class="btn sm ghost" data-a="ingchk" data-i="${id}">Close</button></div></li>`;
 }
 /* ingredient lines with calories: kcal for the amount, and kcal per 100g (or 100ml) to check against the pack's label */
-const per100 = id => `${fmtN(ING[id].k)} kcal per 100${ING[id].ml ? 'ml' : 'g'}`;
-function ingRows(list, totLabel, chk) {
+const per100 = (id, I = ING) => `${fmtN(I[id].k)} kcal per 100${I[id].ml ? 'ml' : 'g'}`;
+function ingRows(list, totLabel, chk, I = ING, era = null) {
   let tot = 0;
   const rows = list.map(([id, g, extra]) => {
-    const kc = ING[id].k * g / 100, q = fmtQ(id, g), w = /\d(k?g|ml)\b|litres/.test(q) ? '' : `${ING[id].ml ? fmtMl(g) : fmtG(g)} · `; // spoons and counts get their weight too
+    const kc = I[id].k * g / 100, q = fmtQ(id, g), w = /\d(k?g|ml)\b|litres/.test(q) ? '' : `${ING[id].ml ? fmtMl(g) : fmtG(g)} · `; // spoons and counts get their weight too
     tot += kc;
     const own = !!S.ingOver[id], ok = own || !!S.ingChk[id];
-    const btn = chk ? `<button class="ichip ${own ? 'own' : ok ? 'ok' : ''}" data-a="ingchk" data-i="${id}" aria-expanded="${SH && SH.chk === id}">${ok ? ic('check') : ''}${own ? 'Your pack' : ok ? 'Confirmed' : 'Check'}</button>` : '';
-    return `<li><span class="in">${esc(ING[id].n)}${extra || ''}<small>${per100(id)}${btn}</small></span><span class="q">${q}<small>${w}${fmtN(kc)} kcal</small></span></li>${chk && SH && SH.chk === id ? ingPanel(id) : ''}`;
+    const btn = !chk ? '' : era ? `<button class="ichip" data-a="ingchk" data-i="${id}" aria-expanded="${SH && SH.chk === id}">That week</button>` : `<button class="ichip ${own ? 'own' : ok ? 'ok' : ''}" data-a="ingchk" data-i="${id}" aria-expanded="${SH && SH.chk === id}">${ok ? ic('check') : ''}${own ? 'Your pack' : ok ? 'Confirmed' : 'Check'}</button>`;
+    return `<li><span class="in">${esc(I[id].n)}${extra || ''}<small>${per100(id, I)}${btn}</small></span><span class="q">${q}<small>${w}${fmtN(kc)} kcal</small></span></li>${chk && SH && SH.chk === id ? ingPanel(id, I, era) : ''}`;
   }).join('');
   return `${rows}<li class="itot"><span>${totLabel || 'Total'}</span><span class="q">${fmtN(tot)} kcal</span></li>`;
 }
@@ -4652,7 +4690,7 @@ function shRecipe() {
   if (SH.k && SH.s) { const x = dayCalc(SH.k).slots[SH.s]; if (x.kind === 'recipe' && x.r.id === r.id) { o = x; m = x.m; r = x.r; } }
   const swapped = Object.entries(r.swapped || {}).map(([orig, key]) => [orig, key, subOptions(orig).find(q => q.key === key)]).filter(x => x[2] && r.items.some(it => it.from === x[0] || (x[1] === 'omit' && !r.items.some(i2 => i2.i === x[0]))))
     .map(([orig, key, opt]) => key === 'omit' ? `no ${shortN(orig)}` : `${subLabel(opt)} instead of ${shortN(orig)}`);
-  const n = SH.n || 1, mm = m * n;
+  const n = SH.n || 1, mm = m * n, era = SH.k ? eraKey(SH.k) : null;
   const plants = r.plants.slice().sort((a, b) => PLANTS[b][1] - PLANTS[a][1]).map(x => `<span class="pchip ${PLANTS[x][1] < 1 ? 'q' : ''}">${PLANTS[x][2] ? `<i class="c-${PLANTS[x][2]}"></i>` : ''}${esc(PLANTS[x][0])}${PLANTS[x][1] < 1 ? ' ¼' : ''}</span>`).join('');
   const keeps = [];
   if (r.rice) keeps.push('Rice: fridge 1 day, freeze the rest, reheat once until piping hot');
@@ -4678,7 +4716,7 @@ function shRecipe() {
     ${ctx}
     <section><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h4 style="margin:0">Ingredients</h4><div class="stepper"><button data-a="serv" data-v="-1" aria-label="Fewer portions">−</button><span>${n} portion${n > 1 ? 's' : ''}</span><button data-a="serv" data-v="1" aria-label="More portions">+</button></div></div>
       ${swapped.length ? `<div class="callout" style="margin-top:8px">${ic('swap')}<div>This week: ${esc(swapped.join('; '))}. Follow the method with the swap.</div></div>` : ''}
-      ${nutConf(r)}<ul class="ilist ik" style="margin-top:8px">${ingRows(r.items.map(it => [it.i, it.g * mm, (it.from ? ` <span class="muted for">for ${esc(shortN(it.from))}</span>` : '') + (it.own ? ' <span class="muted for">your amount</span>' : '')]), n > 1 ? `Total for ${n} portions` : 'Total', true)}</ul></section>
+      ${era ? '<p class="small muted" style="margin:8px 0 0">Using the figures from that week. Label changes made since then count only from the week they were made.</p>' : nutConf(r)}<ul class="ilist ik" style="margin-top:8px">${ingRows(r.items.map(it => [it.i, it.g * mm, (it.from ? ` <span class="muted for">for ${esc(shortN(it.from))}</span>` : '') + (it.own ? ' <span class="muted for">your amount</span>' : '')]), n > 1 ? `Total for ${n} portions` : 'Total', true, era ? eraIng(era) : ING, era)}</ul></section>
     <section><h4>Method</h4><ol class="steps">${r.steps.map(x => `<li>${esc(x)}${swapNotes(r, x)}</li>`).join('')}</ol>${r.note ? `<p class="small muted">${esc(r.note)}</p>` : ''}</section>
     <section><details class="more"><summary>Plants & storage${ic('chev')}</summary>${keeps.length ? `<p style="margin:8px 0">${keeps.join(' · ').replace(/^./, c => c.toUpperCase())}.</p>` : ''}<div class="plantgrid">${plants}</div></details></section>`;
 }
@@ -5796,12 +5834,13 @@ Object.assign(ACT, {
       const a = +ae.value;
       if (isFinite(a) && a >= 0 && Math.abs(a - c.g * c.m) > 0.05) { const base = a / (c.m || 1); setAmt(c, Math.abs(base - c.def) < 0.01 ? null : +base.toFixed(2)); amtTxt = a ? `${+a.toFixed(1)}${g.ml ? 'ml' : 'g'} a portion` : 'left out'; }
     }
+    if (SH.k && eraKey(SH.k)) { SH.chk = null; save(); render(); renderSheet(); toast(amtTxt ? `${shortN(id)}: ${amtTxt}` : 'Nothing changed'); return; }
     NUTL.forEach(([f]) => { const el = $(`ic-${f}`), x = el && el.value.trim() !== '' ? +el.value : g[f]; v[f] = isFinite(x) && x >= 0 ? x : g[f]; if (Math.abs(v[f] - g[f]) > 1e-9) changed = true; });
-    if (changed) { const b = ING_BASE[id]; if (NUTL.every(([f]) => Math.abs(v[f] - b[f]) < 1e-9)) delete S.ingOver[id]; else S.ingOver[id] = v; applyStock(); }
+    if (changed) { ingKeepPast(id); const b = ING_BASE[id]; if (NUTL.every(([f]) => Math.abs(v[f] - b[f]) < 1e-9)) delete S.ingOver[id]; else S.ingOver[id] = v; applyStock(); }
     S.ingChk[id] = todayKey(); SH.chk = null; save(); render(); renderSheet(); toast(amtTxt ? `${shortN(id)}: ${amtTxt}${changed ? ", with your pack's figures" : ''}` : changed ? `${shortN(id)}: now using your pack's figures` : `${shortN(id)} confirmed`);
   },
   amtreset(d) { const c = amtCtx(d.i); if (c) setAmt(c, null); SH.chk = null; save(); render(); renderSheet(); toast(`${shortN(d.i)}: back to the recipe's amount`); },
-  ingreset(d) { delete S.ingOver[d.i]; applyStock(); SH.chk = null; save(); render(); renderSheet(); toast(`${shortN(d.i)}: back to the app's figures`); },
+  ingreset(d) { ingKeepPast(d.i); delete S.ingOver[d.i]; applyStock(); SH.chk = null; save(); render(); renderSheet(); toast(`${shortN(d.i)}: back to the app's figures`); },
   ingunchk(d) { delete S.ingChk[d.i]; SH.chk = null; save(); renderSheet(); },
   ingall(d) { const tk = todayKey(); d.v.split(',').forEach(id => { if (ING[id] && !S.ingChk[id] && !S.ingOver[id]) S.ingChk[id] = tk; }); SH.chk = null; save(); renderSheet(); toast('Nutrition confirmed'); },
   rvsel(d) { RV.sel = RV.sel === d.k ? null : d.k; renderRV(); },
