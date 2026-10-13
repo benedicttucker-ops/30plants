@@ -986,6 +986,56 @@ body.rvon .scrim { z-index: 80; }
 .swapdays { margin-top: 10px; }
 .pick.sd { grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; }
 .pick.sd > svg { width: 18px; height: 18px; color: var(--accent); }
+/* amount in one portion, in the ingredient check */
+.ipf.ipa { grid-template-columns: minmax(0, 1fr); }
+.ipf.ipa input { max-width: 160px; }
+/* long words in headings break rather than push the screen sideways; big sheet titles shrink to fit instead (fitTitles) */
+h1, h2, h3 { overflow-wrap: anywhere; }
+.sheet h2 { overflow-wrap: normal; }
+.sheet h2.squeeze { overflow-wrap: anywhere; }
+/* backup line and nudge */
+.bkline { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; font-size: 13px; font-weight: 700; color: var(--muted); }
+.bkline svg { width: 16px; height: 16px; flex: none; }
+.bkline.due { color: var(--ink); }
+.rvbk .btn { margin-top: 2px; }
+.bknudge .btnrow { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+/* trends: the story summary, jump chips, now-against-usual bars, extras folded at the bottom */
+:root { --zone: color-mix(in srgb, var(--leaf) 36%, var(--surface)); }
+.trstory { display: grid; gap: 8px; }
+.trstory p { margin: 0; font-size: 15px; line-height: 1.5; }
+.trstory p:first-child { font-weight: 700; }
+.trgrp h3 .muted { font-weight: 400; font-size: 14px; }
+.tchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.tchip { min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.tchip.t-off { background: color-mix(in srgb, var(--st-off) 12%, var(--surface)); border-color: color-mix(in srgb, var(--st-off) 40%, var(--surface)); }
+.tchip.t-mid { background: color-mix(in srgb, var(--st-mid) 16%, var(--surface)); border-color: color-mix(in srgb, var(--st-mid) 50%, var(--surface)); }
+.trlegend { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 12px; margin-top: 14px; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--line) 55%, var(--bg)); font-size: 12.5px; }
+.trlegend span { display: inline-flex; align-items: center; gap: 6px; }
+.trlegend i { display: inline-block; flex: none; }
+.lg-n { width: 22px; height: 5px; border-radius: 3px; background: var(--ink); }
+.lg-u { width: 10px; height: 10px; margin: 0 2px; transform: rotate(45deg); border: 2px solid var(--ink); background: var(--surface); box-sizing: border-box; }
+.lg-z { width: 22px; height: 10px; border-radius: 3px; background: var(--zone); }
+.trlist { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.trlist .trrow { border: 0; border-radius: 0; background: none; }
+.trlist > * + * { border-top: 1px solid var(--line); }
+.trhead { display: flex; flex-direction: column; align-items: stretch; gap: 6px; padding: 12px 12px 11px 14px; }
+.trtop { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto 18px; gap: 10px; align-items: center; }
+.trtop .trv b { font-family: var(--f-display); font-size: 24px; font-weight: 800; line-height: 1; }
+.trtop .trv small { display: block; white-space: normal; max-width: 128px; margin-left: auto; line-height: 1.25; }
+.bul { position: relative; display: block; height: 14px; margin: 2px 0 0 20px; }
+.bul::before { content: ''; position: absolute; left: 0; right: 0; top: 3px; height: 8px; border-radius: 4px; background: var(--bg); }
+.bul i { position: absolute; display: block; }
+.bul .bz { top: 3px; height: 8px; border-radius: 4px; background: var(--zone); }
+.bul .bn { left: 0; top: 5px; height: 4px; border-radius: 2px; background: var(--ink); }
+.bul .bu { top: 2px; width: 10px; height: 10px; margin-left: -5px; transform: rotate(45deg); box-sizing: border-box; border: 2px solid var(--ink); background: var(--surface); }
+.trfoot { display: block; margin-left: 20px; font-size: 12.5px; line-height: 1.35; color: var(--muted); }
+.alsohead { width: 100%; min-height: 60px; display: grid; grid-template-columns: minmax(0, 1fr) auto 18px; gap: 10px; align-items: center; padding: 11px 12px 11px 14px; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.alsohead svg.chev { width: 18px; height: 18px; color: var(--muted); transition: transform .25s var(--ease); }
+.also.open .alsohead svg.chev { transform: rotate(90deg); }
+.abadge { min-width: 26px; height: 26px; padding: 0 8px; box-sizing: border-box; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+.alsobody { display: grid; gap: 10px; padding: 0 12px 14px 14px; }
+.seg.trwin { margin-top: 12px; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-flow: row; }
+.seg.trwin button { min-height: 44px; padding: 6px 4px; font-size: 14px; line-height: 1.15; }
 
 </style>
 </head>
@@ -1010,7 +1060,7 @@ body.rvon .scrim { z-index: 80; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '2.0.0';</script>
+<script>window.TP_VERSION = '2.4.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -2254,6 +2304,8 @@ function stepMentions(text, orig) {
 }
 const swapNotes = (r, text) => swapList(r).filter(x => stepMentions(text, x.orig)).map(x => `<p class="swapin">${ic('swap')}<span>${esc(x.text)}</span></p>`).join('');
 const subLabel = o => o.key === 'omit' ? 'Leave it out' : o.to.length > 1 ? o.note.split(/[;,]/)[0] : shortN(o.to[0][0]);
+const AMT = '@g:';
+const isAmt = k => k.slice(0, 3) === AMT;
 function buildVariant(base, sw) {
   const merged = new Map();
   base.items.forEach(it => {
@@ -2261,6 +2313,8 @@ function buildVariant(base, sw) {
     if (!opt) { const m0 = merged.get(it.i); if (m0) m0.g += it.g; else merged.set(it.i, { i: it.i, g: it.g }); return; }
     opt.to.forEach(([id, q]) => { const m0 = merged.get(id); if (m0) { m0.g += it.g * q; m0.from = m0.from || it.i; } else merged.set(id, { i: id, g: it.g * q, from: it.i }); });
   });
+  // your own amounts, kept with the week's swaps as '@g:<ingredient>': grams for one portion before the day's scaling
+  Object.entries(sw).forEach(([k, g]) => { if (k.slice(0, 3) !== AMT) return; const m0 = merged.get(k.slice(3)); if (!m0) return; if (+g > 0) { m0.g = +g; m0.own = 1; } else merged.delete(m0.i); });
   return finish(Object.assign({}, base, { items: [...merged.values()], swapped: Object.assign({}, sw) }));
 }
 const VAR = {};
@@ -2400,7 +2454,8 @@ function normalise(s) {
   s.rev = s.rev && typeof s.rev === 'object' ? s.rev : {}; // weeks reviewed: week start -> the day it was done
   s.ingChk = s.ingChk && typeof s.ingChk === 'object' ? s.ingChk : {}; // ingredients checked against your packs: id -> day
   s.ingOver = s.ingOver && typeof s.ingOver === 'object' ? s.ingOver : {}; // figures per 100g from your own packs
-  s.gapsOk = s.gapsOk && typeof s.gapsOk === 'object' ? s.gapsOk : {}; // things marked as not recorded, off the still-to-fill-in list
+  s.gapsOk = s.gapsOk && typeof s.gapsOk === 'object' ? s.gapsOk : {};
+  if (s.bk !== undefined && !(isObj(s.bk) && DAY_KEY.test(s.bk.at || ''))) delete s.bk; // when you last backed up // things marked as not recorded, off the still-to-fill-in list
   s.hist = Object.assign({ d: {}, w: {}, wc: {} }, isObj(s.hist) ? s.hist : {}); // food history brought in from the old tracker
   ['d', 'w', 'wc', 'notes'].forEach(f => { if (s.hist[f] !== undefined && !isObj(s.hist[f])) s.hist[f] = {}; });
   Object.values(s.hist.d).forEach(e => { if (e) delete e.col; }); // colours are counted by week now (wc)
@@ -2410,7 +2465,7 @@ function normalise(s) {
     Object.keys(w.swaps).forEach(rid => {
       const m = w.swaps[rid];
       if (!R[rid] || !m) { delete w.swaps[rid]; return; }
-      Object.keys(m).forEach(o => { if (!ING[o]) delete m[o]; });
+      Object.keys(m).forEach(o => { if (o.slice(0, 3) === '@g:' ? !(ING[o.slice(3)] && Number.isFinite(+m[o]) && +m[o] >= 0) : !ING[o]) delete m[o]; });
       if (!Object.keys(m).length) delete w.swaps[rid];
     });
   });
@@ -2858,11 +2913,13 @@ const pct = x => `${Math.max(0, Math.min(100, x * 100)).toFixed(1)}%`;
 // checking one ingredient against the pack: the figures per 100g, editable
 const NUTL = [['k', 'kcal', ''], ['p', 'Protein', 'g'], ['f', 'Fibre', 'g'], ['sf', 'Sat fat', 'g'], ['sa', 'Salt', 'g'], ['fs', 'Added sugar', 'g']];
 function ingPanel(id) {
-  const g = ING[id], b = ING_BASE[id], own = !!S.ingOver[id], u = g.ml ? '100ml' : '100g';
+  const g = ING[id], b = ING_BASE[id], own = !!S.ingOver[id], u = g.ml ? '100ml' : '100g', c = amtCtx(id), un = g.ml ? 'ml' : 'g';
+  const amt = c ? `<div class="ipf ipa"><label><span>In one portion of this meal (${un})</span><input id="ic-amt" type="number" inputmode="decimal" step="any" min="0" value="${+(c.g * c.m).toFixed(1)}"></label></div>
+    <p class="small muted" style="margin:0">${c.own ? `The recipe has ${+(c.def * c.m).toFixed(1)}${un}. ` : ''}A new amount applies to this dish all week, including portions already packed or eaten. Portions not yet packed still scale to fit each day.</p>` : '';
   const diff = own ? NUTL.filter(([f]) => Math.abs(g[f] - b[f]) > 1e-9).map(([f, l, un]) => `${l.toLowerCase()} ${+b[f].toFixed(2)}${un}`) : [];
-  return `<li class="ipanel"><div class="ipf">${NUTL.map(([f, l, un]) => `<label><span>${l}${un ? ` (${un})` : ''}</span><input id="ic-${f}" type="number" inputmode="decimal" step="any" min="0" value="${+(+g[f]).toFixed(2)}"></label>`).join('')}</div>
+  return `<li class="ipanel">${amt}<div class="ipf">${NUTL.map(([f, l, un]) => `<label><span>${l}${un ? ` (${un})` : ''}</span><input id="ic-${f}" type="number" inputmode="decimal" step="any" min="0" value="${+(+g[f]).toFixed(2)}"></label>`).join('')}</div>
     <p class="small muted" style="margin:0">Per ${u}, as on your pack's label. ${own ? `The app's own figures were ${esc(joinAnd(diff))}.` : "These are the app's figures: change any that differ."} Added sugar is only sugar the maker put in, not what's in milk, yoghurt, fruit or veg.</p>
-    <div class="btnrow"><button class="btn sm primary" data-a="ingsave" data-i="${id}">${ic('check')}Confirm</button>${own ? `<button class="btn sm ghost" data-a="ingreset" data-i="${id}">Back to the app's figures</button>` : S.ingChk[id] ? `<button class="btn sm ghost" data-a="ingunchk" data-i="${id}">Not checked</button>` : ''}<button class="btn sm ghost" data-a="ingchk" data-i="${id}">Close</button></div></li>`;
+    <div class="btnrow"><button class="btn sm primary" data-a="ingsave" data-i="${id}">${ic('check')}Confirm</button>${c && c.own ? `<button class="btn sm ghost" data-a="amtreset" data-i="${id}">Back to the recipe's amount</button>` : ''}${own ? `<button class="btn sm ghost" data-a="ingreset" data-i="${id}">Back to the app's figures</button>` : S.ingChk[id] ? `<button class="btn sm ghost" data-a="ingunchk" data-i="${id}">Not checked</button>` : ''}<button class="btn sm ghost" data-a="ingchk" data-i="${id}">Close</button></div></li>`;
 }
 /* ingredient lines with calories: kcal for the amount, and kcal per 100g (or 100ml) to check against the pack's label */
 const per100 = id => `${fmtN(ING[id].k)} kcal per 100${ING[id].ml ? 'ml' : 'g'}`;
@@ -3131,6 +3188,7 @@ function todayPrompts() {
     });
   });
   if (defrost.length) cards.push(`<div class="callout warn">${ic('info')}<div><b>Tonight:</b> move ${esc(joinAnd(defrost))} from the freezer to the fridge.</div></div>`);
+  if (bkDue() && S.bkSnooze !== tk && Object.keys(S.days).length) cards.push(`<div class="callout bknudge">${ic('info')}<div><b>${bkAge() === null ? 'Time for a first backup.' : `It's been ${bkAge()} days since your last backup.`}</b> Save a copy to Drive or email it to yourself.<div class="btnrow"><button class="btn sm primary" data-a="bkshare">Back up now</button><button class="btn sm ghost" data-a="bklater">Later</button></div></div></div>`);
   return cards.join('');
 }
 function mealRow(o) {
@@ -3260,11 +3318,11 @@ function metrics() {
   L.push({ id: 'plants', n: 'Plant points', grp: 'Food', kind: 'week', end: 'week', wval: weekPlants, first: () => minKey(S.days, S.hist.w), fmt: v => fmtPts(Math.round(v * 4) / 4), unit: 'a week', goal: set.plantGoal, goalTxt: `${set.plantGoal} a week`,
     light() { const v = weekPlants(cur); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; return { st: v >= set.plantGoal ? 'ok' : v >= set.plantGoal - 5 ? 'mid' : 'off', txt: `${fmtPts(v)} in this week's plan` }; } });
   L.push(food('fish', 'Oily fish', 'rate', v => oneDp(v), `${set.oilyGoal} a week`, function () { const v = wkRate(this); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; const r = Math.round(v); return { st: r >= set.oilyGoal ? 'ok' : r >= set.oilyGoal - 1 ? 'mid' : 'off', txt: `${r} in this week's plan` }; }, { unit: 'a week', goal: set.oilyGoal }));
-  L.push(food('ferm', 'Fermented days', 'rate', v => oneDp(v), 'every day', function () { const v = wkRate(this); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; const r = Math.round(v); return { st: r >= 7 ? 'ok' : r >= 5 ? 'mid' : 'off', txt: `${r} of 7 days in this week's plan` }; }, { unit: 'days a week', goal: 7 }));
+  L.push(food('ferm', 'Fermented days', 'rate', v => oneDp(v), 'every day', function () { const v = wkRate(this); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; const r = Math.round(v); return { st: r >= 7 ? 'ok' : r >= 5 ? 'mid' : 'off', txt: `${r} of 7 days in this week's plan` }; }, { unit: 'days a week', goal: 7, cap: 7 }));
   L.push(food('red', 'Red meat', 'rate', v => oneDp(v), `${set.redMax} a week at most`, function () { const v = wkRate(this); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; const r = Math.round(v); return { st: r <= set.redMax ? 'ok' : r <= set.redMax + 1 ? 'mid' : 'off', txt: `${r} in this week's plan` }; }, { unit: 'a week', goal: set.redMax, lo: true }));
   L.push(food('protein', 'Protein', 'avg', v => `${fmtN(v)}g`, `${set.protGoal}g a day`, missLight('protein'), { unit: 'a day', goal: set.protGoal }));
   L.push(food('fibre', 'Fibre', 'avg', v => `${fmtN(v)}g`, `${set.fibreGoal}g a day`, missLight('fibre'), { unit: 'a day', goal: set.fibreGoal }));
-  L.push({ id: 'colours', n: 'Colour groups', grp: 'Food', kind: 'week', end: 'week', wval: weekColours, first: () => minKey(S.days, S.hist.wc), fmt: v => (Number.isInteger(v) ? String(v) : v.toFixed(1)), unit: `of ${set.colourGoal}`, goal: set.colourGoal, goalTxt: `all ${set.colourGoal} every week`,
+  L.push({ id: 'colours', n: 'Colour groups', grp: 'Food', kind: 'week', end: 'week', wval: weekColours, first: () => minKey(S.days, S.hist.wc), fmt: v => (Number.isInteger(v) ? String(v) : v.toFixed(1)), unit: `of ${set.colourGoal}`, goal: set.colourGoal, cap: set.colourGoal, goalTxt: `all ${set.colourGoal} every week`,
     light() { const v = weekColours(cur); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; return { st: v >= set.colourGoal ? 'ok' : v >= set.colourGoal - 1 ? 'mid' : 'off', txt: `${v} of ${set.colourGoal} in this week's plan` }; } });
   L.push(food('sodium', 'Sodium', 'avg', v => `${v.toFixed(1)}g`, `under ${set.naMax}g a day`, missLight('sodium'), { unit: 'a day', goal: set.naMax, lo: true }));
   L.push(food('sugar', 'Added sugar', 'avg', v => fmtFS(v), `under ${set.fsMax}g a day`, missLight('sugar'), { unit: 'a day', goal: set.fsMax, lo: true }));
@@ -3275,7 +3333,7 @@ function metrics() {
     light() { const r = aggWin(this, '4w'); if (!r) return { st: 'none', txt: 'Not enough logged in the last 4 weeks' }; return { st: r.v >= 2 ? 'ok' : r.v >= 1 ? 'mid' : 'off', txt: `${oneDp(r.v)} a week over the last 4 weeks` }; } });
   L.push({ id: 'sleep', n: 'Sleep', grp: 'Sleep and checks', kind: 'day', agg: 'avg', end: 'today', val: k => (S.ck[k] && S.ck[k].sl ? S.ck[k].sl : null), first: () => minKey(S.ck), fmt: v => `${v.toFixed(1)} h`, unit: 'a night', goal: set.sleepGoal, goalTxt: `${set.sleepGoal} h a night`,
     light() { const a = sleepAvg(tk); if (!a) return { st: 'none', txt: 'No nights logged this week' }; const v = Math.round(a.v * 10) / 10; return { st: v >= set.sleepGoal ? 'ok' : v >= set.sleepGoal - 0.5 ? 'mid' : 'off', txt: `${v.toFixed(1)} h over the last ${a.n} night${a.n > 1 ? 's' : ''}` }; } });
-  habits().forEach(h => L.push({ id: 'h:' + h.id, n: h.n, grp: 'Sleep and checks', kind: 'day', agg: 'pct', end: 'today', val: k => habitVal(h, k), first: () => Object.keys(S.ck).filter(k => habitVal(h, k) !== null).reduce((a, k) => (k < a ? k : a), '9999'), fmt: v => `${Math.round(v)}%`, unit: 'of days', goal: 100, goalTxt: h.ids.length > 1 ? 'at least one a day' : 'every day',
+  habits().forEach(h => L.push({ id: 'h:' + h.id, h, okFrom: 85, cap: 100, n: h.n, grp: 'Sleep and checks', kind: 'day', agg: 'pct', end: 'today', val: k => habitVal(h, k), first: () => Object.keys(S.ck).filter(k => habitVal(h, k) !== null).reduce((a, k) => (k < a ? k : a), '9999'), fmt: v => `${Math.round(v)}%`, unit: 'of days', goal: 100, goalTxt: h.ids.length > 1 ? 'at least one a day' : 'every day',
     light() { const st = ckStats(h, tk); if (st.logged < 3) return { st: 'none', txt: st.logged ? `Only ${st.logged} day logged so far` : 'Nothing logged this week' }; const r = st.yes / st.logged; return { st: r >= 0.85 ? 'ok' : r >= 0.57 ? 'mid' : 'off', txt: `${st.yes} of the last ${st.logged} day${st.logged > 1 ? 's' : ''}` }; } }));
   L.push({ id: 'weight', n: 'Weight', grp: 'Body', kind: 'day', agg: 'avg', end: 'today', val: k => (w.log[k] ? toU(w.log[k]) : null), first: () => minKey(w.log), fmt: v => `${v.toFixed(1)} ${w.unit}`, unit: 'average', line: true, goalTxt: w.goal === 'maintain' ? 'hold steady' : `${w.goal} ${fmtW(w.rate, w.unit === 'lb' ? 1 : 2)} a week`,
     light() { const a = wAdvice(); if (a.need) return { st: 'none', txt: 'Needs two weeks of weigh-ins' }; return { st: a.head === 'On track' ? 'ok' : 'mid', txt: `${a.head}: ${a.rate < 0 ? 'losing' : 'gaining'} ${toU(Math.abs(a.rate)).toFixed(1)} ${w.unit} a week` }; } });
@@ -3292,7 +3350,7 @@ function alcLight() {
     { st: ms, txt: `${mo} binge${mo === 1 ? '' : 's'} so far in ${MONS[+tk.slice(5, 7) - 1]}`, rule: 'One binge a month' },
     { st: ys, txt: `${bigs} week${bigs === 1 ? '' : 's'} of 32+ units in ${tk.slice(0, 4)}`, rule: 'Three 32+ weeks a year' }
   ];
-  return { st: worst(wk, ms, ys), txt: parts.filter(p => p.st !== 'ok').map(p => p.txt).join('; ') || `${fmtU(r.v)} units a week, no binges this month`, parts };
+  return { st: worst(wk, ms, ys), txt: parts.filter(p => p.st !== 'ok').map(p => p.txt).join('; ') || `${fmtU(r.v)} units a week, no binges this month`, parts, v: r.v, wk, ms, ys, mo, bigs, yr: tk.slice(0, 4), mon: MONS[+tk.slice(5, 7) - 1] };
 }
 let MCACHE = null;
 function METRIC(id) { return (MCACHE || (MCACHE = metrics())).find(m => m.id === id); }
@@ -3333,23 +3391,119 @@ function weekSeries(m, nW) {
   return out;
 }
 
-/* the text summary */
-function trSummary(L, lights) {
-  const off = [], mid = [], ok = [];
-  L.forEach((m, i) => { const l = lights[i]; if (l.info) return; if (l.st === 'off') off.push(`${m.n}: ${l.txt}.`); else if (l.st === 'mid') mid.push(`${m.n}: ${l.txt}.`); else if (l.st === 'ok') ok.push(m.n.toLowerCase()); });
-  const cap = x => x.charAt(0).toUpperCase() + x.slice(1);
-  // the long view only uses measures with at least eight weeks of data, and says when a shorter one starts
-  const long = [], g = id => L.find(m => m.id === id), tk = todayKey(), y12 = addDays(tk, -364);
-  const y = id => { const m = g(id); if (!m) return null; const f = m.first(); if (f === '9999' || f > addDays(tk, -56)) return null; const r = aggWin(m, '12m'); return r ? Object.assign({ since: f > y12 ? ` since ${shortD(f)}` : '' }, r) : null; };
-  const al = y('alcohol'); if (al) { const B = alcBinges(), over = lastMonths(12).filter(mm => (B.months[mm] || 0) > 1).length; long.push(`alcohol ${fmtU(al.v)} units a week${al.since}, with ${over} of the last 12 months over the one-binge limit`); }
-  const sl = y('sleep'); if (sl) long.push(`sleep ${sl.v.toFixed(1)} h a night${sl.since}`);
-  const rn = y('run'); if (rn) long.push(`cardio ${oneDp(rn.v)} a week${rn.since}`);
-  const fi = y('fish'); if (fi) long.push(`oily fish ${oneDp(fi.v)} a week${fi.since}`);
-  const pl = y('plants'); if (pl) long.push(`${fmtPts(Math.round(pl.v * 4) / 4)} plant points a week${pl.since}`);
-  const co = y('colours'); if (co) { const m = g('colours'); let hit = 0, n = 0; for (let st = startOf(addDays(tk, -364)), cur = startOf(tk); st < cur; st = addDays(st, 7)) { const v = m.wval(st); if (v !== null) { n++; if (v >= m.goal) hit++; } } if (n) long.push(`all ${m.goal} colour groups in ${hit} of ${n} week${n > 1 ? 's' : ''}${co.since}`); }
-  return { off, mid, ok: ok.length ? `${cap(joinAnd(ok))}.` : '', long: long.length ? `Over the last 12 months: ${joinAnd(long)}.` : '' };
+/* the summaries, told as a short story: the bright spot, what needs a push, what's nearly there, the rest */
+const lcFirst = x => (x && /^[A-Z][a-z]/.test(x) ? x.charAt(0).toLowerCase() + x.slice(1) : x);
+const TR_SHORT = { run: 'cardio' }; // names that read better mid-sentence
+const trName = m => TR_SHORT[m.id] || lcFirst(m.n);
+const capFirst = x => (x ? x.charAt(0).toUpperCase() + x.slice(1) : x);
+const plDays = n => `${n} planned day${n === 1 ? '' : 's'}`;
+// a list read aloud: commas, or semicolons once the pieces have commas of their own
+function story(items) { if (items.length < 2) return items[0] || ''; const commas = items.some(x => x.includes(',')); if (items.length === 2) return `${items[0]}${commas ? ',' : ''} and ${items[1]}`; const sep = commas ? '; ' : ', '; return `${items.slice(0, -1).join(sep)}${commas ? ';' : ''} and ${items[items.length - 1]}`; }
+function trPhrase(m, l, now) {
+  const st = l.st, t = now ? now.txt : '', id = m.id, nm = lcFirst(m.n);
+  if (st === 'none') return null;
+  if (id === 'plants') {
+    if (st !== 'ok') return st === 'mid' ? `plants are just shy of ${m.goal}, at ${t} points` : `plants are thin on the ground at ${t} points, against a goal of ${m.goal}`;
+    const u = aggWin(m, '12m');
+    if (now && now.v >= m.goal * 2) return `plants are flying: ${t} points in this week's plan, more than double the goal of ${m.goal}`;
+    if (now && u && now.v > u.v * 1.2) return `plants are flying at ${t} points this week, well up on your usual ${m.fmt(u.v)}`;
+    return `plants are on song at ${t} points`;
+  }
+  if (id === 'fish') return st === 'ok' ? `oily fish is sorted, ${t} this week` : now && now.v === 0 ? "there's no oily fish in the plan yet" : `oily fish is ${m.goal - now.v === 1 ? 'one' : m.goal - now.v} short at ${t}`;
+  if (id === 'ferm') return st === 'ok' ? "there's something fermented every day" : `fermented food turns up on only ${t} days`;
+  if (id === 'red') return st === 'ok' ? 'red meat is staying in its lane' : `red meat has crept up to ${t} this week`;
+  if (['protein', 'fibre'].includes(id)) { const w = weekMisses(id); return st === 'ok' ? `${nm} hits the mark every planned day` : `${nm} comes up short on ${plDays(w.miss)}`; }
+  if (['sodium', 'sugar', 'satfat'].includes(id)) { const w = weekMisses(id); return st === 'ok' ? null : `${nm} goes over on ${plDays(w.miss)}`; }
+  if (id === 'colours') return st === 'ok' ? `all ${m.goal} colour groups make it onto the plate` : st === 'mid' ? `${t} of ${m.goal} colour groups, one short of the full set` : `only ${t} colour groups so far`;
+  if (id === 'alcohol') {
+    if (st === 'ok') return `drinking is in check at ${t} units a week`;
+    const more = [l.ms !== 'ok' ? `${l.mo === 1 ? 'a binge' : `${l.mo} binges`} already this month` : '', l.ys !== 'ok' ? `${l.bigs} week${l.bigs === 1 ? '' : 's'} of 32+ units so far this year (the aim is three at most)` : ''].filter(Boolean);
+    if (l.wk === 'ok') return more.length ? `alcohol's weekly average is fine at ${t} units, though there's ${joinAnd(more)}` : `drinking is in check at ${t} units a week`;
+    const base = l.wk === 'mid' ? `alcohol is running a little warm at ${t} units a week` : `alcohol is running hot at ${t} units a week`;
+    return more.length ? `${base}, with ${joinAnd(more)}` : base;
+  }
+  if (id === 'run') return st === 'ok' ? `you're getting out ${t} times a week` : st === 'mid' ? `cardio is ticking over at ${t} a week` : `cardio has gone quiet at ${t} a week lately, against a goal of 2`;
+  if (id === 'sleep') return st === 'ok' ? `sleep is in a good place at ${t} a night` : st === 'mid' ? `sleep is a touch short at ${t} a night` : `sleep is running short at ${t} a night`;
+  if (id.startsWith('h:')) { const x = lcFirst(l.txt); return st === 'ok' ? `${nm} is a proper habit, ${x}` : st === 'mid' ? `${nm} is patchy at ${x}` : `${nm} has slipped to ${x}`; }
+  if (id === 'weight') {
+    const a = wAdvice(); if (a.need) return null;
+    const pace = `${a.rate < 0 ? 'losing' : 'gaining'} ${toU(Math.abs(a.rate)).toFixed(1)} ${WT().unit} a week`;
+    if (a.head === 'On track') return `weight is heading the right way, ${pace}`;
+    if (a.head === 'Eat a little less') return `weight is moving slower than planned (${pace}), so the advice is to eat a little less`;
+    if (a.head === 'Eat a little more') return `weight is moving faster than planned (${pace}), so the advice is to eat a little more`;
+    return `weight is ${pace}; ${lcFirst(a.head)}`;
+  }
+  return st === 'ok' ? null : `${nm}: ${lcFirst(l.txt)}`;
 }
-
+const TR_STAR = ['plants', 'colours', 'ferm', 'fish', 'protein', 'sleep', 'run', 'alcohol'];
+function trStory(L, lights, nows) {
+  const rows = L.map((m, i) => ({ m, l: lights[i], now: nows[i] })).filter(x => !x.l.info);
+  const of = s => rows.filter(x => x.l.st === s), ok = of('ok'), mid = of('mid'), off = of('off'), none = of('none');
+  const out = [];
+  // the bright spot: the strongest thing on track
+  const star = TR_STAR.map(id => ok.find(x => x.m.id === id)).find(x => x && trPhrase(x.m, x.l, x.now));
+  if (star) out.push(`${capFirst(trPhrase(star.m, star.l, star.now))}.`);
+  const ph = xs => xs.map(x => trPhrase(x.m, x.l, x.now)).filter(Boolean);
+  const o = ph(off), mi = ph(mid);
+  if (o.length) out.push(`${o.length === 1 ? 'One thing needs a push' : o.length === 2 ? 'Two things need a push' : 'A few things need a push'}: ${story(o)}.`);
+  if (mi.length) out.push(`Nearly there: ${story(mi)}.`);
+  if (!o.length && !mi.length && ok.length) out.push(star ? 'Nothing is off track, and nothing is even wobbling.' : 'A clean sheet: every goal is on track.');
+  // everything else on track, by name
+  const lim = ['sodium', 'sugar', 'satfat'], rest = ok.filter(x => x !== star), limOk = lim.every(id => rest.some(x => x.m.id === id));
+  const names = rest.filter(x => !(limOk && lim.includes(x.m.id))).map(x => trName(x.m));
+  if (limOk) names.push('salt', 'sugar', 'saturated fat');
+  if (names.length && (o.length || mi.length)) out.push(`Everything else is behaving: ${joinAnd(names)}.`);
+  else if (names.length) out.push(`${capFirst(joinAnd(names))}: all on track too.`);
+  if (!out.length) out.push("Nothing to tell yet. Plan a week and log a few check-ins, and the story starts here.");
+  if (none.length) out.push(`Nothing logged yet for ${joinAnd(none.map(x => trName(x.m))).replace(/ and ([^ ]+( [A-Za-z]+)?)$/, ' or $1')}.`);
+  return out;
+}
+// the long view, using measures with at least eight weeks of data and saying when a shorter one starts
+function trLongStory(L) {
+  const g = id => L.find(m => m.id === id), tk = todayKey(), y12 = addDays(tk, -364);
+  const y = id => { const m = g(id); if (!m) return null; const f = m.first(); if (f === '9999' || f > addDays(tk, -56)) return null; const r = aggWin(m, '12m'); return r ? Object.assign({ since: f > y12 ? ` since ${shortD(f)}` : '' }, r) : null; };
+  const out = [], food = [];
+  const pl = y('plants'); if (pl) food.push(`averaged ${fmtPts(Math.round(pl.v * 4) / 4)} plant points a week${pl.since}`);
+  const co = y('colours'); if (co) { const m = g('colours'); let hit = 0, n = 0; for (let st = startOf(addDays(tk, -364)), cur = startOf(tk); st < cur; st = addDays(st, 7)) { const v = m.wval(st); if (v !== null) { n++; if (v >= m.goal) hit++; } } if (n) food.push(`got all ${m.goal} colour groups in ${hit} of ${n} week${n > 1 ? 's' : ''}${co.since}`); }
+  if (food.length) out.push(`The long view: over the past year you've ${joinAnd(food)}.`);
+  const mid = [];
+  const fi = y('fish'); if (fi) mid.push(`oily fish comes in at ${oneDp(fi.v)} a week${fi.since}`);
+  const sl = y('sleep'); if (sl) mid.push(`sleep at ${sl.v.toFixed(1)} h a night${sl.since}`);
+  const rn = y('run'); if (rn) mid.push(`cardio at ${oneDp(rn.v)} a week${rn.since}`);
+  if (mid.length) out.push(`${capFirst(story(mid))}.`);
+  const al = y('alcohol'); if (al) { const B = alcBinges(), over = lastMonths(12).filter(mm => (B.months[mm] || 0) > 1).length; out.push(`Alcohol averages ${fmtU(al.v)} units a week${al.since}, with ${over} of the last 12 months over the one-binge limit.`); }
+  if (out.length && !food.length) out[0] = `The long view: ${lcFirst(out[0])}`;
+  return out.join(' ');
+}
+/* each goal's "now": the figure its traffic light is judged on, plus a value for the bar */
+function trNow(m) {
+  const tk = todayKey(), cur = startOf(tk), set = S.set;
+  if (m.id === 'plants') { const v = weekPlants(cur); return v === null ? null : { v, txt: fmtPts(v), lab: 'this week' }; }
+  if (m.id === 'colours') { const v = weekColours(cur); return v === null ? null : { v, txt: String(v), lab: `of ${set.colourGoal}, this week` }; }
+  if (['fish', 'ferm', 'red'].includes(m.id)) { const r = aggWin(m, 'wk'); if (!r) return null; const v = Math.round(r.v); return { v, txt: m.id === 'ferm' ? `${v} of 7` : String(v), lab: m.id === 'ferm' ? 'days this week' : 'this week' }; }
+  if (m.grp === 'Food') { const r = aggWin(m, 'wk'); return r ? { v: r.v, txt: m.fmt(r.v), lab: 'a day, this week' } : null; }
+  if (m.id === 'alcohol' || m.id === 'run') { const r = aggWin(m, '4w'); return r ? { v: r.v, txt: m.fmt(r.v), lab: `${m.id === 'alcohol' ? 'units ' : ''}a week, last 4 weeks` } : null; }
+  if (m.id === 'sleep') { const a = sleepAvg(tk); return a ? { v: a.v, txt: `${(Math.round(a.v * 10) / 10).toFixed(1)} h`, lab: `a night, last ${a.n}` } : null; }
+  if (m.h) { const c = ckStats(m.h, tk); return c.logged ? { v: c.yes / c.logged * 100, txt: `${c.yes} of ${c.logged}`, lab: 'last days logged' } : null; }
+  if (m.id === 'weight') {
+    const r = aggWin(m, 'wk') || aggWin(m, '4w'), a = wAdvice(), g = WT().goal === 'maintain' ? 0 : (WT().goal === 'gain' ? 1 : -1) * WT().rate;
+    if (!r) return null;
+    const bar = !a.need && g ? { v: Math.max(0, a.rate * Math.sign(g)), goal: Math.abs(g) } : null;
+    return { v: bar ? bar.v : null, goal: bar ? bar.goal : null, txt: m.fmt(r.v), lab: 'average, this week' };
+  }
+  if (m.id === 'waist') { const ks = Object.keys(WT().waist).sort(), k = ks[ks.length - 1]; return k ? { v: null, txt: `${WT().waist[k].toFixed(1)} in`, lab: `on ${fmtDay(k)}` } : null; }
+  return null;
+}
+// the bar: shaded goal zone, solid bar for now, diamond for your 12-month usual
+function trBar(m, now, usual) {
+  const goal = now && now.goal != null ? now.goal : m.goal;
+  if (!now || now.v === null || now.v === undefined || goal === undefined || m.line && now.goal == null) return '';
+  const vals = [now.v, usual].filter(x => x !== null && x !== undefined), from = m.okFrom || goal;
+  const scale = m.lo ? Math.max(goal * 1.6, ...vals.map(x => x * 1.1)) : Math.max(from / 0.8, m.cap || 0, ...vals.map(x => x * 1.1));
+  const pc = x => Math.max(0, Math.min(100, x / scale * 100)).toFixed(1);
+  const zl = m.lo ? 0 : pc(from), zw = m.lo ? pc(goal) : (100 - pc(from)).toFixed(1);
+  return `<span class="bul" aria-hidden="true"><i class="bz" style="left:${zl}%;width:${zw}%"></i><i class="bn" style="width:${Math.max(1.5, +pc(now.v))}%"></i>${usual !== null && usual !== undefined ? `<i class="bu" style="left:${pc(usual)}%"></i>` : ''}</span>`;
+}
 /* charts: one series, weekly, with the goal as a reference line */
 function trChart(m, ser) {
   const vals = ser.map(p => p.v).filter(v => v !== null);
@@ -3415,28 +3569,133 @@ function trLights() {
   TC = null; MCACHE = metrics();
   return MCACHE.map(m => { try { return m.light(); } catch (e) { return { st: 'none', txt: '' }; } });
 }
+/* other time frames: every figure becomes that period's average, judged against the same goals */
+const TWINS = [['wk', 'This week'], ['4w', 'Last month'], ['12m', 'Last year'], ['all', 'All time']];
+const TWL = { '4w': 'last month', '12m': 'last year', all: 'all time' };
+const TBASE = { '4w': '12m', '12m': 'all' }; // what the diamond compares against in each time frame
+function trJudge(m, v) {
+  const g = m.goal;
+  if (v === null || v === undefined) return 'none';
+  if (m.id === 'plants') return v >= g ? 'ok' : v >= g - 5 ? 'mid' : 'off';
+  if (m.id === 'fish' || m.id === 'colours') return v >= g - 0.05 ? 'ok' : v >= g - 1 ? 'mid' : 'off';
+  if (m.id === 'ferm') return v >= 6.5 ? 'ok' : v >= 5 ? 'mid' : 'off';
+  if (m.id === 'red') return v <= g + 0.05 ? 'ok' : v <= g + 1 ? 'mid' : 'off';
+  if (m.id === 'alcohol') return v < ALC.week ? 'ok' : v <= ALC.week * 1.5 ? 'mid' : 'off';
+  if (m.id === 'run') return v >= 2 ? 'ok' : v >= 1 ? 'mid' : 'off';
+  if (m.id === 'sleep') return v >= g - 0.05 ? 'ok' : v >= g - 0.75 ? 'mid' : 'off';
+  if (m.h) return v >= 85 ? 'ok' : v >= 57 ? 'mid' : 'off';
+  if (m.lo) return v <= g ? 'ok' : v <= g * 1.1 ? 'mid' : 'off';
+  return v >= g ? 'ok' : v >= g * 0.9 ? 'mid' : 'off';
+}
+// weight over a time frame: the trend in kg a week, against the goal's pace
+function trWeightWin(win) {
+  const tk = todayKey(), ks = Object.keys(WT().log).sort(); if (!ks.length) return null;
+  const span = win === '4w' ? 28 : win === '12m' ? 365 : daysBetween(ks[0], tk) + 1;
+  const sl = wSlope(tk, span), g = WT().goal === 'maintain' ? 0 : (WT().goal === 'gain' ? 1 : -1) * WT().rate;
+  if (sl === null) return null;
+  const rate = sl * 7, tol = Math.max(0.1, Math.abs(g) * 0.25);
+  return { rate, g, st: Math.abs(rate - g) <= tol ? 'ok' : 'mid', pace: `${rate < 0 ? 'losing' : 'gaining'} ${toU(Math.abs(rate)).toFixed(1)} ${WT().unit} a week` };
+}
+const trGoal = m => (m.id === 'alcohol' ? `under ${ALC.week} a week` : m.lo || /^(at most|under)/.test(m.goalTxt) ? m.goalTxt : `goal ${m.goalTxt}`);
+function trWinRow(m, win) {
+  const r = aggWin(m, win), [a] = winRange(m, win), bw = TBASE[win], b = bw ? aggWin(m, bw) : null, tk = todayKey();
+  const nTxt = r ? `${r.n} ${m.kind === 'week' ? 'week' : 'day'}${r.n === 1 ? '' : 's'}` : '';
+  const since = win === 'all' && r ? ` since ${shortD(a)}${a.slice(0, 4) !== tk.slice(0, 4) ? ` ${a.slice(0, 4)}` : ''}` : '';
+  let st = r ? trJudge(m, r.v) : 'none', line = r ? `Averaged over ${nTxt}${since}` : 'Nothing logged in this period';
+  const now = r ? { v: r.v, txt: m.fmt(r.v), lab: `${m.unit}, ${TWL[win]}` } : null;
+  if (m.id === 'weight') {
+    const w = r ? trWeightWin(win) : null;
+    if (w) { st = w.st; line = capFirst(`${w.pace} on average`); now.v = w.g ? Math.max(0, w.rate * Math.sign(w.g)) : null; now.goal = w.g ? Math.abs(w.g) : null; }
+    else { st = 'none'; if (now) { now.v = null; line = 'Not enough weigh-ins to show a trend'; } }
+  }
+  if (m.id === 'waist') { st = 'none'; if (now) { now.v = null; line = `${r.n} reading${r.n === 1 ? '' : 's'}${since}`; } }
+  if (m.id === 'alcohol' && r && win !== '4w') {
+    const B = alcBinges();
+    if (win === '12m') { const over = lastMonths(12).filter(mm => (B.months[mm] || 0) > 1).length; line += `; ${over} of 12 months over the binge limit`; }
+    else { const big = B.weeks.filter(x => x.big).length; line += `; ${big} week${big === 1 ? '' : 's'} of 32+ units`; }
+  }
+  const baseLab = win === '4w' ? '12-month usual' : win === '12m' ? 'All-time' : '';
+  const foot = m.id === 'waist' ? 'Measured weekly' : `${b && baseLab && !m.line ? `${baseLab} ${m.fmt(b.v)} ${m.unit} · ` : ''}${trGoal(m)}`;
+  return { m, st, line, now, usual: m.line ? null : b ? b.v : null, foot };
+}
+function trWinPhrase(x, win) {
+  const { m, st, now } = x, t = now ? now.txt : '', nm = trName(m), g = m.goal;
+  if (st === 'none') return null;
+  if (m.id === 'plants') return st === 'ok' ? `plants averaged ${t} points a week${now.v >= g * 1.5 ? `, comfortably clear of ${g}` : ''}` : `plants averaged ${t} points a week, ${st === 'mid' ? 'just shy of' : 'well short of'} ${g}`;
+  if (m.id === 'fish') return `oily fish came to ${t} a week${st === 'ok' ? '' : `, against a goal of ${g}`}`;
+  if (m.id === 'ferm') return st === 'ok' ? `something fermented turned up on ${t} days a week` : `something fermented turned up on only ${t} days a week`;
+  if (m.id === 'red') return st === 'ok' ? `red meat stayed within ${g} a week` : `red meat averaged ${t} a week, over the limit of ${g}`;
+  if (m.id === 'colours') return st === 'ok' ? `all ${g} colour groups turned up week after week` : `colour groups averaged ${t} of ${g} a week`;
+  if (m.id === 'alcohol') return st === 'ok' ? `alcohol averaged ${t} units a week, under ${ALC.week}` : `alcohol averaged ${t} units a week, ${st === 'mid' ? 'a bit' : 'well'} over ${ALC.week}`;
+  if (m.id === 'run') return st === 'ok' ? `you got out ${t} times a week` : `cardio averaged ${t} a week, ${st === 'mid' ? 'short of' : 'well short of'} 2`;
+  if (m.id === 'sleep') return `sleep averaged ${t} a night${st === 'ok' ? '' : st === 'mid' ? `, a touch under ${g} h` : `, well under ${g} h`}`;
+  if (m.id === 'weight') { const w = trWeightWin(win); return w ? (st === 'ok' ? `weight kept to plan, ${w.pace}` : `weight was off the planned pace, ${w.pace}`) : null; }
+  if (m.h) return `${nm} happened on ${t} of days${st === 'ok' ? '' : st === 'mid' ? ', a bit patchy' : ', more misses than hits'}`;
+  if (m.lo) return st === 'ok' ? null : `${nm} averaged ${t} a day, over the ${m.fmt(g)} limit`;
+  return st === 'ok' ? `${nm} averaged ${t} a day` : `${nm} averaged ${t} a day, ${st === 'mid' ? 'a little under' : 'well under'} ${m.fmt(g)}`;
+}
+function trWinStory(rows, win) {
+  const lead = { '4w': 'Over the last month', '12m': 'Over the past year', all: 'Since your records began' }[win];
+  const of = s => rows.filter(x => x.st === s && !(x.m.id === 'waist')), ok = of('ok'), mid = of('mid'), off = of('off'), none = of('none');
+  const out = [], ph = xs => xs.map(x => trWinPhrase(x, win)).filter(Boolean);
+  const star = TR_STAR.map(id => ok.find(x => x.m.id === id)).find(x => x && trWinPhrase(x, win));
+  out.push(star ? `${lead}, ${trWinPhrase(star, win)}.` : `${lead}, it's been a mixed picture.`);
+  const o = ph(off), mi = ph(mid);
+  if (o.length) out.push(`Where it slipped: ${story(o)}.`);
+  if (mi.length) out.push(`Close, but not quite: ${story(mi)}.`);
+  if (!o.length && !mi.length && ok.length) out.push('Nothing went off track in this stretch.');
+  const lim = ['sodium', 'sugar', 'satfat'], rest = ok.filter(x => x !== star), limOk = lim.every(id => rest.some(x => x.m.id === id));
+  const names = rest.filter(x => !(limOk && lim.includes(x.m.id))).map(x => trName(x.m));
+  if (limOk) names.push('salt', 'sugar', 'saturated fat');
+  if (names.length) out.push(o.length || mi.length ? `Steady throughout: ${joinAnd(names)}.` : `${capFirst(joinAnd(names))}: all on track too.`);
+  if (none.length) out.push(`Not enough logged to judge ${joinAnd(none.map(x => trName(x.m))).replace(/ and ([^ ]+( [A-Za-z]+)?)$/, ' or $1')}.`);
+  return out;
+}
 function vTrends() {
-  const L = MCACHE || (MCACHE = metrics()), lights = L.map(m => m.light()), sum = trSummary(L, lights);
+  const L = MCACHE || (MCACHE = metrics()), win = UI.twin || 'wk';
   const head = `<div class="rhead"><button class="btn sm ghost" data-a="trback">${ic('left')}Back</button><h2>Trends</h2><button class="btn sm rvbtn" data-a="review">${ic('week')}Review a week</button></div>`;
-  const summary = `<section class="wsum trsum"><div class="eyebrow">Where things stand</div>
-    ${sum.off.length ? `<div class="trgrp"><h3>${stDot('off')}Off track</h3>${sum.off.map(x => `<p>${esc(x)}</p>`).join('')}</div>` : ''}
-    ${sum.mid.length ? `<div class="trgrp"><h3>${stDot('mid')}Close</h3>${sum.mid.map(x => `<p>${esc(x)}</p>`).join('')}</div>` : ''}
-    ${sum.ok ? `<div class="trgrp"><h3>${stDot('ok')}On track</h3><p>${esc(sum.ok)}</p></div>` : ''}
-    ${sum.long ? `<p class="trlong">${esc(sum.long)}</p>` : ''}</section>`;
+  const tabs = `<div class="seg trwin" role="group" aria-label="Time frame">${TWINS.map(([v, l]) => `<button data-a="twin" data-v="${v}" aria-pressed="${win === v}">${l}</button>`).join('')}</div>`;
+  let rows, story;
+  if (win === 'wk') {
+    const lights = L.map(m => m.light()), nows = L.map(m => { try { return trNow(m); } catch (e) { return null; } });
+    rows = L.map((m, i) => {
+      const yr = aggWin(m, '12m'), f = m.first(), since = f !== '9999' && f > addDays(todayKey(), -364) ? ` since ${shortD(f)}` : '';
+      const foot = m.id === 'waist' ? 'Measured weekly' : m.id === 'weight' ? `${yr ? `${m.fmt(yr.v)} average${since || ' over 12 months'} · ` : ''}${trGoal(m)}` : `${yr ? `Usual ${m.fmt(yr.v)} ${m.unit}${since}` : 'No history yet'} · ${trGoal(m)}`;
+      return { m, st: lights[i].st, info: lights[i].info, line: lights[i].txt, now: nows[i], usual: m.line ? null : yr ? yr.v : null, foot };
+    });
+    story = trStory(L, lights, nows);
+  } else { rows = L.map(m => trWinRow(m, win)); story = trWinStory(rows, win); }
+  const chips = st => rows.filter(x => x.st === st && !x.info).map(x => `<button class="tchip t-${st}" data-a="tjump" data-v="${esc(x.m.id)}">${esc(x.m.n)}</button>`).join('');
+  const nOk = rows.filter(x => x.st === 'ok' && !x.info).length, long = win === 'wk' ? trLongStory(L) : '';
+  const offC = chips('off'), midC = chips('mid');
+  const summary = `<section class="wsum trsum"><div class="eyebrow">${{ wk: 'Where things stand', '4w': 'The last month', '12m': 'The past year', all: 'All time' }[win]}</div>
+    <div class="trstory">${story.map(x => `<p>${esc(x)}</p>`).join('')}</div>
+    ${offC ? `<div class="trgrp"><h3>${stDot('off')}Off track</h3><div class="tchips">${offC}</div></div>` : ''}
+    ${midC ? `<div class="trgrp"><h3>${stDot('mid')}Close</h3><div class="tchips">${midC}</div></div>` : ''}
+    ${nOk ? `<div class="trgrp"><h3>${stDot('ok')}On track<span class="muted">· ${nOk} goal${nOk === 1 ? '' : 's'}, all below</span></h3></div>` : ''}
+    ${long ? `<p class="trlong">${esc(long)}</p>` : ''}</section>`;
+  const usualLab = { wk: 'Usual, 12 months', '4w': '12-month usual', '12m': 'All-time average' }[win];
+  const legend = `<div class="trlegend" aria-hidden="true"><span><i class="lg-n"></i>${win === 'wk' ? 'Now' : capFirst(TWL[win])}</span>${usualLab ? `<span><i class="lg-u"></i>${usualLab}</span>` : ''}<span><i class="lg-z"></i>Goal zone</span></div>`;
   const grps = [...new Set(L.map(m => m.grp))];
-  const body = grps.map(g => `<section class="trsec"><h3 class="eyebrow">${g === 'Food' ? "Food · this week's plan" : g}</h3>${L.map((m, i) => ({ m, l: lights[i] })).filter(x => x.m.grp === g).map(({ m, l }) => {
-    const open = UI.topen === m.id, yr = aggWin(m, '12m'), f = m.first(), since = f !== '9999' && f > addDays(todayKey(), -364) ? `since ${shortD(f)}` : '12 mo';
-    return `<article class="trrow ${open ? 'open' : ''}"><button class="trhead" data-a="topen" data-v="${esc(m.id)}" aria-expanded="${open}">${stDot(l.st)}<span class="trn"><b>${esc(m.n)}</b><small><span class="sr-only">${TR_ST[l.st]}. </span>${esc(l.txt)}</small></span><span class="trv"><b>${yr ? m.fmt(yr.v) : '–'}</b><small>${yr ? `${m.unit} · ${since}` : since}</small></span>${ic('chev', false, 'chev')}</button>${open ? trDetail(m) : ''}</article>`;
-  }).join('')}</section>`).join('');
+  const body = grps.map(g => `<section class="trsec"><h3 class="eyebrow">${g === 'Food' && win === 'wk' ? "Food · this week's plan" : g}</h3><div class="trlist">${rows.filter(x => x.m.grp === g).map(({ m, st, line, now, usual, foot }) => {
+    const open = UI.topen === m.id;
+    return `<article class="trrow ${open ? 'open' : ''}" id="tr-${esc(m.id)}"><button class="trhead" data-a="topen" data-v="${esc(m.id)}" aria-expanded="${open}"><span class="trtop">${stDot(st)}<span class="trn"><b>${esc(m.n)}</b><small><span class="sr-only">${TR_ST[st]}. </span>${esc(line)}</small></span><span class="trv"><b>${now ? esc(now.txt) : '–'}</b><small>${now ? esc(now.lab) : ''}</small></span>${ic('chev', false, 'chev')}</span>${trBar(m, now, usual)}<span class="trfoot">${esc(foot)}</span></button>${open ? trDetail(m) : ''}</article>`;
+  }).join('')}</div></section>`).join('');
   // dishes most often on the plan and plants not had for a while, over the last 8 weeks
   const tk = todayKey(), cnt = {}, recent = new Set();
   eachDay(addDays(tk, -56), addDays(tk, -1), k => { const c = dcc(k); if (!c || !c.hasPlan) return; SLOTS.forEach(s => { const o = c.slots[s]; if (o.kind === 'recipe') { cnt[o.r.id] = (cnt[o.r.id] || 0) + 1; if (k >= addDays(tk, -28)) o.r.plants.forEach(x => recent.add(x)); } }); });
   const top = Object.entries(cnt).sort((a, b) => b[1] - a[1] || R[a[0]].n.localeCompare(R[b[0]].n)).slice(0, 6);
-  const topHtml = top.length ? `<section class="hsec"><h3 class="eyebrow">Most often on your plan · 8 weeks</h3><div class="hlist">${top.map(([id, n]) => `<div class="hdish"><button class="hopen" data-a="open" data-r="${id}">${art(R[id], 36)}<span>${esc(R[id].n)}<small>${n} time${n > 1 ? 's' : ''}</small></span></button>${thumbs(id, true)}</div>`).join('')}</div></section>` : '';
+  const topHtml = top.length ? `<div class="hlist">${top.map(([id, n]) => `<div class="hdish"><button class="hopen" data-a="open" data-r="${id}">${art(R[id], 36)}<span>${esc(R[id].n)}<small>${n} time${n > 1 ? 's' : ''}</small></span></button>${thumbs(id, true)}</div>`).join('')}</div>` : '';
   const uses = {}; RL.forEach(r => r.plants.forEach(x => { uses[x] = (uses[x] || 0) + 1; }));
   const missing = Object.keys(cnt).length ? Object.keys(PLANTS).filter(x => PLANTS[x][1] >= 1 && !recent.has(x) && uses[x]).sort((a, b) => uses[b] - uses[a]).slice(0, 18) : [];
-  const missHtml = missing.length ? `<section class="hsec"><h3 class="eyebrow">Not on your plan for four weeks</h3><div class="plantgrid">${missing.map(x => `<button class="pchip" data-a="plantfind" data-v="${x}">${PLANTS[x][2] ? `<i class="c-${PLANTS[x][2]}"></i>` : ''}${esc(PLANTS[x][0])}</button>`).join('')}</div><p class="small muted" style="margin:6px 0 0">Tap one to see recipes with it.</p></section>` : '';
-  return `${head}${summary}${gapCard()}${body}${topHtml}${missHtml}`;
+  const missHtml = missing.length ? `<div class="plantgrid">${missing.map(x => `<button class="pchip" data-a="plantfind" data-v="${x}">${PLANTS[x][2] ? `<i class="c-${PLANTS[x][2]}"></i>` : ''}${esc(PLANTS[x][0])}</button>`).join('')}</div><p class="small muted" style="margin:6px 0 0">Tap one to see recipes with it.</p>` : '';
+  // the extras, folded away at the bottom so the figures come first
+  const nGap = gapCount(), also = [];
+  if (nGap !== null) also.push(['gaps', 'Still to fill in', nGap ? `${nGap} week${nGap === 1 ? '' : 's'} with gaps` : 'Nothing missing', nGap, () => gapCard(true)]);
+  if (top.length) also.push(['top', 'Most often on your plan', `Last 8 weeks · ${esc(R[top[0][0]].n.split(/ with | & |,/)[0].toLowerCase())} tops it, ${top[0][1]} time${top[0][1] > 1 ? 's' : ''}`, 0, () => `<div class="alsobody">${topHtml}</div>`]);
+  if (missing.length) also.push(['miss', 'Not on your plan for four weeks', `${missing.length} plant${missing.length > 1 ? 's' : ''}, ${esc(PLANTS[missing[0]][0].toLowerCase())} to ${esc(PLANTS[missing[missing.length - 1]][0].toLowerCase())}`, 0, () => `<div class="alsobody">${missHtml}</div>`]);
+  const alsoHtml = also.length ? `<section class="trsec"><h3 class="eyebrow">Also here</h3><div class="trlist">${also.map(([k, n, sub, badge, body]) => { const open = !!(UI.tAlso || {})[k]; return `<div class="also ${open ? 'open' : ''}"><button class="alsohead" data-a="talso" data-v="${k}" aria-expanded="${open}"><span class="trn"><b>${n}</b><small>${sub}</small></span>${badge ? `<span class="abadge">${badge}</span>` : ''}${ic('chev', false, 'chev')}</button>${open ? body() : ''}</div>`; }).join('')}</div></section>` : '';
+  return `${head}${tabs}${summary}${legend}${body}${alsoHtml}`;
 }
 /* weeks with something still to fill in, from where each record starts to the end of last week */
 const GAPNAME = { plants: 'Plant points', cols: 'Colour groups', food: 'Food', alc: 'Alcohol', run: 'Cardio', ck: 'Check-ins' };
@@ -3481,7 +3740,9 @@ function rvNR(fs, own) {
 }
 const gapCardOf = g => (g.plants || g.cols || g.food ? 'plants' : g.alc ? 'alc' : g.run ? 'run' : 'checks');
 const gapDesc = g => joinAnd(Object.keys(GAPNAME).filter(f => g[f]).map(f => (f === 'plants' || f === 'cols' ? GAPNAME[f].toLowerCase() : `${g[f]} day${g[f] > 1 ? 's' : ''} of ${f === 'ck' ? 'check-ins' : GAPNAME[f].toLowerCase()}`))).replace(/^./, c => c.toUpperCase());
-function gapCard() {
+// weeks still to fill in (null when there's no past week to check yet)
+function gapCount() { const all = gapWeeks(); if (!all.checked) return null; return all.filter(x => Object.keys(x.g).some(f => !gapOk(x.st, f))).length; }
+function gapCard(bare) {
   const all = gapWeeks(); if (!all.checked) return '';
   const rows = all.map(x => { const g = {}, off = {}; Object.keys(x.g).forEach(f => { (gapOk(x.st, f) ? off : g)[f] = x.g[f]; }); return { st: x.st, g, off }; });
   const list = rows.filter(x => Object.keys(x.g).length), aside = rows.filter(x => Object.keys(x.off).length);
@@ -3491,6 +3752,7 @@ function gapCard() {
   const N = 5, shown = UI.gapAll ? list : list.slice(0, N);
   const asideHtml = aside.length ? `<button class="btn link sm gaplink" data-a="gapshow" aria-expanded="${!!UI.gapAside}">Not recorded: ${aside.length} week${aside.length > 1 ? 's' : ''} · ${UI.gapAside ? 'hide' : 'show'}</button>${UI.gapAside ? `<div class="gaplist">${aside.map(x => `<div class="gaprow aside"><span><b>Week of ${fmtRange(x.st)}</b><small>${gapDesc(x.off)}</small></span><button class="btn sm ghost" data-a="gapback" data-v="${x.st}">Bring back</button></div>`).join('')}</div>` : ''}` : '';
   const body = list.length ? `<p style="margin:0">${joinAnd(parts).replace(/^./, c => c.toUpperCase())}.</p><div class="gaplist">${shown.map(row).join('')}</div>${list.length > N ? `<button class="btn sm" data-a="gapmore">${UI.gapAll ? 'Show fewer' : `Show ${list.length - N} more week${list.length - N > 1 ? 's' : ''}`}</button>` : ''}<p class="small muted" style="margin:0">Tap a week to fill it in. If you don't have a week's information, tap × and it's marked as not recorded. Blanks are never counted in averages.</p>` : `<p style="margin:0">Nothing missing. Every week has its plant points, colour groups, food, alcohol, cardio and check-ins${aside.length ? ', or is marked as not recorded' : ''}.</p>`;
+  if (bare) return `<div class="gapcard alsobody">${body}${asideHtml}</div>`;
   return `<section class="wsum gapcard"><div class="eyebrow">Still to fill in</div>${body}${asideHtml}</section>`;
 }
 // the header button: plant points ring plus one dot per headline goal
@@ -4232,8 +4494,9 @@ function vShop() {
     return `<div class="sitem"><button class="sbox" role="checkbox" aria-checked="${on}" data-a="shopck" data-i="${i}"><span class="box">${ic('check')}</span><span class="n">${esc(ing.n)}${hint ? `<span class="h ${subs ? 'sw' : ''}">${esc(hint)}</span>` : ''}</span><span class="q">${fmtQ(i, tot[i], true)}</span></button>${canSwap ? `<button class="iconbtn swapbtn" data-a="swap" data-i="${i}" aria-label="Can't find ${esc(ing.n)}? Swap it">${ic('swap')}</button>` : '<span></span>'}</div>`;
   };
   const main = ids.filter(i => !ING[i].pantry), pantry = ids.filter(i => ING[i].pantry), done = ids.filter(i => w.shop[key(i)]).length;
-  const swaps = Object.entries(w.swaps || {}).flatMap(([rid, sw]) => Object.entries(sw).map(([o, k]) => ({ rid, o, k })));
-  const swapBox = swaps.length ? `<details class="more swaps"><summary>${swaps.length} swap${swaps.length > 1 ? 's' : ''} this week${ic('chev')}</summary><div class="swaplist">${swaps.map(x => { const opt = subOptions(x.o).find(q => q.key === x.k); return `<div class="swaprow"><span><b>${esc(shortN(x.o))}</b> → ${esc(opt ? subLabel(opt) : x.k)}<small>${esc(R[x.rid].n)}</small></span><button class="btn sm ghost" data-a="unswap" data-r="${x.rid}" data-o="${x.o}">Undo</button></div>`; }).join('')}</div></details>` : '';
+  const swaps = Object.entries(w.swaps || {}).flatMap(([rid, sw]) => Object.entries(sw).map(([o, k]) => ({ rid, o, k }))).filter(x => R[x.rid] && ING[isAmt(x.o) ? x.o.slice(3) : x.o]);
+  const nAmt = swaps.filter(x => isAmt(x.o)).length, nSw = swaps.length - nAmt;
+  const swapBox = swaps.length ? `<details class="more swaps"><summary>${joinAnd([nSw ? `${nSw} swap${nSw > 1 ? 's' : ''}` : '', nAmt ? `${nAmt} amount${nAmt > 1 ? 's' : ''} changed` : ''].filter(Boolean))} this week${ic('chev')}</summary><div class="swaplist">${swaps.map(x => { const am = isAmt(x.o), opt = !am && subOptions(x.o).find(q => q.key === x.k); return `<div class="swaprow"><span><b>${esc(shortN(am ? x.o.slice(3) : x.o))}</b> → ${am ? (+x.k ? 'your amount' : 'left out') : esc(opt ? subLabel(opt) : x.k)}<small>${esc(R[x.rid].n)}</small></span><button class="btn sm ghost" data-a="unswap" data-r="${x.rid}" data-o="${x.o}">Undo</button></div>`; }).join('')}</div></details>` : '';
   const aisles = AISLES.map(([a, name]) => {
     const its = main.filter(i => ING[i].a === a).sort((x, y) => ING[x].n.localeCompare(ING[y].n));
     if (!its.length) return '';
@@ -4353,6 +4616,16 @@ function vOut() {
 let SH = null, pending = null;
 function openSheet(o) { SH = o; renderSheet(true); syncHistory(); }
 function closeSheet() { SH = null; pending = null; $('sheet-root').innerHTML = ''; if (!WZ && !PM && !RV) document.body.style.overflow = ''; syncHistory(); }
+// a big title shrinks until its longest word fits (MOZZARELLA or PUTTANESCA beside the picture on a narrow phone)
+function fitTitles(root) {
+  if (!root || !root.isConnected) return;
+  root.querySelectorAll('h2').forEach(h => {
+    h.style.fontSize = ''; h.classList.remove('squeeze');
+    let f = parseFloat(getComputedStyle(h).fontSize);
+    while (h.scrollWidth > h.clientWidth + 1 && f > 18) { f -= 1; h.style.fontSize = `${f}px`; }
+    if (h.scrollWidth > h.clientWidth + 1) h.classList.add('squeeze');
+  });
+}
 function renderSheet(fresh) {
   const root = $('sheet-root');
   if (!SH) { root.innerHTML = ''; return; }
@@ -4362,6 +4635,7 @@ function renderSheet(fresh) {
   if (!fresh) root.querySelector('.scrim').style.animation = 'none';
   const sh = root.querySelector('.sheet'); if (!fresh) sh.style.animation = 'none';
   document.body.style.overflow = 'hidden'; sh.scrollTop = top;
+  fitTitles(sh); if (document.fonts && document.fonts.status !== 'loaded') document.fonts.ready.then(() => fitTitles(sh));
   if (fresh) { const f = sh.querySelector('[autofocus]'); if (f) f.focus(); }
 }
 const closeBtn = `<button class="iconbtn" data-a="close" aria-label="Close">${ic('x')}</button>`;
@@ -4404,7 +4678,7 @@ function shRecipe() {
     ${ctx}
     <section><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h4 style="margin:0">Ingredients</h4><div class="stepper"><button data-a="serv" data-v="-1" aria-label="Fewer portions">−</button><span>${n} portion${n > 1 ? 's' : ''}</span><button data-a="serv" data-v="1" aria-label="More portions">+</button></div></div>
       ${swapped.length ? `<div class="callout" style="margin-top:8px">${ic('swap')}<div>This week: ${esc(swapped.join('; '))}. Follow the method with the swap.</div></div>` : ''}
-      ${nutConf(r)}<ul class="ilist ik" style="margin-top:8px">${ingRows(r.items.map(it => [it.i, it.g * mm, it.from ? ` <span class="muted for">for ${esc(shortN(it.from))}</span>` : '']), n > 1 ? `Total for ${n} portions` : 'Total', true)}</ul></section>
+      ${nutConf(r)}<ul class="ilist ik" style="margin-top:8px">${ingRows(r.items.map(it => [it.i, it.g * mm, (it.from ? ` <span class="muted for">for ${esc(shortN(it.from))}</span>` : '') + (it.own ? ' <span class="muted for">your amount</span>' : '')]), n > 1 ? `Total for ${n} portions` : 'Total', true)}</ul></section>
     <section><h4>Method</h4><ol class="steps">${r.steps.map(x => `<li>${esc(x)}${swapNotes(r, x)}</li>`).join('')}</ol>${r.note ? `<p class="small muted">${esc(r.note)}</p>` : ''}</section>
     <section><details class="more"><summary>Plants & storage${ic('chev')}</summary>${keeps.length ? `<p style="margin:8px 0">${keeps.join(' · ').replace(/^./, c => c.toUpperCase())}.</p>` : ''}<div class="plantgrid">${plants}</div></details></section>`;
 }
@@ -4588,7 +4862,7 @@ function shSettings() {
   <button class="btn primary" style="width:100%;margin-top:14px" data-a="setsave">Save settings</button>
   <hr class="rule">
   <details class="more help"><summary>Put it on your Android home screen${ic('chev')}</summary><ol><li>Open this app's web address in Chrome on your phone.</li><li>Tap ⋮, then <b>Add to Home screen</b> (or <b>Install app</b>).</li><li>It opens full screen with its own icon and works offline.</li></ol></details>
-  <section><h4>Backup</h4><p class="small muted" style="margin:0 0 8px">Everything lives on this device.</p><div class="btnrow"><button class="btn sm" data-a="backup" data-v="export">Export</button><button class="btn sm" data-a="backup" data-v="import">Import</button><button class="btn sm" data-a="backup" data-v="hist">Add history</button></div></section>
+  <section><h4>Backup</h4><p class="small muted" style="margin:0 0 8px">Everything lives on this device, in Chrome. Back up once a week: <b>Back up now</b> opens the share menu, so you can save the file to Google Drive or email it to yourself. To restore, use Import and pick that file.</p><p class="bkline ${bkDue() ? 'due' : ''}">${ic(bkDue() ? 'warn' : 'check')}${esc(bkLine())}</p><div class="btnrow"><button class="btn sm primary" data-a="bkshare">Back up now</button><button class="btn sm" data-a="backup" data-v="export">Export</button><button class="btn sm" data-a="backup" data-v="import">Import</button><button class="btn sm" data-a="backup" data-v="hist">Add history</button></div></section>
   <section><h4>Start again</h4><button class="btn sm danger" data-a="resetall">Clear all data</button></section>`;
 }
 function shBackup() {
@@ -4596,7 +4870,7 @@ function shBackup() {
   if (SH.mode === 'hist') return `<div class="sheethead"><div><span class="eyebrow">Backup</span><h2>Add history</h2></div>${closeBtn}</div>
     <p class="small muted">Adds days from a history file, such as your old tracker. Nothing already in the app is changed, so it's safe to add the same file twice.</p>
     ${SH.res ? `<div class="callout">${ic('check')}<div>${esc(SH.res)}</div></div>` : ''}
-    <div class="field"><label for="bk-file">History file</label><input id="bk-file" type="file" accept=".json,application/json,text/plain"></div>
+    <div class="field"><label for="bk-file">History file</label><input id="bk-file" type="file" accept=".json,.txt,application/json,text/plain"></div>
     <div class="field"><label for="bk">Or paste it here</label><textarea id="bk"></textarea></div>
     <button class="btn primary" style="width:100%;margin-top:10px" data-a="histadd">Add to my data</button>`;
   if (SH.mode === 'export') return `<div class="sheethead"><div><span class="eyebrow">Backup</span><h2>Export</h2></div>${closeBtn}</div>
@@ -4605,7 +4879,7 @@ function shBackup() {
     <div class="btnrow" style="margin-top:10px"><button class="btn primary" data-a="bkcopy">${ic('copy')}Copy</button>${window.TP_PREVIEW ? '' : '<button class="btn" data-a="bkdl">Download file</button>'}</div>`;
   return `<div class="sheethead"><div><span class="eyebrow">Backup</span><h2>Import</h2></div>${closeBtn}</div>
   <p class="small muted">Paste an export or choose a backup file. This replaces everything on this device.</p>
-  <div class="field"><label for="bk-file">Backup file</label><input id="bk-file" type="file" accept=".json,application/json,text/plain"></div>
+  <div class="field"><label for="bk-file">Backup file</label><input id="bk-file" type="file" accept=".json,.txt,application/json,text/plain"></div>
   <div class="field"><label for="bk">Or paste it here</label><textarea id="bk"></textarea></div>
   <button class="btn primary" style="width:100%;margin-top:10px" data-a="bkimport">Replace my data</button>`;
 }
@@ -4859,9 +5133,26 @@ function applyOut(k) {
 /* ───────────── toast & clipboard ───────────── */
 let toastT = null;
 function toast(msg) { const r = $('toast-root'); r.innerHTML = `<div class="toast">${esc(msg)}</div>`; clearTimeout(toastT); toastT = setTimeout(() => { r.innerHTML = ''; }, 2200); }
-function copyText(text, el) {
+function copyText(text, el, ok) {
   const fallback = () => { if (el) { el.focus(); el.select(); } toast('Select and copy the text'); };
-  try { navigator.clipboard.writeText(text).then(() => toast('Copied'), fallback); } catch (e) { fallback(); }
+  try { navigator.clipboard.writeText(text).then(() => { toast('Copied'); if (ok) ok(); }, fallback); } catch (e) { fallback(); }
+}
+/* backups: a copy kept off the phone, nudged once a week */
+const bkAge = () => S.bk && S.bk.at ? daysBetween(S.bk.at, todayKey()) : null;
+const bkDue = () => { const a = bkAge(); return a === null || a >= 7; };
+const bkLine = () => { const a = bkAge(); return a === null ? 'Not backed up yet' : a <= 0 ? 'Backed up today' : a === 1 ? 'Backed up yesterday' : `Last backed up ${a} days ago, ${fmtDay(S.bk.at)}`; };
+function bkMark(how) { S.bk = { at: todayKey(), how }; save(); render(); }
+// the phone's share menu with the backup as a file (Drive, Gmail, Files…); the export sheet where that isn't available
+async function bkShare() {
+  const name = `thirty-plants-backup-${todayKey()}.txt`;
+  try {
+    const file = new File([JSON.stringify(S)], name, { type: 'text/plain' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'Thirty Plants backup' });
+      bkMark('share'); toast('Backed up'); if (SH && SH.type === 'settings') renderSheet(); return;
+    }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  openSheet({ type: 'backup', mode: 'export' });
 }
 
 /* ───────────── actions ───────────── */
@@ -4881,6 +5172,22 @@ function setWeekStart(ws) {
   UI.week = startOf(UI.week);
 }
 // meals already eaten keep the version (swaps included) they were eaten as
+// the meal a recipe sheet was opened from, so the ingredient check can change how much of something goes in
+function amtCtx(id) {
+  if (!SH || SH.type !== 'recipe' || !SH.k || !SH.s) return null;
+  const o = dayCalc(SH.k).slots[SH.s]; if (o.kind !== 'recipe' || o.r.id !== SH.r) return null;
+  const it = o.r.items.find(x => x.i === id); if (!it) return null;
+  const key = AMT + id, sw = Object.assign({}, o.r.swapped || {}), own = key in sw; delete sw[key];
+  const d0 = variant(R[SH.r], sw).items.find(x => x.i === id);
+  return { st: startOf(SH.k), rid: SH.r, key, m: o.m, g: it.g, def: d0 ? d0.g : 0, own };
+}
+// sets (or with null clears) an amount for the week's dish, including portions already packed or eaten from it
+function setAmt(c, g) {
+  freezeEaten(c.st);
+  const put = sw => { if (g === null) delete sw[c.key]; else sw[c.key] = g; }, w = W(c.st);
+  w.swaps = w.swaps || {}; const m = w.swaps[c.rid] = w.swaps[c.rid] || {}; put(m); if (!Object.keys(m).length) delete w.swaps[c.rid];
+  weekDays(c.st).forEach(k => { const d = S.days[k]; if (!d) return; SLOTS.forEach(s => { if (d.sl[s] !== c.rid) return; if (d.done[s] && d.done[s].sw) put(d.done[s].sw); if (d.pk && d.pk[s] && d.pk[s].r === c.rid) put(d.pk[s].sw = d.pk[s].sw || {}); }); });
+}
 function freezeEaten(st) {
   const sw = (S.weeks[st] && S.weeks[st].swaps) || {};
   weekDays(st).forEach(k => { const dd = S.days[k]; if (!dd) return; SLOTS.forEach(s => { const dn = dd.done[s]; if (dn && dn.m && !dn.sw && R[dd.sl[s]]) dn.sw = Object.assign({}, sw[dd.sl[s]] || {}); }); });
@@ -5017,7 +5324,7 @@ const ACT = {
     });
     save(); closeSheet(); render(); toast(n ? `Swapped in ${n} dish${n > 1 ? 'es' : ''}` : 'Nothing changed');
   },
-  unswap(d) { const w = W(UI.week); freezeEaten(UI.week); if (w.swaps && w.swaps[d.r]) { delete w.swaps[d.r][d.o]; if (!Object.keys(w.swaps[d.r]).length) delete w.swaps[d.r]; } save(); render(); toast('Swap undone'); },
+  unswap(d) { if (isAmt(d.o)) { setAmt({ st: UI.week, rid: d.r, key: d.o }, null); save(); render(); toast('Back to the recipe amount'); return; } const w = W(UI.week); freezeEaten(UI.week); if (w.swaps && w.swaps[d.r]) { delete w.swaps[d.r][d.o]; if (!Object.keys(w.swaps[d.r]).length) delete w.swaps[d.r]; } save(); render(); toast('Swap undone'); },
   untick() { W(UI.week).shop = {}; save(); render(); },
   cupboard() { openSheet({ type: 'cupboard', q: '' }); },
   stockck(d, el) {
@@ -5030,6 +5337,9 @@ const ACT = {
   trends() { closeSheet(); if (UI.trends) { window.scrollTo(0, 0); return; } UI.trends = true; UI.anim = 'enter'; render(); window.scrollTo(0, 0); syncHistory(); },
   trback() { UI.trends = false; UI.anim = 'enter'; render(); window.scrollTo(0, 0); syncHistory(); },
   topen(d) { UI.topen = UI.topen === d.v ? null : d.v; UI.tbar = null; render(); },
+  twin(d) { UI.twin = d.v; UI.topen = null; UI.tbar = null; render(); },
+  tjump(d) { UI.topen = d.v; UI.tbar = null; render(); const el = document.getElementById(`tr-${d.v}`); if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' }); },
+  talso(d) { UI.tAlso = Object.assign({}, UI.tAlso || {}); UI.tAlso[d.v] = !UI.tAlso[d.v]; render(); },
   tbar(d) { UI.tbar = +d.i; render(); },
   tlong(d) { UI.tlong = d.v === '1'; UI.tbar = null; render(); },
 
@@ -5136,9 +5446,11 @@ const ACT = {
     };
     if (f) { const rd = new FileReader(); rd.onload = () => go(rd.result); rd.readAsText(f); } else go($('bk').value);
   },
-  bkcopy() { copyText($('bk').value, $('bk')); },
+  bkcopy() { copyText($('bk').value, $('bk'), () => bkMark('copy')); },
+  bkshare() { bkShare(); },
+  bklater() { S.bkSnooze = todayKey(); save(); render(); },
   bkdl() {
-    try { const blob = new Blob([JSON.stringify(S)], { type: 'application/json' }), a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `thirty-plants-backup-${todayKey()}.json`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
+    try { const blob = new Blob([JSON.stringify(S)], { type: 'application/json' }), a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `thirty-plants-backup-${todayKey()}.json`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); bkMark('file'); }
     catch (e) { toast('Download not available here; use Copy'); }
   },
   bkimport() {
@@ -5402,7 +5714,8 @@ function rvReport(st) {
 function rvSum() {
   const rows = rvReport(RV.st), cnt = s => rows.filter(r => r.st === s).length;
   const head = [[cnt('ok'), 'on track'], [cnt('mid'), 'close'], [cnt('off'), 'off track']].filter(x => x[0]).map(x => `${x[0]} ${x[1]}`).join(', ');
-  return `${rvHead('Your week', head ? `${head}.` : '')}${[...new Set(rows.map(r => r.grp))].map(g => `<section class="wsum rvsum"><div class="eyebrow">${g}</div>${rows.filter(r => r.grp === g).map(r => `<div class="rvsr">${stDot(r.st)}<span>${esc(r.n)}<span class="sr-only">: ${TR_ST[r.st]}</span></span><b>${esc(r.txt)}</b></div>`).join('')}</section>`).join('')}`;
+  const bk = `<section class="wsum rvbk"><div class="eyebrow">Backup</div><p class="bkline ${bkDue() ? 'due' : ''}">${ic(bkDue() ? 'warn' : 'check')}${esc(bkLine())}</p><button class="btn sm ${bkDue() ? 'primary' : ''}" data-a="bkshare">Back up now</button></section>`;
+  return `${rvHead('Your week', head ? `${head}.` : '')}${[...new Set(rows.map(r => r.grp))].map(g => `<section class="wsum rvsum"><div class="eyebrow">${g}</div>${rows.filter(r => r.grp === g).map(r => `<div class="rvsr">${stDot(r.st)}<span>${esc(r.n)}<span class="sr-only">: ${TR_ST[r.st]}</span></span><b>${esc(r.txt)}</b></div>`).join('')}</section>`).join('')}${bk}`;
 }
 
 function renderRV() {
@@ -5477,11 +5790,17 @@ Object.assign(ACT, {
   gapshow() { UI.gapAside = !UI.gapAside; render(); },
   ingchk(d) { SH.chk = SH.chk === d.i ? null : d.i; renderSheet(); },
   ingsave(d) {
-    const id = d.i, g = ING[id], v = {}; let changed = false;
+    const id = d.i, g = ING[id], v = {}; let changed = false, amtTxt = '';
+    const c = amtCtx(id), ae = $('ic-amt');
+    if (c && ae && ae.value.trim() !== '') {
+      const a = +ae.value;
+      if (isFinite(a) && a >= 0 && Math.abs(a - c.g * c.m) > 0.05) { const base = a / (c.m || 1); setAmt(c, Math.abs(base - c.def) < 0.01 ? null : +base.toFixed(2)); amtTxt = a ? `${+a.toFixed(1)}${g.ml ? 'ml' : 'g'} a portion` : 'left out'; }
+    }
     NUTL.forEach(([f]) => { const el = $(`ic-${f}`), x = el && el.value.trim() !== '' ? +el.value : g[f]; v[f] = isFinite(x) && x >= 0 ? x : g[f]; if (Math.abs(v[f] - g[f]) > 1e-9) changed = true; });
     if (changed) { const b = ING_BASE[id]; if (NUTL.every(([f]) => Math.abs(v[f] - b[f]) < 1e-9)) delete S.ingOver[id]; else S.ingOver[id] = v; applyStock(); }
-    S.ingChk[id] = todayKey(); SH.chk = null; save(); render(); renderSheet(); toast(changed ? `${shortN(id)}: now using your pack's figures` : `${shortN(id)} confirmed`);
+    S.ingChk[id] = todayKey(); SH.chk = null; save(); render(); renderSheet(); toast(amtTxt ? `${shortN(id)}: ${amtTxt}${changed ? ", with your pack's figures" : ''}` : changed ? `${shortN(id)}: now using your pack's figures` : `${shortN(id)} confirmed`);
   },
+  amtreset(d) { const c = amtCtx(d.i); if (c) setAmt(c, null); SH.chk = null; save(); render(); renderSheet(); toast(`${shortN(d.i)}: back to the recipe's amount`); },
   ingreset(d) { delete S.ingOver[d.i]; applyStock(); SH.chk = null; save(); render(); renderSheet(); toast(`${shortN(d.i)}: back to the app's figures`); },
   ingunchk(d) { delete S.ingChk[d.i]; SH.chk = null; save(); renderSheet(); },
   ingall(d) { const tk = todayKey(); d.v.split(',').forEach(id => { if (ING[id] && !S.ingChk[id] && !S.ingOver[id]) S.ingChk[id] = tk; }); SH.chk = null; save(); renderSheet(); toast('Nutrition confirmed'); },
