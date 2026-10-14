@@ -737,6 +737,10 @@ svg.inl.nk, .nk { color: var(--warn); }
 .btn.setrow > span { flex: 1; min-width: 0; display: grid; }
 .btn.setrow small { font-weight: 400; color: var(--muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .btn.setrow svg:last-child { color: var(--muted); }
+.btn.setrow.when { margin-top: 10px; align-items: flex-start; padding: 12px; }
+.btn.setrow.when small { white-space: normal; overflow: visible; line-height: 1.4; margin-top: 2px; }
+.btn.setrow.when > svg:first-child { margin-top: 2px; }
+.setdiff { margin: 6px 0 4px; font-weight: 700; line-height: 1.45; }
 .rhead { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
 .rhead .btn { padding-left: 4px; }
 .rhead h2 { margin: 0; font-family: var(--f-display); font-weight: 800; font-size: 22px; text-transform: uppercase; letter-spacing: .03em; }
@@ -943,6 +947,10 @@ body.rvon .scrim { z-index: 80; }
 .ichip.ok { border-color: var(--leaf); background: var(--leaf-soft); color: var(--leaf); }
 .ichip.own { border-color: var(--accent); color: var(--accent); }
 .ichip[aria-expanded="true"] { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ichip.out { border-color: var(--warn); color: var(--warn); min-height: 30px; padding: 2px 10px; }
+.omline { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.omline .btn { flex: none; }
+.callout.omit .btnrow { margin-top: 6px; }
 .ilist.ik .ipanel { display: grid; gap: 8px; padding: 10px; margin: 0 0 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; }
 .ipf { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .ipf label { display: grid; gap: 3px; font-size: 12px; font-weight: 700; color: var(--muted); }
@@ -1036,6 +1044,10 @@ h1, h2, h3 { overflow-wrap: anywhere; }
 .alsobody { display: grid; gap: 10px; padding: 0 12px 14px 14px; }
 .seg.trwin { margin-top: 12px; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-flow: row; }
 .seg.trwin button { min-height: 44px; padding: 6px 4px; font-size: 14px; line-height: 1.15; }
+/* amounts beside the method step that first names each ingredient */
+.stepamt { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0 2px; }
+.samt { display: inline-block; padding: 3px 8px; border-radius: 8px; background: var(--surface-2); color: var(--ink); font-size: 13px; font-weight: 400; line-height: 1.35; }
+.samt b { font-weight: 700; margin-right: 3px; }
 
 </style>
 </head>
@@ -1060,7 +1072,7 @@ h1, h2, h3 { overflow-wrap: anywhere; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '2.5.0';</script>
+<script>window.TP_VERSION = '2.9.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -2289,10 +2301,13 @@ function subOptions(orig) {
   if (!list.some(o => o.key === 'omit') && g && (g.a === 'spices' || AUTO_OMIT.has(orig))) list.push({ key: 'omit', to: [], note: 'Leave it out', no: [] });
   return list;
 }
+// leaving an ingredient out works for any ingredient, not only the ones with a listed substitute
+const OMIT_OPT = { key: 'omit', to: [], note: 'Leave it out', no: [] };
+const subOpt = (orig, key) => (key === 'omit' ? OMIT_OPT : subOptions(orig).find(o => o.key === key));
 const shortN = id => ING[id].n.replace(/\s*\([^)]*\)/g, '').replace(/,.*$/, '');
 // this week's ingredient swaps in a dish, as short lines for the method and prep screens
 function swapList(r) {
-  return Object.entries(r.swapped || {}).map(([orig, key]) => ({ orig, key, opt: subOptions(orig).find(q => q.key === key) }))
+  return Object.entries(r.swapped || {}).map(([orig, key]) => ({ orig, key, opt: subOpt(orig, key) }))
     .filter(x => x.opt && (r.items.some(it => it.from === x.orig) || (x.key === 'omit' && !r.items.some(i2 => i2.i === x.orig))))
     .map(x => ({ orig: x.orig, text: x.key === 'omit' ? `Leave out the ${shortN(x.orig).toLowerCase()}` : `${subLabel(x.opt)} instead of ${shortN(x.orig).toLowerCase()}` }));
 }
@@ -2302,6 +2317,34 @@ function stepMentions(text, orig) {
   const words = shortN(orig).toLowerCase().split(/[^a-zà-ÿ]+/).filter(w => w.length >= 3 && !SW_STOP.has(w));
   return words.some(w => new RegExp(`\\b${w.replace(/(es|s)$/, '')}(e?s)?\\b`, 'i').test(text));
 }
+// which ingredients a method step names: its full short name, a word no other ingredient in the dish shares,
+// a shared last word ("the peppers") when no fuller name is used, or "the spices" / "the veg" for those groups
+const STEP_NOT_VEG = /garlic|ginger|chilli|lemon|lime|parsley|coriander|mint|basil|dill|chive|rosemary|thyme|oregano|sage|apple|banana|pear|orange|clementine|kiwi|grape|mango|berr|cherr|plum|peach|melon|pomegranate/;
+const wordForms = w => { const b = new Set([w, w.replace(/es$/, ''), w.replace(/s$/, '')]); if (/[^aeiou]y$/.test(w)) b.add(w.slice(0, -1) + 'ies'); if (/ies$/.test(w)) b.add(w.slice(0, -3) + 'y'); return [...b].filter(x => x.length >= 3); };
+function stepIngs(r, text) {
+  const ids = [...new Set(r.items.map(it => it.i))], t = text.toLowerCase(), words = {}, count = {};
+  ids.forEach(id => { words[id] = [...new Set(shortN(id).toLowerCase().split(/[^a-zà-ÿ]+/).filter(w => w.length >= 3 && !SW_STOP.has(w)))]; words[id].forEach(w => { count[w] = (count[w] || 0) + 1; }); });
+  const hit = w => new RegExp(`\\b(${wordForms(w).join('|')})(e?s)?\\b`, 'i').test(text);
+  const full = id => shortN(id).toLowerCase(), head = id => words[id][words[id].length - 1];
+  const spices = /\bspices\b|\bspice mix\b/.test(t), veg = /\bveg\b|\bvegetables\b|\bveggies\b/.test(t);
+  return ids.filter(id => {
+    const g = ING[id];
+    if (full(id).length >= 3 && t.includes(full(id))) return true;
+    if (words[id].some(w => count[w] === 1 && hit(w))) return true;
+    const h = head(id);
+    if (h && count[h] > 1 && g.a !== 'spices' && hit(h) && !ids.some(o => o !== id && head(o) === h && t.includes(full(o)))) return true;
+    if (spices && g.a === 'spices' && id !== 'losalt') return true;
+    if (veg && g.a === 'veg' && !STEP_NOT_VEG.test(id) && g.pl.some(x => PLANTS[x] && PLANTS[x][1] >= 1)) return true;
+    return false;
+  });
+}
+// amounts go with the first step that names each ingredient
+function amtPlan(r, texts) { const seen = new Set(); return texts.map(t => stepIngs(r, t).filter(id => !seen.has(id) && seen.add(id))); }
+function amtChips(ids, gOf) {
+  const out = (ids || []).map(id => { const g = gOf(id); if (!(g > 0)) return ''; const q = fmtQ(id, g), w = /\d(k?g|ml)\b|litres/.test(q) ? '' : ` (${ING[id].ml ? fmtMl(g) : fmtG(g)})`; const nm = shortN(id), u = ING[id].u, same = u && nm.toLowerCase().replace(/s$/, '') === u.toLowerCase(); return `<span class="samt">${same ? `<b>${esc(q)}</b>${w}` : `<b>${esc(nm)}</b> ${esc(q)}${w}`}</span>`; }).join('');
+  return out ? `<span class="stepamt">${out}</span>` : '';
+}
+const itemTotals = (r, mult) => { const t = {}; r.items.forEach(it => { t[it.i] = (t[it.i] || 0) + it.g * mult; }); return t; };
 const swapNotes = (r, text) => swapList(r).filter(x => stepMentions(text, x.orig)).map(x => `<p class="swapin">${ic('swap')}<span>${esc(x.text)}</span></p>`).join('');
 const subLabel = o => o.key === 'omit' ? 'Leave it out' : o.to.length > 1 ? o.note.split(/[;,]/)[0] : shortN(o.to[0][0]);
 const AMT = '@g:';
@@ -2309,7 +2352,7 @@ const isAmt = k => k.slice(0, 3) === AMT;
 function buildVariant(base, sw) {
   const merged = new Map();
   base.items.forEach(it => {
-    const key = sw[it.i], opt = key && subOptions(it.i).find(o => o.key === key);
+    const key = sw[it.i], opt = key && subOpt(it.i, key);
     if (!opt) { const m0 = merged.get(it.i); if (m0) m0.g += it.g; else merged.set(it.i, { i: it.i, g: it.g }); return; }
     opt.to.forEach(([id, q]) => { const m0 = merged.get(id); if (m0) { m0.g += it.g * q; m0.from = m0.from || it.i; } else merged.set(id, { i: id, g: it.g * q, from: it.i }); });
   });
@@ -2395,6 +2438,62 @@ function dayList(ks) {
 const KEY = 'thirtyplants.v1';
 const DEF = { target: 2000, latteK: 150, latteP: 11, latteMl: 300, latteOn: true, bud: { b: 200, l: 575, s: 150, d: 700, p: 225 }, prepSnacks: false, plantGoal: 30, colourGoal: 5, oilyGoal: 2, redMax: 1, protGoal: 120, fibreGoal: 30, fsMax: 30, naMax: 2.4, sfMax: 20, loSalt: 0, stock: 'reg', sleepGoal: 7.5, weekendBatch: false, adapt: true, weekStart: 0, drinkMode: 'spread', usualDrink: 'lager', dinnerOutK: 900 };
 const OLD_BUD = { b: 175, l: 525, s: 125, d: 625, p: 200 };
+/* settings that belong to the days they were in force: portions and goals. A change starts on a chosen day and every
+   day before it keeps what it had. S.setPast holds the earlier values, each in force until the day it names. */
+const DATED = ['target', 'latteOn', 'latteK', 'latteP', 'latteMl', 'bud', 'loSalt', 'protGoal', 'fibreGoal', 'fsMax', 'naMax', 'sfMax', 'plantGoal', 'colourGoal', 'oilyGoal', 'redMax', 'sleepGoal'];
+const PORTION_KEYS = ['target', 'latteOn', 'latteK', 'bud'];
+let SETC = {};
+function setAt(k) {
+  const p = S.setPast && S.setPast.length ? S.setPast.find(x => x.until > k) : null;
+  if (!p) return S.set;
+  return SETC[p.until] || (SETC[p.until] = Object.assign({}, S.set, p.v, { bud: Object.assign({}, S.set.bud, p.v.bud || {}) }));
+}
+const datedOf = st => DATED.reduce((o, f) => { o[f] = f === 'bud' ? Object.assign({}, st.bud) : st[f]; return o; }, {});
+const sameVal = (a, b, f) => (f === 'bud' ? SLOTS.every(s => a.bud[s] === b.bud[s]) : a[f] === b[f]);
+const datedSame = (a, b) => DATED.every(f => sameVal(a, b, f));
+// new values in force from day `from`; the days before it keep whatever they had
+function setFrom(from, vals) {
+  const before = datedOf(setAt(addDays(from, -1)));
+  S.setPast = (S.setPast || []).filter(x => x.until <= from);
+  if (!S.setPast.some(x => x.until === from)) S.setPast.push({ until: from, v: before });
+  Object.assign(S.set, vals, { bud: Object.assign({}, vals.bud || S.set.bud) });
+  // a step that changes nothing (a change put back, say) is merged into the one after it
+  const L = S.setPast.sort((a, b) => (a.until < b.until ? -1 : 1));
+  for (let i = L.length - 1; i >= 0; i--) { const next = i + 1 < L.length ? L[i + 1].v : datedOf(S.set); if (datedSame(Object.assign(datedOf(S.set), L[i].v), Object.assign(datedOf(S.set), next))) L.splice(i, 1); }
+  SETC = {};
+}
+// a batch meal counts as cooked once its prep day has passed or its prep has been started
+function batchCooked(k, s) {
+  const st = startOf(k), se = sessions(st, weekMode(st)).find(x => sessDays(x, s).includes(k));
+  if (!se) return false;
+  return se.date < todayKey() || Object.keys(peekPrep(st, se.key).done || {}).length > 0;
+}
+// the next day a saved change comes into force, if one is waiting
+const setNext = () => { const p = (S.setPast || []).find(x => x.until > todayKey()); return p ? p.until : null; };
+const SET_LAB = { target: ['Calories', v => fmtN(v)], latteOn: ['Latte', v => (v ? 'on' : 'off')], latteK: ['Latte kcal', v => fmtN(v)], latteP: ['Latte protein', v => `${v}g`], latteMl: ['Latte milk', v => `${v} ml`], loSalt: ['LoSalt at the table', v => (v ? fmtLo(v) : 'none')], protGoal: ['Protein', v => `${v}g`], fibreGoal: ['Fibre', v => `${v}g`], fsMax: ['Added sugar', v => `${v}g`], naMax: ['Sodium', v => `${v}g`], sfMax: ['Sat fat', v => `${v}g`], plantGoal: ['Plant points', v => `${v}`], colourGoal: ['Colour groups', v => `${v}`], oilyGoal: ['Oily fish', v => `${v}`], redMax: ['Red meat', v => `${v}`], sleepGoal: ['Sleep', v => `${v} h`] };
+// what a change does, as "Lunch 575 → 475"
+function setDiff(a, b) {
+  const out = [];
+  DATED.forEach(f => {
+    if (f === 'bud') { SLOTS.forEach(sl => { if (a.bud[sl] !== b.bud[sl]) out.push(`${SLOTNAME[sl]} ${fmtN(a.bud[sl])} → ${fmtN(b.bud[sl])}`); }); return; }
+    if (a[f] !== b[f]) { const [n, fm] = SET_LAB[f]; out.push(`${n} ${fm(a[f])} → ${fm(b[f])}`); }
+  });
+  return out;
+}
+// batch portions already cooked from `from` on: counted, and when `keep` is set, held at their size through a change
+function cookedFrom(from, keep) {
+  const n = {};
+  for (let i = 0; i < 14; i++) {
+    const k = addDays(from, i), d = S.days[k]; if (!d) continue;
+    const c = dayCalc(k);
+    SLOTS.forEach(s => {
+      const o = c.slots[s]; if (o.kind !== 'recipe' || o.done || o.packed || !o.prepped || !batchCooked(k, s)) return;
+      n[s] = (n[s] || 0) + 1;
+      if (keep) (d.fz = d.fz || {})[s] = { r: d.sl[s], m: +o.m.toFixed(3) };
+    });
+  }
+  return n;
+}
 // check items that share a group count as one habit: a yes to any of them is a yes for the day
 const CK_DEF = () => [{ id: 'rinse', n: 'Nasal rinse this morning', g: 'rinse' }, { id: 'rinsepm', n: 'Nasal rinse last night', g: 'rinse' }, { id: 'steroid', n: 'Steroid spray last night' }, { id: 'skin', n: 'Skincare last night' }, { id: 'vitd', n: 'Vitamin D yesterday' }];
 const CK_GROUPS = { rinse: 'Nasal rinse' };
@@ -2410,6 +2509,8 @@ function mendDay(d) {
   d.x.forEach(x => { x.n = typeof x.n === 'string' && x.n ? x.n : 'Extra'; ['k', 'p'].forEach(f => { x[f] = Number.isFinite(+x[f]) ? +x[f] : 0; }); x.pl = (Array.isArray(x.pl) ? x.pl : []).filter(p => PLANTS[p]); });
   if (d.t !== null && d.t !== undefined && !(+d.t > 0)) d.t = null;
   if (d.out !== undefined && !isObj(d.out)) delete d.out;
+  if (d.sw !== undefined) { if (!isObj(d.sw)) delete d.sw; else { Object.keys(d.sw).forEach(s => { const z = d.sw[s]; if (!isObj(z) || typeof z.r !== 'string' || z.r !== d.sl[s] || !isObj(z.sw)) { delete d.sw[s]; return; } Object.keys(z.sw).forEach(i => { if (z.sw[i] !== 'omit' || !ING[i]) delete z.sw[i]; }); if (!Object.keys(z.sw).length) delete d.sw[s]; }); if (!Object.keys(d.sw).length) delete d.sw; } }
+  if (d.fz !== undefined) { if (!isObj(d.fz)) delete d.fz; else { Object.keys(d.fz).forEach(s => { const z = d.fz[s]; if (!isObj(z) || typeof z.r !== 'string' || !(+z.m > 0)) delete d.fz[s]; else z.m = +z.m; }); if (!Object.keys(d.fz).length) delete d.fz; } }
   return d;
 }
 function normalise(s) {
@@ -2457,6 +2558,19 @@ function normalise(s) {
   s.ingPast = isObj(s.ingPast) ? s.ingPast : {}; // the figures earlier weeks used, before a label change
   Object.keys(s.ingPast).forEach(id => { const l = Array.isArray(s.ingPast[id]) ? s.ingPast[id].filter(x => isObj(x) && DAY_KEY.test(x.until || '') && (x.v === null || isObj(x.v))) : []; if (l.length) s.ingPast[id] = l.sort((a, b) => (a.until < b.until ? -1 : 1)); else delete s.ingPast[id]; });
   s.gapsOk = s.gapsOk && typeof s.gapsOk === 'object' ? s.gapsOk : {};
+  // portions and goals as they were before a change, each in force until the day it names
+  const seen = new Set();
+  s.setPast = (Array.isArray(s.setPast) ? s.setPast : []).filter(x => isObj(x) && DAY_KEY.test(x.until || '') && isObj(x.v) && !seen.has(x.until) && seen.add(x.until)).sort((a, b) => (a.until < b.until ? -1 : 1));
+  s.setPast.forEach(x => {
+    const v = {};
+    DATED.forEach(f => {
+      const y = x.v[f];
+      if (f === 'bud') { if (isObj(y)) { v.bud = {}; SLOTS.forEach(sl => { v.bud[sl] = Number.isFinite(+y[sl]) && +y[sl] >= 0 ? +y[sl] : s.set.bud[sl]; }); } }
+      else if (f === 'latteOn') { if (typeof y === 'boolean') v.latteOn = y; }
+      else if (y !== null && y !== '' && typeof y !== 'boolean' && Number.isFinite(+y) && +y >= 0) v[f] = +y;
+    });
+    x.v = v;
+  });
   if (s.bk !== undefined && !(isObj(s.bk) && DAY_KEY.test(s.bk.at || ''))) delete s.bk; // when you last backed up // things marked as not recorded, off the still-to-fill-in list
   s.hist = Object.assign({ d: {}, w: {}, wc: {} }, isObj(s.hist) ? s.hist : {}); // food history brought in from the old tracker
   ['d', 'w', 'wc', 'notes'].forEach(f => { if (s.hist[f] !== undefined && !isObj(s.hist[f])) s.hist[f] = {}; });
@@ -2474,7 +2588,7 @@ function normalise(s) {
   return s;
 }
 function load() { let s = null; try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) { s = null; } return normalise(s); }
-function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } }
+function save() { SETC = {}; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } }
 let S = load();
 // the stock you buy changes the sodium in every recipe that uses it
 const STOCKS = { reg: ['Stock (from cube or pot)', 0.8, 'Regular'], red: ['Reduced-salt stock (cube or pot)', 0.45, 'Reduced salt'], low: ['Very low salt stock cubes', 0.1, 'Very low salt'] };
@@ -2531,6 +2645,9 @@ try { const m = localStorage.getItem('tp.mode'); if (m === 'weight') UI.mode = m
 
 const emptyDay = () => ({ sl: {}, cu: {}, t: null, done: {}, x: [] });
 const D = k => S.days[k] || (S.days[k] = emptyDay());
+// ingredients left out of one meal (d.sw[slot] = { r: recipe, sw: { ingredient: 'omit' } }), on top of the week's swaps
+const dayOmits = (d, s) => (d.sw && d.sw[s] && d.sw[s].r === d.sl[s] ? d.sw[s].sw : null);
+const weekSw = (st, rid) => { const w = S.weeks[st]; return (w && w.swaps && w.swaps[rid]) || {}; };
 const peekD = k => S.days[k] || emptyDay();
 const W = st => S.weeks[st] || (S.weeks[st] = { mode: 'auto', shop: {} });
 
@@ -2585,7 +2702,7 @@ function drinkShare(k) {
     if (o.units === undefined) add(drinkK(o), o.from);
     else { const pk = drinkPlanK(o); add(pk, o.from); add(drinkK(o) - pk, o.unitsFrom || o.from); }
   });
-  return Math.max(0, Math.min(s, (peekD(k).t || S.set.target) * SHARE_CAP));
+  return Math.max(0, Math.min(s, (peekD(k).t || setAt(k).target) * SHARE_CAP));
 }
 const SHARE_CAP = 0.25; // never take more than a quarter of a day's food for drinks
 
@@ -2596,7 +2713,7 @@ const isBatchLunchDay = k => dayIndex(k) < 5 || S.set.weekendBatch;
 const prepped = (k, s, r) => !!(r && ((r.prep && (s === 'b' || (s === 'l' && isBatchLunchDay(k)))) || (s === 's' && S.set.prepSnacks && isBatchLunchDay(k) && packable(r))));
 
 function dayCalc(k) {
-  const d = peekD(k), st = S.set;
+  const d = peekD(k), st = setAt(k);
   const night = outOf(d), dK = drinkK(night);
   const spread = st.drinkMode === 'spread', share = spread ? drinkShare(k) : 0;
   // spread: the day's total includes its own drinks, less its share of the week's; on the night: drinks come out of the day's total
@@ -2613,11 +2730,13 @@ function dayCalc(k) {
     else if (v === '@c') { const c = d.cu[s] || { n: 'Something else', k: 0, p: 0 }; o.kind = 'custom'; o.c = c; o.k = +c.k || 0; o.p = +c.p || 0; o.f = +c.f || 0; o.na = +c.na || 0; o.fs = +c.fs || 0; o.sf = +c.sf || 0; fixed += o.k; }
     else if (R[v]) {
       // eaten meals and packed boxes keep the recipe (swaps included) and portion they had at the time
-      const dn = d.done[s], pk = d.pk && d.pk[s] && d.pk[s].r === v ? d.pk[s] : null;
-      const r = atEra(dn && dn.sw ? variant(R[v], dn.sw) : pk ? variant(R[v], pk.sw) : eff(R[v], startOf(k)), k);
+      const dn = d.done[s], pk = d.pk && d.pk[s] && d.pk[s].r === v ? d.pk[s] : null, fz = !pk && d.fz && d.fz[s] && d.fz[s].r === v ? d.fz[s] : null;
+      const own = !(dn && dn.sw) && !pk ? dayOmits(d, s) : null;
+      const r = atEra(dn && dn.sw ? variant(R[v], dn.sw) : pk ? variant(R[v], pk.sw) : own ? variant(R[v], Object.assign({}, weekSw(startOf(k), v), own)) : eff(R[v], startOf(k)), k);
       o.kind = 'recipe'; o.r = r; o.prepped = prepped(k, s, r); o.packed = !!pk;
       if (o.done && dn.m) { o.m = dn.m; fixed += r.k * o.m; }
       else if (pk) { o.m = pk.m; fixed += r.k * o.m; }
+      else if (fz && o.prepped) { o.m = fz.m; o.kept = true; fixed += r.k * o.m; } // cooked before a change of portions
       else if (o.prepped || !st.adapt) { o.m = portionM(r, o.base / r.k); fixed += r.k * o.m; }
       else flex.push(o);
     } else o.kind = 'empty';
@@ -2660,7 +2779,7 @@ function weekCalc(st) {
     if (c.fermPlan) fermDays++;
     if (c.fermEat) fermEatDays++;
     c.colours.forEach(x => cols.add(x));
-    if (c.hasPlan) { k += c.planK; p += c.planP; fb += c.planF; na += c.planNa; fs += c.planFS; sf += c.planSF; n++; if (c.planNa > S.set.naMax + 0.05) naOver++; if (c.planFS > S.set.fsMax + 0.5) fsOver++; if (c.planSF > S.set.sfMax + 0.5) sfOver++; }
+    if (c.hasPlan) { k += c.planK; p += c.planP; fb += c.planF; na += c.planNa; fs += c.planFS; sf += c.planSF; n++; const ss = setAt(c.k); if (c.planNa > ss.naMax + 0.05) naOver++; if (c.planFS > ss.fsMax + 0.5) fsOver++; if (c.planSF > ss.sfMax + 0.5) sfOver++; }
   });
   const drinks = dc.reduce((a, c) => a + c.dK, 0), nights = dc.filter(c => c.night).length;
   return { days, dc, plan, eat, ptsPlan: ptsOf(plan), ptsEat: ptsOf(eat), oilyP, oilyE, redP, redE, fermDays, fermEatDays, cols, avgK: n ? k / n : 0, avgP: n ? p / n : 0, avgF: n ? fb / n : 0, avgNa: n ? na / n : 0, avgFS: n ? fs / n : 0, avgSF: n ? sf / n : 0, naOver, fsOver, sfOver, planned: n, drinks, nights };
@@ -2749,18 +2868,19 @@ function carryInto(st) {
 // planner: how many packs' worth of perishables a candidate week would leave unused
 function wasteOf(c, carry) {
   const sc = slotScale(), use = {};
-  c.forEach(sl => SLOTS.forEach(s => { const r = R[sl[s]]; if (!r) return; const m = clampM(S.set.bud[s] * sc / r.k); r.items.forEach(it => { if (PACK[it.i]) use[it.i] = (use[it.i] || 0) + it.g * m; }); }));
+  c.forEach(sl => SLOTS.forEach(s => { const r = R[sl[s]]; if (!r) return; const m = clampM(PS().bud[s] * sc / r.k); r.items.forEach(it => { if (PACK[it.i]) use[it.i] = (use[it.i] || 0) + it.g * m; }); }));
   return Object.entries(spareFrom(use, carry)).reduce((a, [i, g]) => a + g / PACK[i] * wasteW(i), 0);
 }
 
 /* ───────────── auto planner ───────────── */
+let PSET = null; const PS = () => PSET || S.set; // the portions and goals of the week being planned
 const pool = (slot, pred) => { const all = RL.filter(r => r.slots.includes(slot) && !r.treat && (!pred || pred(r))), ok = all.filter(r => !S.nope[r.id]); return ok.length ? ok : all; };
 function argmax(arr, f) { let best = null, bv = -Infinity; for (const x of arr) { const v = f(x); if (v > bv) { bv = v; best = x; } } return best; }
 const feasible = (r, offs) => offs.every(o => storageFor(r, o) !== 'over');
-function slotScale() { const st = S.set; return (st.target - (st.latteOn ? st.latteK : 0)) / SLOTS.reduce((a, s) => a + st.bud[s], 0); }
-function estFibre(sl) { const st = S.set, sc = slotScale(); let f = 0; for (const s of SLOTS) { const r = R[sl[s]]; if (r) f += r.f * clampM(st.bud[s] * sc / r.k); } return f; }
-function estNaFs(sl) { const st = S.set, sc = slotScale(); let na = st.latteOn ? st.latteMl * ING.milk.sa / 250 : 0, fs = 0, sf = st.latteOn ? st.latteMl * ING.milk.sf / 100 : 0, any = false; for (const s of SLOTS) { const r = R[sl[s]]; if (r) { const m = clampM(st.bud[s] * sc / r.k); na += r.na * m; fs += r.fs * m; sf += r.sf * m; any = true; } } if (any) na += (+st.loSalt || 0) * TSP_SALT * LOSALT_NA / 100; return [na, fs, sf]; }
-function estProtein(sl) { const st = S.set, sc = slotScale(); let p = st.latteOn ? st.latteP : 0; for (const s of SLOTS) { const r = R[sl[s]]; if (r) p += r.p * clampM(st.bud[s] * sc / r.k); } return p; }
+function slotScale() { const st = PS(); return (st.target - (st.latteOn ? st.latteK : 0)) / SLOTS.reduce((a, s) => a + st.bud[s], 0); }
+function estFibre(sl) { const st = PS(), sc = slotScale(); let f = 0; for (const s of SLOTS) { const r = R[sl[s]]; if (r) f += r.f * clampM(st.bud[s] * sc / r.k); } return f; }
+function estNaFs(sl) { const st = PS(), sc = slotScale(); let na = st.latteOn ? st.latteMl * ING.milk.sa / 250 : 0, fs = 0, sf = st.latteOn ? st.latteMl * ING.milk.sf / 100 : 0, any = false; for (const s of SLOTS) { const r = R[sl[s]]; if (r) { const m = clampM(st.bud[s] * sc / r.k); na += r.na * m; fs += r.fs * m; sf += r.sf * m; any = true; } } if (any) na += (+st.loSalt || 0) * TSP_SALT * LOSALT_NA / 100; return [na, fs, sf]; }
+function estProtein(sl) { const st = PS(), sc = slotScale(); let p = st.latteOn ? st.latteP : 0; for (const s of SLOTS) { const r = R[sl[s]]; if (r) p += r.p * clampM(st.bud[s] * sc / r.k); } return p; }
 
 function candidate(st, days, prefs, carry) {
   prefs = prefs || {}; carry = carry || {};
@@ -2808,7 +2928,7 @@ function candidate(st, days, prefs, carry) {
   const redSoFar = () => cur.reduce((a, sl) => a + Object.values(sl).filter(v => R[v] && R[v].red).length, 0);
   days.forEach((k, i) => {
     if (cur[i].l) return;
-    const redOk = redSoFar() < S.set.redMax;
+    const redOk = redSoFar() < PS().redMax;
     let opts = pool('l', r => (!r.prep || (r.slots.includes('d') && r.t <= 30)) && !used.has(r.id) && (redOk || !r.red));
     if (!opts.length) opts = pool('l', r => !r.prep);
     const r = argmax(opts, x => gain(x) + fav(x) + Math.random() * 5 - Math.max(0, x.na - 0.8) * 4);
@@ -2825,11 +2945,11 @@ function candidate(st, days, prefs, carry) {
   pd.filter(id => !R[id].oily && !R[id].red).forEach(id => { const i = order.find(x => !cur[x].d); if (i !== undefined) place(id, i); });
   let oily = 0, red = 0;
   cur.forEach(sl => Object.values(sl).forEach(v => { const r = R[v]; if (r && r.oily) oily++; if (r && r.red) red++; }));
-  let redLeft = red < S.set.redMax && Math.random() < 0.75;
+  let redLeft = red < PS().redMax && Math.random() < 0.75;
   for (const i of order) {
     if (cur[i].d) continue;
     let want = 'other';
-    if (oily < S.set.oilyGoal) want = 'oily'; else if (redLeft && weekend(i)) want = 'red';
+    if (oily < PS().oilyGoal) want = 'oily'; else if (redLeft && weekend(i)) want = 'red';
     const nb = [cur[i - 1] && R[cur[i - 1].d], cur[i + 1] && R[cur[i + 1].d]].filter(Boolean).map(r => r.c);
     const okType = r => want === 'oily' ? r.oily : want === 'red' ? r.red : (!r.oily && !r.red);
     let opts = pool('d', r => !used.has(r.id) && okType(r));
@@ -2875,8 +2995,8 @@ function candidate(st, days, prefs, carry) {
   for (let i = 0; i < 7; i++) {
     if (cur[i].s) continue;
     const fermNow = ['b', 'l', 'd', 'p'].some(s => { const r = R[cur[i][s]]; return r && r.fermBase; });
-    const need = S.set.protGoal - estProtein(cur[i]);
-    const se = S.set.prepSnacks && isBatchLunchDay(days[i]) ? sess.find(x => x.lunch.includes(days[i])) : null, off = se ? daysBetween(se.date, days[i]) : 0;
+    const need = PS().protGoal - estProtein(cur[i]);
+    const se = PS().prepSnacks && isBatchLunchDay(days[i]) ? sess.find(x => x.lunch.includes(days[i])) : null, off = se ? daysBetween(se.date, days[i]) : 0;
     const ok0 = r => (snackN[r.id] || 0) < (ps.length || se ? 3 : 2) && (fermNow || r.fermBase);
     const ok = se ? r => ok0(r) && packable(r) && SNACKPACK[r.id][0] >= off : ok0;
     let opts = ps.map(id => R[id]).filter(ok);
@@ -2885,7 +3005,7 @@ function candidate(st, days, prefs, carry) {
     if (!opts.length) opts = pool('s');
     // packed snacks: repeating one already in this session's batch keeps prep short
     const inBatch = x => !!(se && snackSess[se.key] && snackSess[se.key].has(x.id));
-    const r = argmax(opts, x => gain(x) * 1.5 + fav(x) + Math.random() * 3 + (need > 0 ? Math.min(need, x.p * clampM(S.set.bud.s * sc / x.k)) * 0.5 : 0) + (inBatch(x) ? 3 : 0));
+    const r = argmax(opts, x => gain(x) * 1.5 + fav(x) + Math.random() * 3 + (need > 0 ? Math.min(need, x.p * clampM(PS().bud.s * sc / x.k)) * 0.5 : 0) + (inBatch(x) ? 3 : 0));
     cur[i].s = r.id; snackN[r.id] = (snackN[r.id] || 0) + 1; addPlants(r);
     if (se) (snackSess[se.key] = snackSess[se.key] || new Set()).add(r.id);
   }
@@ -2894,20 +3014,24 @@ function candidate(st, days, prefs, carry) {
 function scoreCand(c, carry) {
   const pl = new Set(), cols = new Set(); let ferm = 0, oily = 0, short = 0, over = 0;
   c.forEach(sl => {
-    short += Math.max(0, S.set.protGoal - estProtein(sl)) + Math.max(0, S.set.fibreGoal - estFibre(sl)) * 2;
-    const [na, fs, sf] = estNaFs(sl); over += Math.max(0, na - S.set.naMax) * 8 + Math.max(0, fs - S.set.fsMax) * 0.5 + Math.max(0, sf - S.set.sfMax) * 1.2;
+    short += Math.max(0, PS().protGoal - estProtein(sl)) + Math.max(0, PS().fibreGoal - estFibre(sl)) * 2;
+    const [na, fs, sf] = estNaFs(sl); over += Math.max(0, na - PS().naMax) * 8 + Math.max(0, fs - PS().fsMax) * 0.5 + Math.max(0, sf - PS().sfMax) * 1.2;
     let f = false;
     Object.values(sl).forEach(v => { const r = R[v]; if (!r) return; r.plants.forEach(x => { pl.add(x); if (PLANTS[x][2]) cols.add(CG(PLANTS[x][2])); }); if (r.fermBase) f = true; if (r.oily) oily++; });
     if (f) ferm++;
   });
-  return Math.min(ptsOf(pl), 45) + ferm * 2 + Math.min(cols.size, S.set.colourGoal) * 3 + Math.min(oily, S.set.oilyGoal) * 3 - short * 0.25 - over - wasteOf(c, carry) * 2 + Math.random();
+  return Math.min(ptsOf(pl), 45) + ferm * 2 + Math.min(cols.size, PS().colourGoal) * 3 + Math.min(oily, PS().oilyGoal) * 3 - short * 0.25 - over - wasteOf(c, carry) * 2 + Math.random();
 }
 function planWeek(st, replan, prefs) {
+  const tk = todayKey(); PSET = setAt(tk > st && tk <= addDays(st, 6) ? tk : st);
+  try { planWeek0(st, replan, prefs); } finally { PSET = null; }
+}
+function planWeek0(st, replan, prefs) {
   const days = weekDays(st);
   if (replan) days.forEach(k => {
     const d = D(k), o = outOf(d); delete d.reloc; if (d.outPrev) delete d.outPrev.d;
     // keep eaten meals, your own entries, skipped puddings on nights out, and boxes already packed
-    SLOTS.forEach(s => { if (d.done[s] || d.sl[s] === '@c' || (d.pk && d.pk[s] && d.pk[s].r === d.sl[s]) || (s === 'p' && d.sl[s] === '@skip' && o && o.skipPud)) return; delete d.sl[s]; });
+    SLOTS.forEach(s => { if (d.done[s] || d.sl[s] === '@c' || (d.pk && d.pk[s] && d.pk[s].r === d.sl[s]) || (s === 'p' && d.sl[s] === '@skip' && o && o.skipPud)) return; delete d.sl[s]; if (d.sw) delete d.sw[s]; });
   });
   // days set to have no snack or no pudding keep that through any re-plan
   days.forEach(k => { const d = S.days[k]; if (!d) return; if (d.noS && !d.sl.s) d.sl.s = '@skip'; if (d.noP && !d.sl.p) d.sl.p = '@skip'; });
@@ -3148,7 +3272,7 @@ function emptyBlock(msg) {
 }
 
 function vToday() {
-  const k = UI.day, st = startOf(k), c = dayCalc(k), wc = weekCalc(st), tk = todayKey(), d = peekD(k), set = S.set, pg = set.protGoal;
+  const k = UI.day, st = startOf(k), c = dayCalc(k), wc = weekCalc(st), tk = todayKey(), d = peekD(k), set = setAt(k), pg = set.protGoal;
   const strip = weekDays(st).map((dd, i) => `<button data-a="day" data-v="${dd}" aria-pressed="${dd === k}" class="${dd === tk ? 'today' : ''}" aria-label="${DOWL[dayIndex(dd)]} ${parse(dd).getDate()}"><span class="dw">${DOW[dayIndex(dd)].slice(0, 2)}</span><span class="dn">${parse(dd).getDate()}</span><span class="dots">${GROUPS.filter(x => wc.dc[i].colours.has(x)).map(x => `<i class="c-${x}"></i>`).join('')}</span></button>`).join('');
   if (!c.hasPlan) return `${weekNav(st)}<div class="strip">${strip}</div>${emptyBlock(`Nothing planned for ${fmtDay(k)} yet.`)}`;
   const rem = c.T - c.eatK;
@@ -3237,7 +3361,7 @@ function mealRow(o) {
 
 function vWeek() { return vWeekPlan(); }
 function vWeekPlan() {
-  const st = UI.week, wc = weekCalc(st), tk = todayKey(), g = S.set.plantGoal, set = S.set;
+  const st = UI.week, wc = weekCalc(st), tk = todayKey(), set = setAt(st), g = set.plantGoal;
   const actions = `<div class="wkactions"><button class="btn primary" data-a="wizard">${ic('wand')}Set up week</button><button class="btn" data-a="weekmenu" aria-label="More week options">${ic('dots')}</button></div>`;
   if (!wc.planned) return `${weekNav(st)}${actions}${emptyBlock(`Nothing planned for ${fmtRange(st)} yet.`)}`;
   const more = UI.weekMore ? (() => {
@@ -3334,9 +3458,10 @@ function weekColours(st) {
 }
 // days this week's plan misses a daily target (protein, fibre) or goes over a limit (sodium, sugar, sat fat)
 function weekMisses(id, st) {
-  const cur = st || startOf(todayKey()), set = S.set; let miss = 0, n = 0;
+  const cur = st || startOf(todayKey()); let miss = 0, n = 0;
   weekDays(cur).forEach(k => {
     const c = dcc(k); if (!c || !c.hasPlan) return; n++;
+    const set = setAt(k);
     if (id === 'protein' && Math.round(c.planP) < set.protGoal) miss++;
     if (id === 'fibre' && Math.round(c.planF) < set.fibreGoal) miss++;
     if (id === 'sodium' && Math.round(c.planNa * 10) / 10 > set.naMax) miss++;
@@ -3348,7 +3473,7 @@ function weekMisses(id, st) {
 
 /* the goals. kind 'day' averages day values; 'week' averages whole weeks. agg 'rate' turns a daily mean into a weekly figure */
 function metrics() {
-  const set = S.set, tk = todayKey(), cur = startOf(tk), yd = addDays(tk, -1), w = WT();
+  const tk = todayKey(), set = setAt(tk), cur = startOf(tk), yd = addDays(tk, -1), w = WT();
   const food = (id, n, agg, fmt, goalTxt, light, extra) => Object.assign({ id, n, grp: 'Food', kind: 'day', agg, end: 'week', val: k => foodVal(id, k), first: () => minKey(S.days, id === 'fish' || id === 'ferm' ? S.hist.d : null), fmt, goalTxt, light }, extra || {});
   const missLight = id => () => { const m = weekMisses(id); if (!m.n) return { st: 'none', txt: 'Nothing planned this week' }; const lim = ['sodium', 'sugar', 'satfat'].includes(id); const st = !m.miss ? 'ok' : lim ? (m.miss <= 2 ? 'mid' : 'off') : (m.miss === 1 ? 'mid' : 'off'); return { st, txt: !m.miss ? (lim ? 'Every planned day under' : 'Every planned day on target') : `${m.miss} day${m.miss > 1 ? 's' : ''} ${lim ? 'over' : 'short'} in this week's plan` }; };
   const wkRate = (m) => { const r = aggWin(m, 'wk'); return r ? r.v : null; };
@@ -3515,7 +3640,7 @@ function trLongStory(L) {
 }
 /* each goal's "now": the figure its traffic light is judged on, plus a value for the bar */
 function trNow(m) {
-  const tk = todayKey(), cur = startOf(tk), set = S.set;
+  const tk = todayKey(), cur = startOf(tk), set = setAt(tk);
   if (m.id === 'plants') { const v = weekPlants(cur); return v === null ? null : { v, txt: fmtPts(v), lab: 'this week' }; }
   if (m.id === 'colours') { const v = weekColours(cur); return v === null ? null : { v, txt: String(v), lab: `of ${set.colourGoal}, this week` }; }
   if (['fish', 'ferm', 'red'].includes(m.id)) { const r = aggWin(m, 'wk'); if (!r) return null; const v = Math.round(r.v); return { v, txt: m.id === 'ferm' ? `${v} of 7` : String(v), lab: m.id === 'ferm' ? 'days this week' : 'this week' }; }
@@ -3584,9 +3709,17 @@ function binChart() {
   return `<svg class="hchart" viewBox="0 0 ${W0} ${H0}" role="img" aria-label="Binges per month, last 12 months, with the limit of one">${svg}</svg>`;
 }
 const stDot = st => `<i class="sdot s-${st}" aria-hidden="true"></i>`;
+// where a measure's records begin, or null when they go back further than a year
+function trFirst(m) { const f = m.first(); return f !== '9999' && f > addDays(todayKey(), -364) ? f : null; }
+// a time frame that reaches well before the records begin only repeats the shorter ones
+// for all time, a measure that started well after the rest has too little behind it to judge the long run
+let TB = null, TBL = null;
+function trBegin() { const L = MCACHE || (MCACHE = metrics()); if (TBL !== L) { TBL = L; TB = L.map(m => m.first()).filter(f => f !== '9999').sort()[0] || todayKey(); } return TB; }
+const trPartial = (m, w) => { const f = m.first(); if (w === 'wk' || f === '9999') return false; return w === 'all' ? f > addDays(trBegin(), 56) : f > addDays(winRange(m, w)[0], 7); };
 function trDetail(m) {
-  const nW = UI.tlong ? 52 : 26, ser = weekSeries(m, nW);
-  const rows = WINS.map(([w, lab]) => { const r = aggWin(m, w), [a, b] = winRange(m, w); return `<div class="trw"><span>${lab}${w === 'all' && r ? `<small>since ${shortD(a)}${a.slice(0, 4) !== todayKey().slice(0, 4) ? ` ${a.slice(0, 4)}` : ''}</small>` : ''}</span><b>${r ? m.fmt(r.v) : '–'}</b><small>${r ? `${r.n} ${m.kind === 'week' ? (r.n === 1 ? 'week' : 'weeks') : (r.n === 1 ? 'day' : 'days')}` : ''}</small></div>`; }).join('');
+  const f = trFirst(m), span = f ? daysBetween(startOf(f), startOf(todayKey())) / 7 + 1 : 99, short = span < 26;
+  const nW = short ? Math.max(4, span) : UI.tlong ? 52 : 26, ser = weekSeries(m, nW);
+  const rows = WINS.filter(([w]) => w === 'wk' || w === 'all' || !trPartial(m, w)).map(([w, lab]) => { const r = aggWin(m, w), [a, b] = winRange(m, w); return `<div class="trw"><span>${lab}${w === 'all' && r ? `<small>since ${shortD(a)}${a.slice(0, 4) !== todayKey().slice(0, 4) ? ` ${a.slice(0, 4)}` : ''}</small>` : ''}</span><b>${r ? m.fmt(r.v) : '–'}</b><small>${r ? `${r.n} ${m.kind === 'week' ? (r.n === 1 ? 'week' : 'weeks') : (r.n === 1 ? 'day' : 'days')}` : ''}</small></div>`; }).join('');
   let extra = '';
   if (m.id === 'alcohol') {
     const al = alcLight(), B = alcBinges(), yr = todayKey().slice(0, 4), bigs = B.bigs[yr] || [], prev = B.bigs[String(+yr - 1)] || [];
@@ -3598,7 +3731,7 @@ function trDetail(m) {
   const src = { fish: 'Before the app, from your old tracker: a blank day there counts as no oily fish.', ferm: 'Before the app, from your old tracker, counting only days you filled in.', plants: 'Before the app, weekly totals from your old tracker, which counted herbs and spices at 0.2 rather than 0.25.', alcohol: 'Logged the morning after. A blank day in your old tracker counts as none; days marked "td" are left out until you fill them in.', run: 'Logged the morning after. Your old tracker is included from 22 Jul 2026, when you started running again.' }[m.id];
   const basis = m.grp === 'Food' ? 'Food figures use the plan for each day, including swaps, skips, nights out and anything you logged.' : '';
   return `<div class="trdet">${m.id === 'alcohol' ? extra : ''}
-    <div class="wchead"><div class="eyebrow">By week</div><div class="seg mini3" role="group" aria-label="Chart range"><button data-a="tlong" data-v="0" aria-pressed="${!UI.tlong}">6 mo</button><button data-a="tlong" data-v="1" aria-pressed="${!!UI.tlong}">12 mo</button></div></div>
+    <div class="wchead"><div class="eyebrow">By week${short ? ` · since ${shortD(f)}` : ''}</div>${short ? '' : `<div class="seg mini3" role="group" aria-label="Chart range"><button data-a="tlong" data-v="0" aria-pressed="${!UI.tlong}">6 mo</button><button data-a="tlong" data-v="1" aria-pressed="${!!UI.tlong}">12 mo</button></div>`}</div>
     ${trChart(m, ser)}
     <div class="trwins">${rows}</div>
     <p class="small muted" style="margin:0">Goal: ${esc(m.goalTxt)}. ${basis} ${src || ''}</p></div>`;
@@ -3640,7 +3773,9 @@ function trWinRow(m, win) {
   const nTxt = r ? `${r.n} ${m.kind === 'week' ? 'week' : 'day'}${r.n === 1 ? '' : 's'}` : '';
   const since = win === 'all' && r ? ` since ${shortD(a)}${a.slice(0, 4) !== tk.slice(0, 4) ? ` ${a.slice(0, 4)}` : ''}` : '';
   let st = r ? trJudge(m, r.v) : 'none', line = r ? `Averaged over ${nTxt}${since}` : 'Nothing logged in this period';
-  const now = r ? { v: r.v, txt: m.fmt(r.v), lab: `${m.unit}, ${TWL[win]}` } : null;
+  const part = trPartial(m, win);
+  if (part && r && win !== 'all') line = `Tracked since ${shortD(m.first())}: ${nTxt}`;
+  const now = r ? { v: r.v, txt: m.fmt(r.v), lab: `${m.unit}, ${part && win !== 'all' ? `since ${shortD(m.first())}` : TWL[win]}` } : null;
   if (m.id === 'weight') {
     const w = r ? trWeightWin(win) : null;
     if (w) { st = w.st; line = capFirst(`${w.pace} on average`); now.v = w.g ? Math.max(0, w.rate * Math.sign(w.g)) : null; now.goal = w.g ? Math.abs(w.g) : null; }
@@ -3653,8 +3788,9 @@ function trWinRow(m, win) {
     else { const big = B.weeks.filter(x => x.big).length; line += `; ${big} week${big === 1 ? '' : 's'} of 32+ units`; }
   }
   const baseLab = win === '4w' ? '12-month usual' : win === '12m' ? 'All-time' : '';
-  const foot = m.id === 'waist' ? 'Measured weekly' : `${b && baseLab && !m.line ? `${baseLab} ${m.fmt(b.v)} ${m.unit} · ` : ''}${trGoal(m)}`;
-  return { m, st, line, now, usual: m.line ? null : b ? b.v : null, foot };
+  const bOk = b && bw && !part && !trPartial(m, bw); // a comparison that covers the same few weeks says nothing
+  const foot = m.id === 'waist' ? 'Measured weekly' : `${bOk && baseLab && !m.line ? `${baseLab} ${m.fmt(b.v)} ${m.unit} · ` : ''}${trGoal(m)}`;
+  return { m, st, line, now, usual: m.line || !bOk ? null : b.v, foot, part };
 }
 function trWinPhrase(x, win) {
   const { m, st, now } = x, t = now ? now.txt : '', nm = trName(m), g = m.goal;
@@ -3674,7 +3810,8 @@ function trWinPhrase(x, win) {
 }
 function trWinStory(rows, win) {
   const lead = { '4w': 'Over the last month', '12m': 'Over the past year', all: 'Since your records began' }[win];
-  const of = s => rows.filter(x => x.st === s && !(x.m.id === 'waist')), ok = of('ok'), mid = of('mid'), off = of('off'), none = of('none');
+  const parts = rows.filter(x => x.part && x.st !== 'none' && x.m.id !== 'waist' && x.m.id !== 'weight');
+  const of = s => rows.filter(x => x.st === s && !(x.m.id === 'waist') && !parts.includes(x)), ok = of('ok'), mid = of('mid'), off = of('off'), none = of('none');
   const out = [], ph = xs => xs.map(x => trWinPhrase(x, win)).filter(Boolean);
   const star = TR_STAR.map(id => ok.find(x => x.m.id === id)).find(x => x && trWinPhrase(x, win));
   out.push(star ? `${lead}, ${trWinPhrase(star, win)}.` : `${lead}, it's been a mixed picture.`);
@@ -3686,8 +3823,48 @@ function trWinStory(rows, win) {
   const names = rest.filter(x => !(limOk && lim.includes(x.m.id))).map(x => trName(x.m));
   if (limOk) names.push('salt', 'sugar', 'saturated fat');
   if (names.length) out.push(o.length || mi.length ? `Steady throughout: ${joinAnd(names)}.` : `${capFirst(joinAnd(names))}: all on track too.`);
+  if (parts.length) {
+    const byDate = {}; parts.forEach(x => { (byDate[x.m.first()] = byDate[x.m.first()] || []).push(x); });
+    const ds = Object.keys(byDate).sort(), nm = d => joinAnd(byDate[d].map(x => trName(x.m)));
+    const one = parts.length === 1 && !/s$/i.test(trName(parts[0].m)), bad = parts.filter(x => x.st !== 'ok').map(x => trWinPhrase(x, win)).filter(Boolean);
+    const segs = ds.map((d, i) => i ? `${nm(d)} to ${shortD(d)}` : `${capFirst(nm(d))} only go${one ? 'es' : ''} back to ${shortD(d)}`), back = segs.length < 2 ? segs[0] : `${segs.slice(0, -1).join('; ')}, and ${segs[segs.length - 1]}`;
+    out.push(`${back}, so ${one ? "it's" : "they're"} too new to say much about ${{ '4w': 'the month', '12m': 'the year', all: 'the long run' }[win]}${bad.length ? `; so far ${story(bad)}` : ', though so far so good'}.`);
+  }
   if (none.length) out.push(`Not enough logged to judge ${joinAnd(none.map(x => trName(x.m))).replace(/ and ([^ ]+( [A-Za-z]+)?)$/, ' or $1')}.`);
   return out;
+}
+// what the figures add up to: one or two sentences on the bigger picture for your goals
+function trInsight(rows, win) {
+  const by = id => rows.find(x => x.m.id === id), bad = x => !!x && (x.st === 'off' || x.st === 'mid') && !x.part, good = x => !!x && x.st === 'ok' && !x.part;
+  const out = [], used = new Set(), al = by('alcohol'), wt = by('weight');
+  // drinks next to a slower-than-planned loss
+  let slow = false;
+  if (wt && wt.st === 'mid' && WT().goal === 'lose') {
+    if (win === 'wk') { const a = wAdvice(); slow = !a.need && (a.head === 'Eat a little less' || a.head === 'Hold for now'); }
+    else { const w = trWeightWin(win); slow = !!w && w.rate > w.g; }
+  }
+  if (bad(al) && al.now && slow) {
+    const kc = Math.floor(al.now.v * 56 / 50) * 50; // 8g of alcohol a unit at 7 kcal a gram, before whatever it's mixed with
+    out.push(`At ${fmtU(al.now.v)} units a week, drinks add at least ${fmtN(kc)} kcal a week on top of the plan, which is likely part of why the weight is coming off slower than you'd like.`);
+    used.add('alcohol'); used.add('weight');
+  }
+  // the plan doing its job while the habits around it slip
+  const food = rows.filter(x => x.m.grp === 'Food' && x.st !== 'none' && !x.part), habits = rows.filter(x => x.m.grp !== 'Food' && bad(x) && !x.info && !used.has(x.m.id));
+  if (food.length >= 3 && food.filter(good).length / food.length >= 0.75 && habits.length >= 2) {
+    out.push(`The food side is in good shape, so the plan is doing its job; where you're losing ground is in the habits around it.`);
+    habits.forEach(x => used.add(x.m.id));
+  }
+  // gut health: variety, colour and something fermented
+  const pl = by('plants'), co = by('colours'), fe = by('ferm');
+  if (good(pl) && good(co) && good(fe)) out.push('For your gut that\'s the full set: plenty of variety, every colour and something fermented every day.');
+  else if (good(pl) && bad(fe) && fe.now) out.push('Plenty of variety for your gut, but the fermented habit is the weak link.');
+  const sl = by('sleep'), rn = by('run');
+  if (bad(sl) && bad(rn) && !used.has('sleep') && !used.has('run')) {
+    const foodOk = food.length >= 3 && food.filter(good).length / food.length >= 0.75;
+    out.push(`Sleep and cardio are both under target${foodOk ? ', so the body side is lagging behind the food side' : WT().goal === 'lose' ? ', and those two make the weight goal harder work than it needs to be' : ''}.`);
+  }
+  if (!out.length && !rows.some(x => bad(x))) out.push('Everything points the same way: the habits are holding.');
+  return out.slice(0, 2).join(' ');
 }
 function vTrends() {
   const L = MCACHE || (MCACHE = metrics()), win = UI.twin || 'wk';
@@ -3703,6 +3880,7 @@ function vTrends() {
     });
     story = trStory(L, lights, nows);
   } else { rows = L.map(m => trWinRow(m, win)); story = trWinStory(rows, win); }
+  const ins = trInsight(rows, win); if (ins) story.splice(1, 0, ins);
   const chips = st => rows.filter(x => x.st === st && !x.info).map(x => `<button class="tchip t-${st}" data-a="tjump" data-v="${esc(x.m.id)}">${esc(x.m.n)}</button>`).join('');
   const nOk = rows.filter(x => x.st === 'ok' && !x.info).length, long = win === 'wk' ? trLongStory(L) : '';
   const offC = chips('off'), midC = chips('mid');
@@ -3974,7 +4152,7 @@ function ckCard() {
     ${saved ? `<div class="btnrow"><button class="btn sm ghost" data-a="ckcancel">Cancel</button><button class="btn sm ghost danger" data-a="ckdelday">Delete this day</button></div>` : ''}</section>`;
 }
 function sleepChart(k) {
-  const n = 14, days = Array.from({ length: n }, (_, i) => addDays(k, i - n + 1)), vals = days.map(d => (S.ck[d] || {}).sl || 0), goal = S.set.sleepGoal;
+  const n = 14, days = Array.from({ length: n }, (_, i) => addDays(k, i - n + 1)), vals = days.map(d => (S.ck[d] || {}).sl || 0), goal = setAt(k).sleepGoal;
   const max = Math.max(10, Math.ceil(Math.max(...vals) / 2) * 2), W0 = 340, H0 = 160, L = 26, R = 8, T = 14, B = 22, y = v => T + (H0 - T - B) * (1 - v / max);
   const band = (W0 - L - R) / n, bw = Math.min(18, band - 6);
   let svg = '';
@@ -3990,7 +4168,7 @@ function sleepChart(k) {
 }
 function sleepCard() {
   const tk = todayKey(); if (!sleepDays().length) return '';
-  const a = sleepAvg(tk), prev = sleepAvg(addDays(tk, -7)), last = (S.ck[tk] || {}).sl, g = S.set.sleepGoal;
+  const a = sleepAvg(tk), prev = sleepAvg(addDays(tk, -7)), last = (S.ck[tk] || {}).sl, g = setAt(tk).sleepGoal;
   const atGoal = Array.from({ length: 7 }, (_, i) => (S.ck[addDays(tk, -i)] || {}).sl || 0).filter(v => v >= g).length;
   return `<section class="wsum hist"><div class="eyebrow">Sleep</div>
     <div class="whero"><div><div class="small muted" style="font-weight:700">7-night average</div><div class="big">${a ? a.v.toFixed(1) : '–'}<small> h</small></div></div>
@@ -4021,7 +4199,7 @@ function vWeight() {
   const chart = `<section class="wsum hist"><div class="wchead"><div class="eyebrow">Weight</div><div class="seg mini3" role="group" aria-label="Range">${[[28, '4 wk'], [84, '12 wk'], [0, 'All']].map(([v, l]) => `<button data-a="wrange" data-v="${v}" aria-pressed="${UI.wrange === v}">${l}</button>`).join('')}</div></div>
     ${hero}<div class="wlegend"><span><i class="ldot"></i>Daily</span><span><i class="lline"></i>7-day average</span></div>${wChart(UI.wrange)}<p class="small" style="margin:0">${selP}</p></section>`;
   const adv = wAdvice();
-  const advice = `<section class="wsum wadvice"><div class="eyebrow">Calories</div>${adv.need ? `<p style="margin:0">${adv.need}</p>` : `<h3>${adv.head}</h3><p style="margin:0">${esc(adv.body)}</p>${adv.act ? `<button class="btn primary" data-a="wtarget" data-v="${adv.act}">Set daily target to ${fmtN(adv.act)} kcal</button>` : ''}<p class="small muted" style="margin:0">${esc(adv.basis)} Current target ${fmtN(S.set.target)} kcal.</p>`}</section>`;
+  const advice = `<section class="wsum wadvice"><div class="eyebrow">Calories</div>${adv.need ? `<p style="margin:0">${adv.need}</p>` : `<h3>${adv.head}</h3><p style="margin:0">${esc(adv.body)}</p>${adv.act ? `<button class="btn primary" data-a="wtarget" data-v="${adv.act}">Set daily target to ${fmtN(adv.act)} kcal</button>` : ''}<p class="small muted" style="margin:0">${esc(adv.basis)} Current target ${fmtN(setAt(todayKey()).target)} kcal${setNext() && S.set.target !== setAt(todayKey()).target ? `; ${fmtN(S.set.target)} from ${fmtDay(setNext())}` : ''}.</p>`}</section>`;
   return `${card}${chart}${advice}${sleepCard()}${checksCard()}${wWaistCard()}${wGoalCard()}${list}`;
 }
 function wWaistCard() {
@@ -4095,7 +4273,7 @@ function vPrep() {
         ${sw.length ? `<p class="swapin">${ic('swap')}<span>Swapped this week: ${esc(sw.map(x => x.text).join('; '))}.</span></p>` : ''}
         ${gr.r.rice ? '<div class="small muted">Cool the rice within an hour, keep it in the fridge no more than a day, and freeze the rest. Reheat once, until piping hot.</div>' : ''}
         <details class="more"><summary>Ingredients for ${n} portion${n > 1 ? 's' : ''}${ic('chev')}</summary><ul class="ilist ik">${ingRows(Object.entries(tot).map(([id, g]) => [id, g, from[id] ? ` <span class="muted for">for ${esc(shortN(from[id]))}</span>` : '']), `Total for ${n} portion${n > 1 ? 's' : ''}`)}</ul></details>
-        <details class="more"><summary>${gr.s === 's' ? 'Packing' : 'Method'}${ic('chev')}</summary><ol class="steps">${prepSteps(gr).map(x => `<li>${esc(x)}${swapNotes(gr.r, x)}</li>`).join('')}</ol>${gr.r.note && gr.s !== 's' ? `<p class="small muted">${esc(gr.r.note)}</p>` : ''}</details>
+        <details class="more"><summary>${gr.s === 's' ? 'Packing' : 'Method'}${ic('chev')}</summary><ol class="steps">${(() => { const st2 = prepSteps(gr), plan = amtPlan(gr.r, st2); return st2.map((x, i) => `<li>${esc(x)}${amtChips(plan[i], id => tot[id])}${swapNotes(gr.r, x)}</li>`).join(''); })()}</ol>${gr.r.note && gr.s !== 's' ? `<p class="small muted">${esc(gr.r.note)}</p>` : ''}</details>
         <div><button class="btn sm" data-a="bswap" data-key="${se.key}" data-s="${gr.s}" ${gr.s === 's' ? `data-ks="${gr.entries.map(e => e.k).join(',')}"` : ''}>${ic('edit')}Swap ${sl}</button></div></div>`;
     }).join('') : M.ps.fin ? `<div class="batch"><p class="muted" style="margin:0">Everything from this batch has been eaten.</p></div>`
       : `<div class="batch"><p class="muted" style="margin:0">Nothing to batch-cook in this session.</p><div class="btnrow"><button class="btn sm" data-a="bswap" data-key="${se.key}" data-s="l">Choose a lunch</button><button class="btn sm" data-a="bswap" data-key="${se.key}" data-s="b">Choose a breakfast</button></div></div>`;
@@ -4290,7 +4468,9 @@ function stepHtml(M, s, i, cur) {
     body = `<p class="psub">${M.cook ? `${M.k === todayKey() ? "Today's" : `The ${fmtDay(M.k)}`} portion, ${fmtN(M.o.k)} kcal` : `For ${s.gr.n} portion${s.gr.n > 1 ? 's' : ''}`}</p>${sw.length ? `<p class="swapin">${ic('swap')}<span>Swapped this week: ${esc(sw.map(x => x.text).join('; '))}.</span></p>` : ''}<ul class="ilist ik pings">${ingRows(Object.entries(tot).map(([id, g]) => [id, g, from[id] ? ` <span class="muted for">for ${esc(shortN(from[id]))}</span>` : '']), M.cook ? 'Total' : `Total for ${s.gr.n} portion${s.gr.n > 1 ? 's' : ''}`)}</ul>`;
   } else if (s.kind === 'do') {
     title = s.text;
-    body = swapNotes(s.gr.r, s.text);
+    const mine = M.all.filter(x => x.kind === 'do' && x.gr === s.gr), plan = amtPlan(s.gr.r, mine.map(x => x.text)), tot = {};
+    s.gr.entries.forEach(e => s.gr.r.items.forEach(it => { tot[it.i] = (tot[it.i] || 0) + it.g * e.m; }));
+    body = amtChips(plan[mine.indexOf(s)], id => tot[id]) + swapNotes(s.gr.r, s.text);
     if (s.tm.length) body += `<div class="tbtns">${s.tm.map((_, j) => tbtnHtml(M, s, j)).join('')}</div>${isCur && M.left > 1 && s.tm.some((_, j) => !TM.some(t => t.id === `${M.st}|${M.key}|${s.id}|${j}`)) ? '<p class="psub">Start the timer and carry on. It keeps counting at the top.</p>' : ''}`;
   } else {
     const gr = s.gr, avg = gr.sumM / gr.n, big = gr.entries.filter(e => e.m > avg * 1.08).map(e => DOW[dayIndex(e.k)]), small = gr.entries.filter(e => e.m < avg * 0.92).map(e => DOW[dayIndex(e.k)]);
@@ -4514,7 +4694,7 @@ function shopTotals(st, trip) {
       if (trip && t !== trip) continue;
       o.r.items.forEach(it => add(it.i, it.g * o.m, it.from));
     }
-    if (S.set.latteOn && !peekD(k).done.latte) { const t = mode === 'two' ? (di <= 2 ? 1 : 2) : 1; if (!trip || t === trip) add('milk', S.set.latteMl); }
+    const ls = setAt(k); if (ls.latteOn && !peekD(k).done.latte) { const t = mode === 'two' ? (di <= 2 ? 1 : 2) : 1; if (!trip || t === trip) add('milk', ls.latteMl); }
   }
   return { tot, from };
 }
@@ -4534,7 +4714,7 @@ function vShop() {
   const main = ids.filter(i => !ING[i].pantry), pantry = ids.filter(i => ING[i].pantry), done = ids.filter(i => w.shop[key(i)]).length;
   const swaps = Object.entries(w.swaps || {}).flatMap(([rid, sw]) => Object.entries(sw).map(([o, k]) => ({ rid, o, k }))).filter(x => R[x.rid] && ING[isAmt(x.o) ? x.o.slice(3) : x.o]);
   const nAmt = swaps.filter(x => isAmt(x.o)).length, nSw = swaps.length - nAmt;
-  const swapBox = swaps.length ? `<details class="more swaps"><summary>${joinAnd([nSw ? `${nSw} swap${nSw > 1 ? 's' : ''}` : '', nAmt ? `${nAmt} amount${nAmt > 1 ? 's' : ''} changed` : ''].filter(Boolean))} this week${ic('chev')}</summary><div class="swaplist">${swaps.map(x => { const am = isAmt(x.o), opt = !am && subOptions(x.o).find(q => q.key === x.k); return `<div class="swaprow"><span><b>${esc(shortN(am ? x.o.slice(3) : x.o))}</b> → ${am ? (+x.k ? 'your amount' : 'left out') : esc(opt ? subLabel(opt) : x.k)}<small>${esc(R[x.rid].n)}</small></span><button class="btn sm ghost" data-a="unswap" data-r="${x.rid}" data-o="${x.o}">Undo</button></div>`; }).join('')}</div></details>` : '';
+  const swapBox = swaps.length ? `<details class="more swaps"><summary>${joinAnd([nSw ? `${nSw} swap${nSw > 1 ? 's' : ''}` : '', nAmt ? `${nAmt} amount${nAmt > 1 ? 's' : ''} changed` : ''].filter(Boolean))} this week${ic('chev')}</summary><div class="swaplist">${swaps.map(x => { const am = isAmt(x.o), opt = !am && subOpt(x.o, x.k); return `<div class="swaprow"><span><b>${esc(shortN(am ? x.o.slice(3) : x.o))}</b> → ${am ? (+x.k ? 'your amount' : 'left out') : esc(opt ? subLabel(opt) : x.k)}<small>${esc(R[x.rid].n)}</small></span><button class="btn sm ghost" data-a="unswap" data-r="${x.rid}" data-o="${x.o}">Undo</button></div>`; }).join('')}</div></details>` : '';
   const aisles = AISLES.map(([a, name]) => {
     const its = main.filter(i => ING[i].a === a).sort((x, y) => ING[x].n.localeCompare(ING[y].n));
     if (!its.length) return '';
@@ -4624,7 +4804,7 @@ function vRecipes() {
 
 
 function vOut() {
-  const st = UI.week, wc = weekCalc(st), set = S.set;
+  const st = UI.week, wc = weekCalc(st), set = setAt(st);
   const shares = wc.days.map(drinkShare), onDays = wc.days.filter((k, i) => shares[i] > 0.5), applied = shares.reduce((a, x) => a + x, 0);
   const share = onDays.length ? applied / onDays.length : 0, capped = set.drinkMode === 'spread' && applied < wc.drinks - 5;
   const avgT = wc.dc.reduce((a, c) => a + c.T, 0) / 7;
@@ -4668,7 +4848,7 @@ function renderSheet(fresh) {
   const root = $('sheet-root');
   if (!SH) { root.innerHTML = ''; return; }
   const old = root.querySelector('.sheet'), top = old && !fresh ? old.scrollTop : 0;
-  const html = ({ wgoal: shWGoal, ckitems: shCkItems, cupboard: shCupboard, recipe: shRecipe, pick: shPick, xadd: shAdd, custom: shCustom, target: shTarget, settings: shSettings, confirm: shConfirm, backup: shBackup, weekmenu: shWeekMenu, night: shNight, swap: shSwap })[SH.type]();
+  const html = ({ wgoal: shWGoal, ckitems: shCkItems, cupboard: shCupboard, recipe: shRecipe, pick: shPick, xadd: shAdd, custom: shCustom, target: shTarget, settings: shSettings, confirm: shConfirm, setwhen: shSetWhen, backup: shBackup, weekmenu: shWeekMenu, night: shNight, swap: shSwap })[SH.type]();
   root.innerHTML = `<div class="scrim" data-scrim="1"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(SH.title || 'Details')}"><div class="grab"></div>${html}</div></div>`;
   if (!fresh) root.querySelector('.scrim').style.animation = 'none';
   const sh = root.querySelector('.sheet'); if (!fresh) sh.style.animation = 'none';
@@ -4684,12 +4864,34 @@ function nutConf(r) {
   if (done === ids.length) return `<div class="nconf ok">${ic('check')}<span><b>Nutrition confirmed.</b> Every ingredient matches your packs${own ? `, ${own} with figures from your own label${own > 1 ? 's' : ''}` : ''}.</span></div>`;
   return `<div class="nconf"><span>${done ? `${done} of ${ids.length} ingredients checked against your packs.` : 'Check the figures per 100g against your packs: tap Check on any that differ, or confirm the lot.'}</span><button class="btn sm" data-a="ingall" data-v="${ids.join(',')}">${ic('check')}All match my packs</button></div>`;
 }
+// what can be left out of a planned meal: just this meal when it's cooked on the day, the whole batch when it's
+// batch-cooked and not cooked yet; nothing once it's eaten, packed or cooked
+function omitScope(k, s, o) {
+  if (!o || o.kind !== 'recipe' || o.done || o.packed || o.kept) return null;
+  if (o.prepped) return batchCooked(k, s) ? null : 'batch';
+  return 'meal';
+}
+function omitBox(dOm, wOm, fixedOm, o, scope) {
+  const back = (i, lv, full) => `<button class="btn sm ghost" data-a="unomit" data-i="${esc(i)}" data-v="${lv}">${full ? `Put back the ${esc(shortN(i).toLowerCase())}` : 'Put back'}</button>`;
+  const line = (lab, ids, lv) => {
+    if (!ids.length) return '';
+    const one = ids.length === 1 && scope;
+    return `<div class="omline"><span>${lab}: <b>${esc(joinAnd(ids.map(i => shortN(i).toLowerCase())))}</b></span>${one ? back(ids[0], lv) : ''}</div>${ids.length > 1 && scope ? `<div class="btnrow">${ids.map(i => back(i, lv, true)).join('')}</div>` : ''}`;
+  };
+  const tail = scope ? `<p class="small muted" style="margin:4px 0 0">The rest is scaled up to keep the meal at ${fmtN(o.k)} kcal.</p>` : '';
+  return `<div class="callout omit" style="margin-top:8px">${ic('x')}<div>${line('Left out of this meal', dOm, 'day')}${line(o && o.prepped ? "Left out of this week's batch" : 'Left out all week', wOm, 'week')}${line('Left out', fixedOm, '')}${tail}</div></div>`;
+}
 function shRecipe() {
   let r = R[SH.r]; SH.title = r.n;
   let m = 1, o = null;
   if (SH.k && SH.s) { const x = dayCalc(SH.k).slots[SH.s]; if (x.kind === 'recipe' && x.r.id === r.id) { o = x; m = x.m; r = x.r; } }
-  const swapped = Object.entries(r.swapped || {}).map(([orig, key]) => [orig, key, subOptions(orig).find(q => q.key === key)]).filter(x => x[2] && r.items.some(it => it.from === x[0] || (x[1] === 'omit' && !r.items.some(i2 => i2.i === x[0]))))
-    .map(([orig, key, opt]) => key === 'omit' ? `no ${shortN(orig)}` : `${subLabel(opt)} instead of ${shortN(orig)}`);
+  // left out: this meal's own leave-outs, then any for the whole week; other swaps get their own line
+  const scope = o ? omitScope(SH.k, SH.s, o) : null;
+  const omAll = Object.entries(r.swapped || {}).filter(([orig, key]) => key === 'omit' && !r.items.some(it => it.i === orig)).map(([orig]) => orig);
+  const dOm = scope ? Object.keys(dayOmits(peekD(SH.k), SH.s) || {}).filter(i => omAll.includes(i)) : [];
+  const wOm = scope ? omAll.filter(i => !dOm.includes(i)) : [], fixedOm = scope ? [] : omAll;
+  const swapped = Object.entries(r.swapped || {}).map(([orig, key]) => [orig, key, subOpt(orig, key)]).filter(x => x[2] && x[1] !== 'omit' && r.items.some(it => it.from === x[0]))
+    .map(([orig, key, opt]) => `${subLabel(opt)} instead of ${shortN(orig)}`);
   const n = SH.n || 1, mm = m * n, era = SH.k ? eraKey(SH.k) : null;
   const plants = r.plants.slice().sort((a, b) => PLANTS[b][1] - PLANTS[a][1]).map(x => `<span class="pchip ${PLANTS[x][1] < 1 ? 'q' : ''}">${PLANTS[x][2] ? `<i class="c-${PLANTS[x][2]}"></i>` : ''}${esc(PLANTS[x][0])}${PLANTS[x][1] < 1 ? ' ¼' : ''}</span>`).join('');
   const keeps = [];
@@ -4702,7 +4904,7 @@ function shRecipe() {
     const bn = batchName(SH.k, SH.s, r), bc = o.prepped && batchContext(SH.k, SH.s);
     const go = bc ? `<button class="btn primary" style="width:100%;margin-top:10px" data-a="pmopen" data-st="${bc.st}" data-key="${bc.se.key}">${ic('play')}Open ${sessName(bc.se)} prep</button>`
       : `<button class="btn primary" style="width:100%;margin-top:10px" data-a="cookopen" data-k="${SH.k}" data-s="${SH.s}">${ic('play')}Cook it step by step</button>`;
-    ctx = `${go}<div class="callout">${ic('info')}<div>${SLOTNAME[SH.s]} on ${fmtDay(SH.k)}${bn ? ` (${bn})` : ''}. ${o.packed ? `Packed at <b>${fmtN(o.k)} kcal</b>.` : `Scaled to <b>${fmtN(o.k)} kcal</b>, ${m.toFixed(2)}× the base recipe, to fit the day.`}</div></div>
+    ctx = `${go}<div class="callout">${ic('info')}<div>${SLOTNAME[SH.s]} on ${fmtDay(SH.k)}${bn ? ` (${bn})` : ''}. ${o.packed ? `Packed at <b>${fmtN(o.k)} kcal</b>.` : o.kept ? `Already cooked at <b>${fmtN(o.k)} kcal</b>, so it keeps that size.` : `Scaled to <b>${fmtN(o.k)} kcal</b>, ${m.toFixed(2)}× the base recipe, to fit the day.${m >= 1.795 ? " That's as far as it scales, so the rest of the day makes up the difference." : ''}`}</div></div>
       <div class="btnrow" style="margin-top:10px"><button class="btn sm" data-a="pick" data-k="${SH.k}" data-s="${SH.s}">${ic('edit')}Swap</button><button class="btn sm" data-a="custom" data-k="${SH.k}" data-s="${SH.s}">Eat something else</button><button class="btn sm ghost" data-a="skip" data-k="${SH.k}" data-s="${SH.s}">Skip</button></div>`;
   } else {
     ctx = `<section><h4>Add to plan</h4><div class="fieldrow"><div class="field" style="margin:0"><label for="ap-day">Day</label><select id="ap-day">${weekDays(UI.week).map(k => `<option value="${k}" ${k === UI.day ? 'selected' : ''}>${fmtDay(k)}</option>`).join('')}</select></div>
@@ -4712,12 +4914,14 @@ function shRecipe() {
   return `<div class="sheethero">${art(r, 96)}<div><span class="eyebrow">${r.slots.map(s => SLOTNAME[s]).join(' / ')} · ${esc(r.c)} · ${tmin(r.t)}</span><h2>${esc(r.n)}</h2></div>
     <div style="display:grid;gap:2px;align-self:start"><button class="iconbtn" data-a="close" aria-label="Close">${ic('x')}</button>${thumbs(r.id)}</div></div>
     <section style="margin-top:12px">${badges(r)}</section>
-    <section style="margin-top:10px"><div class="nutri"><div><b>${fmtN(r.k * m)}</b><span>kcal</span></div><div><b>${fmtN(r.p * m)}g</b><span>protein</span></div><div><b>${fmtN(r.f * m)}g</b><span>fibre</span></div><div><b>${fmtPts(r.pts)}</b><span>plants</span></div></div><p class="small muted" style="margin:6px 2px 0">Sodium ${fmtNa(r.na * m)} (${(r.na * m * 2.5).toFixed(1)}g salt) · added sugar ${fmtFS(r.fs * m)} · sat fat ${fmtN(r.sf * m)}g${r.na * m > S.set.naMax * 0.5 ? ' · a salty one: over half the day\'s sodium' : ''}</p></section>
+    <section style="margin-top:10px"><div class="nutri"><div><b>${fmtN(r.k * m)}</b><span>kcal</span></div><div><b>${fmtN(r.p * m)}g</b><span>protein</span></div><div><b>${fmtN(r.f * m)}g</b><span>fibre</span></div><div><b>${fmtPts(r.pts)}</b><span>plants</span></div></div><p class="small muted" style="margin:6px 2px 0">Sodium ${fmtNa(r.na * m)} (${(r.na * m * 2.5).toFixed(1)}g salt) · added sugar ${fmtFS(r.fs * m)} · sat fat ${fmtN(r.sf * m)}g${r.na * m > (SH.k ? setAt(SH.k) : S.set).naMax * 0.5 ? ' · a salty one: over half the day\'s sodium' : ''}</p></section>
     ${ctx}
-    <section><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h4 style="margin:0">Ingredients</h4><div class="stepper"><button data-a="serv" data-v="-1" aria-label="Fewer portions">−</button><span>${n} portion${n > 1 ? 's' : ''}</span><button data-a="serv" data-v="1" aria-label="More portions">+</button></div></div>
+    <section><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h4 style="margin:0">Ingredients</h4>${scope && !era ? `<button class="btn sm ${SH.om ? 'primary' : 'ghost'}" data-a="omitmode" aria-pressed="${!!SH.om}">${SH.om ? `${ic('check')}Done` : 'Leave something out'}</button>` : ''}<div class="stepper"><button data-a="serv" data-v="-1" aria-label="Fewer portions">−</button><span>${n} portion${n > 1 ? 's' : ''}</span><button data-a="serv" data-v="1" aria-label="More portions">+</button></div></div>
       ${swapped.length ? `<div class="callout" style="margin-top:8px">${ic('swap')}<div>This week: ${esc(swapped.join('; '))}. Follow the method with the swap.</div></div>` : ''}
-      ${era ? '<p class="small muted" style="margin:8px 0 0">Using the figures from that week. Label changes made since then count only from the week they were made.</p>' : nutConf(r)}<ul class="ilist ik" style="margin-top:8px">${ingRows(r.items.map(it => [it.i, it.g * mm, (it.from ? ` <span class="muted for">for ${esc(shortN(it.from))}</span>` : '') + (it.own ? ' <span class="muted for">your amount</span>' : '')]), n > 1 ? `Total for ${n} portions` : 'Total', true, era ? eraIng(era) : ING, era)}</ul></section>
-    <section><h4>Method</h4><ol class="steps">${r.steps.map(x => `<li>${esc(x)}${swapNotes(r, x)}</li>`).join('')}</ol>${r.note ? `<p class="small muted">${esc(r.note)}</p>` : ''}</section>
+      ${dOm.length || wOm.length || fixedOm.length ? omitBox(dOm, wOm, fixedOm, o, scope) : ''}
+      ${SH.om && scope ? `<p class="small muted" style="margin:8px 0 0">${scope === 'batch' ? 'Tap what to leave out of this week\'s batch' : 'Tap what to leave out of this meal'}. The rest scales up to keep the calories the same.</p>` : ''}
+      ${era ? '<p class="small muted" style="margin:8px 0 0">Using the figures from that week. Label changes made since then count only from the week they were made.</p>' : SH.om ? '' : nutConf(r)}<ul class="ilist ik" style="margin-top:8px">${ingRows(r.items.map(it => [it.i, it.g * mm, (it.from ? ` <span class="muted for">for ${esc(shortN(it.from))}</span>` : '') + (it.own ? ' <span class="muted for">your amount</span>' : '') + (SH.om && scope && it.i !== 'losalt' && r.items.filter(x => x.i !== 'losalt').length > 1 ? `<button class="ichip out" data-a="omit" data-i="${esc(it.from || it.i)}">${ic('x')}Leave out</button>` : '')]), n > 1 ? `Total for ${n} portions` : 'Total', !SH.om, era ? eraIng(era) : ING, era)}</ul></section>
+    <section><h4>Method</h4><ol class="steps">${(() => { const plan = amtPlan(r, r.steps), tot = itemTotals(r, mm); return r.steps.map((x, i) => `<li>${esc(x)}${amtChips(plan[i], id => tot[id])}${swapNotes(r, x)}</li>`).join(''); })()}</ol>${r.note ? `<p class="small muted">${esc(r.note)}</p>` : ''}</section>
     <section><details class="more"><summary>Plants & storage${ic('chev')}</summary>${keeps.length ? `<p style="margin:8px 0">${keeps.join(' · ').replace(/^./, c => c.toUpperCase())}.</p>` : ''}<div class="plantgrid">${plants}</div></details></section>`;
 }
 
@@ -4763,7 +4967,7 @@ function shSwap() {
       ${so.note && sel !== '@keep' ? `<p class="small" style="margin:0">${esc(so.note)}</p>` : ''}
       ${fx ? `<div class="chips">${fx.out.map(([c, t]) => `<span class="chip ${c}">${t}</span>`).join('')}</div>` : ''}</div>`;
   }).join('');
-  const oilyNow = weekCalc(st).oilyP, warn = oilyDrop && oilyNow - oilyDrop < S.set.oilyGoal ? `<div class="callout warn">${ic('warn')}<div>Oily fish this week would drop to ${oilyNow - oilyDrop} of ${S.set.oilyGoal}.</div></div>` : '';
+  const oilyNow = weekCalc(st).oilyP, warn = oilyDrop && oilyNow - oilyDrop < setAt(st).oilyGoal ? `<div class="callout warn">${ic('warn')}<div>Oily fish this week would drop to ${oilyNow - oilyDrop} of ${setAt(st).oilyGoal}.</div></div>` : '';
   return `<div class="sheethead"><div><span class="eyebrow">Not in stock?</span><h2>${esc(ING[x].n)}</h2></div>${closeBtn}</div>
     <p class="small muted">Pick a swap for each dish it's in this week. Portions rescale so each day stays on target, and the prep plan and this list update.</p>
     <div class="swapgrps">${groups.length ? body : '<p>Nothing left this week uses it.</p>'}</div>${warn}
@@ -4860,23 +5064,57 @@ function shCustom() {
 }
 function shTarget() {
   SH.title = 'Calorie target';
-  const d = peekD(UI.day), v = d.t || S.set.target;
+  const d = peekD(UI.day), v = d.t || setAt(UI.day).target;
   return `<div class="sheethead"><div><span class="eyebrow">${fmtDay(UI.day)}</span><h2>Calorie target</h2></div>${closeBtn}</div>
   <p class="small muted">For this day only, e.g. a long run or a dinner out. Every portion that day rescales to fit.</p>
   <div class="field"><label for="t-v">Target for ${fmtDay(UI.day)} (kcal)</label><input id="t-v" type="number" inputmode="numeric" value="${v}" autofocus></div>
   <div class="chips" style="margin-top:10px">${[1600, 1800, 2000, 2200, 2500, 2800].map(x => `<button class="chip" data-a="tpreset" data-v="${x}">${fmtN(x)}</button>`).join('')}</div>
-  <div class="btnrow" style="margin-top:14px"><button class="btn primary" data-a="tsave">Save</button>${d.t ? `<button class="btn ghost" data-a="treset">Back to ${fmtN(S.set.target)}</button>` : ''}</div>`;
+  <div class="btnrow" style="margin-top:14px"><button class="btn primary" data-a="tsave">Save</button>${d.t ? `<button class="btn ghost" data-a="treset">Back to ${fmtN(setAt(UI.day).target)}</button>` : ''}</div>`;
 }
 function shWeekMenu() {
   SH.title = 'Week options';
   return `<div class="sheethead"><div><span class="eyebrow">${fmtRange(UI.week)}</span><h2>Week options</h2></div>${closeBtn}</div>
   <div class="menu"><button class="btn" data-a="wizard">${ic('wand')}Set up week step by step</button><button class="btn" data-a="fill">${ic('leaf')}Fill empty slots</button><button class="btn" data-a="replan">${ic('edit')}Re-plan the whole week</button><button class="btn" data-a="tab" data-v="prep">${ic('prep')}Prep plan</button><button class="btn" data-a="tab" data-v="shop">${ic('shop')}Shopping list</button></div>`;
 }
+/* meal budgets in Settings add up to the calorie target. Change a meal and the ones you haven't changed make room
+   (all the others, once you've changed them all); change Calories or the latte and the unchanged ones follow. */
+const BUD_IDS = { b: 's-bb', l: 's-bl', s: 's-bs', d: 's-bd', p: 's-bp' };
+function budNoteText(v, lat, tgt) {
+  const meals = SLOTS.reduce((a, s) => a + (+v[s] || 0), 0), sum = meals + lat;
+  if (Math.abs(sum - tgt) < 1) return `${lat ? `Latte ${fmtN(lat)} + meals` : 'Meals'} ${fmtN(meals)} = ${fmtN(tgt)} kcal, your daily target. Change a meal and the others make room; change Calories and they follow. Days with drinks trim every meal a little.`;
+  const pct = sum > 0 && meals > 0 ? Math.round(Math.abs((tgt - lat) / meals - 1) * 100) : 0;
+  return `These add up to ${fmtN(sum)} kcal against a target of ${fmtN(tgt)}, so each day makes every meal ${pct ? `about ${pct}% ` : ''}${sum < tgt ? 'bigger' : 'smaller'} to fit. Change any box and they'll line up.`;
+}
+function budVals() { const v = {}; SLOTS.forEach(s => { v[s] = Math.max(0, +$(BUD_IDS[s]).value || 0); }); return v; }
+const budLatte = () => ($('s-latte').checked ? Math.max(0, +$('s-lk').value || 0) : 0);
+function budNote() { const el = $('bud-note'); if (el && $('s-bl')) el.textContent = budNoteText(budVals(), budLatte(), +$('s-target').value || 0); }
+function budFit(changed) {
+  if (!SH || SH.type !== 'settings' || !$('s-bl')) return;
+  const t = SH.budT || (SH.budT = new Set()), v = budVals(), avail = (+$('s-target').value || 0) - budLatte();
+  if (!(avail > 0)) return budNote();
+  let free;
+  if (changed) {
+    t.add(changed);
+    free = SLOTS.filter(s => !t.has(s)); if (!free.length) free = SLOTS.filter(s => s !== changed);
+    // leave at least 25 kcal for each meal that has to make room
+    const cap = avail - SLOTS.filter(s => s !== changed && !free.includes(s)).reduce((a, s) => a + v[s], 0) - free.length * 25;
+    if (v[changed] > cap) { v[changed] = Math.max(0, Math.floor(cap / 5) * 5); $(BUD_IDS[changed]).value = v[changed]; }
+  } else free = SLOTS.filter(s => !t.has(s));
+  let rest = avail - SLOTS.filter(s => !free.includes(s)).reduce((a, s) => a + v[s], 0);
+  if (!free.length || rest < free.length * 25) { free = SLOTS.slice(); rest = avail; t.clear(); } // no room left: every meal follows the target
+  // shared out in the proportions of the saved budgets, so a few changes in a row don't drift
+  const base = S.set.bud, cur = free.reduce((a, s) => a + base[s], 0);
+  const r = free.map(s => Math.round((cur > 0 ? base[s] * rest / cur : rest / free.length) / 5) * 5);
+  const big = r.indexOf(Math.max(...r)); r[big] += Math.round(rest) - r.reduce((a, b) => a + b, 0);
+  free.forEach((s, i) => { $(BUD_IDS[s]).value = r[i]; });
+  budNote();
+}
 function shSettings() {
   SH.title = 'Settings';
-  const st = S.set, b = st.bud, sum = (st.latteOn ? st.latteK : 0) + SLOTS.reduce((a, s) => a + b[s], 0);
+  const st = S.set, b = st.bud;
   const num = (id, label, v) => `<div class="field"><label for="${id}">${label}</label><input id="${id}" type="number" inputmode="numeric" value="${v}"></div>`;
   return `<div class="sheethead"><div><span class="eyebrow">Thirty Plants${VER}</span><h2>Settings</h2></div>${closeBtn}</div>
+  ${setNext() ? `<div class="callout">${ic('info')}<div>Your new figures start ${fmtDay(setNext())}; until then the ones before still apply. These boxes show the new ones.</div></div>` : ''}
   <button class="btn setrow" data-a="recipes">${ic('book')}<span>Browse recipes<small>All ${RL.length}, with search and filters</small></span>${ic('chev')}</button>
   <section><h4>Daily targets</h4><div class="fieldrow three">${num('s-target', 'Calories (kcal)', st.target)}${num('s-prot', 'Protein (g)', st.protGoal)}${num('s-fib', 'Fibre (g)', st.fibreGoal)}</div></section>
   <details class="more"><summary>Sugar, salt and fat limits${ic('chev')}</summary>
@@ -4887,7 +5125,7 @@ function shSettings() {
   <section><h4>Morning latte</h4><label class="check"><input type="checkbox" id="s-latte" ${st.latteOn ? 'checked' : ''}> Include a latte every day</label>
     <div class="fieldrow three">${num('s-lk', 'kcal', st.latteK)}${num('s-lp', 'Protein (g)', st.latteP)}${num('s-lml', 'Milk (ml)', st.latteMl)}</div></section>
   <details class="more"><summary>Meal budgets${ic('chev')}</summary><div class="fieldrow three">${num('s-bb', 'Breakfast', b.b)}${num('s-bl', 'Lunch', b.l)}${num('s-bs', 'Snack', b.s)}${num('s-bd', 'Dinner', b.d)}${num('s-bp', 'Pudding', b.p)}</div>
-    <p class="small muted">Latte plus these add up to ${fmtN(sum)} kcal. Each day scales them to fit its target.</p></details>
+    <p class="small muted" id="bud-note">${budNoteText(b, st.latteOn ? st.latteK : 0, st.target)}</p></details>
   <details class="more"><summary>Weekly goals${ic('chev')}</summary><div class="fieldrow">${num('s-plants', 'Plant points', st.plantGoal)}${num('s-col', 'Colour groups', st.colourGoal)}${num('s-oily', 'Oily fish meals', st.oilyGoal)}${num('s-red', 'Red meat (max)', st.redMax)}</div></details>
   <section><h4>Nights out</h4><div class="fieldrow"><div class="field"><label for="s-usual">Usual drink</label><select id="s-usual">${DRINKS.filter(d => d[0] !== 'latefood').map(d => `<option value="${d[0]}" ${st.usualDrink === d[0] ? 'selected' : ''}>${esc(d[1])}</option>`).join('')}</select></div>
     <div class="field"><label for="s-dm">Drinks count</label><select id="s-dm"><option value="spread" ${st.drinkMode === 'spread' ? 'selected' : ''}>Across the week</option><option value="day" ${st.drinkMode === 'day' ? 'selected' : ''}>On the night</option></select></div></div>
@@ -4949,6 +5187,20 @@ function shConfirm() {
   SH.title = SH.head;
   return `<div class="sheethead"><div><h2>${esc(SH.head)}</h2></div>${closeBtn}</div><p>${esc(SH.msg)}</p>
   <div class="btnrow"><button class="btn ${SH.danger ? 'danger' : 'primary'}" data-a="confirmyes">${esc(SH.yes)}</button><button class="btn ghost" data-a="close">Cancel</button></div>`;
+}
+// a change to portions or goals: from today, or from the start of next week
+function shSetWhen() {
+  SH.title = 'When should this start?';
+  const tk = todayKey(), nw = addDays(startOf(tk), 7), cur = datedOf(S.set), diff = setDiff(cur, SH.vals);
+  const portions = PORTION_KEYS.some(f => !sameVal(cur, SH.vals, f)), ck = cookedFrom(tk, false);
+  const cookedTxt = joinAnd(['l', 'b', 's'].filter(s => ck[s]).map(s => countOf(ck[s], s)));
+  const nowTxt = portions ? `Meals not yet ticked as eaten resize, today's included.${cookedTxt ? ` The ${cookedTxt} already cooked keep their size, so the other meals make up the difference.` : ''}` : 'This week is judged against the new figures.';
+  return `<div class="sheethead"><div><span class="eyebrow">Settings</span><h2>When should this start?</h2></div>${closeBtn}</div>
+  <p class="setdiff">${diff.map(esc).join(' · ')}</p>
+  <button class="btn setrow when" data-a="setwhen" data-v="now">${ic('check')}<span>From today<small>${esc(nowTxt)}</small></span>${ic('chev')}</button>
+  <button class="btn setrow when" data-a="setwhen" data-v="next">${ic('week')}<span>From next week · ${fmtDay(nw)}<small>This week stays as it is.</small></span>${ic('chev')}</button>
+  <p class="small muted">Earlier weeks keep the figures they had either way.</p>
+  <div class="btnrow"><button class="btn ghost" data-a="close">Cancel</button></div>`;
 }
 function ask(head, msg, yes, fn, danger) { pending = fn; openSheet({ type: 'confirm', head, msg, yes, danger }); }
 
@@ -5021,7 +5273,7 @@ function wzSub(s) {
     if (WZ.mode === 'one') return `One batch on ${DOWL[dayIndex(ses.pre)]}. ${n ? 'Picked.' : 'Swipe and tap one.'}`;
     return `First pick is cooked ${DOWL[dayIndex(ses.pre)]}, second ${DOWL[dayIndex(ses.mid)]}. ${n}/2 picked.`;
   }
-  if (s === 'd') { const oily = WZ.picks.d.filter(id => R[id].oily).length, mx = wzMax('d'); return `${n}/${mx} picked${mx < 7 ? ` (${7 - mx} out)` : ''} · ${oily} oily fish (aim ${S.set.oilyGoal})`; }
+  if (s === 'd') { const oily = WZ.picks.d.filter(id => R[id].oily).length, mx = wzMax('d'); return `${n}/${mx} picked${mx < 7 ? ` (${7 - mx} out)` : ''} · ${oily} oily fish (aim ${setAt(WZ.start).oilyGoal})`; }
   return `${n} picked`;
 }
 function wzStep() {
@@ -5059,10 +5311,10 @@ function wzStep() {
     wzOutInit();
     const nd = WZ.picks.d.length + wzDinOut(), oily = WZ.picks.d.filter(id => R[id].oily).length, red = WZ.picks.d.filter(id => R[id].red).length;
     const checks = [];
-    if (oily >= S.set.oilyGoal) checks.push(['good', `${oily} oily fish dinners`]);
-    else if (7 - nd >= S.set.oilyGoal - oily) checks.push(['', `${oily} oily fish picked; ${S.set.oilyGoal - oily} more will be added`]);
-    else checks.push(['bad', `Only ${oily} oily fish dinner${oily === 1 ? '' : 's'} (aim ${S.set.oilyGoal})`]);
-    if (red > S.set.redMax) checks.push(['bad', `${red} red meat dinners (limit ${S.set.redMax})`]);
+    if (oily >= setAt(WZ.start).oilyGoal) checks.push(['good', `${oily} oily fish dinners`]);
+    else if (7 - nd >= setAt(WZ.start).oilyGoal - oily) checks.push(['', `${oily} oily fish picked; ${setAt(WZ.start).oilyGoal - oily} more will be added`]);
+    else checks.push(['bad', `Only ${oily} oily fish dinner${oily === 1 ? '' : 's'} (aim ${setAt(WZ.start).oilyGoal})`]);
+    if (red > setAt(WZ.start).redMax) checks.push(['bad', `${red} red meat dinners (limit ${setAt(WZ.start).redMax})`]);
     const noS = days.filter(k => WZ.noS[k]), noP = days.filter(k => WZ.noP[k]);
     if (noS.length) checks.push(['', `No snack ${dayList(noS)}`]);
     if (noP.length) checks.push(['', `No pudding ${dayList(noP)}`]);
@@ -5230,7 +5482,7 @@ function freezeEaten(st) {
   const sw = (S.weeks[st] && S.weeks[st].swaps) || {};
   weekDays(st).forEach(k => { const dd = S.days[k]; if (!dd) return; SLOTS.forEach(s => { const dn = dd.done[s]; if (dn && dn.m && !dn.sw && R[dd.sl[s]]) dn.sw = Object.assign({}, sw[dd.sl[s]] || {}); }); });
 }
-function setSlot(k, s, v) { const d = D(k); d.sl[s] = v; delete d.done[s]; if (v !== '@c') delete d.cu[s]; save(); }
+function setSlot(k, s, v) { const d = D(k); d.sl[s] = v; delete d.done[s]; if (v !== '@c') delete d.cu[s]; if (d.sw) { delete d.sw[s]; if (!Object.keys(d.sw).length) delete d.sw; } save(); }
 function applyBatch(st, key, s, rid, only) {
   const se = sessions(st, weekMode(st)).find(x => x.key === key), tk = todayKey();
   // leave past days, eaten meals, your own entries and boxes already packed alone; a snack batch changes only its own days
@@ -5340,7 +5592,7 @@ const ACT = {
   xdel(d) { D(UI.day).x.splice(+d.i, 1); save(); render(); },
   target() { openSheet({ type: 'target' }); },
   tpreset(d) { $('t-v').value = d.v; },
-  tsave() { const v = Math.round(+$('t-v').value); if (v < 800 || v > 6000) { toast('Pick something between 800 and 6,000'); return; } D(UI.day).t = v === S.set.target ? null : v; save(); closeSheet(); render(); },
+  tsave() { const v = Math.round(+$('t-v').value); if (v < 800 || v > 6000) { toast('Pick something between 800 and 6,000'); return; } D(UI.day).t = v === setAt(UI.day).target ? null : v; save(); closeSheet(); render(); },
   treset() { D(UI.day).t = null; save(); closeSheet(); render(); },
   fill() { closeSheet(); const st = UI.tab === 'today' ? startOf(UI.day) : UI.week; planWeek(st, false); UI.anim = 'built'; toast('Week planned'); render(); },
   replan() { const st = UI.week; ask('Re-plan this week?', 'Every meal you haven\'t ticked off or set yourself will be replaced with a fresh plan.', 'Re-plan', () => { planWeek(st, true); UI.anim = 'built'; toast('New plan ready'); }); },
@@ -5458,21 +5710,32 @@ const ACT = {
   wgsave() {
     const w = WT(), t = $('wg-target').value.trim(); w.unit = $('wg-unit').value === 'kg' ? 'kg' : 'lb';
     w.target = t ? (() => { const kg = w.unit === 'lb' ? +t / LB : +t; return kg > 30 && kg < 300 ? kg : null; })() : null;
-    w.waistDay = +$('wg-day').value || 0; const sg = +$('wg-sleep').value; if (sg >= 3 && sg <= 14) S.set.sleepGoal = Math.round(sg * 4) / 4;
+    w.waistDay = +$('wg-day').value || 0; const sg = Math.round(+$('wg-sleep').value * 4) / 4; if (sg >= 3 && sg <= 14 && sg !== S.set.sleepGoal) setFrom(todayKey(), Object.assign(datedOf(S.set), { sleepGoal: sg }));
     save(); closeSheet(); render(); toast('Settings saved');
   },
-  wtarget(d) { const v = +d.v; if (!(v >= 1200 && v <= 5000)) return; S.set.target = v; save(); render(); toast(`Daily target is now ${fmtN(v)} kcal; the meal plan uses it from now on`); },
+  wtarget(d) { const v = +d.v; if (!(v >= 1200 && v <= 5000)) return; openSheet({ type: 'setwhen', vals: Object.assign(datedOf(S.set), { target: v }) }); },
   setsave() {
-    const g = id => +$(id).value, st = S.set, pos = (v, f) => isFinite(v) && v > 0 ? v : f;
-    st.target = pos(g('s-target'), st.target); st.protGoal = pos(g('s-prot'), st.protGoal); st.fibreGoal = pos(g('s-fib'), st.fibreGoal);
-    st.fsMax = pos(g('s-fs'), st.fsMax); st.naMax = pos(g('s-na'), st.naMax); st.sfMax = pos(g('s-sf'), st.sfMax); st.loSalt = Math.max(0, Math.min(1, +$('s-lo').value || 0)); st.stock = STOCKS[$('s-stock').value] ? $('s-stock').value : 'reg'; applyStock();
-    st.latteOn = $('s-latte').checked; st.latteK = pos(g('s-lk'), st.latteK); st.latteP = Math.max(0, g('s-lp') || 0); st.latteMl = pos(g('s-lml'), st.latteMl);
-    st.bud = { b: pos(g('s-bb'), st.bud.b), l: pos(g('s-bl'), st.bud.l), s: Math.max(1, g('s-bs') || 0), d: pos(g('s-bd'), st.bud.d), p: Math.max(1, g('s-bp') || 0) };
-    st.plantGoal = pos(g('s-plants'), st.plantGoal); st.colourGoal = Math.min(GROUPS.length, pos(g('s-col'), st.colourGoal)); st.oilyGoal = Math.max(0, g('s-oily') || 0); st.redMax = Math.max(0, g('s-red') || 0);
+    const g = id => +$(id).value, st = S.set, pos = (v, f) => isFinite(v) && v > 0 ? v : f, nv = datedOf(st);
+    // portions and goals wait for a start day; the rest is in force straight away
+    nv.target = pos(g('s-target'), st.target); nv.protGoal = pos(g('s-prot'), st.protGoal); nv.fibreGoal = pos(g('s-fib'), st.fibreGoal);
+    nv.fsMax = pos(g('s-fs'), st.fsMax); nv.naMax = pos(g('s-na'), st.naMax); nv.sfMax = pos(g('s-sf'), st.sfMax); nv.loSalt = Math.max(0, Math.min(1, +$('s-lo').value || 0));
+    nv.latteOn = $('s-latte').checked; nv.latteK = pos(g('s-lk'), st.latteK); nv.latteP = Math.max(0, g('s-lp') || 0); nv.latteMl = pos(g('s-lml'), st.latteMl);
+    nv.bud = { b: pos(g('s-bb'), st.bud.b), l: pos(g('s-bl'), st.bud.l), s: Math.max(1, g('s-bs') || 0), d: pos(g('s-bd'), st.bud.d), p: Math.max(1, g('s-bp') || 0) };
+    nv.plantGoal = pos(g('s-plants'), st.plantGoal); nv.colourGoal = Math.min(GROUPS.length, pos(g('s-col'), st.colourGoal)); nv.oilyGoal = Math.max(0, g('s-oily') || 0); nv.redMax = Math.max(0, g('s-red') || 0);
+    st.stock = STOCKS[$('s-stock').value] ? $('s-stock').value : 'reg'; applyStock();
     setWeekStart(+$('s-ws').value || 0); st.weekendBatch = $('s-wkb').checked; st.prepSnacks = $('s-psn').checked; st.adapt = $('s-adapt').checked;
     st.usualDrink = $('s-usual').value; st.drinkMode = $('s-dm').value; st.dinnerOutK = pos(g('s-dok'), st.dinnerOutK);
     UI.week = startOf(UI.day);
-    save(); closeSheet(); toast('Settings saved'); render();
+    save();
+    if (datedSame(nv, datedOf(st))) { closeSheet(); toast('Settings saved'); render(); return; }
+    openSheet({ type: 'setwhen', vals: nv }); render();
+  },
+  setwhen(d) {
+    if (!SH || !SH.vals) return;
+    const tk = todayKey(), from = d.v === 'next' ? addDays(startOf(tk), 7) : tk, vals = SH.vals;
+    if (PORTION_KEYS.some(f => !sameVal(datedOf(S.set), vals, f))) cookedFrom(from, true);
+    setFrom(from, vals); save(); closeSheet(); render();
+    toast(d.v === 'next' ? `Saved: starts ${fmtDay(from)}` : 'Saved: in force from today');
   },
   backup(d) { openSheet({ type: 'backup', mode: d.v }); },
   histadd() {
@@ -5645,7 +5908,7 @@ function rvMeals() {
 }
 
 function rvPlStat() {
-  const wc = weekCalc(RV.st), set = S.set, miss = GROUPS.filter(x => !wc.cols.has(x));
+  const wc = weekCalc(RV.st), set = setAt(RV.st), miss = GROUPS.filter(x => !wc.cols.has(x));
   return `<div class="rvstat"><div><b>${fmtPts(wc.ptsPlan)}<small>/${set.plantGoal}</small></b><span>plant points</span></div><div><b>${wc.cols.size}<small>/${set.colourGoal}</small></b><span>colour groups ${cdots(wc.cols)}</span></div></div>${miss.length ? `<p class="small" style="margin:0">No ${miss.map(x => GROUPNAME[x]).join(' or ')} this week.</p>` : ''}`;
 }
 function rvPlGrid() {
@@ -5724,7 +5987,7 @@ function rvChecks() {
 // the week's results, using the same rules as the lights in Trends
 function rvReport(st) {
   TC = null;
-  const set = S.set, days = weekDays(st), rows = [], add = (grp, n, s, txt) => rows.push({ grp, n, st: s, txt });
+  const set = setAt(st), days = weekDays(st), rows = [], add = (grp, n, s, txt) => rows.push({ grp, n, st: s, txt });
   const fv = id => days.map(k => foodVal(id, k)).filter(v => v !== null && v !== undefined);
   const pl = weekPlants(st); add('Food', 'Plant points', pl === null ? 'none' : pl >= set.plantGoal ? 'ok' : pl >= set.plantGoal - 5 ? 'mid' : 'off', pl === null ? 'Not logged' : `${fmtPts(pl)} of ${set.plantGoal}`);
   const co = weekColours(st); add('Food', 'Colour groups', co === null ? 'none' : co >= set.colourGoal ? 'ok' : co >= set.colourGoal - 1 ? 'mid' : 'off', co === null ? 'Not logged' : `${co} of ${set.colourGoal}`);
@@ -5827,6 +6090,24 @@ Object.assign(ACT, {
   gapmore() { UI.gapAll = !UI.gapAll; render(); },
   gapshow() { UI.gapAside = !UI.gapAside; render(); },
   ingchk(d) { SH.chk = SH.chk === d.i ? null : d.i; renderSheet(); },
+  omitmode() { SH.om = !SH.om; SH.chk = null; renderSheet(); },
+  omit(d) {
+    if (!SH || !SH.k || !SH.s || !ING[d.i]) return;
+    const k = SH.k, s = SH.s, o = dayCalc(k).slots[s], scope = omitScope(k, s, o); if (!scope || o.r.id !== SH.r) return;
+    const k0 = Math.round(o.k);
+    if (scope === 'meal') { const dd = D(k); dd.sw = dd.sw || {}; const cur = dayOmits(dd, s) || {}; dd.sw[s] = { r: SH.r, sw: Object.assign({}, cur, { [d.i]: 'omit' }) }; }
+    else { const st = startOf(k), w = W(st); freezeEaten(st); w.swaps = w.swaps || {}; const m = w.swaps[SH.r] = w.swaps[SH.r] || {}; m[d.i] = 'omit'; }
+    save(); render(); renderSheet();
+    const o2 = dayCalc(k).slots[s];
+    toast(`Left out the ${shortN(d.i).toLowerCase()}${o2.kind === 'recipe' ? (Math.abs(o2.k - k0) < 15 ? `; the rest scales up to keep ${fmtN(o2.k)} kcal` : `; now ${fmtN(o2.k)} kcal`) : ''}`);
+  },
+  unomit(d) {
+    if (!SH || !SH.k || !SH.s) return;
+    const k = SH.k, s = SH.s;
+    if (d.v === 'day') { const dd = S.days[k], z = dd && dd.sw && dd.sw[s]; if (z) { delete z.sw[d.i]; if (!Object.keys(z.sw).length) delete dd.sw[s]; if (!Object.keys(dd.sw).length) delete dd.sw; } }
+    else { const st = startOf(k), w = S.weeks[st]; freezeEaten(st); if (w && w.swaps && w.swaps[SH.r] && w.swaps[SH.r][d.i] === 'omit') { delete w.swaps[SH.r][d.i]; if (!Object.keys(w.swaps[SH.r]).length) delete w.swaps[SH.r]; } }
+    save(); render(); renderSheet(); toast(`The ${shortN(d.i).toLowerCase()} is back in`);
+  },
   ingsave(d) {
     const id = d.i, g = ING[id], v = {}; let changed = false, amtTxt = '';
     const c = amtCtx(id), ae = $('ic-amt');
@@ -5880,12 +6161,15 @@ document.addEventListener('input', e => {
   else if (id === 'pq' && SH && $('pk-list')) { SH.q = e.target.value; $('pk-list').innerHTML = pickList(); }
   else if (id === 'cq' && SH && $('cq-list')) { SH.q = e.target.value; $('cq-list').innerHTML = cupList(); }
   else if (id === 'plq' && SH && $('pl-grid')) { keepAddFields(); $('pl-grid').innerHTML = plantGrid(); }
+  else if (SH && SH.type === 'settings' && (Object.values(BUD_IDS).includes(id) || id === 's-target' || id === 's-lk')) budNote();
 });
 document.addEventListener('change', e => {
   if (e.target.id === 'ck-w' && e.target.value !== '' && +e.target.value === 0) ACT.ckwna({ v: '1' });
   if (e.target.id === 'wz-date' && WZ && e.target.value) { WZ.start = e.target.value; renderWZ(); }
   if (e.target.id === 'ck-date' && e.target.value) { const v = e.target.value > todayKey() ? todayKey() : e.target.value; UI.ckDate = v; UI.ckEdit = !ckSaved(v); UI.ckWaist = false; ckReset(); render(); }
   if (e.target.id === 'wz-usual' && WZ) { WZ.usual = e.target.value; renderWZ(); }
+  const bs = SLOTS.find(s => BUD_IDS[s] === e.target.id);
+  if (bs) budFit(bs); else if (['s-target', 's-lk', 's-latte'].includes(e.target.id)) budFit(null);
 });
 document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if (SH) closeSheet(); else if (RV) closeReview(); else if (WZ) closeWizard(); else if (PM) closePrep(); });
 
@@ -5893,8 +6177,8 @@ document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if (
 const TABS = [['today', 'Today', 'today'], ['week', 'Week', 'week'], ['out', 'Out', 'glass'], ['prep', 'Prep', 'prep'], ['shop', 'Shop', 'shop']];
 function render() {
   lockMode(startOf(todayKey())); if (UI.week !== startOf(todayKey())) lockMode(UI.week);
-  TC = null; MCACHE = null;
-  const wc = weekCalc(startOf(todayKey())), g = S.set.plantGoal, ph = pillHtml(wc, g);
+  TC = null; MCACHE = null; SETC = {};
+  const wc = weekCalc(startOf(todayKey())), g = setAt(todayKey()).plantGoal, ph = pillHtml(wc, g);
   $('pill').innerHTML = ph.html; $('pill').setAttribute('aria-label', ph.label); $('pill').setAttribute('aria-pressed', UI.trends);
   $('gear').innerHTML = ic('gear'); $('wandbtn').innerHTML = ic('wand');
   // top level: meals or the daily check-in (kept as 'weight' internally)
