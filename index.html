@@ -1048,6 +1048,39 @@ h1, h2, h3 { overflow-wrap: anywhere; }
 .stepamt { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0 2px; }
 .samt { display: inline-block; padding: 3px 8px; border-radius: 8px; background: var(--surface-2); color: var(--ink); font-size: 13px; font-weight: 400; line-height: 1.35; }
 .samt b { font-weight: 700; margin-right: 3px; }
+/* saved foods */
+.foodbox { margin-top: 10px; }
+.foodlist { display: grid; gap: 6px; margin-top: 8px; }
+.frow { display: flex; align-items: center; gap: 4px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); padding: 2px 4px 2px 0; }
+.frow .nm { flex: 1; min-width: 0; text-align: left; background: none; border: 0; padding: 8px 12px; color: var(--ink); font: inherit; font-weight: 700; display: grid; gap: 2px; cursor: pointer; }
+.frow .nm .mt { font-weight: 400; font-size: 12.5px; color: var(--muted); }
+/* leftovers you can correct */
+button.link { border: 0; background: none; padding: 0; font: inherit; color: var(--accent); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.lrow { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.lrow:last-child { border-bottom: 0; }
+.lrow .n { flex: 1; min-width: 0; font-weight: 700; display: block; overflow-wrap: anywhere; }
+.lrow .n .h { display: block; font-weight: 400; font-size: 12.5px; color: var(--muted); }
+.lrow .n .ichip { margin: 4px 0 0; }
+.lrow .lbtns { display: flex; align-items: center; gap: 2px; flex: none; }
+.lrow .lbtns .iconbtn { font-size: 20px; font-weight: 700; }
+.crow .n .ichip { margin-left: 6px; }
+
+/* the ⓘ by a recipe's name, and the description it opens */
+.glue { white-space: nowrap; }
+.glue.loose { white-space: normal; }
+.infodot { display: inline-grid; place-items: center; width: 30px; height: 30px; margin: -4px -4px -4px 4px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--muted); vertical-align: middle; cursor: pointer; }
+.infodot svg { width: 22px; height: 22px; }
+.infodot:hover { color: var(--ink); background: var(--surface-2); }
+.infodot[aria-expanded="true"] { color: var(--accent-ink); background: var(--accent); }
+.pghead .infodot { width: 28px; height: 28px; margin-left: 2px; }
+.pghead .infodot svg { width: 19px; height: 19px; }
+.rdesc { margin-top: 12px; padding: 11px 14px 12px; border-radius: 14px; background: var(--surface-2); border-left: 4px solid var(--accent); }
+.rdesc[hidden] { display: none; }
+.rdesc p { margin: 4px 0 0; font-size: 15.5px; line-height: 1.45; text-wrap: pretty; }
+.rdesc p.small { font-size: 13px; margin-top: 6px; }
+.pgroup .rdesc { margin: 6px 0 8px; }
+.sheet h2.squeeze .infodot { width: 24px; height: 24px; margin: -2px -2px -2px 2px; }
+.sheet h2.squeeze .infodot svg { width: 19px; height: 19px; }
 
 </style>
 </head>
@@ -1072,7 +1105,7 @@ h1, h2, h3 { overflow-wrap: anywhere; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '2.9.0';</script>
+<script>window.TP_VERSION = '3.3.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -1106,7 +1139,7 @@ const PLANTS = {
   redlentil:['Red lentils',1,'orange'], greenlentil:['Green / puy lentils',1,'green'], soya:['Soya (edamame, tofu, miso)',1,'green'],
   // grains
   oats:['Oats',1,'white'], wheat:['Wholewheat',1,'white'], rye:['Rye',1,'white'], barley:['Barley',1,'white'],
-  spelt:['Spelt',1,'white'], quinoa:['Quinoa',1,'white'], buckwheat:['Buckwheat',1,'white'], brownrice:['Brown rice',1,'white'],
+  spelt:['Spelt',1,'white'], quinoa:['Quinoa',1,'white'], buckwheat:['Buckwheat',1,'white'], brownrice:['Brown rice',1,'white'], popcorn:['Popcorn',1,'white'],
   amaranth:['Amaranth',1,'white'],
   // nuts & seeds
   almond:['Almonds',1,'white'], walnut:['Walnuts',1,'white'], hazelnut:['Hazelnuts',1,'white'], peanut:['Peanuts',1,'white'],
@@ -1145,6 +1178,16 @@ const ING_ROWS = [
   // chilled & fermented
   ['kimchi','Kimchi (live)',25,1.5,2.4,'chilled',['napacabbage','chilli'],{fe:30,sb:'The Cultured Collective Original Kimchi in larger stores; any unpasteurised kimchi'}],
   ['kombucha','Kombucha, no sugar',2,0,0,'drinks',[],{fe:200,ml:1,sb:'Remedy Kombucha, 4 × 330ml'}],
+  // grab-and-go snacks, bought on the day at a Sainsbury's Local, Tesco Express or Little Waitrose (label figures, Oct 2026)
+  ['biokefir','Biotiful kefir, 250ml bottle',59,3.5,0,'grab',[],{fe:100,ml:1,u:'bottle',uw:250,sb:'Biotiful Kefir Original 250ml'}],
+  ['kombuchacan','Remedy kombucha, 330ml can',2,0,0,'grab',[],{fe:200,ml:1,u:'can',uw:330,sb:'Remedy Kombucha, any flavour'}],
+  ['fagepot','Fage Total 0%, 170g pot',54,10.3,0,'grab',[],{fe:80,u:'pot',uw:170,sb:'Fage Total 0% 170g'}],
+  ['arlapro','Arla Protein Natural, 200g pot',65,11,0,'grab',[],{u:'pot',uw:200,sb:'Arla Protein Natural Yogurt 200g'}],
+  ['babybel','Mini Babybel Light',208,25,0,'grab',[],{u:'Babybel',uw:20,sb:'Mini Babybel Light'}],
+  ['propercorn','Propercorn Lightly Sea Salted, 20g bag',436,8.6,11,'grab',['popcorn'],{u:'bag',uw:20,sb:'Propercorn Lightly Sea Salted 20g'}],
+  ['eggpot','Egg & spinach protein pot',122,12.8,0.5,'grab',['spinach'],{u:'pot',uw:90,sb:'Egg & spinach pot, about 90g'}],
+  ['carrothoum','Carrot & houmous snack pot',92,2.6,3,'grab',['carrot','chickpea','sesame','garlic','lemon'],{u:'pot',uw:100,sb:'Carrot & houmous pot, about 100g'}],
+  ['fulfil','Fulfil protein bar',374,36,5.7,'grab',['peanut'],{u:'bar',uw:55,sb:'Fulfil Chocolate Peanut Butter 55g'}],
   ['miso','White miso paste',199,12,5,'world',['soya'],{fe:15,sp:6}],
   ['tofu','Firm tofu',120,13,1,'chilled',['soya']],
   ['hummus','Reduced-fat hummus',200,7,6,'chilled',['chickpea','sesame']],
@@ -1710,7 +1753,19 @@ const RECIPE_ROWS = [
 ['s_crispbread','Rye, cottage cheese & tomato','s',{c:'Snack',t:3,g:'quick'}, 'rye 25, cottage 60, cherrytom 50', 'Top the rye with cottage cheese, tomatoes and black pepper.'],
 ['s_chickpeas','Crunchy roast chickpeas','s',{c:'Snack',t:35,g:'',fr:5,mk:5}, 'chickpeas 80, smokedpap 1, cumin 1, oil 3', 'Dry the chickpeas well, toss with the oil and spices.|Roast at 200°C fan for 30 min, shaking halfway. Cool fully before boxing.'],
 ['s_kefirberry','Kefir with berries','s',{c:'Snack',t:2,g:'quick'}, 'kefir 150, strawblue 60', 'Pour the kefir over the thawed berries.'],
-['s_dates','Medjool date & walnuts','s',{c:'Snack',t:0,g:'quick'}, 'dates 20, walnuts 10', 'Split the date and stuff with walnut.']
+['s_dates','Medjool date & walnuts','s',{c:'Snack',t:0,g:'quick'}, 'dates 20, walnuts 10', 'Split the date and stuff with walnut.'],
+// shop-bought: sized as they come, so the rest of the day fits around them
+['g_kefir','Biotiful kefir','s',{c:'Shop-bought',t:0,g:'quick',shop:1}, 'biokefir 250', 'Grab a 250ml bottle of Biotiful kefir, Original.'],
+['g_kefirclem','Biotiful kefir & a clementine','s',{c:'Shop-bought',t:0,g:'quick',shop:1}, 'biokefir 250, clementine 60', 'Grab a bottle of Biotiful kefir and a clementine.'],
+['g_kombbanana','Kombucha & a banana','s',{c:'Shop-bought',t:0,g:'quick',shop:1}, 'kombuchacan 330, banana 110', 'Grab a can of Remedy kombucha and a banana.'],
+['g_kombpop','Kombucha & Propercorn','s',{c:'Shop-bought',t:0,g:'quick',shop:1}, 'kombuchacan 330, propercorn 20', 'Grab a can of Remedy kombucha and a 20g bag of Propercorn.'],
+['g_fageapple','Fage 0% pot & an apple','s',{c:'Shop-bought',t:0,g:'quick',shop:1}, 'fagepot 170, apple 150', 'Grab a 170g pot of Fage Total 0% and an apple.'],
+['g_fageclem','Fage 0% pot & a clementine','s',{c:'Shop-bought',t:0,g:'quick',shop:1}, 'fagepot 170, clementine 60', 'Grab a 170g pot of Fage Total 0% and a clementine.'],
+['g_arla','Arla Protein pot & a clementine','s',{c:'Shop-bought',t:0,g:'quick',shop:1}, 'arlapro 200, clementine 60', 'Grab an Arla Protein Natural pot and a clementine.'],
+['g_babybel','2 Babybel Light & an apple','s',{c:'Shop-bought',t:0,g:'quick',shop:1}, 'babybel 40, apple 150', 'Grab two Mini Babybel Light and an apple.'],
+['g_eggpot','Egg & spinach protein pot','s',{c:'Shop-bought',t:0,g:'quick',shop:1}, 'eggpot 90', 'Grab an egg & spinach protein pot from the chiller.'],
+['g_houmous','Carrot & houmous pot','s',{c:'Shop-bought',t:0,g:'quick',shop:1}, 'carrothoum 100', 'Grab a carrot & houmous snack pot from the chiller.'],
+['g_fulfil','Fulfil protein bar','s',{c:'Shop-bought',t:0,g:'quick',shop:1}, 'fulfil 55', 'Grab a Fulfil bar, Chocolate Peanut Butter.']
 ];
 
 
@@ -2198,6 +2253,231 @@ Object.assign(SUBS_SRC, {
   plum: [['frozpeach', 'Peach slices, straight from frozen'], ['apple', 'Chopped; bake a little longer'], ['frozcherry', 'From frozen']]
 });
 
+// What each dish is like when it lands on the plate (the ⓘ on the recipe sheet).
+const DESC = {
+  b_matcha: "A jar of cool, spoonable green: thick yoghurt flecked with chia and grassy matcha, gently sweet with vanilla, topped with bright kiwi slices that cut through it all.",
+  b_kefiroats: "Soft, creamy oats with a tangy kefir edge, studded with chia and warmed by cinnamon, under a layer of thawed berries that have bled their purple juice into the top.",
+  b_eggmuffin: "Golden, puffed little egg cakes, smoky with paprika, with ribbons of spinach, sweet red pepper and salty pockets of feta in every bite. Good warm or straight from the fridge.",
+  b_bakedoats: "A sliceable square of banana bread meets porridge: golden on top, soft and custardy inside, with blueberries burst into jammy pockets and a whisper of cinnamon.",
+  b_pancakes: "Small, fluffy banana pancakes, lightly crisp at the edges, stacked with a cold dollop of thick yoghurt and a tumble of juicy strawberries and blueberries.",
+  b_mangochia: "A tropical little jar: coconut-scented chia pudding with a lime lift, crowned with soft, sunny mango that's thawed into its own sweet juice.",
+  b_bircher: "Creamy, tangy oats with grated apple woven through, a hint of cinnamon, and a crunchy scatter of seeds on top. Like apple crumble's sensible cousin.",
+  b_frittata: "Neat squares of fluffy, golden frittata, green with courgette, sweet peas and fresh mint, with a savoury parmesan edge. Springtime in a lunchbox.",
+  b_chocpb: "Overnight oats that taste like a brownie: rich cocoa, a salty swirl of peanut butter through the top, and tart raspberries bursting against the chocolate.",
+  b_carrotcake: "All the warmth of carrot cake, spoonable: soft oats with sweet grated carrot, cinnamon, nutmeg and vanilla, finished with a crunch of toasted walnuts.",
+  b_tiramisu: "Breakfast pretending to be pudding: coffee-soaked oats layered with thick vanilla yoghurt, dusted with bitter cocoa and shards of dark chocolate.",
+  b_yogberry: "Thick, cold Greek yoghurt under a pile of jewel-dark berries running with juice, finished with a nutty crunch of seeds.",
+  b_cottage: "Crisp, dark rye piled with cool cottage cheese, sweet halved cherry tomatoes, sharp spring onion, seeds and a grind of black pepper.",
+  b_kimchieggs: "Soft, creamy scrambled eggs on toasted rye, topped with a tangle of cold, fiery kimchi and spring onion. Hot, cold, creamy and sharp all at once.",
+  b_croissant: "A flaky, buttery croissant, warm and shattering at the edges, with a sweet, easy-peel clementine on the side.",
+  l_harissachick: "Smoky, sticky harissa chicken and blistered chickpeas on a tray of charred peppers, courgette and red onion, over lemony bulgur with cool yoghurt and parsley.",
+  l_prawnbean: "Pink, juicy prawns and creamy butter beans among roasted tomatoes and courgette, on pesto-glossed orzo with wilted spinach, lemon and melty shavings of cheddar.",
+  l_turkeychilli: "A thick, smoky chilli, rich with tomatoes, two kinds of beans and pops of sweetcorn, with a gentle cumin warmth, over nutty brown rice with a cool spoon of yoghurt.",
+  l_lemonorzo: "Silky orzo cooked in stock until creamy, with tender chicken, sweet peas and spinach, lifted with lots of lemon, parmesan and fresh dill.",
+  l_peanutsoba: "Cold buckwheat noodles tossed with crunchy red cabbage, carrot and cucumber, edamame and sliced chicken, all coated in a punchy peanut, lime and ginger dressing.",
+  l_dal: "Golden, collapsed red lentils, gently spiced and silky with coconut, with tender chicken and wilted spinach, finished with fresh coriander and a swirl of yoghurt.",
+  l_shawarma: "Warm-spiced, charred chicken over fluffy bulgur with a crunchy chopped salad of cucumber, red cabbage and tomato, all drizzled with nutty tahini yoghurt.",
+  l_meatballorzo: "Tender little oregano meatballs nestled in rich tomato orzo with courgette and kale, finished with torn basil and a snowfall of parmesan.",
+  l_tunapasta: "A sunny Mediterranean pasta salad: chunks of tuna, creamy white beans, sweet roasted peppers, salty olives and capers, all sharp with vinegar and peppery with rocket.",
+  l_burrito: "Spiced chicken over limey rice with black beans, sweetcorn and caramelised sweet potato and peppers, finished with cool yoghurt and fresh coriander.",
+  l_greencurry: "Fragrant, creamy green curry with tender chicken and crisp-tender green beans, courgette and peas, bright with lime, over brown rice with toasted cashews.",
+  l_barleyrisotto: "Chewy, nutty barley in a creamy, thyme-scented risotto with golden chicken, earthy mushrooms and dark ribbons of kale, rich with parmesan.",
+  l_pestopasta: "Wholewheat pasta glossed in a creamy pesto sauce with bright broccoli, sweet peas and sliced chicken, finished with lemon and parmesan.",
+  l_turkeyragu: "A deep, slow-tasting ragù of turkey and puy lentils with sweet carrot, celery and tomato, wound around wholewheat spaghetti with parmesan on top.",
+  l_gochujang: "Sticky, sweet-spicy gochujang chicken over brown rice with steamed broccoli, carrot and edamame, finished with cold, tangy kimchi and toasted sesame.",
+  l_nicoise: "Warm new potatoes and green beans soaked in a mustardy dressing, with chunky tuna, a jammy egg, sweet tomatoes, olives and crisp Little Gem.",
+  l_tikkatray: "Golden, yoghurt-marinated tikka chicken roasted with charred cauliflower, chickpeas and red onion, with spinach wilted through and fresh coriander on top.",
+  l_teriyakitofu: "Crisp-edged tofu and bright edamame, broccoli and pepper, tossed with noodles in a glossy, gingery teriyaki sauce and finished with sesame and spring onion.",
+  l_greekorzo: "Lemony orzo full of sweet peppers, burst tomatoes, salty olives and tender chicken, with creamy crumbled feta on top. Tastes like a Greek holiday.",
+  l_quinoapot: "A warming, smoky pot of fluffy quinoa with chicken, black beans, sweetcorn and peppers in tomato, finished with lime, creamy avocado and coriander.",
+  l_leekstew: "A comforting bowl of tender chicken, silky leeks and creamy white beans in a thyme-scented broth with chewy spelt, kale and a mustardy kick.",
+  l_halloumilentil: "Squeaky golden halloumi on balsamic-dressed puy lentils with sweet roasted squash and peppers, finished with peppery rocket, jewel-like pomegranate and mint.",
+  l_cajun: "Spicy, crisp-edged Cajun chicken and sweet potato wedges with a crunchy, limey slaw of red cabbage, carrot, sweetcorn and black beans.",
+  l_moroccan: "Warm-spiced turkey meatballs in a rich tomato sauce with chickpeas and sweet apricots, over fluffy couscous with cool yoghurt and fresh mint.",
+  l_friedrice: "Smoky, wok-fried brown rice with tender chicken, ribbons of egg, peas, edamame and carrot, seasoned with soy and sesame and finished with crunchy beansprouts.",
+  l_smokystew: "A deep red, smoky stew of tender chicken, buttery beans and soft sweet peppers in tomato, with spinach wilted through and sourdough for mopping.",
+  l_beefnoodles: "Silky strips of seared beef and crisp broccoli and pepper, glossed in a savoury soy and ginger sauce and tossed through wholewheat noodles.",
+  l_squashsoup: "A thick, velvety, golden soup of squash, lentils and chickpeas, gently curried and creamy with coconut, finished with yoghurt, seeds and toasty sourdough.",
+  l_avokimchi: "Crunchy sourdough smothered in chilli-flecked smashed avocado, topped with eggs, cold tangy kimchi, spring onion and seeds, with peppery rocket.",
+  l_shakshuka: "Eggs gently set into a bubbling, smoky sauce of tomatoes, peppers and white beans, with crumbled feta, fresh parsley and sourdough for dunking.",
+  l_tunapitta: "Warm pittas stuffed with a zingy, dill-flecked smash of tuna and chickpeas, crisp lettuce, cucumber, juicy tomatoes and creamy avocado.",
+  l_misosoup: "A steaming, savoury miso broth with soba noodles, silky tofu, pak choi, shiitake and edamame, crowned with a soft, jammy egg.",
+  l_caesarwrap: "A soft wrap packed with sliced chicken, crisp Little Gem, tomatoes and avocado, with a tangy, garlicky Caesar-style dressing and shaved parmesan.",
+  d_salmonbeans: "Pesto-topped salmon on a tray of creamy butter beans, jammy roasted tomatoes and courgette, with lemon, basil, rocket and crusty sourdough on the side.",
+  d_misosalmon: "Salmon with a caramelised, sweet-salty miso glaze on a tangle of soba with pak choi and edamame, finished with sesame, spring onion and lime.",
+  d_harissasalmon: "Rosy, spiced harissa salmon with charred aubergine, peppers and chickpeas, over lemony bulgur with cool yoghurt and mint.",
+  d_salmonpenne: "Flaky salmon and wilted spinach in a light, creamy lemon sauce with peas and penne, finished with fresh dill and parmesan.",
+  d_teriyakisalmon: "Glossy teriyaki salmon over brown rice with edamame and cool cucumber, plus a pile of tangy kimchi, spring onion and sesame.",
+  d_mackerelbeet: "Crisp-skinned mackerel on warm, lemony puy lentils with earthy beetroot and peppery watercress, a punchy horseradish yoghurt and toasted walnuts.",
+  d_sardinepasta: "Spaghetti tossed with garlicky, chilli-warmed olive oil, flakes of sardine, capers and sweet tomatoes, with dark cavolo nero, lemon and toasted pine nuts.",
+  d_kedgeree: "Golden, curry-scented rice studded with smoky flakes of mackerel, peas and spinach, topped with a jammy egg, parsley and a squeeze of lemon.",
+  d_goancurry: "Tender mackerel poached in a fragrant, gently spiced coconut and tomato curry with spinach, over brown rice with lime and fresh coriander.",
+  d_sardinetoast: "Crunchy, garlic-rubbed sourdough piled with rich sardines, with a bright salad of white beans, sweet tomatoes, olives, red onion and basil.",
+  d_trout: "Crisp-skinned trout on buttery crushed new potatoes with peas and broad beans, wilted spinach and a cool, herby dill and lemon yoghurt.",
+  d_salmonbroth: "A fragrant, creamy red curry broth with chunks of poached salmon, slippery rice noodles, pak choi and mushrooms, topped with beansprouts, chilli, lime and coriander.",
+  d_salmongnocchi: "Gnocchi roasted until crisp outside and pillowy within, with charred broccoli, burst tomatoes and a pesto-slicked salmon fillet that flakes at a touch. Lemon and parmesan to finish.",
+  d_sardineorzo: "Bold, briny puttanesca orzo: rich tomato, salty olives and capers, a kick of chilli and garlic, with chunks of oily sardine and spinach folded through.",
+  d_mackerelfennel: "Crisp-skinned mackerel over golden potatoes and soft, sweet roasted fennel, with juicy caramelised orange slices, olives and creamy beans, and peppery rocket on top.",
+  d_gochujangsalmon: "Salmon lacquered in a sticky, sweet-hot gochujang glaze, charred at the edges, over brown rice with chilli-ginger stir-fried greens, sesame and spring onion.",
+  d_trouttikka: "Spiced, yoghurt-charred trout with warm, tomatoey chickpeas and spinach, a cool cucumber and mint raita, and a warm pitta to scoop it all up.",
+  d_prawnarrabbiata: "Juicy prawns in a fiery, garlicky tomato sauce with burst cherry tomatoes and wilted spinach, tossed through hearty lentil penne with basil and parmesan.",
+  d_chickenorzo: "Creamy, savoury orzo with golden chicken, deeply browned mushrooms and soft spinach, scented with thyme and finished with parmesan.",
+  d_turkeyragu: "A thick, slow-tasting ragù of turkey and lentils with sweet carrot and celery in tomato, twirled through wholewheat spaghetti and topped with basil and parmesan.",
+  d_beefragu: "A deep, glossy beef ragù simmered with rosemary and bay until rich and tender, clinging to ribbons of pasta under a blanket of parmesan.",
+  d_beefbroccoli: "Silky, ginger-glazed strips of seared steak with crisp broccoli and sweet red pepper, tossed through rice noodles with chilli, spring onion and crunchy cashews.",
+  d_porkfennel: "Rigatoni in a rustic pork ragù fragrant with toasted fennel seeds and a little chilli, soft sweet fennel, dark cavolo nero and plenty of parmesan.",
+  d_steak: "Juicy seared steak, sliced pink, with caramelised sweet potato wedges, tender broccoli and spinach, and a sharp, herby salsa verde spooned over everything.",
+  d_padthai: "Sweet, sour and salty rice noodles with chicken, ribbons of egg and crunchy beansprouts, finished with chopped peanuts, lime, chilli and fresh coriander.",
+  d_prawnrice: "Smoky, wok-tossed brown rice with plump prawns, egg, peas and crunchy veg, warmed with ginger, garlic and chilli, and glossy with soy and sesame.",
+  d_laksa: "A rich, coconutty, gently fiery red curry broth with tender chicken, slippery rice noodles, pak choi and a halved jammy egg, finished with lime and coriander.",
+  d_tofucurry: "Golden, crisp-edged tofu in a creamy red Thai curry with melting aubergine, sweet pepper and green beans, lifted with lime and basil, over brown rice.",
+  d_sweetpotatocurry: "A thick, golden curry of tender sweet potato and chickpeas in a gently spiced tomato and coconut sauce with spinach, with a cool swirl of yoghurt.",
+  d_fajita: "Smoky, charred strips of chicken, peppers and onion with black beans, piled into a warm wrap with creamy avocado, cool yoghurt and a squeeze of lime.",
+  d_turkeychilli: "A dark, smoky turkey chilli with two kinds of beans and a hint of cocoa for depth, topped with creamy avocado and a cool dollop of yoghurt.",
+  d_cassoulet: "A rustic, smoky pot of tender chicken thighs and creamy white beans in tomato with carrot and kale, under a golden, crunchy breadcrumb crust.",
+  d_codolives: "Flaky white cod steamed on a bed of burst cherry tomatoes, buttery beans, salty olives and capers, with basil, wilted spinach and sourdough for the juices.",
+  d_bream: "Crisp-skinned sea bream with golden new potatoes, charred broccoli and creamy beans, a sharp herb and caper salsa verde, and toasted almonds for crunch.",
+  d_barlotto: "Creamy, chewy pearl barley risotto with sweet peas, juicy prawns and spinach, bright with lemon and rich with parmesan.",
+  d_gnocchibake: "Soft gnocchi and chicken baked in a rich tomato sauce with spinach, under bubbling, stretchy mozzarella and torn basil.",
+  d_pestognocchi: "Golden, crisp-fried gnocchi tossed with pink prawns, sweet peas and courgette in pesto, with lemon, parmesan, rocket and toasted pine nuts.",
+  d_shawarmatray: "Warm-spiced, charred chicken with roasted cauliflower, peppers and onion, piled into soft pitta with a creamy, nutty tahini yoghurt.",
+  d_bibimbap: "A colourful bowl of brown rice topped with garlicky chicken, sesame veg and mushrooms, a runny-yolked egg, tangy kimchi and a sweet-hot gochujang sauce to mix through.",
+  d_ramen: "A deep, savoury miso broth with slurpable noodles, golden tofu, silky mushrooms and pak choi, crowned with a jammy egg and spring onion.",
+  d_prawnlinguine: "Bright, zesty linguine with juicy prawns, sweet tomatoes and peas, and courgette melted into a garlicky, chilli-warmed sauce, finished with lemon, parsley and parmesan.",
+  d_tikkamasala: "Charred, yoghurt-marinated chicken in a rich, gently spiced and lightly creamy tomato sauce with spinach, finished with fresh coriander.",
+  d_lentilragu: "A dark, meaty-tasting ragù of mushrooms and lentils with a balsamic richness, wrapped around wholewheat tagliatelle with kale and parmesan.",
+  d_teriyakichicken: "Sticky, glossy teriyaki chicken over chewy soba with chilli-ginger stir-fried greens and edamame, finished with toasted sesame.",
+  d_tagine: "Tender, warmly spiced chicken with sweet squash, carrot and chickpeas in a fragrant tomato sauce with soft apricots, over fluffy couscous with coriander.",
+  d_halloumitray: "Golden, squeaky halloumi on a za'atar-roasted tray of courgette, peppers and chickpeas, over lemony bulgur with cool minty yoghurt.",
+  d_periperirice: "Fiery, smoky peri-peri chicken on a pan of spicy tomato rice with sweet peppers, peas and sweetcorn, with a squeeze of lemon to wake it up.",
+  d_krapow: "Garlicky, fiery chicken stir-fried with green beans and fragrant Thai basil, over brown rice and topped with a crispy-edged fried egg with a runny yolk.",
+  d_tuscansoup: "A hearty, rustic soup of chicken, creamy white beans and dark kale in a rosemary-scented tomato broth, with parmesan and crusty sourdough.",
+  d_larb: "Zingy, crisp-edged turkey mince with lime, fish sauce, chilli and handfuls of fresh mint and coriander, scooped into cool lettuce cups with peanuts and rice on the side.",
+  p_fageberry: "Thick, cold Greek yoghurt under a tumble of warm, juicy berries that bleed purple into it, finished with a nutty crunch of seeds.",
+  p_compote: "Warm, jammy berry compote spooned over cool, thick yoghurt, topped with toasty cinnamon oats and walnuts. Crumble in a bowl.",
+  p_bakedapple: "A soft, collapsing baked apple stuffed with cinnamon walnuts and oats, its juices pooling, with a cool spoon of thick yoghurt alongside.",
+  p_crumble: "Bubbling, jammy apple and berries under a golden, buttery oat and almond crumble, with a cool dollop of yoghurt melting into the edges.",
+  p_chocchia: "A silky, rich chocolate chia pudding, thick like mousse, topped with cool yoghurt and tart raspberries.",
+  p_pears: "Tender, glistening pears poached in vanilla and cardamom, served on thick skyr with a little of the fragrant syrup and crushed pistachios.",
+  p_bark: "Snappable shards of frozen yoghurt studded with berries, dark chocolate and seeds. Creamy, icy and crunchy, like a lolly you can break.",
+  p_pbchoc: "Thick chocolate yoghurt with soft banana slices and a warm, salty peanut butter drizzle. Tastes far naughtier than it is.",
+  p_tiramisu: "Layers of coffee-soaked oats and smooth, vanilla-scented creamy yoghurt and ricotta, dusted with bitter cocoa and grated dark chocolate.",
+  p_peaches: "Warm, caramelised peaches with cinnamon and vanilla over cool, creamy whipped ricotta, scattered with crunchy pistachios.",
+  p_matcha: "Cool, creamy yoghurt tinted green with grassy, slightly sweet matcha, topped with tangy kiwi and crushed pistachios.",
+  p_mugcake: "A warm, squidgy chocolate sponge straight from the mug, nutty with almonds, with a cold spoon of yoghurt melting on top.",
+  p_mangoskyr: "Thick, tangy skyr under soft, sunny mango with bright lime zest and a crunch of seeds.",
+  p_blackforest: "Warm, juicy dark cherries in their syrup over cold, thick yoghurt with curls of dark chocolate. Black Forest gâteau, minus the faff.",
+  p_cheesecake: "Little pots with a toasty oat and walnut base, a smooth lemony ricotta cheesecake layer, and a jammy berry top.",
+  p_strawberries: "Juicy strawberries with a snappy dark chocolate shell, with vanilla yoghurt for dipping and a sprinkle of pistachios.",
+  s_kombucha: "A cold, fizzy, sweet-sour can of kombucha with a handful of crunchy, buttery mixed nuts.",
+  s_kefir: "A cool glass of tangy, lightly fizzy kefir, thick like a drinking yoghurt.",
+  s_applepb: "Crisp, juicy apple slices dragged through rich, salty peanut butter.",
+  s_hummus: "Crunchy, cold sticks of carrot, cucumber and sweet red pepper for dunking in smooth, garlicky hummus.",
+  s_edamame: "Hot, bright green edamame pods, salty and chilli-flecked with a squeeze of lime. Pop them straight from the pod.",
+  s_kimchiegg: "Firm, creamy-yolked boiled eggs with a pile of cold, fiery, tangy kimchi.",
+  s_skyr: "A pot of thick, cool, tangy skyr with a sweet, juicy clementine that peels in one go.",
+  s_pistachio: "A little pile of salty-sweet, buttery pistachios with two bright, juicy clementines.",
+  s_crispbread: "Dense, malty rye topped with cool, creamy cottage cheese, sweet halved tomatoes and a crack of black pepper.",
+  s_chickpeas: "Crunchy, golden roasted chickpeas, smoky with paprika and warm with cumin. Hard to stop at one handful.",
+  s_kefirberry: "Tangy, lightly fizzy kefir poured over soft, sweet berries that turn the whole glass pink.",
+  s_dates: "A sticky, fudgy Medjool date split open and stuffed with a crunchy, slightly bitter walnut. Like a tiny sweet.",
+  g_kefir: "A cold bottle of smooth, tangy kefir, thick like a drinking yoghurt with a gentle fizz.",
+  g_kefirclem: "A cold bottle of tangy, creamy kefir with a sweet, easy-peel clementine.",
+  g_kombbanana: "A cold, fizzy, sweet-sour can of kombucha and a soft, sweet banana.",
+  g_kombpop: "A crisp, fizzy can of kombucha and a bag of light, salty popcorn that melts as you crunch it.",
+  g_fageapple: "A pot of thick, cold, tangy Greek yoghurt and a crisp, juicy apple.",
+  g_fageclem: "A pot of thick, cold, tangy Greek yoghurt and a bright, sweet clementine.",
+  g_arla: "A thick, smooth, mildly tangy protein yoghurt and a sweet, juicy clementine.",
+  g_babybel: "Two creamy, mild little cheeses popped from their red wax, with a crisp, juicy apple.",
+  g_eggpot: "Soft-boiled eggs on a bed of tender spinach. A savoury chiller-cabinet pot that keeps you full.",
+  g_houmous: "Crunchy, cold carrot sticks with a smooth, garlicky houmous for dunking.",
+  g_fulfil: "A chewy chocolate bar with a soft, salty peanut butter centre. Tastes like a treat, does a protein job.",
+  d_mackpenne: "Penne tossed with smoky flakes of mackerel, soft sweet leeks, kale and peas in a tangy lemon, horseradish and dill yoghurt sauce.",
+  d_salmonrigatoni: "Rigatoni in a chilli-warmed tomato sauce with soft, sweet fennel, olives and spinach, topped with big flakes of roasted salmon, lemon and parsley.",
+  d_troutpesto: "Fusilli, new potatoes and green beans tossed in pesto, with crisp-skinned trout, sweet tomatoes, peppery rocket, parmesan and toasted pine nuts.",
+  d_seafoodlinguine: "Linguine with flaky cod and juicy prawns in a garlicky, chilli-warmed sauce of burst tomatoes, courgette and fennel, topped with crunchy golden breadcrumbs.",
+  d_norma: "Silky, golden roasted aubergine in a rich, garlicky tomato sauce with lentil penne, topped with cool, creamy ricotta, basil and parmesan.",
+  d_orecchiette: "Little pasta ears catching a garlicky, chilli-warmed tangle of broccoli, kale and sweet roasted peppers, with golden chicken, lemon and parmesan.",
+  d_ragubianco: "A creamy white ragù of turkey and mushrooms with sweet leek, carrot and a hint of nutmeg, wound through tagliatelle with spinach, lemon and parmesan.",
+  d_carbonara: "Silky, peppery carbonara with chickpea pasta, golden courgette and sweet peas, lifted with lemon and mint, with juicy tomatoes and rocket on the side.",
+  d_tantanmen: "A creamy, nutty, chilli-warmed miso and sesame broth with savoury turkey, noodles, pak choi, sweetcorn and a halved jammy egg.",
+  d_gochunoodles: "Sticky, sweet-hot gochujang chicken with crunchy veg and edamame tossed through noodles, with cool cucumber and tangy kimchi on top.",
+  d_drunken: "Wide rice noodles stir-fried with chicken, egg and crunchy veg in a salty, fiery garlic and chilli sauce, perfumed with handfuls of Thai basil.",
+  d_singapore: "Thin, golden curry-spiced rice noodles tossed with juicy prawns, ribbons of omelette, crunchy beansprouts, peppers and peas.",
+  d_meegoreng: "Sweet, spicy, savoury noodles with crispy golden tofu, pak choi and beansprouts, topped with a fried egg and a squeeze of lime.",
+  d_chaca: "Golden, turmeric-rubbed trout sizzled with heaps of dill and spring onion, over cool rice noodles and crunchy salad with peanuts and a sharp lime and fish sauce dressing.",
+  d_mackerelsoba: "Sticky ginger-soy mackerel over cold, slippery soba with edamame and a crunchy rainbow of cucumber, carrot and red cabbage.",
+  d_kungpao: "Glossy, tangy, fiery chicken with crunchy peppers, broccoli and celery and plenty of roasted peanuts, tossed through noodles.",
+  d_salmonrisotto: "Creamy, lemony risotto with sweet leeks, peas and broad beans, topped with flakes of salmon, dill and parmesan.",
+  d_biryani: "Fragrant, warmly spiced rice with tender chicken, cauliflower and peas, crowned with crispy golden onions and served with cool cucumber raita.",
+  d_paella: "Smoky, saffron-yellow rice with tender chicken, creamy butter beans, green beans and sweet peppers, scented with rosemary.",
+  d_mackereldon: "Brown rice topped with crisp-skinned mackerel, edamame and a crunchy rainbow of veg, drizzled with a savoury, gingery miso dressing.",
+  d_jambalaya: "A smoky, Cajun-spiced pot of rice with juicy prawns, kidney beans and sweet peppers in tomato. Big Louisiana flavour from one pan.",
+  d_congee: "Silky, comforting rice porridge infused with ginger, with flaky cod, shiitake and pak choi, topped with a soft egg, soy, sesame and spring onion.",
+  d_kimchirice: "Tangy, spicy kimchi fried rice with crispy golden tofu and colourful veg, topped with a runny fried egg, spring onion and sesame.",
+  d_gnocchitray: "Crispy roasted gnocchi with smoky chicken, chickpeas, sweet peppers and burst tomatoes, with a cool garlic yoghurt to drizzle over.",
+  d_eggmasala: "Halved boiled eggs in a rich, warmly spiced tomato and onion masala with peas, spinach and cashews, with a cool cucumber raita.",
+  d_moqueca: "A sunny Brazilian stew of salmon and prawns in creamy coconut with sweet peppers, tomato and lime, over rice and finished with coriander.",
+  d_koftatray: "Warm-spiced turkey koftas roasted with charred peppers, courgette, chickpeas and tomatoes, with cool garlicky tzatziki and a warm pitta.",
+  d_bourguignon: "A dark, rich stew of meaty browned mushrooms and lentils with thyme and a balsamic depth, over buttery crushed potatoes with kale.",
+  d_keema: "Fragrant, warmly spiced beef mince with peas and spinach, a fresh chilli kick and brown rice, with a cool raita alongside.",
+  d_goulash: "A rich, smoky paprika stew of pork and soft red peppers, with new potatoes, a swirl of crème fraîche and a tangy forkful of sauerkraut.",
+  l_greengoddess: "Pasta tossed in a vivid green, herby yoghurt dressing with capers and parmesan, with sliced chicken, green beans, broad beans and cool cucumber.",
+  l_puttbake: "A bubbling bake of pasta in a punchy tomato sauce with tuna, olives, capers and chilli, under a golden layer of melted mozzarella.",
+  l_ricottabake: "Creamy, comforting pasta bake with chicken, sweet leeks and broccoli in a lemony ricotta sauce, topped with golden melted cheese.",
+  l_prawnorzo: "Baked orzo in a warmly spiced tomato sauce with juicy prawns and peppers, topped with salty crumbled feta, fresh dill and lemon.",
+  l_pastaceci: "A thick, soupy Italian pot of pasta and creamy chickpeas, scented with rosemary and garlic, with kale and lots of parmesan.",
+  l_cacciatore: "Tender chicken thighs braised with mushrooms, peppers, olives and rosemary in a tangy tomato sauce, over nutty, chewy spelt.",
+  l_misosoba: "Cold soba with golden tofu, edamame and crunchy veg, tossed in a savoury, gingery miso-sesame dressing with a squeeze of lime.",
+  l_bunprawn: "Cool rice noodles with juicy prawns, crisp lettuce, carrot and cucumber, handfuls of mint and coriander, crunchy peanuts and a sweet-sour-salty lime dressing.",
+  l_dandan: "Crispy, savoury chicken mince over noodles in a nutty, chilli-warmed sesame and soy sauce, with pak choi and crushed peanuts.",
+  l_jpcurry: "A thick, glossy, mild and slightly sweet Japanese curry with tender chicken, carrot and potato, ladled over brown rice.",
+  l_massaman: "A rich, warmly spiced, nutty curry with tender chicken and soft potatoes in coconut and peanut, with green beans, lime and crunchy peanuts.",
+  l_dubu: "Golden slices of tofu braised in a garlicky, chilli-flecked soy glaze, over brown rice with sesame greens and a side of tangy kimchi.",
+  l_gadogado: "An Indonesian salad of potatoes, crisp veg, golden tempeh and a halved egg, drenched in a rich, tangy, gently spicy peanut sauce.",
+  l_tarkadal: "Creamy, golden lentils and chickpeas topped with charred, turmeric-roasted cauliflower and a sizzling garlic and spice tarka, with a cool spoon of yoghurt.",
+  l_keema: "Warmly spiced turkey mince with sweet peas and spinach, a fresh chilli kick, a cool mint raita and a warm pitta for scooping.",
+  l_stuffedpep: "Soft, sweet roasted pepper halves piled with warmly spiced turkey, bulgur and chickpeas in tomato, topped with salty feta, parsley and mint.",
+  b_bakewell: "Creamy vanilla oats under a layer of dark cherries that thaw into a jammy, ruby-red top, with toasted almonds for that Bakewell crunch.",
+  b_peachmelba: "Thick, vanilla-scented skyr topped with soft, sweet peaches and tart raspberries, finished with a crunch of almonds.",
+  b_apricotoats: "Tangy kefir oats bright with orange zest and studded with chewy, honeyed apricot, warmed with cinnamon and topped with seeds.",
+  b_chaioats: "Creamy oats with sweet grated pear and a warming chai blend of ginger, cinnamon, cardamom and nutmeg, topped with crunchy walnuts.",
+  b_tahinidate: "Thick yoghurt swirled with sticky, caramel-like dates and cinnamon, drizzled with nutty tahini and topped with jewel-bright pomegranate.",
+  b_pbjam: "A PB&J in a jar: thick vanilla yoghurt layered with jammy berry chia compote and a salty peanut butter drizzle with crushed peanuts.",
+  b_zaatar: "A savoury yoghurt jar: cool, creamy yoghurt topped with crunchy cucumber, sweet tomatoes and chickpeas, herby za'atar, lemon, olive oil and mint.",
+  b_morningglory: "Soft, golden muffins packed with sweet carrot and apple, warmed with cinnamon and fresh ginger, with seeds on top for crunch.",
+  b_choccourgette: "Fudgy, rich chocolate oat squares with melty pockets of dark chocolate. The courgette keeps them moist and disappears completely.",
+  b_quarkpancakes: "Small, fluffy, lemony pancakes, golden at the edges, with a cool dollop of thick yoghurt and fresh sliced strawberries.",
+  b_broccmuffin: "Puffy little egg muffins with tender broccoli, sweet pepper and spring onion, golden pockets of mature cheddar and fresh chives.",
+  b_masala: "Spiced, fluffy squares of masala omelette with sweet onion, tomato, spinach, chilli and coriander, with a cool mint yoghurt.",
+  p_lemonposset: "A silky, zingy lemon yoghurt set thick like a posset, with juicy blueberries and toasted almonds on top.",
+  p_chocorange: "A rich, thick chocolate mousse bright with orange zest, with juicy orange rounds, curls of dark chocolate and crunchy nuts.",
+  p_matcharasp: "A light, fluffy, pale green mousse with grassy, gently sweet matcha, topped with tart raspberries and crushed pistachios.",
+  p_banoffee: "Thick yoghurt with sticky date caramel, sweet banana slices and toasty cinnamon oats, dusted with cocoa. Banoffee pie in a pot.",
+  p_shrikhand: "Thick, silky yoghurt fragrant with cardamom, topped with sweet, juicy mango and crushed pistachios.",
+  p_clemskyr: "Thick skyr with a warming kick of fresh ginger, topped with juicy clementine rounds, jewel-like pomegranate, walnuts and mint.",
+  p_roaststraw: "Warm, jammy roasted strawberries in a glossy balsamic syrup, spooned over cool vanilla yoghurt with toasted almonds.",
+  p_rhubarbfool: "Soft, tangy pink rhubarb with ginger and orange, folded through thick yoghurt and topped with toasty oat and almond crunch.",
+  p_kefirchia: "Creamy vanilla kefir chia pudding with a jammy layer of warm berry compote and a sprinkle of almonds.",
+  p_clafoutis: "Juicy dark cherries baked in a soft, wobbly vanilla and almond custard, golden on top, with cool yoghurt alongside.",
+  p_plumcrumble: "Soft, jammy plums and pears, warmed with ginger and cinnamon, under a golden oat and walnut crumble with thick skyr.",
+  p_quarkcheesecake: "Creamy, gently set vanilla cheesecakes with a lemon lift on a toasty oat and almond base, topped with dark, jammy berries.",
+  p_squashpie: "Smooth, silky spiced custard pots that taste like pumpkin pie, warm with cinnamon, nutmeg and ginger, with yoghurt and walnuts.",
+  p_peachlolly: "Creamy frozen yoghurt lollies rippled with sweet peach, dipped in dark chocolate and pistachios. A proper summer treat.",
+  s_edakimchi: "Cool, bright green edamame tossed with tangy, fiery chopped kimchi, spring onion and toasted sesame.",
+  s_cottkimchi: "Cool, creamy cottage cheese topped with spicy, tangy kimchi and crunchy cucumber, with spring onion and sesame.",
+  s_misodip: "A savoury, umami miso yoghurt dip with a lime lift, with crunchy, cold sticks of carrot, cucumber and sweet pepper.",
+  s_kefircocoa: "A cold, smooth chocolate kefir, tangy and rich like a chocolate milkshake, with a handful of crunchy almonds.",
+  s_lassi: "A thick, cold, sunny mango lassi with a tangy kefir edge and a floral hint of cardamom, poured over ice.",
+  s_skyrapple: "Thick skyr with sweet grated apple and cinnamon, topped with crunchy walnuts. Apple pie in a bowl.",
+  s_beetdip: "A vivid pink, earthy beetroot yoghurt with dill, garlic and lemon, scooped up with crisp, toasted rye.",
+  s_kombcheddar: "Crisp apple slices with sharp, nutty mature cheddar and walnuts, with a cold, fizzy kombucha alongside.",
+  s_cottpeach: "Cool, creamy cottage cheese topped with soft, sweet peaches, a dusting of cinnamon and a crunch of seeds.",
+  s_devilled: "Halved boiled eggs filled with a creamy, tangy, mustardy yolk mix, dusted with smoky paprika and chives.",
+  s_tofubites: "Crispy, golden cubes of tofu with a salty soy glaze, a sprinkle of sesame and a little chilli. Great warm, good cold.",
+  s_quarkstraw: "Thick, smooth lemony quark topped with juicy sliced strawberries and a crunch of seeds.",
+};
+
 </script>
 <script>
 (function () {
@@ -2211,7 +2491,8 @@ for (const r of ING_ROWS) ING[r[0]] = Object.assign({ id: r[0], n: r[1], k: r[2]
 // Sugar in milk, yoghurt, whole, frozen, tinned or dried fruit and veg doesn't count. Anything not listed is 0.
 const SALT_FS = {
   milk: [0.1], fage0: [0.1], kefir: [0.1], skyr: [0.1], cottage: [0.6], ricotta: [0.3], feta: [2.5], parmesan: [1.6], mozz: [0.5], halloumi: [2.7],
-  cheddar: [1.8], cremef: [0.1], egg: [0.35], butter: [1.2], kimchi: [1.8, 1], kombucha: [0, 0.5], miso: [11, 8], tofu: [0.03], hummus: [0.9, 0.6], gnocchi: [1.0, 0.5],
+  cheddar: [1.8], cremef: [0.1], egg: [0.35], butter: [1.2], kimchi: [1.8, 1], kombucha: [0, 0.5],
+  biokefir: [0.1], fagepot: [0.1], arlapro: [0.12], babybel: [1.8], propercorn: [1.4], eggpot: [0.39], carrothoum: [0.37, 0.2], fulfil: [0.22, 2.7], miso: [11, 8], tofu: [0.03], hummus: [0.9, 0.6], gnocchi: [1.0, 0.5],
   salmon: [0.12], mackerel: [0.2], smokedmack: [2.6], sardines: [0.9], trout: [0.1], bream: [0.2], cod: [0.2], prawns: [0.8], tuna: [0.7],
   chicken: [0.15], thigh: [0.2], turkeymince: [0.2], beefmince: [0.2], steak: [0.15], porkmince: [0.2], chickenmince: [0.2],
   sourdough: [1.1, 1], rye: [1.1, 2], pitta: [1.0, 1], wrap: [1.0, 2], croissant: [0.9, 7], couscous: [0.03], grainpouch: [0.6, 0.5],
@@ -2227,6 +2508,7 @@ const SALT_FS = {
 // saturated fat, g per 100g, from typical UK labels and McCance & Widdowson. Anything not listed is 0.
 const SATF = {
   milk: 1.1, kefir: 1.0, skyr: 0.1, cottage: 1.0, ricotta: 6.5, feta: 14, parmesan: 19, mozz: 6, halloumi: 10, cheddar: 21.7, cremef: 10, egg: 2.6, butter: 52,
+  biokefir: 2.1, arlapro: 0.1, babybel: 8, propercorn: 2, eggpot: 2.2, carrothoum: 0.6, fulfil: 6.9,
   kimchi: 0.1, miso: 1, tofu: 1, hummus: 1.2, gnocchi: 0.2, salmon: 2.4, mackerel: 3.3, smokedmack: 5.5, sardines: 3, trout: 1.1, bream: 0.8, cod: 0.1, prawns: 0.1, tuna: 0.2,
   chicken: 0.3, thigh: 1.4, turkeymince: 0.6, beefmince: 2.2, steak: 2.6, porkmince: 1.8, chickenmince: 0.7,
   sourdough: 0.3, rye: 0.3, pitta: 0.3, wrap: 1.3, croissant: 13, pasta: 0.3, wwpasta: 0.4, lentilpasta: 0.3, chickpeapasta: 0.6, orzo: 0.3, brownrice: 0.6, basmati: 0.2, arborio: 0.2,
@@ -2263,7 +2545,7 @@ function finish(r, I = ING) {
 for (const row of RECIPE_ROWS) {
   const [id, n, slots, m, ings, steps] = row;
   const items = ings.split(',').map(s => { const [i, g] = s.trim().split(/\s+/); return { i, g: +g }; });
-  const r = finish({ id, n, slots: slots.split(''), c: m.c || '', t: m.t || 0, tags: (m.g || '').split(/\s+/).filter(Boolean), fr: m.fr || 0, fz: !!m.fz, prep: !!m.prep, treat: !!m.treat, note: m.n || '', mk: m.mk || 0, items, steps: steps.split('|') });
+  const r = finish({ id, n, slots: slots.split(''), c: m.c || '', t: m.t || 0, tags: (m.g || '').split(/\s+/).filter(Boolean), fr: m.fr || 0, fz: !!m.fz, prep: !!m.prep, treat: !!m.treat, shop: !!m.shop, note: m.n || '', mk: m.mk || 0, items, steps: steps.split('|') });
   if (r.prep && r.slots.includes('l') && !m.fr && !r.rice) r.fr = 4;
   R[id] = r; RL.push(r);
 }
@@ -2402,6 +2684,10 @@ const SNACKPACK = {
   s_quarkstraw: [3, true, ['Beat the quark with the lemon zest, a squeeze of juice and the erythritol, and spoon into small lidded pots.', 'Pack the strawberries whole and bag up the seeds.', 'Slice the strawberries over the quark just before eating.']]
 };
 const packable = r => !!(r && SNACKPACK[r.id]);
+// where the shop-bought snacks are sold; ranges in the smaller local shops vary
+const GRAB_WHERE = { biokefir: 'Biotiful: Sainsbury\'s, Tesco and Waitrose', kombuchacan: 'Remedy: all three', fagepot: 'Fage pots: all three', arlapro: 'Arla Protein Natural: Sainsbury\'s and Tesco; newer, so not every local has it',
+  babybel: 'Babybel: all three', propercorn: 'Propercorn: all three', eggpot: 'Egg pots: Waitrose and M&S do egg & spinach; Sainsbury\'s and Tesco do egg protein pots', carrothoum: 'Carrot & houmous pots: each has its own', fulfil: 'Fulfil: all three' };
+const grabWhere = r => r.items.map(it => GRAB_WHERE[it.i]).filter(Boolean);
 const fridgeLife = r => r.rice ? 1 : packable(r) ? SNACKPACK[r.id][0] : r.fr;
 // the steps for a batch: snacks get their packing steps
 const prepSteps = gr => (gr.s === 's' && packable(gr.r) ? SNACKPACK[gr.r.id][2] : gr.r.steps);
@@ -2436,7 +2722,7 @@ function dayList(ks) {
 
 /* ───────────── state ───────────── */
 const KEY = 'thirtyplants.v1';
-const DEF = { target: 2000, latteK: 150, latteP: 11, latteMl: 300, latteOn: true, bud: { b: 200, l: 575, s: 150, d: 700, p: 225 }, prepSnacks: false, plantGoal: 30, colourGoal: 5, oilyGoal: 2, redMax: 1, protGoal: 120, fibreGoal: 30, fsMax: 30, naMax: 2.4, sfMax: 20, loSalt: 0, stock: 'reg', sleepGoal: 7.5, weekendBatch: false, adapt: true, weekStart: 0, drinkMode: 'spread', usualDrink: 'lager', dinnerOutK: 900 };
+const DEF = { target: 2000, latteK: 150, latteP: 11, latteMl: 300, latteOn: true, bud: { b: 200, l: 575, s: 150, d: 700, p: 225 }, prepSnacks: false, plantGoal: 30, colourGoal: 5, oilyGoal: 2, redMax: 1, protGoal: 120, fibreGoal: 30, fsMax: 30, naMax: 2.4, sfMax: 20, loSalt: 0, stock: 'reg', sleepGoal: 7.5, weekendBatch: false, snackShop: 'work', adapt: true, weekStart: 0, drinkMode: 'spread', usualDrink: 'lager', dinnerOutK: 900 };
 const OLD_BUD = { b: 175, l: 525, s: 125, d: 625, p: 200 };
 /* settings that belong to the days they were in force: portions and goals. A change starts on a chosen day and every
    day before it keeps what it had. S.setPast holds the earlier values, each in force until the day it names. */
@@ -2513,6 +2799,20 @@ function mendDay(d) {
   if (d.fz !== undefined) { if (!isObj(d.fz)) delete d.fz; else { Object.keys(d.fz).forEach(s => { const z = d.fz[s]; if (!isObj(z) || typeof z.r !== 'string' || !(+z.m > 0)) delete d.fz[s]; else z.m = +z.m; }); if (!Object.keys(d.fz).length) delete d.fz; } }
   return d;
 }
+/* saved foods: everything you log yourself is kept by name, so it can go straight back in another day */
+const FOOD_SKIP = new Set(['extra', 'something else', 'plants outside the plan']);
+const foodKey = n => String(n || '').trim().toLowerCase().replace(/\s+/g, ' ');
+function foodPut(st, x, day) {
+  const key = foodKey(x && x.n); if (!key || FOOD_SKIP.has(key) || x.rv || x.auto) return;
+  st.foods = st.foods || {};
+  const prev = st.foods[key] || {}, e = { n: String(x.n).trim(), k: +x.k || 0, p: +x.p || 0 };
+  if (x.fe) e.fe = true;
+  if (Array.isArray(x.pl) && x.pl.length) e.pl = x.pl.filter(q => PLANTS[q]);
+  ['na', 'sa', 'fs', 'sf', 'f'].forEach(f => { if (x[f] !== undefined && x[f] !== null && Number.isFinite(+x[f])) e[f] = +x[f]; });
+  e.used = (prev.used || 0) + 1; e.last = day && (!prev.last || day >= prev.last) ? day : prev.last || day || todayKey();
+  st.foods[key] = e;
+}
+const foodCopy = e => { const x = { n: e.n, k: e.k, p: e.p, pl: (e.pl || []).slice() }; if (e.fe) x.fe = true; ['na', 'sa', 'fs', 'sf', 'f'].forEach(f => { if (e[f] !== undefined) x[f] = e[f]; }); return x; };
 function normalise(s) {
   if (!isObj(s) || s.v !== 1) s = { v: 1, set: {}, days: {}, weeks: {}, favs: {} };
   s.set = isObj(s.set) ? s.set : {};
@@ -2531,6 +2831,7 @@ function normalise(s) {
   SLOTS.forEach(x => { if (!(+bud[x] >= 0)) bud[x] = DEF.bud[x]; else bud[x] = +bud[x]; });
   s.set.weekStart = Math.round(s.set.weekStart); if (!(s.set.weekStart >= 0 && s.set.weekStart <= 6)) s.set.weekStart = 0;
   if (s.set.colourGoal > 5) s.set.colourGoal = 5; // 5 colour groups a week
+  if (!['work', 'home', 'all'].includes(s.set.snackShop)) s.set.snackShop = 'work';
   s.wt = Object.assign({ log: {}, waist: {}, unit: 'lb', goal: 'lose', rate: 0.45, waistDay: s.set.weekStart || 0, target: null }, s.wt || {});
   ['log', 'waist'].forEach(f => { if (!isObj(s.wt[f])) s.wt[f] = {}; });
   s.days = s.days || {}; s.weeks = s.weeks || {}; s.favs = s.favs || {}; s.nope = s.nope || {}; s.stock = s.stock || {};
@@ -2558,6 +2859,21 @@ function normalise(s) {
   s.ingPast = isObj(s.ingPast) ? s.ingPast : {}; // the figures earlier weeks used, before a label change
   Object.keys(s.ingPast).forEach(id => { const l = Array.isArray(s.ingPast[id]) ? s.ingPast[id].filter(x => isObj(x) && DAY_KEY.test(x.until || '') && (x.v === null || isObj(x.v))) : []; if (l.length) s.ingPast[id] = l.sort((a, b) => (a.until < b.until ? -1 : 1)); else delete s.ingPast[id]; });
   s.gapsOk = s.gapsOk && typeof s.gapsOk === 'object' ? s.gapsOk : {};
+  // your pack sizes, and leftovers you've corrected by hand
+  s.packs = isObj(s.packs) ? s.packs : {};
+  Object.keys(s.packs).forEach(i => { const v = +s.packs[i]; if (!ING[i] || !(v > 0) || !Number.isFinite(v)) delete s.packs[i]; else s.packs[i] = v; });
+  Object.values(s.weeks).forEach(w => {
+    if (w.left === undefined) return;
+    if (!isObj(w.left)) { delete w.left; return; }
+    Object.keys(w.left).forEach(i => { const o = w.left[i]; if (!ING[i] || !isObj(o) || !Number.isFinite(+o.g) || +o.g < 0) { delete w.left[i]; return; } o.g = +o.g; if (o.until !== undefined && o.until !== null && !DAY_KEY.test(o.until)) delete o.until; });
+  });
+  // saved foods; the first time, built from everything already logged
+  s.foods = isObj(s.foods) ? s.foods : {};
+  Object.keys(s.foods).forEach(key => { const e = s.foods[key]; if (!isObj(e) || typeof e.n !== 'string' || !e.n.trim() || !Number.isFinite(+e.k)) { delete s.foods[key]; return; } e.k = +e.k; e.p = Number.isFinite(+e.p) ? +e.p : 0; if (e.pl !== undefined) e.pl = Array.isArray(e.pl) ? e.pl.filter(q => PLANTS[q]) : []; });
+  if (!s.foodv) {
+    Object.keys(s.days).sort().forEach(k => { const d = s.days[k]; (d.x || []).forEach(x => foodPut(s, x, k)); Object.values(d.cu || {}).forEach(c => foodPut(s, c, k)); });
+    s.foodv = 1;
+  }
   // portions and goals as they were before a change, each in force until the day it names
   const seen = new Set();
   s.setPast = (Array.isArray(s.setPast) ? s.setPast : []).filter(x => isObj(x) && DAY_KEY.test(x.until || '') && isObj(x.v) && !seen.has(x.until) && seen.add(x.until)).sort((a, b) => (a.until < b.until ? -1 : 1));
@@ -2588,7 +2904,7 @@ function normalise(s) {
   return s;
 }
 function load() { let s = null; try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) { s = null; } return normalise(s); }
-function save() { SETC = {}; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } }
+function save() { SETC = {}; CARRYC = {}; LOC = {}; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } }
 let S = load();
 // the stock you buy changes the sodium in every recipe that uses it
 const STOCKS = { reg: ['Stock (from cube or pot)', 0.8, 'Regular'], red: ['Reduced-salt stock (cube or pot)', 0.45, 'Reduced salt'], low: ['Very low salt stock cubes', 0.1, 'Very low salt'] };
@@ -2737,6 +3053,7 @@ function dayCalc(k) {
       if (o.done && dn.m) { o.m = dn.m; fixed += r.k * o.m; }
       else if (pk) { o.m = pk.m; fixed += r.k * o.m; }
       else if (fz && o.prepped) { o.m = fz.m; o.kept = true; fixed += r.k * o.m; } // cooked before a change of portions
+      else if (r.shop) { o.m = 1; o.fixedPack = true; fixed += r.k; } // shop-bought: a pot is a pot
       else if (o.prepped || !st.adapt) { o.m = portionM(r, o.base / r.k); fixed += r.k * o.m; }
       else flex.push(o);
     } else o.kind = 'empty';
@@ -2833,20 +3150,43 @@ function batchName(k, s, r) {
 /* ───────────── packs and leftovers ───────────── */
 // Typical Sainsbury's pack sizes (g or ml) for perishables that go off once opened; countable veg uses one item.
 const PACK = { feta: 200, ricotta: 250, mozz: 125, halloumi: 225, cremef: 300, cottage: 300, quark: 250, skyr: 450, liveyog: 500, hummus: 200, gnocchi: 500, tofu: 280, tempeh: 200,
-  thigh: 500, turkeymince: 500, beefmince: 500, porkmince: 500, chickenmince: 500, chicken: 300, steak: 225,
+  thigh: 320, turkeymince: 500, beefmince: 500, porkmince: 500, chickenmince: 500, chicken: 300, steak: 225,
   passata: 500, coconutmilk: 400, choptom: 400, chickpeas: 240, butterbeans: 235, cannellini: 240, blackbeans: 240, kidneybeans: 240, puy: 250,
   spinach: 240, rocket: 60, kale: 200, cherrytom: 250, mushroom: 250, shiitake: 150, broccoli: 350, cauli: 600, redcabbage: 500, greenbeans: 200, beansprouts: 300, watercress: 85,
   squash: 900, cucumber: 300, beetroot: 250, pomegranate: 100, raspberries: 150, strawberries: 400, blueberries: 150, celery: 400, pakchoi: 240, lettuce: 180,
   basil: 30, parsley: 30, coriander: 30, mint: 30, dill: 20, chives: 20,
-  courgette: 250, aubergine: 300, fennel: 250, leek: 200, redpepper: 150, yellowpepper: 150, avocado: 120 };
+  courgette: 250, aubergine: 300, fennel: 250, leek: 200, redpepper: 150, yellowpepper: 150, avocado: 120,
+  // checked against sainsburys.co.uk, Oct 2026: salmon fillets ×2 240g, cod fillets ×2 250g, raw king prawns 165g, spring onions 100g, thigh fillets 320g
+  salmon: 240, cod: 250, trout: 250, mackerel: 200, bream: 200, prawns: 165, springonion: 100, tomato: 400, fage0: 1000, kefir: 500, pitta: 330 };
+// tubs, tins and pouches keep sealed; their clock starts when they're opened, the rest from the day they're bought
+const OPENED = new Set(['feta', 'ricotta', 'mozz', 'halloumi', 'cremef', 'cottage', 'quark', 'skyr', 'liveyog', 'hummus', 'fage0', 'kefir', 'gnocchi', 'tofu', 'tempeh',
+  'passata', 'coconutmilk', 'choptom', 'chickpeas', 'butterbeans', 'cannellini', 'blackbeans', 'kidneybeans', 'puy']);
+// days a pack keeps once bought (tubs, tins and pouches: once opened), in the fridge
+const SHELF = { feta: 5, ricotta: 4, mozz: 3, halloumi: 5, cremef: 5, cottage: 5, quark: 5, skyr: 5, liveyog: 5, hummus: 4, gnocchi: 3, tofu: 3, tempeh: 4,
+  thigh: 2, turkeymince: 2, beefmince: 2, porkmince: 2, chickenmince: 2, chicken: 2, steak: 3, salmon: 2, cod: 2, trout: 2, mackerel: 2, bream: 2, prawns: 2,
+  passata: 5, coconutmilk: 4, choptom: 3, chickpeas: 3, butterbeans: 3, cannellini: 3, blackbeans: 3, kidneybeans: 3, puy: 3,
+  spinach: 4, rocket: 3, kale: 5, cherrytom: 7, mushroom: 5, shiitake: 4, broccoli: 6, cauli: 7, redcabbage: 10, greenbeans: 5, beansprouts: 2, watercress: 3,
+  squash: 5, cucumber: 5, beetroot: 7, pomegranate: 4, raspberries: 3, strawberries: 4, blueberries: 6, celery: 10, pakchoi: 4, lettuce: 5,
+  basil: 4, parsley: 7, coriander: 4, mint: 5, dill: 4, chives: 4,
+  courgette: 6, aubergine: 6, fennel: 7, leek: 10, redpepper: 7, yellowpepper: 7, avocado: 3, springonion: 6, tomato: 7, fage0: 7, kefir: 7, pitta: 4 };
+// your own pack sizes (S.packs) replace the usual ones; anything you give a size to is tracked for leftovers too
+const PACK_BASE = Object.assign({}, PACK);
+function applyPacks() { Object.keys(PACK).forEach(i => { if (!(i in PACK_BASE)) delete PACK[i]; }); Object.assign(PACK, PACK_BASE); Object.entries(S.packs || {}).forEach(([i, g]) => { if (ING[i] && g > 0) PACK[i] = g; }); }
+applyPacks();
+// how long something keeps when there's no figure for it: by the aisle it comes from
+const SHELF_AISLE = { veg: 7, dairy: 7, meat: 2, fish: 2, chilled: 7, bakery: 4, frozen: 365 };
+const shelfOf = i => SHELF[i] || (ING[i] && SHELF_AISLE[ING[i].a]) || 14;
 const HERBS = new Set(['basil', 'parsley', 'coriander', 'mint', 'dill', 'chives']);
-const FREEZE = new Set(['thigh', 'turkeymince', 'beefmince', 'porkmince', 'chickenmince', 'chicken', 'steak', 'gnocchi']); // spare goes in the freezer
+const FREEZE = new Set(['thigh', 'turkeymince', 'beefmince', 'porkmince', 'chickenmince', 'chicken', 'steak', 'gnocchi', 'salmon', 'cod', 'trout', 'mackerel', 'bream', 'prawns', 'pitta']); // spare goes in the freezer
 const wasteW = i => HERBS.has(i) || FREEZE.has(i) ? 0.3 : 1;
 const packsFor = (need, P) => need > 0 ? Math.ceil(need / P - 0.03) : 0;
-// grams used across a week's plan (eaten or not)
+// grams used each day of a week's plan (eaten or not), and across the week
+function weekUseDays(st) {
+  return weekDays(st).map(k => { const t = {}, c = dayCalc(k); SLOTS.forEach(s => { const o = c.slots[s]; if (o.kind === 'recipe') o.r.items.forEach(it => { t[it.i] = (t[it.i] || 0) + it.g * o.m; }); }); return t; });
+}
 function weekUse(st) {
   const t = {};
-  weekDays(st).forEach(k => { const c = dayCalc(k); SLOTS.forEach(s => { const o = c.slots[s]; if (o.kind === 'recipe') o.r.items.forEach(it => { t[it.i] = (t[it.i] || 0) + it.g * o.m; }); }); });
+  weekUseDays(st).forEach(d => Object.entries(d).forEach(([i, g]) => { t[i] = (t[i] || 0) + g; }));
   return t;
 }
 // what's left of opened packs at the end of a week, after using any spare carried in
@@ -2859,17 +3199,91 @@ function spareFrom(use, carry) {
   });
   return out;
 }
-// last week's spares worth using this week: a quarter of a pack or more (herbs don't keep)
-function carryInto(st) {
-  const sp = spareFrom(weekUse(addDays(st, -7)), null), out = {};
-  Object.entries(sp).forEach(([i, g]) => { if (!HERBS.has(i) && g >= PACK[i] * 0.25 && g >= 20) out[i] = g; });
-  return out;
+// the day a week's pack of something was bought: the first shop, or the second when the later meals need it
+function buyDates(st) {
+  const mode = weekMode(st), sess = sessions(st, mode), late = new Set();
+  if (mode === 'two' && sess[1]) weekDays(st).slice(3).forEach(k => { const c = dayCalc(k); SLOTS.forEach(s => { const o = c.slots[s]; if (o.kind === 'recipe' && !o.r.shop) o.r.items.forEach(it => late.add(it.i)); }); });
+  return i => (late.has(i) ? sess[1].date : sess[0].date);
 }
-// planner: how many packs' worth of perishables a candidate week would leave unused
-function wasteOf(c, carry) {
-  const sc = slotScale(), use = {};
-  c.forEach(sl => SLOTS.forEach(s => { const r = R[sl[s]]; if (!r) return; const m = clampM(PS().bud[s] * sc / r.k); r.items.forEach(it => { if (PACK[it.i]) use[it.i] = (use[it.i] || 0) + it.g * m; }); }));
-  return Object.entries(spareFrom(use, carry)).reduce((a, [i, g]) => a + g / PACK[i] * wasteW(i), 0);
+// what a week's plan will leave over, with the last day each is still good (null: it goes in the freezer and keeps)
+function spareInfo(st, carry, cUntil) {
+  carry = carry || {}; cUntil = cUntil || {};
+  const per = weekUseDays(st), days = weekDays(st), next = addDays(st, 7), bo = buyDates(st), g = {}, until = {};
+  new Set([...Object.keys(carry), ...per.flatMap(d => Object.keys(d))]).forEach(i => {
+    const P = PACK[i]; if (!P) return;
+    // last week's spare covers what's used while it's still good; the rest comes from new packs
+    const c = carry[i] || 0, cu = cUntil[i];
+    let left = c, need = 0;
+    const fromNew = per.map((d, di) => { const u = d[i] || 0, ok = !cu || days[di] <= cu, t = ok ? Math.min(left, u) : 0; left -= t; need += u - t; return u - t; });
+    const packs = packsFor(need, P), newLeft = packs * P - need, oldLeft = left > 0.5 && (!cu || cu >= next) ? left : 0;
+    let u0 = null;
+    if (newLeft > 0.5 && !FREEZE.has(i)) {
+      let start = bo(i);
+      if (OPENED.has(i)) { const last = (packs - 1) * P; let cum = 0; for (let d = 0; d < 7; d++) { const before = cum; cum += fromNew[d]; if (fromNew[d] > 0 && cum > last && before <= last) { start = days[d]; break; } } }
+      u0 = addDays(start, shelfOf(i) - 1);
+    }
+    const v = (newLeft > 0.5 ? newLeft : 0) + oldLeft;
+    if (v < P * 0.25 || v < 20) return;
+    g[i] = v;
+    until[i] = FREEZE.has(i) ? null : newLeft > 0.5 && oldLeft ? (cu && cu < u0 ? cu : u0) : newLeft > 0.5 ? u0 : cu || null;
+  });
+  return { g, until };
+}
+// last week's spares worth using this week: a quarter of a pack or more, and only what's still good once the week starts
+let CARRYC = {};
+function carryInfo(st, depth = 0) {
+  if (CARRYC[st]) return CARRYC[st];
+  const prev = addDays(st, -7), pc = depth < 3 ? carryInfo(prev, depth + 1) : { g: {}, until: {} };
+  const sp = spareInfo(prev, pc.g, pc.until), g = {}, until = {};
+  Object.keys(sp.g).forEach(i => { const u = sp.until[i]; if (u && u < st) return; g[i] = sp.g[i]; until[i] = u; });
+  // what you've told the app you actually have: amounts changed, things used up or binned, things added
+  const ov = (S.weeks[st] && S.weeks[st].left) || {};
+  Object.entries(ov).forEach(([i, o]) => {
+    if (!ING[i]) return;
+    if (!(o.g > 0)) { delete g[i]; delete until[i]; return; }
+    g[i] = o.g; until[i] = o.until !== undefined ? o.until : i in until ? until[i] : FREEZE.has(i) ? null : addDays(st, shelfOf(i) - 1);
+  });
+  return (CARRYC[st] = { g, until });
+}
+const carryInto = st => carryInfo(st).g;
+// leftovers a meal on day k could use: last week's spares that are still good that day
+let LOC = {};
+function leftoversOn(k) {
+  if (LOC[k]) return LOC[k];
+  const ci = carryInfo(startOf(k)), out = {};
+  Object.keys(ci.g).forEach(i => { if (!ci.until[i] || k <= ci.until[i]) out[i] = { g: ci.g[i], until: ci.until[i], last: true }; });
+  return (LOC[k] = out);
+}
+const usesUp = (r, lo) => [...new Set(r.items.filter(it => lo[it.i]).map(it => it.i))];
+// how much sooner-going-off spares count: a day or two left is three times as pressing as a frozen one
+const urgency = (st, until) => (until ? Math.min(3, 1 + 4 / Math.max(1, daysBetween(st, until) + 1)) : 1);
+// planner: how many packs' worth of perishables a candidate week would waste. It walks the week day by day: packs are
+// bought at that half of the week's shop (tubs and tins start their clock once opened), last week's spares are used
+// while they're good, and anything that goes off before it's used, or before next week, counts against the plan.
+// Spares that will keep into next week count a little, since next week's plan can use them.
+function wasteOf(c, carry, cUntil, days, st) {
+  carry = carry || {}; cUntil = cUntil || {};
+  const sc = slotScale(), per = c.map(() => ({}));
+  c.forEach((sl, di) => SLOTS.forEach(s => { const r = R[sl[s]]; if (!r) return; const m = r.shop ? 1 : clampM(PS().bud[s] * sc / r.k); r.items.forEach(it => { if (PACK[it.i]) per[di][it.i] = (per[di][it.i] || 0) + it.g * m; }); }));
+  if (!days || !st) { const use = {}; per.forEach(d => Object.entries(d).forEach(([i, g]) => { use[i] = (use[i] || 0) + g; })); return Object.entries(spareFrom(use, carry)).reduce((a, [i, g]) => a + g / PACK[i] * wasteW(i), 0); }
+  const trips = c.mode === 'two' ? sessions(st, 'two').map(x => x.date) : [addDays(st, -1)], tripOf = di => (trips.length > 1 && di >= 3 ? trips[1] : trips[0]), next = addDays(st, 7);
+  let w = 0;
+  new Set([...Object.keys(carry), ...per.flatMap(d => Object.keys(d))]).forEach(i => {
+    const P = PACK[i], life = shelfOf(i) - 1; if (!P) return;
+    const L = carry[i] ? [{ g: carry[i], until: cUntil[i] || null, carried: true }] : [];
+    per.forEach((d, di) => {
+      let need = d[i] || 0; if (!need) return;
+      const k = days[di];
+      for (const x of L) { if (need <= 0) break; if (x.g <= 0 || (x.until && x.until < k)) continue; const t = Math.min(x.g, need); x.g -= t; need -= t; }
+      while (need > 0.5) { const nb = { g: P, until: FREEZE.has(i) ? null : addDays(OPENED.has(i) ? k : tripOf(di), life) }, t = Math.min(P, need); nb.g -= t; need -= t; L.push(nb); }
+    });
+    L.forEach(x => {
+      if (x.g < 0.5) return;
+      const f = x.g / P * wasteW(i), gone = x.until && x.until < next;
+      w += gone ? (x.carried ? f * 1.5 * urgency(st, x.until) : f) : f * 0.4;
+    });
+  });
+  return w;
 }
 
 /* ───────────── auto planner ───────────── */
@@ -2882,8 +3296,8 @@ function estFibre(sl) { const st = PS(), sc = slotScale(); let f = 0; for (const
 function estNaFs(sl) { const st = PS(), sc = slotScale(); let na = st.latteOn ? st.latteMl * ING.milk.sa / 250 : 0, fs = 0, sf = st.latteOn ? st.latteMl * ING.milk.sf / 100 : 0, any = false; for (const s of SLOTS) { const r = R[sl[s]]; if (r) { const m = clampM(st.bud[s] * sc / r.k); na += r.na * m; fs += r.fs * m; sf += r.sf * m; any = true; } } if (any) na += (+st.loSalt || 0) * TSP_SALT * LOSALT_NA / 100; return [na, fs, sf]; }
 function estProtein(sl) { const st = PS(), sc = slotScale(); let p = st.latteOn ? st.latteP : 0; for (const s of SLOTS) { const r = R[sl[s]]; if (r) p += r.p * clampM(st.bud[s] * sc / r.k); } return p; }
 
-function candidate(st, days, prefs, carry) {
-  prefs = prefs || {}; carry = carry || {};
+function candidate(st, days, prefs, carry, cUntil) {
+  prefs = prefs || {}; carry = carry || {}; cUntil = cUntil || {};
   const P = s => (prefs[s] || []).filter(id => R[id]);
   const cur = days.map(k => Object.assign({}, peekD(k).sl));
   const w = S.weeks[st];
@@ -2900,12 +3314,19 @@ function candidate(st, days, prefs, carry) {
   // running grams of pack-sold perishables, so later picks can finish packs already opened
   const useT = {};
   const addPlants = (r, n = 1) => { r.plants.forEach(x => plants.add(x)); r.items.forEach(it => { if (PACK[it.i]) useT[it.i] = (useT[it.i] || 0) + it.g * n; }); };
-  const packBonus = r => r.items.reduce((a, it) => { const P = PACK[it.i]; if (!P) return a; const u = useT[it.i] || 0, rem = u > 0 ? Math.ceil(u / P - 0.03) * P - u : (carry[it.i] || 0); return a + Math.min(it.g, Math.max(0, rem)) / P * wasteW(it.i); }, 0);
+  // finishing an opened pack scores; so does using last week's spares while they're good, more so the sooner they go off
+  const packBonus = (r, k) => r.items.reduce((a, it) => {
+    const P = PACK[it.i]; if (!P) return a;
+    const u = useT[it.i] || 0, until = cUntil[it.i], have = carry[it.i] && (!k || !until || k <= until) ? carry[it.i] : 0;
+    if (u < have) return a + Math.min(it.g, have - u) / P * wasteW(it.i) * urgency(st, until);
+    const rem = u > 0 ? Math.ceil((u - have) / P - 0.03) * P - (u - have) : 0;
+    return a + Math.min(it.g, Math.max(0, rem)) / P * wasteW(it.i);
+  }, 0);
   cur.forEach(sl => Object.values(sl).forEach(v => { if (R[v]) { used.add(v); addPlants(R[v]); } }));
   const gain = r => r.plants.reduce((a, x) => a + (plants.has(x) ? 0 : PLANTS[x][1]), 0);
   // favourites get a nudge; last week's dishes get pushed back so weeks don't repeat
   const lastWk = new Set(weekDays(addDays(st, -7)).flatMap(k => Object.values(peekD(k).sl)));
-  const fav = r => (S.favs[r.id] ? 3 : 0) - (lastWk.has(r.id) ? 3 : 0) + packBonus(r) * 3;
+  const fav = (r, k) => (S.favs[r.id] ? 3 : 0) - (lastWk.has(r.id) ? 3 : 0) + packBonus(r, k) * 3;
 
   for (const s of ['b', 'l']) {
     let prev = null; const pp = P(s);
@@ -2918,7 +3339,7 @@ function candidate(st, days, prefs, carry) {
         // red meat stays out of batches: a batch is eaten on several days
         let opts = pool(s, x => x.prep && !x.red && feasible(x, offs) && x.id !== prev && !used.has(x.id));
         if (!opts.length) opts = pool(s, x => x.prep && !x.red && x.id !== prev);
-        r = argmax(opts, x => gain(x) * 0.6 + fav(x) + Math.random() * 6);
+        r = argmax(opts, x => gain(x) * 0.6 + fav(x, ds[0]) + Math.random() * 6);
       }
       if (!r) return;
       ds.forEach(k => { cur[days.indexOf(k)][s] = r.id; });
@@ -2931,7 +3352,7 @@ function candidate(st, days, prefs, carry) {
     const redOk = redSoFar() < PS().redMax;
     let opts = pool('l', r => (!r.prep || (r.slots.includes('d') && r.t <= 30)) && !used.has(r.id) && (redOk || !r.red));
     if (!opts.length) opts = pool('l', r => !r.prep);
-    const r = argmax(opts, x => gain(x) + fav(x) + Math.random() * 5 - Math.max(0, x.na - 0.8) * 4);
+    const r = argmax(opts, x => gain(x) + fav(x, k) + Math.random() * 5 - Math.max(0, x.na - 0.8) * 4);
     cur[i].l = r.id; used.add(r.id); addPlants(r);
   });
 
@@ -2954,7 +3375,7 @@ function candidate(st, days, prefs, carry) {
     const okType = r => want === 'oily' ? r.oily : want === 'red' ? r.red : (!r.oily && !r.red);
     let opts = pool('d', r => !used.has(r.id) && okType(r));
     if (!opts.length) opts = pool('d', r => !used.has(r.id) && !r.red);
-    const r = argmax(opts, x => gain(x) * 1.2 + fav(x) + Math.random() * 5 - (nb.includes(x.c) ? 3 : 0) - (x.slots[0] === 'l' ? 1.5 : 0) - Math.max(0, x.na - 0.9) * 4);
+    const r = argmax(opts, x => gain(x) * 1.2 + fav(x, days[i]) + Math.random() * 5 - (nb.includes(x.c) ? 3 : 0) - (x.slots[0] === 'l' ? 1.5 : 0) - Math.max(0, x.na - 0.9) * 4);
     place(r.id, i);
     if (r.oily) oily++;
     if (r.red) { red++; redLeft = false; }
@@ -2971,7 +3392,7 @@ function candidate(st, days, prefs, carry) {
     if (cur[i].p) continue;
     let opts = pool('p', r => !pudUsed.has(r.id));
     if (!opts.length) opts = pool('p');
-    const r = argmax(opts, x => gain(x) + fav(x) + Math.random() * 5);
+    const r = argmax(opts, x => gain(x) + fav(x, days[i]) + Math.random() * 5);
     cur[i].p = r.id; pudUsed.add(r.id); addPlants(r);
     if (r.mk >= 3 && i < 6 && !cur[i + 1].p && Math.random() < 0.6) { cur[i + 1].p = r.id; i++; }
   }
@@ -2983,11 +3404,11 @@ function candidate(st, days, prefs, carry) {
     if (sl.s !== '@skip' || fermIn(sl)) return;
     const shared = (cur[i - 1] && cur[i - 1].p === sl.p) || (cur[i + 1] && cur[i + 1].p === sl.p);
     if (R[sl.p] && !pre.p && !shared) {
-      const r = argmax(pool('p', x => x.fermBase && !pudUsed.has(x.id)), x => gain(x) + fav(x) + Math.random() * 5);
+      const r = argmax(pool('p', x => x.fermBase && !pudUsed.has(x.id)), x => gain(x) + fav(x, k) + Math.random() * 5);
       if (r) { sl.p = r.id; pudUsed.add(r.id); addPlants(r); return; }
     }
     if (R[sl.d] && !pre.d) {
-      const was = R[sl.d], r = argmax(pool('d', x => x.fermBase && !used.has(x.id) && !!x.oily === !!was.oily && !!x.red === !!was.red), x => gain(x) * 1.2 + fav(x) + Math.random() * 5 - Math.max(0, x.na - 0.9) * 4);
+      const was = R[sl.d], r = argmax(pool('d', x => x.fermBase && !used.has(x.id) && !!x.oily === !!was.oily && !!x.red === !!was.red), x => gain(x) * 1.2 + fav(x, k) + Math.random() * 5 - Math.max(0, x.na - 0.9) * 4);
       if (r) { sl.d = r.id; used.add(r.id); addPlants(r); }
     }
   });
@@ -2996,22 +3417,27 @@ function candidate(st, days, prefs, carry) {
     if (cur[i].s) continue;
     const fermNow = ['b', 'l', 'd', 'p'].some(s => { const r = R[cur[i][s]]; return r && r.fermBase; });
     const need = PS().protGoal - estProtein(cur[i]);
-    const se = PS().prepSnacks && isBatchLunchDay(days[i]) ? sess.find(x => x.lunch.includes(days[i])) : null, off = se ? daysBetween(se.date, days[i]) : 0;
-    const ok0 = r => (snackN[r.id] || 0) < (ps.length || se ? 3 : 2) && (fermNow || r.fermBase);
+    // workdays get a shop-bought snack (unless set otherwise); nothing to pack on those days
+    const shopD = PS().snackShop === 'all' || (PS().snackShop !== 'home' && dayIndex(days[i]) < 5);
+    const se = !shopD && PS().prepSnacks && isBatchLunchDay(days[i]) ? sess.find(x => x.lunch.includes(days[i])) : null, off = se ? daysBetween(se.date, days[i]) : 0;
+    const fit = r => (snackN[r.id] || 0) < (ps.length || se ? 3 : 2) && (fermNow || r.fermBase);
+    const ok0 = r => fit(r) && !!r.shop === shopD;
     const ok = se ? r => ok0(r) && packable(r) && SNACKPACK[r.id][0] >= off : ok0;
-    let opts = ps.map(id => R[id]).filter(ok);
+    let opts = ps.map(id => R[id]).filter(se ? r => fit(r) && packable(r) && SNACKPACK[r.id][0] >= off : fit);
     if (!opts.length) opts = pool('s', ok);
+    if (!opts.length) opts = pool('s', r => !!r.shop === shopD);
     if (!opts.length && se) opts = pool('s', r => packable(r) && SNACKPACK[r.id][0] >= off);
     if (!opts.length) opts = pool('s');
     // packed snacks: repeating one already in this session's batch keeps prep short
     const inBatch = x => !!(se && snackSess[se.key] && snackSess[se.key].has(x.id));
-    const r = argmax(opts, x => gain(x) * 1.5 + fav(x) + Math.random() * 3 + (need > 0 ? Math.min(need, x.p * clampM(PS().bud.s * sc / x.k)) * 0.5 : 0) + (inBatch(x) ? 3 : 0));
+    const r = argmax(opts, x => gain(x) * 1.5 + fav(x, days[i]) + Math.random() * 3 + (need > 0 ? Math.min(need, x.shop ? x.p : x.p * clampM(PS().bud.s * sc / x.k)) * 0.5 : 0) + (inBatch(x) ? 3 : 0));
     cur[i].s = r.id; snackN[r.id] = (snackN[r.id] || 0) + 1; addPlants(r);
     if (se) (snackSess[se.key] = snackSess[se.key] || new Set()).add(r.id);
   }
+  cur.mode = mode; // which shop buys what, for the waste check
   return cur;
 }
-function scoreCand(c, carry) {
+function scoreCand(c, carry, cUntil, days, st) {
   const pl = new Set(), cols = new Set(); let ferm = 0, oily = 0, short = 0, over = 0;
   c.forEach(sl => {
     short += Math.max(0, PS().protGoal - estProtein(sl)) + Math.max(0, PS().fibreGoal - estFibre(sl)) * 2;
@@ -3020,7 +3446,7 @@ function scoreCand(c, carry) {
     Object.values(sl).forEach(v => { const r = R[v]; if (!r) return; r.plants.forEach(x => { pl.add(x); if (PLANTS[x][2]) cols.add(CG(PLANTS[x][2])); }); if (r.fermBase) f = true; if (r.oily) oily++; });
     if (f) ferm++;
   });
-  return Math.min(ptsOf(pl), 45) + ferm * 2 + Math.min(cols.size, PS().colourGoal) * 3 + Math.min(oily, PS().oilyGoal) * 3 - short * 0.25 - over - wasteOf(c, carry) * 2 + Math.random();
+  return Math.min(ptsOf(pl), 45) + ferm * 2 + Math.min(cols.size, PS().colourGoal) * 3 + Math.min(oily, PS().oilyGoal) * 3 - short * 0.25 - over - wasteOf(c, carry, cUntil, days, st) * 2 + Math.random();
 }
 function planWeek(st, replan, prefs) {
   const tk = todayKey(); PSET = setAt(tk > st && tk <= addDays(st, 6) ? tk : st);
@@ -3036,8 +3462,8 @@ function planWeek0(st, replan, prefs) {
   // days set to have no snack or no pudding keep that through any re-plan
   days.forEach(k => { const d = S.days[k]; if (!d) return; if (d.noS && !d.sl.s) d.sl.s = '@skip'; if (d.noP && !d.sl.p) d.sl.p = '@skip'; });
   let best = null;
-  const carry = carryInto(st);
-  for (let a = 0; a < 40; a++) { const c = candidate(st, days, prefs, carry); const sc = scoreCand(c, carry); if (!best || sc > best.sc) best = { c, sc }; }
+  CARRYC = {}; const ci = carryInfo(st);
+  for (let a = 0; a < 40; a++) { const c = candidate(st, days, prefs, ci.g, ci.until); const sc = scoreCand(c, ci.g, ci.until, days, st); if (!best || sc > best.sc) best = { c, sc }; }
   days.forEach((k, i) => { const d = D(k); SLOTS.forEach(s => { if (!d.sl[s] && best.c[i][s]) d.sl[s] = best.c[i][s]; }); });
   save();
 }
@@ -3073,8 +3499,9 @@ const pct = x => `${Math.max(0, Math.min(100, x * 100)).toFixed(1)}%`;
 const NUTL = [['k', 'kcal', ''], ['p', 'Protein', 'g'], ['f', 'Fibre', 'g'], ['sf', 'Sat fat', 'g'], ['sa', 'Salt', 'g'], ['fs', 'Added sugar', 'g']];
 function ingPanel(id, I = ING, era = null) {
   const g = I[id], b = ING_BASE[id], own = !!S.ingOver[id], u = g.ml ? '100ml' : '100g', c = amtCtx(id), un = g.ml ? 'ml' : 'g';
-  const amt = c ? `<div class="ipf ipa"><label><span>In one portion of this meal (${un})</span><input id="ic-amt" type="number" inputmode="decimal" step="any" min="0" value="${+(c.g * c.m).toFixed(1)}"></label></div>
-    <p class="small muted" style="margin:0">${c.own ? `The recipe has ${+(c.def * c.m).toFixed(1)}${un}. ` : ''}A new amount applies to this dish all week, including portions already packed or eaten. Portions not yet packed still scale to fit each day.</p>` : '';
+  const packLine = PACK[id] ? `<p class="small" style="margin:0">Pack you buy: <b>${packTxt(id)}</b> <button class="link" data-a="packopen" data-i="${id}">Change</button></p>` : '';
+  const amt = packLine + (c ? `<div class="ipf ipa"><label><span>In one portion of this meal (${un})</span><input id="ic-amt" type="number" inputmode="decimal" step="any" min="0" value="${+(c.g * c.m).toFixed(1)}"></label></div>
+    <p class="small muted" style="margin:0">${c.own ? `The recipe has ${+(c.def * c.m).toFixed(1)}${un}. ` : ''}A new amount applies to this dish all week, including portions already packed or eaten. Portions not yet packed still scale to fit each day.</p>` : '');
   if (era) return `<li class="ipanel">${amt}<p class="small" style="margin:0">${esc(NUTL.map(([f, l, un2]) => `${l} ${+(+g[f]).toFixed(2)}${un2}`).join(' · '))} per ${u}.</p>
     <p class="small muted" style="margin:0">These are the figures this week used. Label changes count from the week you make them, so earlier weeks keep theirs. To change the figures, open a meal from this week.</p>
     <div class="btnrow">${c ? `<button class="btn sm primary" data-a="ingsave" data-i="${id}">${ic('check')}Save amount</button>` : ''}${c && c.own ? `<button class="btn sm ghost" data-a="amtreset" data-i="${id}">Back to the recipe's amount</button>` : ''}<button class="btn sm ghost" data-a="ingchk" data-i="${id}">Close</button></div></li>`;
@@ -3134,6 +3561,7 @@ function badges(r) {
   if (r.tags.includes('onepot')) b.push('<span class="badge">One pot</span>');
   if (r.tags.includes('tray')) b.push('<span class="badge">Traybake</span>');
   if (r.prep) b.push('<span class="badge">Batch</span>');
+  if (r.shop) b.push('<span class="badge">Shop-bought</span>');
   if (r.fz) b.push('<span class="badge">Freezes</span>');
   return `<div class="badges">${b.join('')}</div>`;
 }
@@ -3306,7 +3734,7 @@ function vToday() {
     if (o.kind === 'empty') rows.push(mealRow({ tick: s, disabled: true, slot: SLOTNAME[s], nm: `<span class="addslot">+ Add ${SLOTNAME[s].toLowerCase()}</span>`, art: art({ type: 'plate', main: 'white', cols: ['white'] }, 42), open: `data-a="pick" data-k="${k}" data-s="${s}"` }));
     else if (o.kind === 'skip') rows.push(mealRow({ tick: s, disabled: true, slot: SLOTNAME[s], nm: '<span class="muted">Skipped</span>', art: art({ type: 'plate', main: 'white', cols: ['white'] }, 42), open: `data-a="pick" data-k="${k}" data-s="${s}"` }));
     else if (o.kind === 'custom') rows.push(mealRow({ tick: s, on: o.done, done: o.done, slot: SLOTNAME[s], nm: esc(o.c.n), kc: `${fmtN(o.k)}<small>kcal</small>`, art: art({ type: 'plate', main: 'orange', cols: ['orange', 'green', 'red'] }, 42), open: `data-a="custom" data-k="${k}" data-s="${s}"` }));
-    else { const bn = batchName(k, s, o.r); rows.push(mealRow({ tick: s, on: o.done, done: o.done, slot: `${SLOTNAME[s]}${bn ? ` <span class="tape">${bn}</span>` : ''}`, nm: esc(o.r.n), kc: `${fmtN(o.k)}<small>kcal</small>`, art: art(o.r, 42), open: `data-a="open" data-r="${o.r.id}" data-k="${k}" data-s="${s}"` })); }
+    else { const bn = batchName(k, s, o.r) || (o.r.shop ? 'Shop' : ''); rows.push(mealRow({ tick: s, on: o.done, done: o.done, slot: `${SLOTNAME[s]}${bn ? ` <span class="tape">${bn}</span>` : ''}`, nm: esc(o.r.n), kc: `${fmtN(o.k)}<small>kcal</small>`, art: art(o.r, 42), open: `data-a="open" data-r="${o.r.id}" data-k="${k}" data-s="${s}"` })); }
   }
   if (c.night) rows.push(mealRow({ tick: 'out', on: !!c.night.done, done: !!c.night.done, slot: `Night out${c.night.note ? ` · ${esc(c.night.note)}` : ''}`, nm: esc(drinkSummary(c.night)), kc: `${fmtN(c.dK)}<small>kcal</small>`, art: nightArt(c.night, 42), open: `data-a="night" data-k="${k}"` }));
   const extras = d.x.map((x, i) => `<div class="xrow"><button class="nm" data-a="xedit" data-i="${i}">${esc(x.n)}<span class="mt">${fmtN(x.k)} kcal · ${fmtN(x.p || 0)}g protein${(x.pl || []).length ? ` · ${x.pl.length} plant${x.pl.length > 1 ? 's' : ''}` : ''}${x.fe ? ' · fermented' : ''}</span></button><button class="iconbtn" data-a="xedit" data-i="${i}" aria-label="Edit ${esc(x.n)}">${ic('edit')}</button><button class="iconbtn" data-a="xdel" data-i="${i}" aria-label="Remove ${esc(x.n)}">${ic('trash')}</button></div>`).join('');
@@ -3471,11 +3899,72 @@ function weekMisses(id, st) {
   return { miss, n };
 }
 
+/* this week as a running budget for the daily food goals: the days so far, and what the rest of the plan does */
+const LEDGER = ['protein', 'fibre', 'sugar', 'sodium', 'satfat'];
+const LEDGER_NAME = { protein: 'protein', fibre: 'fibre', sugar: 'added sugar', sodium: 'sodium', satfat: 'sat fat' };
+const LEDGER_TIP = { fibre: 'an apple or a handful of nuts adds about 4g', protein: 'a Fage or skyr pot adds about 17g', sugar: 'skip the sweet extras', sodium: 'go easy on stock, soy and cheese', satfat: 'go easy on cheese and butter' };
+const ledgerFmt = id => v => (id === 'sodium' ? `${(Math.round(v * 10) / 10).toFixed(1)}g` : `${Math.round(v)}g`);
+function weekLedger(id, st) {
+  const tk = todayKey(), cur = st || startOf(tk), set = setAt(tk), lo = id !== 'protein' && id !== 'fibre';
+  const goal = { protein: set.protGoal, fibre: set.fibreGoal, sodium: set.naMax, sugar: set.fsMax, satfat: set.sfMax }[id];
+  const past = [], rest = [];
+  weekDays(cur).forEach(k => { const c = dcc(k); if (!c || !c.hasPlan) return; (k < tk ? past : rest).push(FOOD[id](c)); });
+  const n = past.length + rest.length; if (!n) return null;
+  const sum = a => a.reduce((x, y) => x + y, 0), sp = sum(past);
+  return { id, goal, lo, so: past.length ? sp / past.length : null, nPast: past.length, ra: rest.length ? sum(rest) / rest.length : null, nRest: rest.length,
+    wk: (sp + sum(rest)) / n, need: past.length && rest.length ? (goal * n - sp) / rest.length : null };
+}
+// judged on the week as a whole: where the days so far and the rest of the plan leave the average
+function ledgerSt(L) {
+  const { goal: g, lo, so, wk } = L;
+  if (lo) return wk > g * 1.1 ? 'off' : wk > g || (so !== null && so > g) ? 'mid' : 'ok';
+  return wk < g * 0.9 ? 'off' : wk < g ? 'mid' : 'ok';
+}
+function ledgerTxt(L) {
+  const f = ledgerFmt(L.id), g = L.goal, v = L.so !== null ? L.so : L.wk;
+  const gap = L.lo ? (v <= g ? `${f(g - v)} under` : `${f(v - g)} over`) : (v >= g ? `${f(v - g)} clear` : `${f(g - v)} short`);
+  return L.so !== null ? `${f(v)} a day so far, ${gap}` : `${f(v)} a day in this week's plan, ${gap}`;
+}
+// one goal as a line of the budget sentence
+function ledgerItem(L) {
+  const f = ledgerFmt(L.id), nm = LEDGER_NAME[L.id], g = L.goal, tip = LEDGER_TIP[L.id], so = L.so;
+  if (so === null) {
+    if (L.lo) return L.wk <= g ? `${nm} ${f(L.wk)}, ${L.wk > g * 0.9 ? `only ${f(g - L.wk)} under the limit, so go carefully` : `${f(g - L.wk)} under the limit`}` : `${nm} ${f(L.wk)}, ${f(L.wk - g)} over the limit, so ${tip}`;
+    return L.wk >= g ? `${nm} ${f(L.wk)}, ${f(L.wk - g)} clear of ${f(g)}` : `${nm} ${f(L.wk)}, ${f(g - L.wk)} short of ${f(g)}: ${tip}`;
+  }
+  if (L.lo) {
+    if (so <= g) {
+      const s0 = `${nm} ${f(so)}, ${so > g * 0.9 ? `only ${f(g - so)} under the limit, so go carefully` : `${f(g - so)} under the limit`}`;
+      return L.wk > g && L.nRest ? `${s0}, though the rest of the plan would tip the week over` : s0;
+    }
+    if (!L.nRest) return `${nm} ${f(so)}, ${f(so - g)} over the limit for the week`;
+    const n = L.nPast + L.nRest, spare = (g - L.wk) * n; // what's left of the week's budget once the plan is eaten
+    if (L.wk <= g) return `${nm} ${f(so)}, ${f(so - g)} over, but the rest of the plan brings the week back under${spare < g * 0.5 ? `, with only ${f(spare)} to spare, so go carefully` : `, with ${f(spare)} to spare`}`;
+    if (L.need <= 0) return `${nm} ${f(so)}, already past the whole week's budget, so ${tip}`;
+    return f(L.need) === f(L.ra) ? `${nm} ${f(so)}, ${f(so - g)} over: the rest of the week needs to average ${f(L.need)}, which is about what the plan has, so stick to it and ${tip}`
+      : `${nm} ${f(so)}, ${f(so - g)} over: the rest of the week needs to average ${f(L.need)} to get back under and the plan has ${f(L.ra)}, so ${tip}`;
+  }
+  if (so >= g) return `${nm} ${f(so)}, ${f(so - g)} clear of ${f(g)}`;
+  if (!L.nRest) return `${nm} ${f(so)}, ${f(g - so)} short of ${f(g)} for the week`;
+  if (L.wk >= g) return `${nm} ${f(so)}, ${f(g - so)} short, but the rest of the plan catches it up`;
+  return f(L.need) === f(L.ra) ? `${nm} ${f(so)}, ${f(g - so)} short: the rest of the week needs ${f(L.need)} a day, about what the plan has, so stick to it` : `${nm} ${f(so)}, ${f(g - so)} short: the rest of the week needs ${f(L.need)} a day and the plan has ${f(L.ra)}, so ${tip}`;
+}
+function ledgerStory() {
+  const Ls = LEDGER.map(id => weekLedger(id)).filter(Boolean); if (!Ls.length) return '';
+  const past = Ls.some(L => L.so !== null), goals = Ls.filter(L => !L.lo), lims = Ls.filter(L => L.lo);
+  // both short so far but caught up by the plan: say it once
+  const catchUp = L => L.so !== null && L.so < L.goal && L.nRest && L.wk >= L.goal;
+  const gTxt = goals.length === 2 && goals.every(catchUp) ? `${goals.map(L => `${LEDGER_NAME[L.id]} ${ledgerFmt(L.id)(L.so)} (${ledgerFmt(L.id)(L.goal - L.so)} short)`).join(' and ')}, but the rest of the plan catches both up` : story(goals.map(ledgerItem));
+  const a = goals.length ? `${past ? 'Daily averages so far this week' : "This week's plan, per day"}: ${gTxt}.` : '';
+  const b = lims.length ? `${a ? 'On the limits' : past ? 'Daily averages so far this week' : "This week's plan, per day"}: ${story(lims.map(ledgerItem))}.` : '';
+  return [a, b].filter(Boolean).join(' ');
+}
+
 /* the goals. kind 'day' averages day values; 'week' averages whole weeks. agg 'rate' turns a daily mean into a weekly figure */
 function metrics() {
   const tk = todayKey(), set = setAt(tk), cur = startOf(tk), yd = addDays(tk, -1), w = WT();
   const food = (id, n, agg, fmt, goalTxt, light, extra) => Object.assign({ id, n, grp: 'Food', kind: 'day', agg, end: 'week', val: k => foodVal(id, k), first: () => minKey(S.days, id === 'fish' || id === 'ferm' ? S.hist.d : null), fmt, goalTxt, light }, extra || {});
-  const missLight = id => () => { const m = weekMisses(id); if (!m.n) return { st: 'none', txt: 'Nothing planned this week' }; const lim = ['sodium', 'sugar', 'satfat'].includes(id); const st = !m.miss ? 'ok' : lim ? (m.miss <= 2 ? 'mid' : 'off') : (m.miss === 1 ? 'mid' : 'off'); return { st, txt: !m.miss ? (lim ? 'Every planned day under' : 'Every planned day on target') : `${m.miss} day${m.miss > 1 ? 's' : ''} ${lim ? 'over' : 'short'} in this week's plan` }; };
+  const missLight = id => () => { const L = weekLedger(id); if (!L) return { st: 'none', txt: 'Nothing planned this week' }; return { st: ledgerSt(L), txt: capFirst(ledgerTxt(L)) }; };
   const wkRate = (m) => { const r = aggWin(m, 'wk'); return r ? r.v : null; };
   const L = [];
   L.push({ id: 'plants', n: 'Plant points', grp: 'Food', kind: 'week', end: 'week', wval: weekPlants, first: () => minKey(S.days, S.hist.w), fmt: v => fmtPts(Math.round(v * 4) / 4), unit: 'a week', goal: set.plantGoal, goalTxt: `${set.plantGoal} a week`,
@@ -3562,31 +4051,61 @@ const capFirst = x => (x ? x.charAt(0).toUpperCase() + x.slice(1) : x);
 const plDays = n => `${n} planned day${n === 1 ? '' : 's'}`;
 // a list read aloud: commas, or semicolons once the pieces have commas of their own
 function story(items) { if (items.length < 2) return items[0] || ''; const commas = items.some(x => x.includes(',')); if (items.length === 2) return `${items[0]}${commas ? ',' : ''} and ${items[1]}`; const sep = commas ? '; ' : ', '; return `${items.slice(0, -1).join(sep)}${commas ? ';' : ''} and ${items[items.length - 1]}`; }
+// this week, day by day: what's still to come and what's been logged
+const DAYW = k => DOWL[dayIndex(k)];
+function weekCounts() {
+  const tk = todayKey(), cur = startOf(tk), days = weekDays(cur), fishUp = [], fermGap = [], fermMissed = [];
+  days.forEach(k => { const c = dcc(k); if (!c || !c.hasPlan) return; SLOTS.forEach(s => { const o = c.slots[s]; if (k >= tk && o.kind === 'recipe' && o.r.oily && !o.done) fishUp.push(k); }); if (!c.fermPlan) (k >= tk ? fermGap : fermMissed).push(k); });
+  const ud = days.filter(k => k in S.alc), units = ud.reduce((a, k) => a + +S.alc[k], 0), runs = days.filter(k => S.run[k] === 1).length;
+  const nights = days.filter(k => k <= tk && S.ck[k] && S.ck[k].sl > 0).map(k => S.ck[k].sl);
+  return { fishUp: [...new Set(fishUp)], fermGap, fermMissed, units, unitDays: ud.length, runs, nights, started: tk > cur };
+}
 function trPhrase(m, l, now) {
-  const st = l.st, t = now ? now.txt : '', id = m.id, nm = lcFirst(m.n);
+  const st = l.st, t = now ? now.txt : '', id = m.id, nm = lcFirst(m.n), W = weekCounts();
   if (st === 'none') return null;
   if (id === 'plants') {
-    if (st !== 'ok') return st === 'mid' ? `plants are just shy of ${m.goal}, at ${t} points` : `plants are thin on the ground at ${t} points, against a goal of ${m.goal}`;
+    const wc = weekCalc(startOf(todayKey())), eaten = W.started && wc.ptsEat > 0 ? ` (${fmtPts(wc.ptsEat)} eaten so far)` : '';
+    if (st !== 'ok') return st === 'mid' ? `plants are just shy of ${m.goal}, at ${t} points${eaten}` : `plants are thin on the ground at ${t} points, against a goal of ${m.goal}${eaten}`;
     const u = aggWin(m, '12m');
-    if (now && now.v >= m.goal * 2) return `plants are flying: ${t} points in this week's plan, more than double the goal of ${m.goal}`;
-    if (now && u && now.v > u.v * 1.2) return `plants are flying at ${t} points this week, well up on your usual ${m.fmt(u.v)}`;
-    return `plants are on song at ${t} points`;
+    if (now && now.v >= m.goal * 2) return `plants are flying: ${t} points in this week's plan, more than double the goal of ${m.goal}${eaten}`;
+    if (now && u && now.v > u.v * 1.2) return `plants are flying at ${t} points this week, well up on your usual ${m.fmt(u.v)}${eaten}`;
+    return `plants are on song at ${t} points${eaten}`;
   }
-  if (id === 'fish') return st === 'ok' ? `oily fish is sorted, ${t} this week` : now && now.v === 0 ? "there's no oily fish in the plan yet" : `oily fish is ${m.goal - now.v === 1 ? 'one' : m.goal - now.v} short at ${t}`;
-  if (id === 'ferm') return st === 'ok' ? "there's something fermented every day" : `fermented food turns up on only ${t} days`;
+  if (id === 'fish') {
+    const up = W.fishUp.length ? `, with ${W.fishUp.length === 1 ? 'one' : W.fishUp.length} still to come on ${joinAnd(W.fishUp.map(DAYW))}` : '';
+    if (st === 'ok') return `oily fish is sorted at ${t} this week${up}`;
+    if (!now || now.v === 0) return "there's no oily fish in the plan yet: swap a dinner on the Week tab";
+    return `oily fish is ${m.goal - now.v === 1 ? 'one' : m.goal - now.v} short, with ${now.v === 1 ? 'just the one' : t} in the plan${W.fishUp.length ? ` (${joinAnd(W.fishUp.map(DAYW))})` : ''}, so swap a dinner on the Week tab`;
+  }
+  if (id === 'ferm') {
+    if (st === 'ok' && !W.fermGap.length) return "there's something fermented every day";
+    return W.fermGap.length ? `nothing fermented is planned for ${joinAnd(W.fermGap.map(DAYW))}, so add a kefir, kombucha or live yoghurt` : `fermented food turns up on only ${t} days`;
+  }
   if (id === 'red') return st === 'ok' ? 'red meat is staying in its lane' : `red meat has crept up to ${t} this week`;
-  if (['protein', 'fibre'].includes(id)) { const w = weekMisses(id); return st === 'ok' ? `${nm} hits the mark every planned day` : `${nm} comes up short on ${plDays(w.miss)}`; }
-  if (['sodium', 'sugar', 'satfat'].includes(id)) { const w = weekMisses(id); return st === 'ok' ? null : `${nm} goes over on ${plDays(w.miss)}`; }
+  if (LEDGER.includes(id)) return null; // told in the week's budget sentence
   if (id === 'colours') return st === 'ok' ? `all ${m.goal} colour groups make it onto the plate` : st === 'mid' ? `${t} of ${m.goal} colour groups, one short of the full set` : `only ${t} colour groups so far`;
   if (id === 'alcohol') {
-    if (st === 'ok') return `drinking is in check at ${t} units a week`;
+    // this week's running total against the 14, then the four-week picture
+    const left = ALC.week - W.units, wkTxt = W.unitDays ? `${fmtU(W.units)} unit${W.units === 1 ? '' : 's'} so far this week, ${left > 0 ? `${fmtU(left)} left before ${ALC.week}` : left === 0 ? `right on ${ALC.week}` : `already ${fmtU(-left)} over ${ALC.week}`}` : '';
+    if (st === 'ok') return wkTxt ? `drinking is in check at ${wkTxt}` : `drinking is in check at ${t} units a week`;
     const more = [l.ms !== 'ok' ? `${l.mo === 1 ? 'a binge' : `${l.mo} binges`} already this month` : '', l.ys !== 'ok' ? `${l.bigs} week${l.bigs === 1 ? '' : 's'} of 32+ units so far this year (the aim is three at most)` : ''].filter(Boolean);
-    if (l.wk === 'ok') return more.length ? `alcohol's weekly average is fine at ${t} units, though there's ${joinAnd(more)}` : `drinking is in check at ${t} units a week`;
-    const base = l.wk === 'mid' ? `alcohol is running a little warm at ${t} units a week` : `alcohol is running hot at ${t} units a week`;
-    return more.length ? `${base}, with ${joinAnd(more)}` : base;
+    const warm = l.wk === 'ok' ? '' : l.wk === 'mid' ? 'a little warm' : 'hot';
+    const base = wkTxt ? `alcohol is at ${wkTxt}${warm ? `, after four weeks running ${warm} at ${t} a week` : ''}` : warm ? `alcohol has run ${warm} at ${t} units a week over the last four weeks` : `alcohol's weekly average is fine at ${t} units`;
+    return `${base}${more.length ? `${warm || wkTxt ? ', and there have been' : ', though there have been'} ${joinAnd(more)}` : ''}`;
   }
-  if (id === 'run') return st === 'ok' ? `you're getting out ${t} times a week` : st === 'mid' ? `cardio is ticking over at ${t} a week` : `cardio has gone quiet at ${t} a week lately, against a goal of 2`;
-  if (id === 'sleep') return st === 'ok' ? `sleep is in a good place at ${t} a night` : st === 'mid' ? `sleep is a touch short at ${t} a night` : `sleep is running short at ${t} a night`;
+  if (id === 'run') {
+    const wk = W.runs >= 2 ? `, and ${W.runs} already this week` : W.started ? `, with ${W.runs === 1 ? 'one' : 'none'} so far this week (${W.runs === 1 ? 'one more' : 'two'} by Sunday would make 2)` : '';
+    return st === 'ok' ? `you're getting out ${t} times a week${wk}` : st === 'mid' ? `cardio is ticking over at ${t} a week${wk}` : `cardio has gone quiet at ${t} a week lately${wk}`;
+  }
+  if (id === 'sleep') {
+    const g = m.goal, n = W.nights.length, avg = n ? W.nights.reduce((a, b) => a + b, 0) / n : null, left = 7 - n;
+    if (n >= 2 && avg < g - 0.05 && left > 0) {
+      const need = (g * 7 - avg * n) / left;
+      return need <= 9.5 ? `sleep is averaging ${avg.toFixed(1)} h this week; ${left} night${left > 1 ? 's' : ''} at ${need.toFixed(1)} h would bring it up to ${g} h` : `sleep is averaging ${avg.toFixed(1)} h this week, too far under to make ${g} h by Sunday, so bank some early nights`;
+    }
+    if (n >= 2 && avg >= g - 0.05) return `sleep is in a good place, ${avg.toFixed(1)} h a night this week`;
+    return st === 'ok' ? `sleep is in a good place at ${t} a night` : st === 'mid' ? `sleep is a touch short at ${t} a night` : `sleep is running short at ${t} a night`;
+  }
   if (id.startsWith('h:')) { const x = lcFirst(l.txt); return st === 'ok' ? `${nm} is a proper habit, ${x}` : st === 'mid' ? `${nm} is patchy at ${x}` : `${nm} has slipped to ${x}`; }
   if (id === 'weight') {
     const a = wAdvice(); if (a.need) return null;
@@ -3598,9 +4117,9 @@ function trPhrase(m, l, now) {
   }
   return st === 'ok' ? null : `${nm}: ${lcFirst(l.txt)}`;
 }
-const TR_STAR = ['plants', 'colours', 'ferm', 'fish', 'protein', 'sleep', 'run', 'alcohol'];
+const TR_STAR = ['plants', 'colours', 'ferm', 'fish', 'sleep', 'run', 'alcohol'];
 function trStory(L, lights, nows) {
-  const rows = L.map((m, i) => ({ m, l: lights[i], now: nows[i] })).filter(x => !x.l.info);
+  const rows = L.map((m, i) => ({ m, l: lights[i], now: nows[i] })).filter(x => !x.l.info && !LEDGER.includes(x.m.id));
   const of = s => rows.filter(x => x.l.st === s), ok = of('ok'), mid = of('mid'), off = of('off'), none = of('none');
   const out = [];
   // the bright spot: the strongest thing on track
@@ -3611,14 +4130,16 @@ function trStory(L, lights, nows) {
   if (o.length) out.push(`${o.length === 1 ? 'One thing needs a push' : o.length === 2 ? 'Two things need a push' : 'A few things need a push'}: ${story(o)}.`);
   if (mi.length) out.push(`Nearly there: ${story(mi)}.`);
   if (!o.length && !mi.length && ok.length) out.push(star ? 'Nothing is off track, and nothing is even wobbling.' : 'A clean sheet: every goal is on track.');
+  const led = ledgerStory(); if (led) out.splice(out.length && star ? 1 : 0, 0, led);
   // everything else on track, by name
-  const lim = ['sodium', 'sugar', 'satfat'], rest = ok.filter(x => x !== star), limOk = lim.every(id => rest.some(x => x.m.id === id));
-  const names = rest.filter(x => !(limOk && lim.includes(x.m.id))).map(x => trName(x.m));
-  if (limOk) names.push('salt', 'sugar', 'saturated fat');
+  const names = ok.filter(x => x !== star).map(x => trName(x.m));
   if (names.length && (o.length || mi.length)) out.push(`Everything else is behaving: ${joinAnd(names)}.`);
   else if (names.length) out.push(`${capFirst(joinAnd(names))}: all on track too.`);
   if (!out.length) out.push("Nothing to tell yet. Plan a week and log a few check-ins, and the story starts here.");
-  if (none.length) out.push(`Nothing logged yet for ${joinAnd(none.map(x => trName(x.m))).replace(/ and ([^ ]+( [A-Za-z]+)?)$/, ' or $1')}.`);
+  const W = weekCounts(), alNone = none.find(x => x.m.id === 'alcohol');
+  if (alNone && W.unitDays) { const left = ALC.week - W.units; out.push(`Alcohol: ${fmtU(W.units)} unit${W.units === 1 ? '' : 's'} so far this week, ${left > 0 ? `${fmtU(left)} left before ${ALC.week}` : left === 0 ? `right on ${ALC.week}` : `already ${fmtU(-left)} over ${ALC.week}`}.`); }
+  const none2 = none.filter(x => !(x === alNone && W.unitDays));
+  if (none2.length) out.push(`Nothing logged yet for ${joinAnd(none2.map(x => trName(x.m))).replace(/ and ([^ ]+( [A-Za-z]+)?)$/, ' or $1')}.`);
   return out;
 }
 // the long view, using measures with at least eight weeks of data and saying when a shorter one starts
@@ -3805,8 +4326,8 @@ function trWinPhrase(x, win) {
   if (m.id === 'sleep') return `sleep averaged ${t} a night${st === 'ok' ? '' : st === 'mid' ? `, a touch under ${g} h` : `, well under ${g} h`}`;
   if (m.id === 'weight') { const w = trWeightWin(win); return w ? (st === 'ok' ? `weight kept to plan, ${w.pace}` : `weight was off the planned pace, ${w.pace}`) : null; }
   if (m.h) return `${nm} happened on ${t} of days${st === 'ok' ? '' : st === 'mid' ? ', a bit patchy' : ', more misses than hits'}`;
-  if (m.lo) return st === 'ok' ? null : `${nm} averaged ${t} a day, over the ${m.fmt(g)} limit`;
-  return st === 'ok' ? `${nm} averaged ${t} a day` : `${nm} averaged ${t} a day, ${st === 'mid' ? 'a little under' : 'well under'} ${m.fmt(g)}`;
+  if (m.lo) return st === 'ok' ? null : `${nm} averaged ${t} a day, ${m.fmt(now.v - g)} over the ${m.fmt(g)} limit`;
+  return st === 'ok' ? `${nm} averaged ${t} a day` : `${nm} averaged ${t} a day, ${m.fmt(g - now.v)} short of ${m.fmt(g)}`;
 }
 function trWinStory(rows, win) {
   const lead = { '4w': 'Over the last month', '12m': 'Over the past year', all: 'Since your records began' }[win];
@@ -4519,7 +5040,10 @@ function renderPrep() {
     if (s.gr !== g) {
       if (g !== 0) html += '</div>';
       g = s.gr;
-      if (g) { const gs = M.steps.filter(x => x.gr === g), gd = gs.filter(x => M.ps.done[x.id]).length; html += `<div class="pgroup ${gd === gs.length ? 'gdone' : ''}"><div class="pghead">${art(g.r, 44)}<div><span class="eyebrow">${M.cook ? `${g.r.t} min · ${fmtN(M.o.k)} kcal` : `${SLOTNAME[g.s]} × ${g.n} · ${dayList(g.entries.map(e => e.k))}`}</span><h3>${esc(g.r.n)}</h3></div><span class="pgc">${gd}/${gs.length}</span></div>`; }
+      if (g) {
+        const gs = M.steps.filter(x => x.gr === g), gd = gs.filter(x => M.ps.done[x.id]).length, dsc = descOf(g.r), on = !!(PM.desc && PM.desc[g.r.id]), did = `pd-${g.r.id}`;
+        html += `<div class="pgroup ${gd === gs.length ? 'gdone' : ''}"><div class="pghead">${art(g.r, 44)}<div><span class="eyebrow">${M.cook ? `${g.r.t} min · ${fmtN(M.o.k)} kcal` : `${SLOTNAME[g.s]} × ${g.n} · ${dayList(g.entries.map(e => e.k))}`}</span><h3>${dsc ? nameDot(g.r.n, 'pdesc', g.r.id, on, did) : esc(g.r.n)}</h3></div><span class="pgc">${gd}/${gs.length}</span></div>${dsc ? descBox(g.r, did, on) : ''}`;
+      }
       else html += '<div class="pgroup">';
     }
     html += stepHtml(M, s, i, cur);
@@ -4676,8 +5200,14 @@ const AISLES = [['veg', 'Fruit, veg & herbs'], ['meat', 'Meat'], ['fish', 'Fish'
 function shopList(st, trip) {
   const r = shopTotals(st, trip), fromLast = {};
   if ((trip === 0 || trip === 1) && st >= startOf(todayKey())) {
-    const carry = carryInto(st);
-    Object.keys(carry).forEach(i => { if (!r.tot[i]) return; const c = Math.min(carry[i], r.tot[i]); fromLast[i] = c; r.tot[i] -= c; if (r.tot[i] < 1) delete r.tot[i]; });
+    // last week's spares only cover what's eaten while they're still good
+    const ci = carryInfo(st), per = weekUseDays(st), days = weekDays(st);
+    Object.keys(ci.g).forEach(i => {
+      if (!r.tot[i]) return;
+      const u = ci.until[i], inTime = days.reduce((a, k, di) => a + (!u || k <= u ? (per[di][i] || 0) : 0), 0), c = Math.min(ci.g[i], r.tot[i], inTime);
+      if (c < 1) return;
+      fromLast[i] = c; r.tot[i] -= c; if (r.tot[i] < 1) delete r.tot[i];
+    });
   }
   r.fromLast = fromLast;
   return r;
@@ -4689,7 +5219,7 @@ function shopTotals(st, trip) {
     const c = dayCalc(k), di = daysBetween(st, k);
     for (const s of SLOTS) {
       const o = c.slots[s];
-      if (o.kind !== 'recipe' || o.done) continue;
+      if (o.kind !== 'recipe' || o.done || o.r.shop) continue; // shop-bought snacks go on their own list
       const t = mode === 'two' ? (o.prepped ? (sessDays(sess[1], s).includes(k) ? 2 : 1) : (di <= 2 ? 1 : 2)) : 1;
       if (trip && t !== trip) continue;
       o.r.items.forEach(it => add(it.i, it.g * o.m, it.from));
@@ -4698,10 +5228,71 @@ function shopTotals(st, trip) {
   }
   return { tot, from };
 }
+// a pack size as it reads on the shelf
+const packTxt = i => (ING[i].ml ? fmtMl(PACK[i]) : fmtG(PACK[i]));
+const leftStep = i => (ING[i].u && ING[i].uw >= 20 ? ING[i].uw / 2 : PACK[i] ? Math.max(5, Math.round(PACK[i] / 8 / 5) * 5) : 25);
+// last week's leftovers for this week, as worked out from the plan, with your corrections
+function leftBox(st) {
+  const ci = carryInfo(st), ov = (S.weeks[st] && S.weeks[st].left) || {}, ids = Object.keys(ci.g).sort((a, b) => ING[a].n.localeCompare(ING[b].n));
+  const gone = Object.keys(ov).filter(i => !(ov[i].g > 0) && ING[i]);
+  const row = i => {
+    const u = ci.until[i], when = u ? `good till ${u === todayKey() ? 'today' : fmtDay(u)}` : 'in the freezer', mine = ov[i] ? ' · your figure' : '';
+    return `<div class="lrow"><span class="n">${esc(ING[i].n)}<span class="h">about ${fmtQ(i, ci.g[i])} · ${when}${mine}</span>${PACK[i] ? `<button class="ichip" data-a="packopen" data-i="${i}">pack ${packTxt(i)}</button>` : ''}</span>
+      <span class="lbtns"><button class="iconbtn" data-a="leftadj" data-i="${i}" data-v="-1" aria-label="Less ${esc(ING[i].n)}">−</button><button class="iconbtn" data-a="leftadj" data-i="${i}" data-v="1" aria-label="More ${esc(ING[i].n)}">+</button><button class="btn sm ghost" data-a="leftgone" data-i="${i}">Gone</button></span></div>`;
+  };
+  return `<details class="more aisle leftbox" ${ids.length ? 'open' : ''}><summary>Leftovers to use · ${ids.length || 'none'}${ic('chev')}</summary>
+    <p class="small muted" style="margin:4px 0 6px">Worked out from last week's plan and the packs it would have bought. Put it right if it's wrong: the shopping list, the swap suggestions and the next plan all go by this.</p>
+    <div class="shoplist">${ids.map(row).join('')}</div>
+    ${gone.length ? `<p class="small muted" style="margin:6px 0 0">Marked as gone: ${gone.map(i => `<button class="link" data-a="leftreset" data-i="${i}">${esc(shortN(i).toLowerCase())}</button>`).join(', ')}. Tap one to bring it back.</p>` : ''}
+    <div class="btnrow"><button class="btn sm" data-a="leftadd">${ic('plus')}Add something you have</button></div></details>`;
+}
+function setLeft(st, i, g, until) {
+  const w = W(st); w.left = w.left || {};
+  const o = { g: Math.max(0, Math.round(g)) }; if (until !== undefined) o.until = until;
+  w.left[i] = o; save(); render(); if (SH) renderSheet();
+}
+function shLeftAdd() {
+  SH.title = 'Add a leftover';
+  const q = (SH.q || '').trim().toLowerCase(), i = SH.i, g = i && ING[i];
+  if (g) {
+    const def = SH.g || (PACK[i] ? Math.round(PACK[i] / 2) : g.uw || 100), days = SH.days || shelfOf(i);
+    return `<div class="sheethead"><div><span class="eyebrow">Leftovers to use</span><h2>${esc(g.n)}</h2></div>${closeBtn}</div>
+      <div class="fieldrow"><div class="field"><label for="la-g">How much (${g.ml ? 'ml' : 'g'})</label><input id="la-g" type="number" inputmode="numeric" value="${def}"></div>
+      <div class="field"><label for="la-d">Good for (days)</label><input id="la-d" type="number" inputmode="numeric" value="${FREEZE.has(i) || days >= 365 ? '' : days}" placeholder="Frozen"></div></div>
+      <p class="small muted" style="margin:6px 0 0">Leave the days empty for something in the freezer.</p>
+      <div class="btnrow" style="margin-top:12px"><button class="btn primary" data-a="leftsave">${ic('check')}Add it</button><button class="btn ghost" data-a="leftpick" data-i="">Pick something else</button></div>`;
+  }
+  const hits = Object.values(ING).filter(x => x.a !== 'grab' && (!q || x.n.toLowerCase().includes(q))).sort((a, b) => (!!PACK[b.id] - !!PACK[a.id]) || a.n.localeCompare(b.n)).slice(0, 40);
+  return `<div class="sheethead"><div><span class="eyebrow">Leftovers to use</span><h2>Add a leftover</h2></div>${closeBtn}</div>
+    <input class="search" id="laq" type="search" placeholder="Search ingredients" value="${esc(SH.q || '')}" aria-label="Search ingredients" style="margin-top:6px">
+    <div class="cuplist" id="la-list" style="margin-top:8px">${hits.map(x => `<button class="cuprow" data-a="leftpick" data-i="${x.id}"><span class="n">${esc(x.n)}</span></button>`).join('')}</div>`;
+}
+// the pack you usually buy, for working out what's left over
+function shPack() {
+  const i = SH.i, g = ING[i], base = PACK_BASE[i], own = S.packs && S.packs[i], un = g.ml ? 'ml' : 'g';
+  SH.title = 'Pack size';
+  return `<div class="sheethead"><div><span class="eyebrow">Pack size</span><h2>${esc(g.n)}</h2></div>${closeBtn}</div>
+    <div class="field"><label for="pk-g">The pack you buy (${un})</label><input id="pk-g" type="number" inputmode="numeric" value="${PACK[i] || ''}" autofocus></div>
+    <p class="small muted" style="margin:6px 0 0">${base ? `The app's usual size is ${g.ml ? fmtMl(base) : fmtG(base)}. ` : ''}Leftovers and the planner work from this, so packs get finished rather than binned.</p>
+    <div class="btnrow" style="margin-top:12px"><button class="btn primary" data-a="packsave">${ic('check')}Save</button>${own ? `<button class="btn ghost" data-a="packreset">${base ? `Back to ${g.ml ? fmtMl(base) : fmtG(base)}` : 'Stop tracking'}</button>` : ''}</div>`;
+}
+// shop-bought snacks still to buy this week, day by day
+function grabRows(st) {
+  const tk = todayKey(), out = [];
+  weekDays(st).forEach(k => { if (k < tk) return; const c = dayCalc(k); SLOTS.forEach(s => { const o = c.slots[s]; if (o.kind === 'recipe' && o.r.shop && !o.done) out.push({ k, s, r: o.r }); }); });
+  return out;
+}
+function grabBox(st, w) {
+  const rows = grabRows(st); if (!rows.length) return '';
+  const where = [...new Set(rows.flatMap(x => grabWhere(x.r)))];
+  return `<details class="more aisle grab" open><summary>Grab on the day · ${rows.length}${ic('chev')}</summary><p class="small muted" style="margin:4px 0 6px">Shop-bought snacks, kept off the big shop. Pick each one up on the day at a Sainsbury's Local, Tesco Express or Little Waitrose.</p>
+    <div class="shoplist">${rows.map(({ k, s, r }) => { const key = `grab:${k}:${s}`, on = !!w.shop[key]; return `<div class="sitem"><button class="sbox" role="checkbox" aria-checked="${on}" data-a="grabck" data-v="${key}"><span class="box">${ic('check')}</span><span class="n">${esc(r.n)}<span class="h">${k === todayKey() ? 'Today' : fmtDay(k)}</span></span><span class="q">${fmtN(r.k)} kcal</span></button></div>`; }).join('')}</div>
+    <p class="small muted" style="margin:6px 0 0">${esc(where.join('. '))}. Ranges vary in the smaller shops.</p></details>`;
+}
 function vShop() {
   const st = UI.week, mode = weekMode(st), w = W(st), sess = sessions(st, mode);
-  const trip = mode === 'two' ? UI.trip : 0, { tot, from, fromLast } = shopList(st, trip), all = Object.keys(tot);
-  if (!all.length && !(mode === 'two' && Object.keys(shopTotals(st, 3 - trip).tot).length)) return `${weekNav(st)}${emptyBlock(`Nothing to buy for ${fmtRange(st)} yet.`)}`;
+  const trip = mode === 'two' ? UI.trip : 0, { tot, from, fromLast } = shopList(st, trip), all = Object.keys(tot), grab = grabBox(st, w);
+  if (!all.length && !(mode === 'two' && Object.keys(shopTotals(st, 3 - trip).tot).length)) return `${weekNav(st)}${grab || emptyBlock(`Nothing to buy for ${fmtRange(st)} yet.`)}`;
   const low = w.low || {}, stocked = i => S.stock[i] && !low[i], ids = all.filter(i => !stocked(i)), inStock = all.filter(stocked);
   const seg = mode === 'two' ? `<div class="seg">${[[1, `${DOW[dayIndex(sess[0].date)]} shop`], [2, `${DOW[dayIndex(sess[1].date)]} shop`]].map(([v, l]) => `<button data-a="trip" data-v="${v}" aria-pressed="${UI.trip === v}">${l}</button>`).join('')}</div><p class="small muted" style="margin:6px 0 0">${UI.trip === 1 ? `For ${sessName(sess[0])}'s prep and fresh meals ${dayList(weekDays(st).slice(0, 3))}.` : `For ${sessName(sess[1])}'s prep and fresh meals ${dayList(weekDays(st).slice(3))}.`}</p>` : `<p class="small muted" style="margin:8px 0 0">One shop for the week, before ${sessName(sess[0])}'s prep. Tap ${ic('swap', false, 'inl')} if something's missing.</p>`;
   const key = i => `${trip}:${i}`;
@@ -4722,14 +5313,18 @@ function vShop() {
   }).join('');
   const cup = pantry.length ? `<details class="more aisle"><summary>Cupboard check · ${pantry.length} staple${pantry.length > 1 ? 's' : ''}${ic('chev')}</summary><p class="small muted" style="margin:4px 0 6px">Staples you always keep in can go in My cupboard so they stop showing here.</p><div class="shoplist">${pantry.sort((x, y) => ING[x].n.localeCompare(ING[y].n)).map(item).join('')}</div></details>` : '';
   const have = inStock.length ? `<details class="more aisle"><summary>In your cupboard · ${inStock.length}${ic('chev')}</summary><div class="shoplist" style="margin-top:6px">${inStock.sort((x, y) => ING[x].n.localeCompare(ING[y].n)).map(i => `<div class="crow"><span class="n">${esc(ING[i].n)}<span class="h">${fmtQ(i, tot[i], true)} this week</span></span><button class="btn sm ghost" data-a="stocklow" data-i="${i}">Running low</button></div>`).join('')}</div></details>` : '';
-  if (!all.length) return `${weekNav(st)}${seg}<p class="small muted" style="margin:14px 0 0">Nothing left to buy for this shop. The meals it covered have been eaten.</p>`;
+  if (!all.length) return `${weekNav(st)}${seg}<p class="small muted" style="margin:14px 0 0">Nothing left to buy for this shop. The meals it covered have been eaten.</p>${grab}`;
   const progress = ids.length ? `<div class="shopbar"><div class="minilbl"><span>In the basket</span><b>${done} of ${ids.length}</b></div><div class="bar leaf">${barI('eat', 'shop' + trip, done / ids.length)}</div></div>` : `<p class="small muted" style="margin:12px 0 0">Everything this week is already in your cupboard.</p>`;
   // last week's spares this plan uses, and what this week will likely leave over
   const covered = Object.keys(fromLast).filter(i => !tot[i]);
-  const useUp = Object.keys(fromLast).length ? `<div class="callout">${ic('leaf')}<div><b>Use up first:</b> ${esc(joinAnd(Object.keys(fromLast).map(i => `${fmtQ(i, fromLast[i])} ${shortN(i).toLowerCase()}`)))} left from last week. ${covered.length ? 'Those are off the list.' : 'The amounts below are what you still need.'}</div></div>` : '';
-  const future = st >= startOf(todayKey()), left = future ? Object.entries(spareFrom(weekUse(st), carryInto(st))).filter(([i, g]) => !HERBS.has(i) && g >= PACK[i] * 0.25 && g >= 20) : [];
-  const spare = left.length ? `<details class="more aisle"><summary>Likely spare after this week · ${left.length}${ic('chev')}</summary><p class="small muted" style="margin:4px 0 6px">Packs this plan won't finish. Next week's plan will try to use them up.</p><div class="shoplist">${left.sort((a, b) => ING[a[0]].n.localeCompare(ING[b[0]].n)).map(([i, g]) => `<div class="crow"><span class="n">${esc(ING[i].n)}</span><span class="small muted">about ${fmtQ(i, g)}${FREEZE.has(i) ? ', freeze it' : ''}</span></div>`).join('')}</div></details>` : '';
-  return `${weekNav(st)}${seg}${progress}${useUp}${swapBox}${aisles}${cup}${have}${spare}
+  const qn = (i, g) => { const q = fmtQ(i, g), nm = shortN(i).toLowerCase(), u = ING[i].u; return u && nm.replace(/s$/, '') === u.toLowerCase().replace(/s$/, '') ? q : `${q} ${nm}`; };
+  const cu = carryInfo(st).until, by = i => (cu[i] ? ` (good till ${DOW[dayIndex(cu[i])]})` : FREEZE.has(i) ? ' (from the freezer)' : '');
+  const useUp = Object.keys(fromLast).length ? `<div class="callout">${ic('leaf')}<div><b>Use up first:</b> ${esc(joinAnd(Object.keys(fromLast).map(i => `${qn(i, fromLast[i])}${by(i)}`)))} left from last week. ${covered.length ? 'Those are off the list.' : 'The amounts below are what you still need.'}</div></div>` : '';
+  const future = st >= startOf(todayKey()), sp = future ? spareInfo(st, carryInfo(st).g, carryInfo(st).until) : { g: {}, until: {} }, left = Object.entries(sp.g);
+  const nextSt = addDays(st, 7), keepTxt = i => (FREEZE.has(i) ? 'freeze it' : sp.until[i] >= nextSt ? `keeps till ${fmtDay(sp.until[i])}` : `use or bin by ${fmtDay(sp.until[i])}`);
+  const spare = left.length ? `<details class="more aisle"><summary>Likely spare after this week · ${left.length}${ic('chev')}</summary><p class="small muted" style="margin:4px 0 6px">Packs this plan won't finish. Next week's plan uses up whatever will still be good, the soonest to go off first.</p><div class="shoplist">${left.sort((a, b) => ING[a[0]].n.localeCompare(ING[b[0]].n)).map(([i, g]) => `<div class="crow"><span class="n">${esc(ING[i].n)}<button class="ichip" data-a="packopen" data-i="${i}">pack ${packTxt(i)}</button></span><span class="small muted">about ${fmtQ(i, g)}, ${keepTxt(i)}</span></div>`).join('')}</div></details>` : '';
+  const lb = st >= startOf(todayKey()) && (trip === 0 || trip === 1) ? leftBox(st) : '';
+  return `${weekNav(st)}${seg}${progress}${useUp}${lb}${swapBox}${aisles}${grab}${cup}${have}${spare}
     <div class="btnrow" style="margin-top:16px"><button class="btn" data-a="copyshop">${ic('copy')}Copy list</button><button class="btn" data-a="cupboard">${ic('home')}My cupboard</button><button class="btn ghost" data-a="untick">Untick all</button></div>`;
 }
 
@@ -4838,9 +5433,17 @@ function closeSheet() { SH = null; pending = null; $('sheet-root').innerHTML = '
 function fitTitles(root) {
   if (!root || !root.isConnected) return;
   root.querySelectorAll('h2').forEach(h => {
-    h.style.fontSize = ''; h.classList.remove('squeeze');
-    let f = parseFloat(getComputedStyle(h).fontSize);
-    while (h.scrollWidth > h.clientWidth + 1 && f > 18) { f -= 1; h.style.fontSize = `${f}px`; }
+    const fit = () => {
+      h.style.fontSize = ''; h.classList.remove('squeeze');
+      let f = parseFloat(getComputedStyle(h).fontSize);
+      while (h.scrollWidth > h.clientWidth + 1 && f > 18) { f -= 1; h.style.fontSize = `${f}px`; }
+      return f;
+    };
+    // a name with the ⓘ glued to its last word: if keeping them together would shrink the title by more than a
+    // couple of sizes, let the ⓘ drop to the next line instead
+    const glue = h.querySelector('.glue'); if (glue) glue.classList.remove('loose');
+    h.style.fontSize = ''; const full = parseFloat(getComputedStyle(h).fontSize);
+    if (fit() < full - 2 && glue) { glue.classList.add('loose'); fit(); }
     if (h.scrollWidth > h.clientWidth + 1) h.classList.add('squeeze');
   });
 }
@@ -4848,7 +5451,7 @@ function renderSheet(fresh) {
   const root = $('sheet-root');
   if (!SH) { root.innerHTML = ''; return; }
   const old = root.querySelector('.sheet'), top = old && !fresh ? old.scrollTop : 0;
-  const html = ({ wgoal: shWGoal, ckitems: shCkItems, cupboard: shCupboard, recipe: shRecipe, pick: shPick, xadd: shAdd, custom: shCustom, target: shTarget, settings: shSettings, confirm: shConfirm, setwhen: shSetWhen, backup: shBackup, weekmenu: shWeekMenu, night: shNight, swap: shSwap })[SH.type]();
+  const html = ({ wgoal: shWGoal, ckitems: shCkItems, cupboard: shCupboard, recipe: shRecipe, pick: shPick, xadd: shAdd, custom: shCustom, target: shTarget, settings: shSettings, confirm: shConfirm, setwhen: shSetWhen, leftadd: shLeftAdd, pack: shPack, backup: shBackup, weekmenu: shWeekMenu, night: shNight, swap: shSwap })[SH.type]();
   root.innerHTML = `<div class="scrim" data-scrim="1"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(SH.title || 'Details')}"><div class="grab"></div>${html}</div></div>`;
   if (!fresh) root.querySelector('.scrim').style.animation = 'none';
   const sh = root.querySelector('.sheet'); if (!fresh) sh.style.animation = 'none';
@@ -4866,6 +5469,31 @@ function nutConf(r) {
 }
 // what can be left out of a planned meal: just this meal when it's cooked on the day, the whole batch when it's
 // batch-cooked and not cooked yet; nothing once it's eaten, packed or cooked
+const grabNote = r => `<div class="callout" style="margin-top:10px">${ic('shop')}<div><b>Buy it on the day.</b> ${esc(grabWhere(r).join('. '))}. Ranges vary in the smaller shops.</div></div>`;
+// the ⓘ by a recipe's name: what the finished dish is like, plus a line for anything swapped or left out this time
+const descOf = r => (typeof DESC !== 'undefined' && r && DESC[r.id]) || '';
+function descNote(r) {
+  const parts = [];
+  Object.entries(r.swapped || {}).forEach(([orig, key]) => {
+    if (!ING[orig]) return;
+    if (key === 'omit') { if (!r.items.some(it => it.i === orig)) parts.push(`no ${shortN(orig).toLowerCase()}`); return; }
+    const opt = subOpt(orig, key);
+    if (opt && r.items.some(it => it.from === orig)) parts.push(`${subLabel(opt).toLowerCase()} instead of ${shortN(orig).toLowerCase()}`);
+  });
+  return parts.length ? `This time: ${parts.join('; ')}.` : '';
+}
+// the name with the ⓘ glued to its last word, so the button never wraps onto a line by itself
+function nameDot(n, a, id, on, ctl) {
+  const btn = `<button class="infodot" data-a="${a}" data-r="${esc(id)}" aria-expanded="${!!on}" aria-controls="${ctl}" aria-label="What it's like">${ic('info')}</button>`;
+  const i = n.lastIndexOf(' ');
+  return `${i < 0 ? '' : `${esc(n.slice(0, i))} `}<span class="glue">${esc(i < 0 ? n : n.slice(i + 1))}${btn}</span>`;
+}
+function descToggle(el, id, on) {
+  const box = $(id); if (!box) return;
+  box.hidden = !on; el.setAttribute('aria-expanded', String(!!on));
+  if (on && !reduced()) box.animate([{ opacity: 0, transform: 'translateY(-4px)' }, { opacity: 1, transform: 'none' }], { duration: 180, easing: 'ease-out' });
+}
+const descBox = (r, id, on) => { const note = descNote(r); return `<div class="rdesc" id="${id}"${on ? '' : ' hidden'}><span class="eyebrow">On the plate</span><p>${esc(descOf(r))}</p>${note ? `<p class="small muted">${esc(note)}</p>` : ''}</div>`; };
 function omitScope(k, s, o) {
   if (!o || o.kind !== 'recipe' || o.done || o.packed || o.kept) return null;
   if (o.prepped) return batchCooked(k, s) ? null : 'batch';
@@ -4902,17 +5530,20 @@ function shRecipe() {
   let ctx;
   if (o) {
     const bn = batchName(SH.k, SH.s, r), bc = o.prepped && batchContext(SH.k, SH.s);
-    const go = bc ? `<button class="btn primary" style="width:100%;margin-top:10px" data-a="pmopen" data-st="${bc.st}" data-key="${bc.se.key}">${ic('play')}Open ${sessName(bc.se)} prep</button>`
+    const go = r.shop ? grabNote(r) : bc ? `<button class="btn primary" style="width:100%;margin-top:10px" data-a="pmopen" data-st="${bc.st}" data-key="${bc.se.key}">${ic('play')}Open ${sessName(bc.se)} prep</button>`
       : `<button class="btn primary" style="width:100%;margin-top:10px" data-a="cookopen" data-k="${SH.k}" data-s="${SH.s}">${ic('play')}Cook it step by step</button>`;
-    ctx = `${go}<div class="callout">${ic('info')}<div>${SLOTNAME[SH.s]} on ${fmtDay(SH.k)}${bn ? ` (${bn})` : ''}. ${o.packed ? `Packed at <b>${fmtN(o.k)} kcal</b>.` : o.kept ? `Already cooked at <b>${fmtN(o.k)} kcal</b>, so it keeps that size.` : `Scaled to <b>${fmtN(o.k)} kcal</b>, ${m.toFixed(2)}× the base recipe, to fit the day.${m >= 1.795 ? " That's as far as it scales, so the rest of the day makes up the difference." : ''}`}</div></div>
+    ctx = `${go}<div class="callout">${ic('info')}<div>${SLOTNAME[SH.s]} on ${fmtDay(SH.k)}${bn ? ` (${bn})` : ''}. ${o.packed ? `Packed at <b>${fmtN(o.k)} kcal</b>.` : o.kept ? `Already cooked at <b>${fmtN(o.k)} kcal</b>, so it keeps that size.` : o.fixedPack ? `<b>${fmtN(o.k)} kcal</b> as it comes; the rest of the day fits around it.` : `Scaled to <b>${fmtN(o.k)} kcal</b>, ${m.toFixed(2)}× the base recipe, to fit the day.${m >= 1.795 ? " That's as far as it scales, so the rest of the day makes up the difference." : ''}`}</div></div>
+      ${(() => { if (o.done) return ''; const lo = leftoversOn(SH.k), lu = usesUp(r, lo).filter(i => lo[i].last); return lu.length ? `<div class="callout" style="margin-top:8px">${ic('leaf')}<div>Uses last week's ${esc(joinAnd(lu.map(i => `${shortN(i).toLowerCase()}${lo[i].until ? ` (good till ${DOW[dayIndex(lo[i].until)]})` : FREEZE.has(i) ? ' from the freezer' : ''}`)))}.</div></div>` : ''; })()}
       <div class="btnrow" style="margin-top:10px"><button class="btn sm" data-a="pick" data-k="${SH.k}" data-s="${SH.s}">${ic('edit')}Swap</button><button class="btn sm" data-a="custom" data-k="${SH.k}" data-s="${SH.s}">Eat something else</button><button class="btn sm ghost" data-a="skip" data-k="${SH.k}" data-s="${SH.s}">Skip</button></div>`;
   } else {
-    ctx = `<section><h4>Add to plan</h4><div class="fieldrow"><div class="field" style="margin:0"><label for="ap-day">Day</label><select id="ap-day">${weekDays(UI.week).map(k => `<option value="${k}" ${k === UI.day ? 'selected' : ''}>${fmtDay(k)}</option>`).join('')}</select></div>
+    ctx = `${r.shop ? grabNote(r) : ''}<section><h4>Add to plan</h4><div class="fieldrow"><div class="field" style="margin:0"><label for="ap-day">Day</label><select id="ap-day">${weekDays(UI.week).map(k => `<option value="${k}" ${k === UI.day ? 'selected' : ''}>${fmtDay(k)}</option>`).join('')}</select></div>
       <div class="field" style="margin:0"><label for="ap-slot">Meal</label><select id="ap-slot">${r.slots.map(s => `<option value="${s}">${SLOTNAME[s]}</option>`).join('')}</select></div></div>
       <button class="btn primary" style="margin-top:10px;width:100%" data-a="addplan">${ic('plus')}Add to plan</button></section>`;
   }
-  return `<div class="sheethero">${art(r, 96)}<div><span class="eyebrow">${r.slots.map(s => SLOTNAME[s]).join(' / ')} · ${esc(r.c)} · ${tmin(r.t)}</span><h2>${esc(r.n)}</h2></div>
+  const dsc = descOf(r);
+  return `<div class="sheethero">${art(r, 96)}<div><span class="eyebrow">${r.slots.map(s => SLOTNAME[s]).join(' / ')} · ${esc(r.c)} · ${tmin(r.t)}</span><h2>${dsc ? nameDot(r.n, 'rdesc', r.id, SH.desc, 'rdesc') : esc(r.n)}</h2></div>
     <div style="display:grid;gap:2px;align-self:start"><button class="iconbtn" data-a="close" aria-label="Close">${ic('x')}</button>${thumbs(r.id)}</div></div>
+    ${dsc ? descBox(r, 'rdesc', SH.desc) : ''}
     <section style="margin-top:12px">${badges(r)}</section>
     <section style="margin-top:10px"><div class="nutri"><div><b>${fmtN(r.k * m)}</b><span>kcal</span></div><div><b>${fmtN(r.p * m)}g</b><span>protein</span></div><div><b>${fmtN(r.f * m)}g</b><span>fibre</span></div><div><b>${fmtPts(r.pts)}</b><span>plants</span></div></div><p class="small muted" style="margin:6px 2px 0">Sodium ${fmtNa(r.na * m)} (${(r.na * m * 2.5).toFixed(1)}g salt) · added sugar ${fmtFS(r.fs * m)} · sat fat ${fmtN(r.sf * m)}g${r.na * m > (SH.k ? setAt(SH.k) : S.set).naMax * 0.5 ? ' · a salty one: over half the day\'s sodium' : ''}</p></section>
     ${ctx}
@@ -5000,9 +5631,10 @@ function shPick() {
 // the recipe list alone, so typing in the search box doesn't rebuild the input
 function pickList() {
   const { k, s } = SH, st = SH.st || startOf(k), wc = weekCalc(st), q = (SH.q || '').toLowerCase(), cur = k ? peekD(k).sl[s] : null;
-  const opts = RL.filter(r => r.slots.includes(s) && textMatch(r, q)).map(r => ({ r, g: r.plants.reduce((a, x) => a + (wc.plan.has(x) ? 0 : PLANTS[x][1]), 0) }))
-    .sort((a, b) => (b.r.id === cur) - (a.r.id === cur) || (!!S.nope[a.r.id] - !!S.nope[b.r.id]) || (!!S.favs[b.r.id] - !!S.favs[a.r.id]) || (b.g - a.g) || a.r.n.localeCompare(b.r.n));
-  return opts.map(({ r, g }) => `<button class="pick ${r.id === cur ? 'cur' : ''}" data-a="choose" data-r="${r.id}">${art(r, 44)}<span><span class="nm">${S.favs[r.id] ? ic('thup', false, 'inl lk') : S.nope[r.id] ? ic('thdown', false, 'inl nk') : ''}${esc(r.n)}</span><span class="mt">${fmtN(r.k)} kcal · ${fmtN(r.p)}g protein${g ? ` · <span class="gain">+${fmtPts(g)} new plant${g === 1 ? '' : 's'}</span>` : ''}${r.oily ? ' · oily fish' : ''}${r.fermBase ? ' · fermented' : ''}${s === 's' && S.set.prepSnacks && packable(r) ? ' · packs for work' : ''}</span></span></button>`).join('') || '<div class="empty">No matches.</div>';
+  const lo = k ? leftoversOn(k) : {};
+  const opts = RL.filter(r => r.slots.includes(s) && textMatch(r, q)).map(r => ({ r, g: r.plants.reduce((a, x) => a + (wc.plan.has(x) ? 0 : PLANTS[x][1]), 0), lu: r.id === cur ? [] : usesUp(r, lo) }))
+    .sort((a, b) => (b.r.id === cur) - (a.r.id === cur) || (!!S.nope[a.r.id] - !!S.nope[b.r.id]) || (!!S.favs[b.r.id] - !!S.favs[a.r.id]) || (b.lu.length - a.lu.length) || (b.g - a.g) || a.r.n.localeCompare(b.r.n));
+  return opts.map(({ r, g, lu }) => `<button class="pick ${r.id === cur ? 'cur' : ''}" data-a="choose" data-r="${r.id}">${art(r, 44)}<span><span class="nm">${S.favs[r.id] ? ic('thup', false, 'inl lk') : S.nope[r.id] ? ic('thdown', false, 'inl nk') : ''}${esc(r.n)}</span><span class="mt">${fmtN(r.k)} kcal · ${fmtN(r.p)}g protein${g ? ` · <span class="gain">+${fmtPts(g)} new plant${g === 1 ? '' : 's'}</span>` : ''}${r.oily ? ' · oily fish' : ''}${r.fermBase ? ' · fermented' : ''}${s === 's' && S.set.prepSnacks && packable(r) ? ' · packs for work' : ''}${r.shop ? ' · shop-bought' : ''}${lu.length ? ` · <span class="gain">uses up ${esc(joinAnd(lu.slice(0, 2).map(i => shortN(i).toLowerCase())))}${lu.length > 2 ? ' and more' : ''}</span>` : ''}</span></span></button>`).join('') || '<div class="empty">No matches.</div>';
 }
 // optional figures from a food label; salt is entered as on the pack and kept as sodium
 function labelFields(px, o) {
@@ -5011,12 +5643,21 @@ function labelFields(px, o) {
 }
 function readLabel(px) { const g = id => { const el = $(`${px}-${id}`), v = el ? el.value.trim() : ''; return v === '' ? undefined : Math.max(0, +v || 0); }; const sa = g('sa'); return { sa, fs: g('fs'), sf: g('sf'), f: g('f') }; }
 const X_FIELDS = ['n', 'k', 'p', 'fe', 'pl', 'na', 'sa', 'fs', 'sf', 'f']; // what the log sheet edits; anything else on an entry is kept
+function foodRows(forMeal) {
+  const q = foodKey(SH && SH.fq), all = Object.entries(S.foods || {}).sort((a, b) => (b[1].last || '').localeCompare(a[1].last || '') || (b[1].used || 0) - (a[1].used || 0));
+  const hits = (q ? all.filter(([k]) => k.includes(q)) : all).slice(0, q ? 30 : 6);
+  if (!all.length) return '<p class="small muted" style="margin:6px 0 0">Anything you log is saved here, so next time it\'s one tap.</p>';
+  if (!hits.length) return '<p class="small muted" style="margin:6px 0 0">Nothing saved by that name.</p>';
+  return `<div class="foodlist">${hits.map(([key, e]) => `<div class="frow"><button class="nm" data-a="${forMeal ? 'fuse' : 'fadd'}" data-v="${esc(key)}">${esc(e.n)}<span class="mt">${fmtN(e.k)} kcal · ${fmtN(e.p || 0)}g protein${(e.pl || []).length ? ` · ${e.pl.length} plant${e.pl.length > 1 ? 's' : ''}` : ''}${e.fe ? ' · fermented' : ''}</span></button>${forMeal ? '' : `<button class="iconbtn" data-a="fedit" data-v="${esc(key)}" aria-label="Change ${esc(e.n)} before adding">${ic('edit')}</button>`}<button class="iconbtn" data-a="fforget" data-v="${esc(key)}" aria-label="Forget ${esc(e.n)}">${ic('x')}</button></div>`).join('')}</div>${!q && all.length > hits.length ? `<p class="small muted" style="margin:4px 0 0">${all.length} saved in all. Search to find the rest.</p>` : ''}`;
+}
+const foodBox = forMeal => (Object.keys(S.foods || {}).length ? `<section class="foodbox"><div class="field" style="margin:0"><label for="fq">${forMeal ? 'Something you\'ve had before?' : 'Saved foods'}</label><input id="fq" type="search" placeholder="Search what you've logged before" value="${esc(SH.fq || '')}"></div><div id="fq-list">${foodRows(forMeal)}</div></section>` : '');
 function labelOut(l) { const o = {}; if (l.sa !== undefined) { o.na = +(l.sa / 2.5).toFixed(3); o.sa = l.sa; } ['fs', 'sf', 'f'].forEach(k => { if (l[k] !== undefined) o[k] = l[k]; }); return o; }
 function shAdd() {
   const ed = SH.ei !== undefined, dk = SH.dk || UI.day;
   SH.title = ed ? 'Edit' : 'Log something else'; SH.pl = SH.pl || [];
   return `<div class="sheethead"><div><span class="eyebrow">${fmtDay(dk)}</span><h2>${ed ? 'Edit what you logged' : 'Log something else'}</h2></div>${closeBtn}</div>
-    <div class="field"><label for="x-n">What was it?</label><input id="x-n" autofocus value="${esc(SH.n || '')}" placeholder="e.g. Office cake"></div>
+    ${ed ? '' : `${foodBox(false)}${Object.keys(S.foods || {}).length ? '<div class="lblh" style="margin-top:14px">Or something new</div>' : ''}`}
+    <div class="field"><label for="x-n">What was it?</label><input id="x-n" ${Object.keys(S.foods || {}).length && !ed ? '' : 'autofocus'} value="${esc(SH.n || '')}" placeholder="e.g. Office cake"></div>
     <div class="fieldrow"><div class="field"><label for="x-k">Calories</label><input id="x-k" type="number" inputmode="numeric" value="${esc(SH.k || '')}"></div><div class="field"><label for="x-p">Protein (g)</label><input id="x-p" type="number" inputmode="numeric" value="${esc(SH.p || '')}"></div></div>
     ${labelFields('x', SH)}
     <label class="check"><input type="checkbox" id="x-fe" ${SH.fe ? 'checked' : ''}> Counts as a fermented portion</label>
@@ -5054,9 +5695,10 @@ function plantGrid() {
 }
 function shCustom() {
   SH.title = 'Something else';
-  const c = peekD(SH.k).cu[SH.s] || {};
+  const c = SH.pre || peekD(SH.k).cu[SH.s] || {};
   return `<div class="sheethead"><div><span class="eyebrow">${SLOTNAME[SH.s]} · ${fmtDay(SH.k)}</span><h2>Something else</h2></div>${closeBtn}</div>
   <p class="small muted">Eating out or improvising. Meals you haven't eaten yet resize to keep the day on target.</p>
+  ${foodBox(true)}
   <div class="field"><label for="c-n">What</label><input id="c-n" autofocus value="${esc(c.n || '')}" placeholder="e.g. Dinner out"></div>
   <div class="fieldrow"><div class="field"><label for="c-k">Calories (estimate)</label><input id="c-k" type="number" inputmode="numeric" value="${esc(c.k || '')}"></div><div class="field"><label for="c-p">Protein (g)</label><input id="c-p" type="number" inputmode="numeric" value="${esc(c.p || '')}"></div></div>
   ${labelFields('c', c)}
@@ -5133,7 +5775,8 @@ function shSettings() {
   <section><h4>Planning</h4>
     <div class="field"><label for="s-ws">Weeks start on</label><select id="s-ws">${DOWL.map((d, i) => `<option value="${i}" ${st.weekStart === i ? 'selected' : ''}>${d}</option>`).join('')}</select></div>
     <label class="check"><input type="checkbox" id="s-wkb" ${st.weekendBatch ? 'checked' : ''}> Weekend lunches come from the batch too</label>
-    <label class="check"><input type="checkbox" id="s-psn" ${st.prepSnacks ? 'checked' : ''}> Pack workday snacks in the batch too</label>
+    <div class="field"><label for="s-snk">Snacks</label><select id="s-snk"><option value="work" ${st.snackShop === 'work' ? 'selected' : ''}>Shop-bought on workdays, homemade at weekends</option><option value="all" ${st.snackShop === 'all' ? 'selected' : ''}>Shop-bought every day</option><option value="home" ${st.snackShop === 'home' ? 'selected' : ''}>Homemade</option></select></div>
+    <label class="check"><input type="checkbox" id="s-psn" ${st.prepSnacks ? 'checked' : ''}> Pack homemade workday snacks in the batch</label>
     <label class="check"><input type="checkbox" id="s-adapt" ${st.adapt ? 'checked' : ''}> Adapt portions through the day</label></section>
   <button class="btn primary" style="width:100%;margin-top:14px" data-a="setsave">Save settings</button>
   <hr class="rule">
@@ -5259,7 +5902,7 @@ function wzCard(r, s) {
   return `<button class="wcard ${idx >= 0 ? 'picked' : ''}" data-a="wzpick" data-r="${r.id}" aria-pressed="${idx >= 0}"><span class="order" ${orderLbl ? '' : 'hidden'}>${orderLbl}</span><span class="wcheck">${ic('check')}</span>
     <span class="wart">${art(r, 132)}</span><h3>${S.favs[r.id] ? ic('thup', false, 'inl lk') : S.nope[r.id] ? ic('thdown', false, 'inl nk') : ''}${esc(r.n)}</h3><span class="mt">${esc(r.c)} · ${tmin(r.t)}</span>
     <span class="wstats"><span><b>${fmtN(r.k)}</b> kcal</span><span><b>${fmtN(r.p)}g</b> protein</span><span><b>${fmtPts(r.pts)}</b> plants</span></span>
-    ${(s === 'b' || s === 'l') ? wzKeepNote(r, s) : s === 's' && WZ.psn ? `<span class="keep ${packable(r) ? '' : 'bad'}">${packable(r) ? `Packs for work · keeps ${SNACKPACK[r.id][0]} days` : 'Not one to pack: weekends only'}</span>` : ''}${badges(r)}</button>`;
+    ${(s === 'b' || s === 'l') ? wzKeepNote(r, s) : s === 's' && r.shop ? '<span class="keep">Shop-bought: grab it on the day</span>' : s === 's' && WZ.psn ? `<span class="keep ${packable(r) ? '' : 'bad'}">${packable(r) ? `Packs for work · keeps ${SNACKPACK[r.id][0]} days` : 'Not one to pack: weekends only'}</span>` : ''}${badges(r)}</button>`;
 }
 function wzTray(s) {
   const picks = WZ.picks[s], max = wzMax(s);
@@ -5568,6 +6211,7 @@ const ACT = {
   csave() {
     const n = $('c-n').value.trim() || 'Something else', k = +$('c-k').value || 0, p = +$('c-p').value || 0, day = D(SH.k), was = day.done[SH.s];
     day.sl[SH.s] = '@c'; day.cu[SH.s] = Object.assign({ n, k, p }, labelOut(readLabel('c'))); if (!was || !was.c) delete day.done[SH.s];
+    foodPut(S, day.cu[SH.s], SH.k);
     save(); closeSheet(); render();
   },
   skip(d) { setSlot(d.k, d.s, '@skip'); closeSheet(); render(); },
@@ -5582,8 +6226,17 @@ const ACT = {
     const xs = D(SH.dk || UI.day).x, nw = Object.assign({ n: SH.n || 'Extra', k: +SH.k || 0, p: +SH.p || 0, fe: !!SH.fe, pl: SH.pl.slice() }, labelOut(SH)), old = SH.ei !== undefined && xs[SH.ei];
     if (old) { const keep = {}; Object.keys(old).forEach(f => { if (!X_FIELDS.includes(f)) keep[f] = old[f]; }); xs[SH.ei] = Object.assign(keep, nw); toast('Updated'); }
     else xs.push(nw);
+    if (!(old && old.rv)) foodPut(S, nw, SH.dk || UI.day);
     save(); closeSheet(); render();
   },
+  fadd(d) {
+    const e = S.foods && S.foods[d.v]; if (!e) return;
+    const dk = SH.dk || UI.day, x = foodCopy(e); D(dk).x.push(x); foodPut(S, x, dk);
+    save(); closeSheet(); render(); toast(`Added ${e.n}`);
+  },
+  fedit(d) { const e = S.foods && S.foods[d.v]; if (!e) return; Object.assign(SH, { n: e.n, k: e.k || '', p: e.p || '', fe: !!e.fe, pl: (e.pl || []).slice(), sa: e.sa !== undefined ? e.sa : e.na !== undefined ? +(e.na * 2.5).toFixed(2) : undefined, fs: e.fs, sf: e.sf, f: e.f }); renderSheet(); },
+  fuse(d) { const e = S.foods && S.foods[d.v]; if (!e) return; SH.pre = { n: e.n, k: e.k, p: e.p, sa: e.sa !== undefined ? e.sa : e.na !== undefined ? +(e.na * 2.5).toFixed(2) : undefined, fs: e.fs, sf: e.sf, f: e.f }; renderSheet(); },
+  fforget(d) { const e = S.foods && S.foods[d.v]; if (!e) return; delete S.foods[d.v]; save(); renderSheet(); toast(`Forgot ${e.n}`); },
   xedit(d) {
     const dk = d.k || UI.day, x = peekD(dk).x[+d.i]; if (!x) return;
     openSheet({ type: 'xadd', dk, ei: +d.i, n: x.n, k: x.k || '', p: x.p || '', fe: !!x.fe, pl: (x.pl || []).slice(), sa: x.sa !== undefined ? x.sa : x.na !== undefined ? +(x.na * 2.5).toFixed(2) : undefined, fs: x.fs, sf: x.sf, f: x.f });
@@ -5599,6 +6252,26 @@ const ACT = {
   weekmenu() { openSheet({ type: 'weekmenu' }); },
   mode(d) { const w = W(UI.week); w.mode = d.v; delete w.lock; save(); render(); },
   trip(d) { UI.trip = +d.v; render(); },
+  leftadj(d) { const st = UI.week, ci = carryInfo(st), cur = ci.g[d.i] || 0; setLeft(st, d.i, cur + leftStep(d.i) * (+d.v), ci.until[d.i]); },
+  leftgone(d) { setLeft(UI.week, d.i, 0); toast(`${shortN(d.i)} marked as gone`); },
+  leftreset(d) { const w = W(UI.week); if (w.left) { delete w.left[d.i]; if (!Object.keys(w.left).length) delete w.left; } save(); render(); },
+  leftadd() { openSheet({ type: 'leftadd', q: '' }); },
+  leftpick(d) { SH.i = d.i || null; SH.g = null; SH.days = null; renderSheet(); },
+  leftsave() {
+    const i = SH.i; if (!i || !ING[i]) return;
+    const g = +$('la-g').value, dv = $('la-d').value.trim(), days = dv === '' ? null : Math.max(1, Math.round(+dv) || 1);
+    if (!(g > 0)) { toast('Add how much you have'); return; }
+    const st = UI.week, until = days === null ? null : addDays(todayKey() > st ? todayKey() : st, days - 1);
+    closeSheet(); setLeft(st, i, g, until); toast(`${shortN(i)} added to your leftovers`);
+  },
+  packopen(d) { openSheet({ type: 'pack', i: d.i }); },
+  packsave() {
+    const i = SH.i, v = Math.round(+$('pk-g').value); if (!(v > 0)) { toast('Add a pack size'); return; }
+    S.packs = S.packs || {}; if (v === PACK_BASE[i]) delete S.packs[i]; else S.packs[i] = v;
+    applyPacks(); save(); closeSheet(); render(); toast(`${shortN(i)}: packs of ${ING[i].ml ? fmtMl(v) : fmtG(v)} from now on`);
+  },
+  packreset() { const i = SH.i; if (S.packs) delete S.packs[i]; applyPacks(); save(); closeSheet(); render(); toast(`${shortN(i)}: back to the usual pack`); },
+  grabck(d) { const w = W(UI.week); if (w.shop[d.v]) delete w.shop[d.v]; else w.shop[d.v] = 1; save(); render(); },
   shopck(d) { const w = W(UI.week), key = `${weekMode(UI.week) === 'two' ? UI.trip : 0}:${d.i}`; if (w.shop[key]) delete w.shop[key]; else w.shop[key] = 1; save(); render(); },
   swap(d) { openSheet({ type: 'swap', i: d.i }); },
   swapsel(d) { SH.sel[d.g] = d.v; renderSheet(); },
@@ -5723,7 +6396,7 @@ const ACT = {
     nv.bud = { b: pos(g('s-bb'), st.bud.b), l: pos(g('s-bl'), st.bud.l), s: Math.max(1, g('s-bs') || 0), d: pos(g('s-bd'), st.bud.d), p: Math.max(1, g('s-bp') || 0) };
     nv.plantGoal = pos(g('s-plants'), st.plantGoal); nv.colourGoal = Math.min(GROUPS.length, pos(g('s-col'), st.colourGoal)); nv.oilyGoal = Math.max(0, g('s-oily') || 0); nv.redMax = Math.max(0, g('s-red') || 0);
     st.stock = STOCKS[$('s-stock').value] ? $('s-stock').value : 'reg'; applyStock();
-    setWeekStart(+$('s-ws').value || 0); st.weekendBatch = $('s-wkb').checked; st.prepSnacks = $('s-psn').checked; st.adapt = $('s-adapt').checked;
+    setWeekStart(+$('s-ws').value || 0); st.weekendBatch = $('s-wkb').checked; st.prepSnacks = $('s-psn').checked; st.adapt = $('s-adapt').checked; st.snackShop = ['work', 'home', 'all'].includes($('s-snk').value) ? $('s-snk').value : 'work';
     st.usualDrink = $('s-usual').value; st.drinkMode = $('s-dm').value; st.dinnerOutK = pos(g('s-dok'), st.dinnerOutK);
     UI.week = startOf(UI.day);
     save();
@@ -6091,6 +6764,9 @@ Object.assign(ACT, {
   gapshow() { UI.gapAside = !UI.gapAside; render(); },
   ingchk(d) { SH.chk = SH.chk === d.i ? null : d.i; renderSheet(); },
   omitmode() { SH.om = !SH.om; SH.chk = null; renderSheet(); },
+  // toggled in place so focus stays on the ⓘ; the state is kept so a re-render shows the same thing
+  rdesc(d, el) { if (!SH) return; SH.desc = !SH.desc; descToggle(el, 'rdesc', SH.desc); },
+  pdesc(d, el) { if (!PM) return; PM.desc = PM.desc || {}; PM.desc[d.r] = !PM.desc[d.r]; descToggle(el, `pd-${d.r}`, PM.desc[d.r]); },
   omit(d) {
     if (!SH || !SH.k || !SH.s || !ING[d.i]) return;
     const k = SH.k, s = SH.s, o = dayCalc(k).slots[s], scope = omitScope(k, s, o); if (!scope || o.r.id !== SH.r) return;
@@ -6161,6 +6837,8 @@ document.addEventListener('input', e => {
   else if (id === 'pq' && SH && $('pk-list')) { SH.q = e.target.value; $('pk-list').innerHTML = pickList(); }
   else if (id === 'cq' && SH && $('cq-list')) { SH.q = e.target.value; $('cq-list').innerHTML = cupList(); }
   else if (id === 'plq' && SH && $('pl-grid')) { keepAddFields(); $('pl-grid').innerHTML = plantGrid(); }
+  else if (id === 'laq' && SH && SH.type === 'leftadd') { SH.q = e.target.value; const el = $('la-list'); if (el) { renderSheet(); const inp = $('laq'); if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); } } }
+  else if (id === 'fq' && SH && $('fq-list')) { SH.fq = e.target.value; $('fq-list').innerHTML = foodRows(SH.type === 'custom'); }
   else if (SH && SH.type === 'settings' && (Object.values(BUD_IDS).includes(id) || id === 's-target' || id === 's-lk')) budNote();
 });
 document.addEventListener('change', e => {
@@ -6177,7 +6855,7 @@ document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if (
 const TABS = [['today', 'Today', 'today'], ['week', 'Week', 'week'], ['out', 'Out', 'glass'], ['prep', 'Prep', 'prep'], ['shop', 'Shop', 'shop']];
 function render() {
   lockMode(startOf(todayKey())); if (UI.week !== startOf(todayKey())) lockMode(UI.week);
-  TC = null; MCACHE = null; SETC = {};
+  TC = null; MCACHE = null; SETC = {}; CARRYC = {}; LOC = {}; applyPacks();
   const wc = weekCalc(startOf(todayKey())), g = setAt(todayKey()).plantGoal, ph = pillHtml(wc, g);
   $('pill').innerHTML = ph.html; $('pill').setAttribute('aria-label', ph.label); $('pill').setAttribute('aria-pressed', UI.trends);
   $('gear').innerHTML = ic('gear'); $('wandbtn').innerHTML = ic('wand');
