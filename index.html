@@ -1082,6 +1082,28 @@ button.link { border: 0; background: none; padding: 0; font: inherit; color: var
 .sheet h2.squeeze .infodot { width: 24px; height: 24px; margin: -2px -2px -2px 2px; }
 .sheet h2.squeeze .infodot svg { width: 19px; height: 19px; }
 
+/* Trends, this week: the plants, colours, fermented days, oily fish and red meat behind the counts */
+.trwk { display: grid; gap: 8px; background: var(--bg); border-radius: 12px; padding: 10px 12px 12px; }
+.trwk .plantgrid { margin-top: 6px; }
+.trwk-h { margin: 2px 0 0; font-size: 13px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.trwk-h span { color: var(--muted); font-weight: 600; font-size: 12px; font-variant-numeric: tabular-nums; }
+.trwk ul { list-style: none; margin: 0; padding: 0; display: grid; }
+.trwk-row { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 7px 0; border-top: 1px solid var(--line); font-size: 13.5px; line-height: 1.35; }
+.trwk li:first-child > .trwk-row, .trwk li.trwk-row:first-child { border-top: 0; }
+button.trwk-row { width: 100%; text-align: left; background: none; border: 0; border-top: 1px solid var(--line); color: inherit; font: inherit; font-size: 13.5px; cursor: pointer; border-radius: 0; }
+@media (hover: hover) { button.trwk-row:hover > span { text-decoration: underline; text-underline-offset: 2px; } }
+.trwk-row .d { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.trwk-row small { color: var(--muted); font-size: 12px; }
+.trwk-row.col { grid-template-columns: 12px minmax(0, 1fr); align-items: start; }
+.trwk-row .cdot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; background: var(--surface-2); margin-top: 4px; }
+.trwk-row .src { display: block; }
+.trwk-row .src + .src { margin-top: 4px; }
+.trwk-row.col .src { margin-top: 2px; }
+.trwk-row .nw { white-space: nowrap; }
+.wt { font-style: normal; font-weight: 700; font-size: 11px; padding: 2px 8px; border-radius: 999px; white-space: nowrap; background: var(--surface-2); color: var(--muted); }
+.wt-ok { background: var(--leaf-soft); color: var(--leaf); }
+.wt-warn { background: var(--warn-soft); color: var(--warn); }
+
 </style>
 </head>
 <body>
@@ -1105,7 +1127,7 @@ button.link { border: 0; background: none; padding: 0; font: inherit; color: var
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.3.0';</script>
+<script>window.TP_VERSION = '3.4.1';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -1119,12 +1141,21 @@ const PLANTS = {
   mango:['Mango',1,'orange'], kiwi:['Kiwi',1,'green'], orange:['Orange',1,'orange'], clementine:['Clementine',1,'orange'],
   lemon:['Lemon',1,'yellow'], lime:['Lime',1,'green'], pomegranate:['Pomegranate',1,'red'], peach:['Peach & nectarine',1,'orange'],
   apricot:['Apricots',1,'orange'], date:['Dates',1,'white'], grape:['Red grapes',1,'purple'], avocado:['Avocado',1,'green'],
-  coconut:['Coconut',1,'white'], olive:['Olives',1,'purple'], tomato:['Tomato',1,'red'],
+  coconut:['Coconut',1,'white'], olive:['Black olives',1,'purple'], tomato:['Tomato',1,'red'],
+  greenapple:['Green apple',1,'green'], greengrape:['Green grapes',1,'green'], greenolive:['Green olives',1,'green'],
+  watermelon:['Watermelon',1,'red'], cantaloupe:['Cantaloupe melon',1,'orange'], honeydew:['Honeydew melon',1,'green'],
+  pineapple:['Pineapple',1,'yellow'], papaya:['Papaya',1,'orange'], passionfruit:['Passion fruit',1,'yellow'],
+  lychee:['Lychee',1,'white'], grapefruit:['Grapefruit',1,'yellow'], bloodorange:['Blood orange',1,'red'],
+  fig:['Figs',1,'purple'], cranberry:['Cranberries',1,'red'], gooseberry:['Gooseberries',1,'green'],
+  physalis:['Physalis',1,'orange'], persimmon:['Persimmon / sharon fruit',1,'orange'], guava:['Guava',1,'red'],
+  dragonfruit:['Dragon fruit',1,'white'], starfruit:['Star fruit',1,'yellow'], kumquat:['Kumquat',1,'orange'],
+  plantain:['Plantain',1,'yellow'], jackfruit:['Jackfruit',1,'yellow'], goji:['Goji berries',1,'red'],
+  mulberry:['Mulberries',1,'purple'], damson:['Damsons',1,'purple'], quince:['Quince',1,'yellow'], acai:['Açaí',1,'purple'],
   // veg
   onion:['Onion',1,'white'], redonion:['Red onion',1,'purple'], springonion:['Spring onion',1,'green'], leek:['Leek',1,'green'],
   celery:['Celery',1,'green'], carrot:['Carrot',1,'orange'], redpepper:['Red pepper',1,'red'], yellowpepper:['Yellow pepper',1,'yellow'],
   greenpepper:['Green pepper',1,'green'], courgette:['Courgette',1,'green'], aubergine:['Aubergine',1,'purple'],
-  mushroom:['Chestnut mushrooms',1,'white'], shiitake:['Shiitake',1,'white'], spinach:['Spinach',1,'green'],
+  mushroom:['Mushrooms',1,'white'], shiitake:['Shiitake',1,'white'], spinach:['Spinach',1,'green'],
   kale:['Kale / cavolo nero',1,'green'], broccoli:['Broccoli',1,'green'], cauliflower:['Cauliflower',1,'white'],
   redcabbage:['Red cabbage',1,'purple'], cabbage:['Green cabbage',1,'green'], napacabbage:['Chinese leaf',1,'white'],
   pakchoi:['Pak choi',1,'green'], greenbean:['Green beans',1,'green'], sugarsnap:['Sugar snaps',1,'green'],
@@ -1133,19 +1164,32 @@ const PLANTS = {
   cucumber:['Cucumber',1,'green'], radish:['Radish',1,'red'], rocket:['Rocket',1,'green'], lettuce:['Lettuce',1,'green'],
   watercress:['Watercress',1,'green'], beansprout:['Beansprouts',1,'white'], waterchestnut:['Water chestnut',1,'white'],
   pea:['Peas',1,'green'], broadbean:['Broad beans',1,'green'],
+  orangepepper:['Orange pepper',1,'orange'], pumpkin:['Pumpkin',1,'orange'], swede:['Swede',1,'yellow'], goldenbeet:['Golden beetroot',1,'yellow'],
+  parsnip:['Parsnip',1,'white'], turnip:['Turnip',1,'white'], celeriac:['Celeriac',1,'white'], mooli:['Mooli / daikon',1,'white'],
+  jartichoke:['Jerusalem artichoke',1,'white'], artichoke:['Globe artichoke',1,'green'], asparagus:['Asparagus',1,'green'],
+  sprouts:['Brussels sprouts',1,'green'], whitecabbage:['White cabbage',1,'white'], psb:['Purple sprouting broccoli',1,'purple'],
+  romanesco:['Romanesco',1,'green'], kohlrabi:['Kohlrabi',1,'green'], chard:['Chard',1,'green'], cress:['Cress',1,'green'],
+  lambslettuce:["Lamb's lettuce",1,'green'], radicchio:['Radicchio',1,'purple'], chicory:['Chicory / endive',1,'white'],
+  okra:['Okra',1,'green'], runnerbean:['Runner beans',1,'green'], shallot:['Shallots',1,'purple'], bamboo:['Bamboo shoots',1,'white'],
+  seaweed:['Seaweed',1,'green'], oystermush:['Oyster mushrooms',1,'white'], enoki:['Enoki',1,'white'], porcini:['Porcini',1,'white'],
   // pulses
   chickpea:['Chickpeas',1,'white'], butterbean:['Butter beans',1,'white'], cannellini:['Cannellini beans',1,'white'],
   blackbean:['Black beans',1,'purple'], kidneybean:['Kidney beans',1,'red'], borlotti:['Borlotti beans',1,'white'],
   redlentil:['Red lentils',1,'orange'], greenlentil:['Green / puy lentils',1,'green'], soya:['Soya (edamame, tofu, miso)',1,'green'],
+  beluga:['Black beluga lentils',1,'purple'], pinto:['Pinto beans',1,'white'], haricot:['Haricot beans',1,'white'], flageolet:['Flageolet beans',1,'green'],
+  blackeyed:['Black-eyed beans',1,'white'], mung:['Mung beans',1,'green'], adzuki:['Adzuki beans',1,'red'], splitpea:['Split peas',1,'yellow'],
   // grains
   oats:['Oats',1,'white'], wheat:['Wholewheat',1,'white'], rye:['Rye',1,'white'], barley:['Barley',1,'white'],
   spelt:['Spelt',1,'white'], quinoa:['Quinoa',1,'white'], buckwheat:['Buckwheat',1,'white'], brownrice:['Brown rice',1,'white'], popcorn:['Popcorn',1,'white'],
-  amaranth:['Amaranth',1,'white'],
+  amaranth:['Amaranth',1,'white'], wildrice:['Wild rice',1,'white'], blackrice:['Black rice',1,'purple'], redrice:['Red rice',1,'red'],
+  millet:['Millet',1,'white'], teff:['Teff',1,'white'],
   // nuts & seeds
   almond:['Almonds',1,'white'], walnut:['Walnuts',1,'white'], hazelnut:['Hazelnuts',1,'white'], peanut:['Peanuts',1,'white'],
   cashew:['Cashews',1,'white'], pistachio:['Pistachios',1,'green'], pinenut:['Pine nuts',1,'white'],
   pumpkinseed:['Pumpkin seeds',1,'green'], sunflowerseed:['Sunflower seeds',1,'white'], sesame:['Sesame',1,'white'],
   linseed:['Linseed',1,'white'], chia:['Chia',1,'white'],
+  brazil:['Brazil nuts',1,'white'], macadamia:['Macadamias',1,'white'], pecan:['Pecans',1,'white'], chestnut:['Chestnuts',1,'white'],
+  hempseed:['Hemp seeds',1,'green'], poppyseed:['Poppy seeds',1,'white'],
   // herbs & spices (quarter points)
   basil:['Basil',.25], parsley:['Parsley',.25], corianderleaf:['Coriander leaf',.25], mint:['Mint',.25], dill:['Dill',.25],
   chives:['Chives',.25], thyme:['Thyme',.25], rosemary:['Rosemary',.25], oregano:['Oregano',.25], bayleaf:['Bay',.25],
@@ -1153,8 +1197,36 @@ const PLANTS = {
   corianderseed:['Ground coriander',.25], turmeric:['Turmeric',.25], garammasala:['Garam masala',.25], curry:['Curry powder',.25],
   cinnamon:['Cinnamon',.25], nutmeg:['Nutmeg',.25], cardamom:['Cardamom',.25], vanilla:['Vanilla',.25], fennelseed:['Fennel seed',.25],
   sumac:['Sumac',.25], lemongrass:['Lemongrass',.25], fivespice:['Five spice',.25], zaatar:["Za'atar",.25], rasel:['Ras el hanout',.25],
-  cacao:['Cacao',.25], tea:['Matcha',.25], caper:['Capers',.25], horseradish:['Horseradish',.25]
+  cacao:['Cacao',.25], tea:['Tea & matcha',.25], caper:['Capers',.25], horseradish:['Horseradish',.25],
+  sage:['Sage',.25], tarragon:['Tarragon',.25], marjoram:['Marjoram',.25], chervil:['Chervil',.25], curryleaf:['Curry leaves',.25],
+  limeleaf:['Lime leaves',.25], fenugreek:['Fenugreek',.25], galangal:['Galangal',.25], blackpepper:['Black pepper',.25],
+  clove:['Cloves',.25], staranise:['Star anise',.25], allspice:['Allspice',.25], mustardseed:['Mustard seed',.25], caraway:['Caraway',.25],
+  nigella:['Nigella seeds',.25], aniseed:['Aniseed',.25], saffron:['Saffron',.25], juniper:['Juniper',.25], asafoetida:['Asafoetida',.25],
+  sichuan:['Sichuan pepper',.25], wasabi:['Wasabi',.25], tamarind:['Tamarind',.25], coffee:['Coffee',.25]
 };
+// other names a plant goes by, so searching "melon", "sultanas" or "tenderstem" finds it
+const PLANT_ALIAS = {
+  apple: 'red apple', greenapple: 'granny smith', grape: 'black grapes raisins', greengrape: 'white grapes sultanas', olive: 'kalamata',
+  cantaloupe: 'melon charentais orange melon', honeydew: 'melon galia piel de sapo green melon', watermelon: 'melon',
+  clementine: 'satsuma tangerine mandarin easy peeler', peach: 'nectarine', plum: 'prunes', date: 'medjool', grapefruit: 'pink grapefruit',
+  persimmon: 'kaki', dragonfruit: 'pitaya', starfruit: 'carambola', physalis: 'cape gooseberry', acai: 'acai',
+  tomato: 'cherry tomatoes sun-dried passata', cucumber: 'gherkins pickles', sweetcorn: 'baby corn polenta cornmeal maize',
+  broccoli: 'tenderstem calabrese', cabbage: 'savoy spring greens hispi sweetheart', kale: 'cavolo nero', springonion: 'scallions salad onions',
+  mushroom: 'chestnut button portobello closed cup white mushrooms', oystermush: 'king oyster', chard: 'swiss chard rainbow chard',
+  lettuce: 'little gem romaine cos iceberg mixed leaves', lambslettuce: 'corn salad mache', chicory: 'endive', radicchio: 'red chicory',
+  sugarsnap: 'mangetout snow peas', greenbean: 'french beans fine beans', pea: 'petits pois', courgette: 'zucchini', aubergine: 'eggplant',
+  mooli: 'daikon white radish', jartichoke: 'sunchoke', squash: 'butternut', pumpkin: 'squash', swede: 'rutabaga', seaweed: 'nori wakame kelp kombu',
+  beansprout: 'bean sprouts', soya: 'edamame tofu tempeh miso soy beans', chickpea: 'hummus houmous chana gram', broadbean: 'fava',
+  butterbean: 'lima', cannellini: 'white beans', haricot: 'baked beans navy beans', greenlentil: 'brown lentils', splitpea: 'yellow split peas',
+  blackeyed: 'black eyed peas', wheat: 'wholemeal bulgur couscous freekeh durum', spelt: 'farro emmer', oats: 'porridge', rye: 'pumpernickel',
+  linseed: 'flaxseed flax', sesame: 'tahini', peanut: 'peanut butter', almond: 'almond butter', cacao: 'cocoa dark chocolate nibs',
+  tea: 'green tea black tea', coffee: 'espresso', chilli: 'jalapeno chipotle cayenne chilli flakes harissa gochujang', paprika: 'smoked paprika',
+  nutmeg: 'mace', basil: 'thai basil holy basil', garlic: 'wild garlic', limeleaf: 'kaffir makrut', fenugreek: 'methi',
+  nigella: 'kalonji black onion seeds', blackpepper: 'white pepper peppercorns', asafoetida: 'hing', corianderleaf: 'cilantro',
+  mustardseed: 'mustard dijon wholegrain', aniseed: 'anise', fivespice: 'chinese five spice'
+};
+// a plant matches a search on its name or any of the names above
+const plantHit = (id, q) => PLANTS[id][0].toLowerCase().includes(q) || (PLANT_ALIAS[id] || '').includes(q);
 
 /* [id, name, kcal, protein, fibre, aisle, plants[], opts]
    opts: fe = grams that make a fermented portion · u/uw = unit name & grams · sp = grams per teaspoon
@@ -4237,6 +4309,64 @@ function trFirst(m) { const f = m.first(); return f !== '9999' && f > addDays(to
 let TB = null, TBL = null;
 function trBegin() { const L = MCACHE || (MCACHE = metrics()); if (TBL !== L) { TBL = L; TB = L.map(m => m.first()).filter(f => f !== '9999').sort()[0] || todayKey(); } return TB; }
 const trPartial = (m, w) => { const f = m.first(); if (w === 'wk' || f === '9999') return false; return w === 'all' ? f > addDays(trBegin(), 56) : f > addDays(winRange(m, w)[0], 7); };
+/* this week behind the counts: which plants, which colours, the fermented portion each day, the oily fish and red meat.
+   Only for the current week; older weeks keep just their totals */
+const TRWK = ['plants', 'colours', 'ferm', 'fish', 'red'];
+const plantSort = a => a.sort((x, y) => (PLANTS[y][1] - PLANTS[x][1]) || COLOURS.indexOf(PLANTS[x][2]) - COLOURS.indexOf(PLANTS[y][2]) || PLANTS[x][0].localeCompare(PLANTS[y][0]));
+const plantChip = x => `<span class="pchip ${PLANTS[x][1] < 1 ? 'q' : ''}">${PLANTS[x][2] ? `<i class="c-${PLANTS[x][2]}"></i>` : ''}${esc(PLANTS[x][0])}${PLANTS[x][1] < 1 ? ' ¼' : ''}</span>`;
+// the fermented ingredients that make a meal count, unless the name already says so: [label, words that give it away]
+const FERM_LAB = { fage0: ['Greek yoghurt', 'yoghurt', 'fage'], fagepot: ['Greek yoghurt', 'yoghurt', 'fage'], liveyog: ['live yoghurt', 'yoghurt'], skyr: ['skyr'], kefir: ['kefir'], biokefir: ['kefir'], kimchi: ['kimchi'], kraut: ['sauerkraut', 'kraut'], kombucha: ['kombucha'], kombuchacan: ['kombucha'], miso: ['miso'] };
+function fermWhat(o) {
+  const nm = o.r.n.toLowerCase(), out = [];
+  o.r.items.forEach(it => {
+    const g = ING[it.i]; if (!g.fe || it.g * o.m < g.fe * 0.9) return;
+    const [lab, ...words] = FERM_LAB[it.i] || [shortN(it.i).toLowerCase()];
+    if (!(words.length ? words : [lab]).some(w => nm.includes(w)) && !out.includes(lab)) out.push(lab);
+  });
+  return out;
+}
+function trWeekList(m) {
+  if (!TRWK.includes(m.id)) return '';
+  const tk = todayKey(), cur = startOf(tk), wc = weekCalc(cur), set = setAt(tk);
+  const wrap = (lead, body) => `<div class="trwk"><div class="eyebrow">This week</div>${lead ? `<p class="small" style="margin:0">${lead}</p>` : ''}${body}</div>`;
+  if (!wc.planned) return wrap("Nothing planned this week yet, so there's nothing to list.", '');
+  const dayLab = k => `${DOW[dayIndex(k)]} ${parse(k).getDate()}`;
+  const tag = (st, txt) => `<em class="wt wt-${st}">${txt}</em>`;
+  const when = (done, k) => (done ? tag('ok', 'Eaten') : k < tk ? tag('warn', 'Not ticked') : tag('none', k === tk ? 'Today' : 'To come'));
+  if (m.id === 'plants') {
+    const eat = plantSort([...wc.eat]), rest = plantSort([...wc.plan].filter(x => !wc.eat.has(x)));
+    const part = (h, a) => (a.length ? `<div><h4 class="trwk-h">${h}<span>${a.length} plant${a.length === 1 ? '' : 's'} · ${fmtPts(ptsOf(new Set(a)))} pts</span></h4><div class="plantgrid">${a.map(plantChip).join('')}</div></div>` : '');
+    const lead = `${wc.plan.size} different plants for <b>${fmtPts(wc.ptsPlan)} points</b> against your ${set.plantGoal}${eat.length ? `, and ${fmtPts(wc.ptsEat)} of those points are already eaten` : ''}.${wc.planned < 7 ? ` That's from ${wc.planned} planned day${wc.planned === 1 ? '' : 's'}.` : ''}`;
+    return wrap(lead, `${part('Eaten so far', eat)}${part(eat.length ? 'Rest of the plan' : "In this week's plan", rest)}`);
+  }
+  if (m.id === 'colours') {
+    const by = {};
+    [...wc.plan].forEach(x => { const c = PLANTS[x][2]; if (c) (by[CG(c)] = by[CG(c)] || []).push(x); });
+    const miss = GROUPS.filter(g => !by[g]);
+    const rows = GROUPS.map(g => `<li class="trwk-row col"><i class="cdot c-${g}" aria-hidden="true"></i><span><b>${capFirst(GROUPNAME[g])}</b>${by[g] ? ` <small>· ${by[g].length}</small>` : ''}<span class="src">${by[g] ? esc(by[g].sort((a, b) => PLANTS[a][0].localeCompare(PLANTS[b][0])).map(x => PLANTS[x][0]).join(', ')) : '<span class="muted">None this week</span>'}</span></span></li>`).join('');
+    return wrap(miss.length ? `No ${esc(miss.map(g => GROUPNAME[g]).join(' or '))} in the plan yet.` : `All ${GROUPS.length} colour groups are in the plan.`, `<ul>${rows}</ul>`);
+  }
+  if (m.id === 'ferm') {
+    const rows = wc.days.map((k, i) => {
+      const c = wc.dc[i], src = [];
+      if (c.hasPlan) SLOTS.forEach(s => { const o = c.slots[s]; if (o.kind === 'recipe' && o.ferm) { const w = fermWhat(o); src.push(`<span class="src">${esc(o.r.n)}${w.length ? ` <small class="nw">· ${esc(w.join(', '))}</small>` : ''}</span>`); } });
+      ((S.days[k] || {}).x || []).forEach(x => { if (x.fe) src.push(`<span class="src">${esc(x.n)} <small class="nw">· logged</small></span>`); });
+      const st = !c.hasPlan && !src.length ? tag('none', 'No plan') : c.fermEat ? tag('ok', 'Eaten') : c.fermPlan ? when(false, k) : tag('warn', k < tk ? 'Missed' : 'None planned');
+      return `<li class="trwk-row"><b class="d">${dayLab(k)}</b><span>${src.length ? src.join('') : '<span class="muted">Nothing fermented</span>'}</span>${st}</li>`;
+    }).join('');
+    const gaps = wc.days.filter((k, i) => k >= tk && wc.dc[i].hasPlan && !wc.dc[i].fermPlan).length;
+    return wrap(`${wc.fermDays} of 7 days have a fermented portion${wc.fermEatDays ? `, ${wc.fermEatDays} eaten so far` : ''}.${gaps ? ` ${gaps} day${gaps === 1 ? '' : 's'} still to come ${gaps === 1 ? 'has' : 'have'} none yet: a kefir or a kombucha sorts it.` : ''}`, `<ul>${rows}</ul>`);
+  }
+  // oily fish and red meat: the meals themselves, each one opening its recipe
+  const flag = m.id === 'fish' ? 'oily' : 'red', meals = [];
+  wc.days.forEach((k, i) => SLOTS.forEach(s => { const o = wc.dc[i].slots[s]; if (o.kind === 'recipe' && o.r[flag]) meals.push({ k, s, o }); }));
+  const eaten = meals.filter(x => x.o.done).length;
+  const rows = meals.map(({ k, s, o }) => `<li><button class="trwk-row" data-a="open" data-r="${o.r.id}" data-k="${k}" data-s="${s}"><b class="d">${dayLab(k)}</b><span>${esc(o.r.n)} <small class="nw">· ${SLOTNAME[s].toLowerCase()}</small></span>${when(o.done, k)}</button></li>`).join('');
+  const lead = m.id === 'fish'
+    ? (meals.length ? `${meals.length} oily fish meal${meals.length === 1 ? '' : 's'} planned against your ${set.oilyGoal}${eaten ? `, ${eaten} eaten so far` : ''}.` : `No oily fish in the plan this week, against your ${set.oilyGoal}.`)
+    : (meals.length ? `${meals.length} red meat meal${meals.length === 1 ? '' : 's'} planned against your limit of ${set.redMax}${eaten ? `, ${eaten} eaten so far` : ''}.` : 'No red meat in the plan this week.');
+  return wrap(lead, rows ? `<ul>${rows}</ul>` : '');
+}
 function trDetail(m) {
   const f = trFirst(m), span = f ? daysBetween(startOf(f), startOf(todayKey())) / 7 + 1 : 99, short = span < 26;
   const nW = short ? Math.max(4, span) : UI.tlong ? 52 : 26, ser = weekSeries(m, nW);
@@ -4251,7 +4381,7 @@ function trDetail(m) {
   }
   const src = { fish: 'Before the app, from your old tracker: a blank day there counts as no oily fish.', ferm: 'Before the app, from your old tracker, counting only days you filled in.', plants: 'Before the app, weekly totals from your old tracker, which counted herbs and spices at 0.2 rather than 0.25.', alcohol: 'Logged the morning after. A blank day in your old tracker counts as none; days marked "td" are left out until you fill them in.', run: 'Logged the morning after. Your old tracker is included from 22 Jul 2026, when you started running again.' }[m.id];
   const basis = m.grp === 'Food' ? 'Food figures use the plan for each day, including swaps, skips, nights out and anything you logged.' : '';
-  return `<div class="trdet">${m.id === 'alcohol' ? extra : ''}
+  return `<div class="trdet">${m.id === 'alcohol' ? extra : ''}${(UI.twin || 'wk') === 'wk' ? trWeekList(m) : ''}
     <div class="wchead"><div class="eyebrow">By week${short ? ` · since ${shortD(f)}` : ''}</div>${short ? '' : `<div class="seg mini3" role="group" aria-label="Chart range"><button data-a="tlong" data-v="0" aria-pressed="${!UI.tlong}">6 mo</button><button data-a="tlong" data-v="1" aria-pressed="${!!UI.tlong}">12 mo</button></div>`}</div>
     ${trChart(m, ser)}
     <div class="trwins">${rows}</div>
@@ -5690,7 +5820,7 @@ function cupList() {
 }
 function plantGrid() {
   const q = (SH.plq || '').toLowerCase();
-  const shown = Object.keys(PLANTS).sort((a, b) => PLANTS[a][0].localeCompare(PLANTS[b][0])).filter(x => SH.pl.includes(x) || (q && PLANTS[x][0].toLowerCase().includes(q)));
+  const shown = Object.keys(PLANTS).sort((a, b) => PLANTS[a][0].localeCompare(PLANTS[b][0])).filter(x => SH.pl.includes(x) || (q && plantHit(x, q)));
   return shown.map(x => `<button class="pchip ${SH.pl.includes(x) ? 'on' : ''}" data-a="xpl" data-v="${x}">${PLANTS[x][2] ? `<i class="c-${PLANTS[x][2]}"></i>` : ''}${esc(PLANTS[x][0])}</button>`).join('');
 }
 function shCustom() {
@@ -6587,7 +6717,7 @@ function rvPlStat() {
 function rvPlGrid() {
   const st = RV.st, wc = weekCalc(st), ex = rvExtraPlants(st), q = RV.plq.trim().toLowerCase();
   const chip = (x, on, counted) => `<button class="pchip ${on ? 'on' : ''} ${counted ? 'eaten' : ''}" data-a="rvpl" data-v="${x}" ${counted ? 'disabled' : ''} aria-pressed="${on}">${PLANTS[x][2] ? `<i class="c-${PLANTS[x][2]}"></i>` : ''}${esc(PLANTS[x][0])}${PLANTS[x][1] < 1 ? ' ¼' : ''}${counted ? ' · counted' : ''}</button>`;
-  const found = q ? Object.keys(PLANTS).filter(x => !ex.includes(x) && PLANTS[x][0].toLowerCase().includes(q)).sort((a, b) => PLANTS[a][0].localeCompare(PLANTS[b][0])).slice(0, 30) : [];
+  const found = q ? Object.keys(PLANTS).filter(x => !ex.includes(x) && plantHit(x, q)).sort((a, b) => PLANTS[a][0].localeCompare(PLANTS[b][0])).slice(0, 30) : [];
   return ex.map(x => chip(x, true, false)).join('') + found.map(x => chip(x, false, wc.plan.has(x))).join('') + (q && !found.length ? '<span class="small muted">No plant by that name</span>' : '');
 }
 // oily fish and fermented for days with no meal plan (days with a plan count from the plan)
