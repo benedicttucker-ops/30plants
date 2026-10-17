@@ -45,7 +45,7 @@ img { max-width: 100%; }
   --c-white: #CDBB98;
   --scrim: rgba(10, 14, 11, .45);
   --shadow: 0 10px 30px rgba(20, 30, 22, .14);
-  --f-display: "Big Shoulders Display", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --f-display: "Big Shoulders Display", "Arial Narrow", "Roboto Condensed", sans-serif-condensed, sans-serif;
   --f-body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-label: "Permanent Marker", "Comic Sans MS", cursive;
   --r: 16px;
@@ -70,7 +70,7 @@ img { max-width: 100%; }
 
 * { box-sizing: border-box; }
 html, body { background: var(--bg); color: var(--ink); }
-body { margin: 0; font-family: var(--f-body); font-size: 15px; line-height: 1.45; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; font-family: var(--f-body); font-size: 15px; line-height: 1.45; -webkit-tap-highlight-color: transparent; overflow-wrap: break-word; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -1217,6 +1217,39 @@ body.tvon .scrim { z-index: 80; }
 @media (max-width: 380px) { .setgrid { grid-template-columns: 22px minmax(0, 1fr) minmax(0, 1fr) 54px 42px; gap: 5px; } .stick { width: 42px; height: 42px; } .tvname { font-size: 18px; } }
 body.tvon .toast { bottom: calc(150px + env(safe-area-inset-bottom, 0px)); }
 
+/* header steps (fitTop): tighter, then the current section as an icon, then no dots */
+.modesw button { flex: none; }
+.top.t1 { gap: 2px; padding-left: 12px; padding-right: 8px; }
+.top.t1 .iconbtn { width: 34px; }
+.top.t1 .modesw { padding: 2px; }
+.top.t1 .modesw button { padding-left: 7px; padding-right: 7px; }
+.top.t1 .plantpill { padding: 5px 7px; gap: 4px; }
+.top.t2 .modesw button[aria-selected="true"] span { display: none; }
+.top.t2 .modesw button[aria-selected="true"] svg { display: block; }
+.top.t3 .plantpill .pdots { display: none; }
+/* nothing may push the page sideways: wide content is fixed where it is, and this stops the page panning if anything slips through */
+.app { overflow-x: clip; }
+.sheet, .pm-body, .wz-body { overflow-x: hidden; }
+/* very narrow screens or very large text: a smaller picture on the recipe sheet, and nothing in its heading can push it wider */
+.sheethero .eyebrow { overflow-wrap: anywhere; }
+@media (max-width: 359px) { .sheethero { grid-template-columns: 72px minmax(0, 1fr) auto; gap: 10px; } .sheethero > svg:first-child, .sheethero > .art:first-child { width: 72px; height: 72px; } }
+.nav-in { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.nav button { min-width: 0; }
+.nav button span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sheethero > div { grid-template-columns: minmax(0, 1fr); }
+.nutri div { min-width: 0; padding-inline: 4px; }
+.nutri span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 359px) { .nutri span { letter-spacing: 0; } .nutri b { font-size: 21px; } }
+.liftrow .n small { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+@media (max-width: 400px) { .liftrow { gap: 8px; } .liftrow .spark { width: 60px; height: 22px; } }
+.frow .nm { grid-template-columns: minmax(0, 1fr); overflow-wrap: anywhere; }
+.outbody .sum .sl { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.rvml .mt { grid-template-columns: minmax(0, 1fr); }
+.rvml .mt b { overflow-wrap: anywhere; }
+.rvxs { grid-template-columns: minmax(0, 1fr); }
+.rvx > span { overflow-wrap: anywhere; }
+.mtext .nm, .tvrow .n b, .liftrow .n b { overflow-wrap: anywhere; }
+
 </style>
 </head>
 <body>
@@ -1241,7 +1274,7 @@ body.tvon .toast { bottom: calc(150px + env(safe-area-inset-bottom, 0px)); }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.5.2';</script>
+<script>window.TP_VERSION = '3.5.3';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -3164,8 +3197,12 @@ function normalise(s) {
   if (!DAY_KEY.test(s.set.carryFrom || '')) s.set.carryFrom = todayKey(); // going over carries forward from the day this arrived, so past weeks stay as they were
   s.wt = Object.assign({ log: {}, waist: {}, unit: 'lb', goal: 'lose', rate: 0.45, waistDay: s.set.weekStart || 0, target: null }, s.wt || {});
   ['log', 'waist'].forEach(f => { if (!isObj(s.wt[f])) s.wt[f] = {}; });
+  // readings that can't be real (a damaged file or a bad import) are dropped rather than wrecking the charts
+  [['log', 20, 400], ['waist', 10, 100]].forEach(([f, lo, hi]) => Object.keys(s.wt[f]).forEach(k => { const raw = s.wt[f][k], v = typeof raw === 'number' || (typeof raw === 'string' && raw.trim()) ? +raw : NaN; if (!DAY_KEY.test(k) || !(v > lo && v < hi)) delete s.wt[f][k]; else s.wt[f][k] = v; }));
   s.days = s.days || {}; s.weeks = s.weeks || {}; s.favs = s.favs || {}; s.nope = s.nope || {}; s.stock = s.stock || {};
   s.ck = s.ck && typeof s.ck === 'object' ? s.ck : {};
+  // each check-in: its answers (1/0 by item) and hours slept; anything else is dropped
+  Object.keys(s.ck).forEach(k => { const e = s.ck[k]; if (!DAY_KEY.test(k) || !isObj(e)) { delete s.ck[k]; return; } if (!isObj(e.c)) e.c = {}; Object.keys(e.c).forEach(id => { if (e.c[id] !== 0 && e.c[id] !== 1) { if (e.c[id] === true || e.c[id] === false || e.c[id] === '0' || e.c[id] === '1') e.c[id] = +e.c[id]; else delete e.c[id]; } }); if (e.sl !== undefined && !(+e.sl >= 0 && +e.sl <= 24)) delete e.sl; else if (e.sl !== undefined) e.sl = +e.sl; });
   if (!Array.isArray(s.ckItems)) { s.ckItems = CK_DEF(); s.ckv = 3; }
   s.ckItems = s.ckItems.filter(x => x && x.id && x.n);
   if ((s.ckv || 1) < 2) { // v1.9: morning and evening rinse count together; steroid spray added
@@ -4331,7 +4368,7 @@ function ledgerStory() {
 
 /* the goals. kind 'day' averages day values; 'week' averages whole weeks. agg 'rate' turns a daily mean into a weekly figure */
 function metrics() {
-  const tk = todayKey(), set = setAt(tk), cur = startOf(tk), yd = addDays(tk, -1), w = WT();
+  const tk = todayKey(), set = setAt(tk), cur = startOf(tk), w = WT();
   const food = (id, n, agg, fmt, goalTxt, light, extra) => Object.assign({ id, n, grp: 'Food', kind: 'day', agg, end: 'week', val: k => foodVal(id, k), first: () => minKey(S.days, id === 'fish' || id === 'ferm' ? S.hist.d : null), fmt, goalTxt, light }, extra || {});
   const missLight = id => () => { const L = weekLedger(id); if (!L) return { st: 'none', txt: 'Nothing planned this week' }; return { st: ledgerSt(L), txt: capFirst(ledgerTxt(L)) }; };
   const wkRate = (m) => { const r = aggWin(m, 'wk'); return r ? r.v : null; };
@@ -4420,7 +4457,6 @@ const lcFirst = x => (x && /^[A-Z][a-z]/.test(x) ? x.charAt(0).toLowerCase() + x
 const TR_SHORT = { run: 'cardio', lift: 'lifting' }; // names that read better mid-sentence
 const trName = m => TR_SHORT[m.id] || lcFirst(m.n);
 const capFirst = x => (x ? x.charAt(0).toUpperCase() + x.slice(1) : x);
-const plDays = n => `${n} planned day${n === 1 ? '' : 's'}`;
 // a list read aloud: commas, or semicolons once the pieces have commas of their own
 function story(items) { if (items.length < 2) return items[0] || ''; const commas = items.some(x => x.includes(',')); if (items.length === 2) return `${items[0]}${commas ? ',' : ''} and ${items[1]}`; const sep = commas ? '; ' : ', '; return `${items.slice(0, -1).join(sep)}${commas ? ';' : ''} and ${items[items.length - 1]}`; }
 // this week, day by day: what's still to come and what's been logged
@@ -4540,7 +4576,7 @@ function trNow(m) {
   if (m.id === 'colours') { const v = weekColours(cur); return v === null ? null : { v, txt: String(v), lab: `of ${set.colourGoal}, this week` }; }
   if (['fish', 'ferm', 'red'].includes(m.id)) { const r = aggWin(m, 'wk'); if (!r) return null; const v = Math.round(r.v); return { v, txt: m.id === 'ferm' ? `${v} of 7` : String(v), lab: m.id === 'ferm' ? 'days this week' : 'this week' }; }
   if (m.grp === 'Food') { const r = aggWin(m, 'wk'); return r ? { v: r.v, txt: m.fmt(r.v), lab: 'a day, this week' } : null; }
-  if (m.id === 'lift') { const x = liftWeek(); return x.planned || x.done ? { v: x.done, goal: x.planned || m.goal, txt: `${x.done} of ${x.planned}`, lab: 'sessions this week' } : null; }
+  if (m.id === 'lift') { const x = liftWeek(); return x.planned || x.done ? { v: x.done, goal: x.planned || m.goal, txt: x.planned ? `${x.done} of ${x.planned}` : `${x.done}`, lab: x.planned ? 'sessions this week' : `session${x.done === 1 ? '' : 's'} this week` } : null; }
   if (m.id === 'alcohol' || m.id === 'run') { const r = aggWin(m, '4w'); return r ? { v: r.v, txt: m.fmt(r.v), lab: `${m.id === 'alcohol' ? 'units ' : ''}a week, last 4 weeks` } : null; }
   if (m.id === 'sleep') { const a = sleepAvg(tk); return a ? { v: a.v, txt: `${(Math.round(a.v * 10) / 10).toFixed(1)} h`, lab: `a night, last ${a.n}` } : null; }
   if (m.h) { const c = ckStats(m.h, tk); return c.logged ? { v: c.yes / c.logged * 100, txt: `${c.yes} of ${c.logged}`, lab: 'last days logged' } : null; }
@@ -4673,7 +4709,7 @@ function trWeekList(m) {
 function trDetail(m) {
   const f = trFirst(m), span = f ? daysBetween(startOf(f), startOf(todayKey())) / 7 + 1 : 99, short = span < 26;
   const nW = short ? Math.max(4, span) : UI.tlong ? 52 : 26, ser = weekSeries(m, nW);
-  const rows = WINS.filter(([w]) => w === 'wk' || w === 'all' || !trPartial(m, w)).map(([w, lab]) => { const r = aggWin(m, w), [a, b] = winRange(m, w); return `<div class="trw"><span>${lab}${w === 'all' && r ? `<small>since ${shortD(a)}${a.slice(0, 4) !== todayKey().slice(0, 4) ? ` ${a.slice(0, 4)}` : ''}</small>` : ''}</span><b>${r ? m.fmt(r.v) : '–'}</b><small>${r ? `${r.n} ${m.kind === 'week' ? (r.n === 1 ? 'week' : 'weeks') : (r.n === 1 ? 'day' : 'days')}` : ''}</small></div>`; }).join('');
+  const rows = WINS.filter(([w]) => w === 'wk' || w === 'all' || !trPartial(m, w)).map(([w, lab]) => { const r = aggWin(m, w), [a] = winRange(m, w); return `<div class="trw"><span>${lab}${w === 'all' && r ? `<small>since ${shortD(a)}${a.slice(0, 4) !== todayKey().slice(0, 4) ? ` ${a.slice(0, 4)}` : ''}</small>` : ''}</span><b>${r ? m.fmt(r.v) : '–'}</b><small>${r ? `${r.n} ${m.kind === 'week' ? (r.n === 1 ? 'week' : 'weeks') : (r.n === 1 ? 'day' : 'days')}` : ''}</small></div>`; }).join('');
   let extra = '';
   if (m.id === 'alcohol') {
     const al = alcLight(), B = alcBinges(), yr = todayKey().slice(0, 4), bigs = B.bigs[yr] || [], prev = B.bigs[String(+yr - 1)] || [];
@@ -4689,10 +4725,6 @@ function trDetail(m) {
     ${trChart(m, ser)}
     <div class="trwins">${rows}</div>
     <p class="small muted" style="margin:0">Goal: ${esc(m.goalTxt)}. ${basis} ${src || ''}</p></div>`;
-}
-function trLights() {
-  TC = null; MCACHE = metrics();
-  return MCACHE.map(m => { try { return m.light(); } catch (e) { return { st: 'none', txt: '' }; } });
 }
 /* other time frames: every figure becomes that period's average, judged against the same goals */
 const TWINS = [['wk', 'This week'], ['4w', 'Last month'], ['12m', 'Last year'], ['all', 'All time']];
@@ -5787,7 +5819,7 @@ function swapGroups(st, x) {
   });
 }
 function swapEffects(st, gr, key) {
-  const sw = Object.assign({}, (((S.weeks[st] || {}).swaps) || {})[gr.base.id] || {});
+  const sw = Object.assign({}, gr.cur.swapped || {}); // the dish as it stands, a meal's own swaps included
   if (key === '@orig') delete sw[gr.orig]; else sw[gr.orig] = key;
   const nv = Object.keys(sw).length ? buildVariant(gr.base, sw) : gr.base, cur = gr.cur, out = [];
   const dp = nv.p - cur.p, dpt = nv.pts - cur.pts;
@@ -5858,7 +5890,7 @@ function vOut() {
     const o = outOf(peekD(k));
     return `<div class="outrow ${o ? 'on' : ''}" style="--i:${i}"><button class="switch" role="switch" aria-checked="${!!o}" data-a="outtoggle" data-k="${k}" aria-label="Going out ${fmtDay(k)}"><span></span></button>
       <button class="outbody" data-a="${o ? 'night' : 'outtoggle'}" data-k="${k}">${o ? nightArt(o, 40) : `<span class="d">${DOW[dayIndex(k)]}<small>${parse(k).getDate()} ${MONS[parse(k).getMonth()]}</small></span>`}
-      <span class="sum">${o ? `${DOW[dayIndex(k)]} ${parse(k).getDate()}${o.note ? ` · ${esc(o.note)}` : ''}<small>${esc(drinkSummary(o))}${o.dinner === 'out' ? ' · dinner out' : ''}${o.skipPud ? ' · no pudding' : ''}</small>` : '<span class="muted">Staying in</span>'}</span>
+      <span class="sum">${o ? `<span class="sl">${DOW[dayIndex(k)]} ${parse(k).getDate()}${o.note ? ` · ${esc(o.note)}` : ''}</span><small>${esc(drinkSummary(o))}${o.dinner === 'out' ? ' · dinner out' : ''}${o.skipPud ? ' · no pudding' : ''}</small>` : '<span class="muted">Staying in</span>'}</span>
       <span class="k">${o ? `${fmtN(drinkK(o))}<small>kcal</small>` : ''}</span></button></div>`;
   }).join('');
   const oily = wc.oilyP < set.oilyGoal ? `<div class="callout warn">${ic('warn')}<div>Oily fish is at ${wc.oilyP} of ${set.oilyGoal} this week. Swap a dinner on the Week tab.</div></div>` : '';
@@ -5870,6 +5902,18 @@ let SH = null, pending = null;
 function openSheet(o) { SH = o; renderSheet(true); syncHistory(); }
 function closeSheet() { SH = null; pending = null; $('sheet-root').innerHTML = ''; if (!WZ && !PM && !RV && !TV) document.body.style.overflow = ''; syncHistory(); }
 // a big title shrinks until its longest word fits (MOZZARELLA or PUTTANESCA beside the picture on a narrow phone)
+// the header steps down until it fits: tighter spacing, then the current section as an icon, then no dots on the
+// plant pill. Narrow screens and large phone text both need it; nothing here may push the page sideways.
+const TOP_STEPS = ['t1', 't2', 't3'];
+function fitTop() {
+  const t = document.querySelector('.top'); if (!t) return;
+  t.classList.remove(...TOP_STEPS);
+  const over = () => { const r = t.getBoundingClientRect(), last = t.lastElementChild; return t.scrollWidth > t.clientWidth || (last && last.getBoundingClientRect().right > r.right - parseFloat(getComputedStyle(t).paddingRight) + 0.5); };
+  for (const c of TOP_STEPS) { if (!over()) break; t.classList.add(c); }
+}
+let FIT_T = 0;
+addEventListener('resize', () => { clearTimeout(FIT_T); FIT_T = setTimeout(() => { fitTop(); if (SH) fitTitles(document.querySelector('.sheet')); }, 120); });
+if (document.fonts) document.fonts.ready.then(() => fitTop());
 function fitTitles(root) {
   if (!root || !root.isConnected) return;
   root.querySelectorAll('h2').forEach(h => {
@@ -6043,7 +6087,7 @@ function shRecipe() {
       : `<button class="btn primary" style="width:100%;margin-top:10px" data-a="cookopen" data-k="${SH.k}" data-s="${SH.s}">${ic('play')}Cook it step by step</button>`;
     ctx = `${go}<div class="callout">${ic('info')}<div>${SLOTNAME[SH.s]} on ${fmtDay(SH.k)}${bn ? ` (${bn})` : ''}. ${o.packed ? `Packed at <b>${fmtN(o.k)} kcal</b>.` : o.kept ? `Already cooked at <b>${fmtN(o.k)} kcal</b>, so it keeps that size.` : o.fixedPack ? `<b>${fmtN(o.k)} kcal</b> as it comes; the rest of the day fits around it.` : `Scaled to <b>${fmtN(o.k)} kcal</b>, ${m.toFixed(2)}× the base recipe, to fit the day.${m >= 1.795 ? " That's as far as it scales, so the rest of the day makes up the difference." : ''}`}</div></div>
       ${(() => { if (o.done) return ''; const lo = leftoversOn(SH.k), lu = usesUp(r, lo).filter(i => lo[i].last); return lu.length ? `<div class="callout" style="margin-top:8px">${ic('leaf')}<div>Uses last week's ${esc(joinAnd(lu.map(i => `${shortN(i).toLowerCase()}${lo[i].until ? ` (good till ${DOW[dayIndex(lo[i].until)]})` : FREEZE.has(i) ? ' from the freezer' : ''}`)))}.</div></div>` : ''; })()}
-      <div class="btnrow" style="margin-top:10px"><button class="btn sm" data-a="pick" data-k="${SH.k}" data-s="${SH.s}">${ic('edit')}Swap</button><button class="btn sm" data-a="custom" data-k="${SH.k}" data-s="${SH.s}">Eat something else</button><button class="btn sm ghost" data-a="skip" data-k="${SH.k}" data-s="${SH.s}">Skip</button></div>`;
+      <div class="btnrow" style="margin-top:10px"><button class="btn sm" data-a="pick" data-k="${SH.k}" data-s="${SH.s}">${ic('edit')}Change meal</button><button class="btn sm" data-a="custom" data-k="${SH.k}" data-s="${SH.s}">Eat something else</button><button class="btn sm ghost" data-a="skip" data-k="${SH.k}" data-s="${SH.s}">Skip</button></div>`;
   } else {
     ctx = `${r.shop ? grabNote(r) : ''}<section><h4>Add to plan</h4><div class="fieldrow"><div class="field" style="margin:0"><label for="ap-day">Day</label><select id="ap-day">${weekDays(UI.week).map(k => `<option value="${k}" ${k === UI.day ? 'selected' : ''}>${fmtDay(k)}</option>`).join('')}</select></div>
       <div class="field" style="margin:0"><label for="ap-slot">Meal</label><select id="ap-slot">${r.slots.map(s => `<option value="${s}">${SLOTNAME[s]}</option>`).join('')}</select></div></div>
@@ -6801,9 +6845,15 @@ const ACT = {
     freezeEaten(st);
     swapGroups(st, SH.i).forEach(g => {
       const sel = SH.sel[g.gk]; if (!sel || sel === '@keep') return;
-      const m = w.swaps[g.base.id] = w.swaps[g.base.id] || {};
-      if (sel === '@orig') delete m[g.orig]; else m[g.orig] = sel;
-      if (!Object.keys(m).length) delete w.swaps[g.base.id];
+      // a meal that has this ingredient through a swap of its own changes on its own; the rest change for the week
+      const own = [], rid = g.base.id; let week = false;
+      g.days.forEach(k => { const d = S.days[k]; if (!d) return; SLOTS.forEach(s => {
+        if (d.sl[s] !== rid || d.done[s] || (d.pk && d.pk[s])) return;
+        const o = dayCalc(k).slots[s]; if (o.kind !== 'recipe' || !o.r.items.some(it => it.i === SH.i && (it.from || it.i) === g.orig)) return;
+        const z = dayOmits(d, s); if (z && g.orig in z && z[g.orig] !== 'omit') own.push([d, s]); else week = true;
+      }); });
+      if (week) { const m = w.swaps[rid] = w.swaps[rid] || {}; if (sel === '@orig') delete m[g.orig]; else m[g.orig] = sel; if (!Object.keys(m).length) delete w.swaps[rid]; }
+      own.forEach(([d, s]) => { const z = swPut(dayOmits(d, s), g.orig, sel, weekSw(st, rid)); if (Object.keys(z).length) d.sw[s] = { r: rid, sw: z }; else delete d.sw[s]; if (!Object.keys(d.sw).length) delete d.sw; });
       n++;
     });
     save(); closeSheet(); render(); toast(n ? `Swapped in ${n} dish${n > 1 ? 'es' : ''}` : 'Nothing changed');
@@ -7519,6 +7569,12 @@ function trLast(ex, date, except) {
   }
   return null;
 }
+// a session's sets in a few characters: "40 kg × 8, 8, 7" when the weight stayed the same, else each set as weight×reps
+function setsTxt(sets, bw) {
+  const kgs = sets.map(x => tnum(x.kg));
+  if (sets.length > 1 && kgs.every(k => k === kgs[0])) { const k = kgs[0]; return `${bw ? (k ? `BW+${k} kg` : 'BW') : k === null ? '?' : `${k} kg`} × ${sets.map(x => x.reps).join(', ')}`; }
+  return sets.map(x => setStr(x, bw)).join(', ');
+}
 const setStr = (x, bw) => { const kg = tnum(x.kg); return `${bw ? (kg ? `+${kg}` : 'BW') : kg === null ? '?' : kg}×${x.reps}`; };
 // what to put on the bar next: add a step once every set reaches the top of the range, drop back if the first set fell well short
 function trSuggest(ex, sl, phase, date, except) {
@@ -7619,7 +7675,7 @@ function trLiftsCard() {
     const base = ser.find(s => s.date >= addDays(tk, -35)) || ser[0], ch = ser.length > 1 && now !== null && val(base) !== null ? now - val(base) : null;
     const big = e.bw ? `${last.reps}<small> reps</small>` : now ? `${Math.round(now)}<small> kg</small>` : `${last.reps}<small> reps</small>`;
     const chTxt = ch === null || base === last ? '' : Math.abs(ch) < 0.05 ? `<small>same as ${shortD(base.date)}</small>` : `<small class="${ch > 0.4 ? 'up' : ch < -0.4 ? 'down' : ''}">${ch > 0 ? '+' : ''}${e.bw ? Math.round(ch) : Math.round(ch * 10) / 10}${e.bw ? '' : ' kg'} since ${shortD(base.date)}</small>`;
-    return `<li><button class="liftrow" data-a="liftopen" data-v="${esc(id)}"><span class="n"><b>${esc(exName(id))}</b><small>${shortD(last.date)}: ${last.sets.map(x => setStr(x, e.bw)).join(', ')}</small></span>${spark(ser.slice(-12).map(val))}<span class="v">${big}${chTxt}</span></button></li>`;
+    return `<li><button class="liftrow" data-a="liftopen" data-v="${esc(id)}"><span class="n"><b>${esc(exName(id))}</b><small>${shortD(last.date)} · ${esc(setsTxt(last.sets, e.bw))}</small></span>${spark(ser.slice(-12).map(val))}<span class="v">${big}${chTxt}</span></button></li>`;
   };
   // the lifts in your plan now; anything else you've logged goes under More
   const now = ids.filter(id => inPlan.has(id)), rest = ids.filter(id => !inPlan.has(id));
@@ -7672,7 +7728,7 @@ function shLift() {
   const mk = SH.m || (e.bw ? 'reps' : 'e1'), pts = ser.map(s => ({ d: s.date, v: s[mk] })).filter(p => p.v !== null && p.v > 0);
   const seg = `<div class="seg mini4" role="group" aria-label="Measure">${Object.entries(LIFT_M).filter(([k]) => !(e.bw && k !== 'reps')).map(([k, [l]]) => `<button data-a="liftm" data-v="${k}" aria-pressed="${mk === k}">${l}</button>`).join('')}</div>`;
   const best = ser.reduce((b, s) => (s.e1 && (!b || s.e1 > b.e1) ? s : b), null);
-  const table = ser.slice().reverse().map(s => `<tr><td>${shortD(s.date)}</td><td>${s.sets.map(x => setStr(x, e.bw)).join(', ')}</td><td>${s[mk] ? Math.round(s[mk] * 10) / 10 : '–'}</td><td>${s.feel || '–'}</td></tr>${s.note ? `<tr><td></td><td colspan="3" class="small muted">${esc(s.note)}</td></tr>` : ''}`).join('');
+  const table = ser.slice().reverse().map(s => `<tr><td>${shortD(s.date)}</td><td>${esc(setsTxt(s.sets, e.bw))}</td><td>${s[mk] ? Math.round(s[mk] * 10) / 10 : '–'}</td><td>${s.feel || '–'}</td></tr>${s.note ? `<tr><td></td><td colspan="3" class="small muted">${esc(s.note)}</td></tr>` : ''}`).join('');
   return `<div class="sheethead"><div><span class="eyebrow">Lift</span><h2>${esc(exName(id))}</h2></div>${closeBtn}</div>
     ${seg}${trChartLine(pts, LIFT_M[mk][1])}
     ${best && !e.bw ? `<p class="small" style="margin:6px 0 0">Best estimated one-rep max: <b>${Math.round(best.e1)} kg</b>, on ${shortD(best.date)}.</p>` : ''}
@@ -7753,7 +7809,7 @@ function tvCard(l, e, i) {
   return `<article class="tvex" id="tvx-${i}">
     <div class="tvex-top">${sel}<span class="rx">${rx}</span></div>
     ${r ? `<p class="small muted" style="margin:2px 0 0">Stop ${slotRir(sl, l.deload)} short · rest ${mins(r.rest)}${x.bw ? ' · bodyweight' : ''}</p>` : ''}
-    <p class="small" style="margin:4px 0 0">${last ? `Last time (${shortD(last.date)}): ${esc(last.sets.map(s => setStr(s, x.bw)).join(', '))}` : '<span class="muted">No earlier sets for this one.</span>'}</p>
+    <p class="small" style="margin:4px 0 0">${last ? `Last time (${shortD(last.date)}): ${esc(setsTxt(last.sets, x.bw))}` : '<span class="muted">No earlier sets for this one.</span>'}</p>
     ${sg && last ? `<p class="tvhint ${sg.up ? 'up' : sg.down ? 'down' : ''}">${sg.kg !== null && !x.bw ? `<b>${sg.kg} kg</b> · ` : ''}${esc(sg.txt)}</p>` : sg ? `<p class="tvhint">${esc(sg.txt)}</p>` : ''}
     ${x.tip ? `<details class="tvhow"><summary>How${ic('chev')}</summary><p class="small">${esc(x.tip)}</p></details>` : ''}
     <label class="feel">Feel before this lift <select data-tf="feel" data-e="${i}"><option value="">–</option>${Array.from({ length: 10 }, (_, k) => `<option ${String(e.feel) === String(k + 1) ? 'selected' : ''}>${k + 1}</option>`).join('')}</select></label>
@@ -7949,7 +8005,7 @@ function liftLight() {
   if (!trLogsAll().length) return { st: 'none', txt: 'Nothing logged yet' };
   const x = liftWeek(), behind = x.due - x.done;
   const nx = x.next ? `; ${SESS[x.next.sess].n} ${x.next.k === todayKey() ? 'today' : `on ${DOWL[dayIndex(x.next.k)]}`}` : '';
-  return { st: behind <= 0 ? 'ok' : behind === 1 ? 'mid' : 'off', txt: `${x.done} of ${x.planned} this week${nx}` };
+  return { st: behind <= 0 ? 'ok' : behind === 1 ? 'mid' : 'off', txt: x.planned ? `${x.done} of ${x.planned} this week${nx}` : `${x.done} this week, no days picked` };
 }
 
 /* ───────────── shell ───────────── */
@@ -7966,6 +8022,7 @@ function render() {
   UI.ckSkip = false;
   $('modesw').innerHTML = [['meals', 'Meals', 'leaf'], ['weight', 'Check-in', 'ckin'], ['train', 'Train', 'lift']].map(([v, l, i]) => `<button data-a="appmode" data-v="${v}" role="tab" aria-selected="${UI.mode === v}" aria-label="${l}">${ic(i)}<span>${l}</span></button>`).join('');
   document.body.classList.toggle('wmode', wm || tm);
+  fitTop();
   $('gear').setAttribute('aria-label', wm ? 'Check-in settings' : tm ? 'Training settings' : 'Settings');
   $('nav').innerHTML = TABS.map(([v, l, i]) => `<button data-a="tab" data-v="${v}" ${UI.tab === v && !UI.trends ? 'aria-current="page"' : ''}>${ic(i)}<span>${l}</span></button>`).join('');
   const main = $('main');
