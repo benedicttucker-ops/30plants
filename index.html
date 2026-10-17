@@ -1249,6 +1249,49 @@ body.tvon .toast { bottom: calc(150px + env(safe-area-inset-bottom, 0px)); }
 .rvxs { grid-template-columns: minmax(0, 1fr); }
 .rvx > span { overflow-wrap: anywhere; }
 .mtext .nm, .tvrow .n b, .liftrow .n b { overflow-wrap: anywhere; }
+/* training ledger */
+.ledger { display: grid; gap: 10px; }
+.wsum .minis.ldose { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ldose .mini b { font-size: 28px; }
+.lmuss { display: grid; gap: 7px; }
+.lmus { display: grid; grid-template-columns: 82px minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: 13px; }
+.lmus .n { font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+.lmus .bar { position: relative; height: 8px; border-radius: 999px; background: var(--surface-2); }
+.lmus .bar i { position: absolute; inset: 0 auto 0 0; border-radius: 999px; background: var(--warn); }
+.lmus.min .bar i { background: var(--leaf); opacity: .55; }
+.lmus.eff .bar i { background: var(--leaf); }
+.lmus .bar u { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--ink); border-radius: 1px; opacity: .7; }
+.lmus .v { font-weight: 800; font-variant-numeric: tabular-nums; min-width: 44px; text-align: right; }
+.lmus .v small { font-weight: 600; color: var(--muted); }
+.lexs, .ladds { list-style: none; margin: 0; padding: 0; display: grid; }
+.lex { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 10px; align-items: center; width: 100%; text-align: left; background: none; border: 0; border-top: 1px solid var(--line); padding: 8px 0; color: inherit; font: inherit; cursor: pointer; }
+.lexs li:first-child .lex { border-top: 0; }
+.lex .box { width: 24px; height: 24px; border-radius: 7px; border: 2px solid var(--line); display: grid; place-items: center; color: #fff; }
+.lex .box svg { width: 15px; height: 15px; }
+.lex.on .box { background: var(--leaf); border-color: var(--leaf); }
+.lex .n { display: grid; min-width: 0; }
+.lex .n b { font-size: 14.5px; overflow-wrap: anywhere; }
+.lex .n small { color: var(--muted); font-size: 12px; }
+.lex .v { font-weight: 800; font-variant-numeric: tabular-nums; }
+.lex .v small { font-weight: 600; color: var(--muted); }
+.ladds li { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid var(--line); font-size: 13.5px; }
+.ladds li:first-child { border-top: 0; }
+.ladds li span { min-width: 0; overflow-wrap: anywhere; }
+/* got it: a meal's ingredients ticked off as in */
+.meal.hashave { grid-template-columns: 44px minmax(0, 1fr) auto; }
+.meal.hashave .mealbody { padding-right: 4px; }
+.havebtn { display: grid; justify-items: center; align-content: center; gap: 1px; min-width: 44px; min-height: 44px; margin-right: 6px; padding: 4px 4px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--muted); font: inherit; font-size: 11px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; cursor: pointer; }
+.havebtn svg { width: 18px; height: 18px; }
+.havebtn span svg { width: 13px; height: 13px; }
+.havebtn.all { border-color: var(--leaf); background: var(--leaf-soft); color: var(--leaf); }
+.drowx { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; border-top: 1px solid var(--line); }
+.drowx:first-child { border-top: 0; }
+.drowx .drow { border-top: 0; }
+.drowx .havebtn { min-width: 40px; min-height: 40px; margin-right: 8px; }
+.havelist .sbox[aria-checked="true"] { opacity: 1; }
+.havelist .sbox[aria-checked="true"] .n { text-decoration: none; color: var(--ink); }
+.havelist .sbox:disabled { cursor: default; }
+.havelist .sitem { grid-template-columns: minmax(0, 1fr) 8px; }
 
 </style>
 </head>
@@ -1274,7 +1317,7 @@ body.tvon .toast { bottom: calc(150px + env(safe-area-inset-bottom, 0px)); }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.5.3';</script>
+<script>window.TP_VERSION = '3.7.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -3157,6 +3200,8 @@ function mendDay(d) {
   if (d.t !== null && d.t !== undefined && !(+d.t > 0)) d.t = null;
   if (d.out !== undefined && !isObj(d.out)) delete d.out;
   if (d.sw !== undefined) { if (!isObj(d.sw)) delete d.sw; else { Object.keys(d.sw).forEach(s => { const z = d.sw[s]; if (!isObj(z) || typeof z.r !== 'string' || z.r !== d.sl[s] || !isObj(z.sw)) { delete d.sw[s]; return; } Object.keys(z.sw).forEach(i => { const v = z.sw[i]; if (!ING[i] || !(v === 'omit' || v === '@orig' || (typeof v === 'string' && v[0] !== '@' && subOptions(i).some(o => o.key === v)))) delete z.sw[i]; }); if (!Object.keys(z.sw).length) delete d.sw[s]; }); if (!Object.keys(d.sw).length) delete d.sw; } }
+  // ingredients ticked off as in for one meal: d.got[slot] = { r: recipe, i: { ingredient: 1 } }
+  if (d.got !== undefined) { if (!isObj(d.got)) delete d.got; else { Object.keys(d.got).forEach(s => { const z = d.got[s]; if (!isObj(z) || typeof z.r !== 'string' || z.r !== d.sl[s] || !isObj(z.i)) { delete d.got[s]; return; } Object.keys(z.i).forEach(i => { if (!ING[i] || z.i[i] !== 1) delete z.i[i]; }); if (!Object.keys(z.i).length) delete d.got[s]; }); if (!Object.keys(d.got).length) delete d.got; } }
   if (d.fz !== undefined) { if (!isObj(d.fz)) delete d.fz; else { Object.keys(d.fz).forEach(s => { const z = d.fz[s]; if (!isObj(z) || typeof z.r !== 'string' || !(+z.m > 0)) delete d.fz[s]; else z.m = +z.m; }); if (!Object.keys(d.fz).length) delete d.fz; } }
   return d;
 }
@@ -3272,7 +3317,7 @@ function normalise(s) {
   return s;
 }
 function load() { let s = null; try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) { s = null; } return normalise(s); }
-function save() { SETC = {}; CARRYC = {}; LOC = {}; FOODC = {}; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } }
+function save() { SETC = {}; CARRYC = {}; LOC = {}; FOODC = {}; HAVEC = {}; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } }
 let S = load();
 // the stock you buy changes the sodium in every recipe that uses it
 const STOCKS = { reg: ['Stock (from cube or pot)', 0.8, 'Regular'], red: ['Reduced-salt stock (cube or pot)', 0.45, 'Reduced salt'], low: ['Very low salt stock cubes', 0.1, 'Very low salt'] };
@@ -3396,6 +3441,7 @@ const SHARE_CAP = 0.25; // never take more than a quarter of a day's food for dr
    it was logged (so a late entry never reaches back into days already eaten). Days that can't take their share pass it on.
    Kept per week and rebuilt when any of that week's days change. */
 let FOODC = {};
+let HAVEC = {}; // the shopping list's amounts by week and shop, for the got-it ticks on meals
 const FC_NONE = { share: {}, src: {}, out: {} };
 function foodCarry(st) {
   const cf = S.set.carryFrom || todayKey();
@@ -4140,7 +4186,7 @@ function vToday() {
     if (o.kind === 'empty') rows.push(mealRow({ tick: s, disabled: true, slot: SLOTNAME[s], nm: `<span class="addslot">+ Add ${SLOTNAME[s].toLowerCase()}</span>`, art: art({ type: 'plate', main: 'white', cols: ['white'] }, 42), open: `data-a="pick" data-k="${k}" data-s="${s}"` }));
     else if (o.kind === 'skip') rows.push(mealRow({ tick: s, disabled: true, slot: SLOTNAME[s], nm: '<span class="muted">Skipped</span>', art: art({ type: 'plate', main: 'white', cols: ['white'] }, 42), open: `data-a="pick" data-k="${k}" data-s="${s}"` }));
     else if (o.kind === 'custom') rows.push(mealRow({ tick: s, on: o.done, done: o.done, slot: SLOTNAME[s], nm: esc(o.c.n), kc: `${fmtN(o.k)}<small>kcal</small>`, art: art({ type: 'plate', main: 'orange', cols: ['orange', 'green', 'red'] }, 42), open: `data-a="custom" data-k="${k}" data-s="${s}"` }));
-    else { const bn = batchName(k, s, o.r) || (o.r.shop ? 'Shop' : ''); rows.push(mealRow({ tick: s, on: o.done, done: o.done, slot: `${SLOTNAME[s]}${bn ? ` <span class="tape">${bn}</span>` : ''}`, nm: esc(o.r.n), kc: `${fmtN(o.k)}<small>kcal</small>`, art: art(o.r, 42), open: `data-a="open" data-r="${o.r.id}" data-k="${k}" data-s="${s}"` })); }
+    else { const bn = batchName(k, s, o.r) || (o.r.shop ? 'Shop' : ''); rows.push(mealRow({ tick: s, on: o.done, done: o.done, slot: `${SLOTNAME[s]}${bn ? ` <span class="tape">${bn}</span>` : ''}`, nm: esc(o.r.n), kc: `${fmtN(o.k)}<small>kcal</small>`, art: art(o.r, 42), open: `data-a="open" data-r="${o.r.id}" data-k="${k}" data-s="${s}"`, have: haveChip(k, s, o) })); }
   }
   if (c.night) rows.push(mealRow({ tick: 'out', on: !!c.night.done, done: !!c.night.done, slot: `Night out${c.night.note ? ` · ${esc(c.night.note)}` : ''}`, nm: esc(drinkSummary(c.night)), kc: `${fmtN(c.dK)}<small>kcal</small>`, art: nightArt(c.night, 42), open: `data-a="night" data-k="${k}"` }));
   const extras = d.x.map((x, i) => `<div class="xrow"><button class="nm" data-a="xedit" data-i="${i}">${esc(x.n)}<span class="mt">${fmtN(x.k)} kcal · ${fmtN(x.p || 0)}g protein${(x.pl || []).length ? ` · ${x.pl.length} plant${x.pl.length > 1 ? 's' : ''}` : ''}${x.fe ? ' · fermented' : ''}</span></button><button class="iconbtn" data-a="xedit" data-i="${i}" aria-label="Edit ${esc(x.n)}">${ic('edit')}</button><button class="iconbtn" data-a="xdel" data-i="${i}" aria-label="Remove ${esc(x.n)}">${ic('trash')}</button></div>`).join('');
@@ -4190,7 +4236,7 @@ function todayPrompts() {
 function mealRow(o) {
   const label = unesc(o.nm.replace(/<[^>]+>/g, ''));
   const inner = `<span>${o.art}</span><span class="mtext"><span class="slot">${o.slot}</span><span class="nm">${o.nm}</span></span><span class="kc">${o.kc || ''}</span>`;
-  return `<div class="meal ${o.done ? 'done' : ''}"><button class="tick" role="checkbox" aria-checked="${!!o.on}" aria-label="Mark ${esc(label)} eaten" ${o.disabled ? 'disabled' : `data-a="tick" data-s="${o.tick}"`}><span>${ic('check')}</span></button>${o.open ? `<button class="mealbody" ${o.open}>${inner}</button>` : `<div class="mealbody">${inner}</div>`}</div>`;
+  return `<div class="meal ${o.done ? 'done' : ''} ${o.have ? 'hashave' : ''}"><button class="tick" role="checkbox" aria-checked="${!!o.on}" aria-label="Mark ${esc(label)} eaten" ${o.disabled ? 'disabled' : `data-a="tick" data-s="${o.tick}"`}><span>${ic('check')}</span></button>${o.open ? `<button class="mealbody" ${o.open}>${inner}</button>` : `<div class="mealbody">${inner}</div>`}${o.have || ''}</div>`;
 }
 
 function vWeek() { return vWeekPlan(); }
@@ -4219,7 +4265,8 @@ function vWeekPlan() {
       if (o.kind === 'empty') return `<button class="drow" data-a="pick" data-k="${k}" data-s="${s}">${art({ type: 'plate', main: 'white', cols: ['white'] }, 36)}<span class="n empty">${lab}+ Add</span><span></span></button>`;
       if (o.kind === 'skip') return `<button class="drow" data-a="pick" data-k="${k}" data-s="${s}">${art({ type: 'plate', main: 'white', cols: ['white'] }, 36)}<span class="n muted">${lab}Skipped</span><span></span></button>`;
       if (o.kind === 'custom') return `<button class="drow ${o.done ? 'done' : ''}" data-a="custom" data-k="${k}" data-s="${s}">${art({ type: 'plate', main: 'orange', cols: ['orange', 'green', 'red'] }, 36)}<span class="n">${lab}${esc(o.c.n)}</span><span class="kc">${fmtN(o.k)}</span></button>`;
-      return `<button class="drow ${o.done ? 'done' : ''}" data-a="open" data-r="${o.r.id}" data-k="${k}" data-s="${s}">${art(o.r, 36)}<span class="n">${lab}${esc(o.r.n)}</span><span class="kc">${fmtN(o.k)}</span></button>`;
+      const hv = haveChip(k, s, o), btn = `<button class="drow ${o.done ? 'done' : ''}" data-a="open" data-r="${o.r.id}" data-k="${k}" data-s="${s}">${art(o.r, 36)}<span class="n">${lab}${esc(o.r.n)}</span><span class="kc">${fmtN(o.k)}</span></button>`;
+      return hv ? `<div class="drowx">${btn}${hv}</div>` : btn;
     }).join('')}${c.night ? `<button class="drow ${c.night.done ? 'done' : ''}" data-a="night" data-k="${k}">${nightArt(c.night, 36)}<span class="n"><small>Night out</small>${esc(drinkSummary(c.night))}</span><span class="kc">${fmtN(c.dK)}</span></button>` : ''}</div>` : '';
     return `<article class="dayacc ${k === tk ? 'today' : ''} ${open ? 'open' : ''}" style="--i:${i}"><button class="dayhead" data-a="dayacc" data-v="${k}" aria-expanded="${open}"><span class="d">${DOW[dayIndex(k)]}<small>${parse(k).getDate()} ${MONS[parse(k).getMonth()]}</small></span><span class="pv">${cdots(c.colours)}${c.night ? '<span class="tape">Out</span> ' : ''}${pv}</span><span class="k">${fmtN(c.planK)}${d.t ? '*' : ''}</span>${ic('chev', false, 'chev')}</button>${body}</article>`;
   }).join('');
@@ -5679,21 +5726,28 @@ function shopList(st, trip) {
   r.fromLast = fromLast;
   return r;
 }
+// which shop a meal's ingredients are bought in: two-shop weeks split the week; otherwise there's one (0)
+function mealTrip(st, k, s, o, sess) {
+  const mode = weekMode(st); if (mode !== 'two') return 0;
+  return o.prepped ? (sessDays((sess || sessions(st, mode))[1], s).includes(k) ? 2 : 1) : (daysBetween(st, k) <= 2 ? 1 : 2);
+}
+const gotOf = (d, s) => (d && d.got && d.got[s] && d.got[s].r === d.sl[s] ? d.got[s].i : null);
 function shopTotals(st, trip) {
-  const mode = weekMode(st), sess = sessions(st, mode), tot = {}, from = {};
+  const tot = {}, from = {}, got = {}, gotAt = {}, sess = weekMode(st) === 'two' ? sessions(st, 'two') : null;
   const add = (i, g, f) => { tot[i] = (tot[i] || 0) + g; if (f) (from[i] = from[i] || new Set()).add(f); };
   for (const k of weekDays(st)) {
-    const c = dayCalc(k), di = daysBetween(st, k);
+    const c = dayCalc(k);
     for (const s of SLOTS) {
       const o = c.slots[s];
       if (o.kind !== 'recipe' || o.done || o.r.shop) continue; // shop-bought snacks go on their own list
-      const t = mode === 'two' ? (o.prepped ? (sessDays(sess[1], s).includes(k) ? 2 : 1) : (di <= 2 ? 1 : 2)) : 1;
+      const t = mealTrip(st, k, s, o, sess) || 1;
       if (trip && t !== trip) continue;
-      o.r.items.forEach(it => add(it.i, it.g * o.m, it.from));
+      const own = gotOf(S.days[k], s);
+      o.r.items.forEach(it => { add(it.i, it.g * o.m, it.from); if (own && own[it.i]) { got[it.i] = (got[it.i] || 0) + it.g * o.m; (gotAt[it.i] = gotAt[it.i] || new Set()).add(`${DOW[dayIndex(k)]} ${SLOTNAME[s].toLowerCase()}`); } });
     }
-    const ls = setAt(k); if (ls.latteOn && !peekD(k).done.latte) { const t = mode === 'two' ? (di <= 2 ? 1 : 2) : 1; if (!trip || t === trip) add('milk', ls.latteMl); }
+    const ls = setAt(k); if (ls.latteOn && !peekD(k).done.latte) { const t = weekMode(st) === 'two' ? (daysBetween(st, k) <= 2 ? 1 : 2) : 1; if (!trip || t === trip) add('milk', ls.latteMl); }
   }
-  return { tot, from };
+  return { tot, from, got, gotAt };
 }
 // a pack size as it reads on the shelf
 const packTxt = i => (ING[i].ml ? fmtMl(PACK[i]) : fmtG(PACK[i]));
@@ -5743,6 +5797,51 @@ function shPack() {
     <p class="small muted" style="margin:6px 0 0">${base ? `The app's usual size is ${g.ml ? fmtMl(base) : fmtG(base)}. ` : ''}Leftovers and the planner work from this, so packs get finished rather than binned.</p>
     <div class="btnrow" style="margin-top:12px"><button class="btn primary" data-a="packsave">${ic('check')}Save</button>${own ? `<button class="btn ghost" data-a="packreset">${base ? `Back to ${g.ml ? fmtMl(base) : fmtG(base)}` : 'Stop tracking'}</button>` : ''}</div>`;
 }
+/* ───────────── got it: a meal's ingredients ticked off as in, shared with the shopping list ───────────── */
+const listTot = (st, t) => HAVEC[`${st}|${t}`] || (HAVEC[`${st}|${t}`] = shopList(st, t).tot);
+// meals still to cook (or batches still to prep) from today on
+const haveable = (k, s, o) => !!o && o.kind === 'recipe' && !o.done && !o.packed && !o.kept && !o.r.shop && k >= todayKey() && !(o.prepped && batchCooked(k, s));
+// each ingredient and where it's in from: your cupboard, ticked in the shopping list, left over from last week, or ticked for this meal
+function mealHave(k, s, o) {
+  const st = startOf(k), w = S.weeks[st] || {}, low = w.low || {}, shop = w.shop || {}, t = mealTrip(st, k, s, o), own = gotOf(S.days[k], s) || {};
+  const tot = listTot(st, t), amt = {};
+  o.r.items.forEach(it => { amt[it.i] = (amt[it.i] || 0) + it.g * o.m; });
+  return Object.keys(amt).map(i => ({ i, g: amt[i], src: S.stock[i] && !low[i] ? 'stock' : shop[`${t}:${i}`] ? 'shop' : own[i] ? 'meal' : !tot[i] ? 'left' : null }));
+}
+// the meals a tick applies to: just this one, or every day of a batch not yet cooked
+function haveGroup(k, s, o) {
+  if (!o.prepped) return [k];
+  const bc = batchContext(k, s); if (!bc) return [k];
+  return sessDays(bc.se, s).filter(k2 => { const d = S.days[k2]; if (!d || d.sl[s] !== o.r.id) return false; const o2 = dayCalc(k2).slots[s]; return haveable(k2, s, o2); });
+}
+function setGot(k, s, i, on) {
+  const d = D(k); d.got = d.got || {};
+  const z = d.got[s] && d.got[s].r === d.sl[s] ? d.got[s] : (d.got[s] = { r: d.sl[s], i: {} });
+  if (on) z.i[i] = 1; else delete z.i[i];
+  if (!Object.keys(z.i).length) delete d.got[s]; if (!Object.keys(d.got).length) delete d.got;
+}
+// take an ingredient off every meal it was ticked for, in one shop of the week (0 = the whole week)
+function clearGot(st, trip, i) {
+  weekDays(st).forEach(k => { const d = S.days[k]; if (!d || !d.got) return; Object.keys(d.got).forEach(s => { const own = gotOf(d, s); if (!own || !own[i]) return; const o = dayCalc(k).slots[s]; if (trip && o.kind === 'recipe' && (mealTrip(st, k, s, o) || 1) !== trip) return; setGot(k, s, i, false); }); });
+}
+function haveChip(k, s, o) {
+  if (!haveable(k, s, o)) return '';
+  const h = mealHave(k, s, o), n = h.filter(x => x.src).length, all = n === h.length;
+  return `<button class="havebtn ${all ? 'all' : ''}" data-a="haveopen" data-k="${k}" data-s="${s}" aria-label="Ingredients for ${esc(o.r.n)}: ${all ? 'everything in' : `${n} of ${h.length} in`}">${ic('shop')}<span>${all ? ic('check') : `${n}/${h.length}`}</span></button>`;
+}
+const HAVE_SRC = { stock: 'In your cupboard', shop: 'Ticked off in the shopping list', left: 'Left over from last week', meal: '' };
+function shHave() {
+  const k = SH.k, s = SH.s, o = dayCalc(k).slots[s];
+  if (!haveable(k, s, o)) { SH.title = 'Ingredients'; return `<div class="sheethead"><div><span class="eyebrow">${SLOTNAME[s]} · ${fmtDay(k)}</span><h2>Ingredients</h2></div>${closeBtn}</div><p class="muted">Nothing to check for this meal now.</p>`; }
+  SH.title = `Ingredients for ${o.r.n}`;
+  const h = mealHave(k, s, o).sort((a, b) => (!!a.src - !!b.src) || ING[a.i].n.localeCompare(ING[b.i].n)), n = h.filter(x => x.src).length, grp = haveGroup(k, s, o);
+  const row = x => `<div class="sitem"><button class="sbox" role="checkbox" aria-checked="${!!x.src}" ${x.src === 'left' ? 'disabled' : `data-a="havetog" data-i="${x.i}"`}><span class="box">${ic('check')}</span><span class="n">${esc(ING[x.i].n)}${HAVE_SRC[x.src] ? `<span class="h">${HAVE_SRC[x.src]}</span>` : ''}</span><span class="q">${fmtQ(x.i, x.g * (grp.length || 1))}</span></button><span></span></div>`;
+  return `<div class="sheethead"><div><span class="eyebrow">${SLOTNAME[s]} · ${fmtDay(k)}</span><h2>Got it?</h2></div>${closeBtn}</div>
+    <p class="small" style="margin:0 0 8px"><b>${esc(o.r.n)}</b>: ${n === h.length ? 'everything is in.' : `${n} of ${h.length} in.`} Tick what you have; it's ticked off in the shopping list too.${grp.length > 1 ? ` This is a batch, so amounts and ticks cover ${dayList(grp)}.` : ''}</p>
+    <div class="shoplist havelist">${h.filter(x => !ING[x.i].pantry).map(row).join('')}</div>
+    ${h.some(x => ING[x.i].pantry) ? `<div class="eyebrow" style="margin:12px 0 6px">Cupboard staples</div><div class="shoplist havelist">${h.filter(x => ING[x.i].pantry).map(row).join('')}</div>` : ''}
+    ${n < h.length ? `<button class="btn primary" style="width:100%;margin-top:12px" data-a="haveall">${ic('check')}I've got everything</button>` : ''}`;
+}
 // shop-bought snacks still to buy this week, day by day
 function grabRows(st) {
   const tk = todayKey(), out = [];
@@ -5758,18 +5857,20 @@ function grabBox(st, w) {
 }
 function vShop() {
   const st = UI.week, mode = weekMode(st), w = W(st), sess = sessions(st, mode);
-  const trip = mode === 'two' ? UI.trip : 0, { tot, from, fromLast } = shopList(st, trip), all = Object.keys(tot), grab = grabBox(st, w);
+  const trip = mode === 'two' ? UI.trip : 0, { tot, from, fromLast, got, gotAt } = shopList(st, trip), all = Object.keys(tot), grab = grabBox(st, w);
   if (!all.length && !(mode === 'two' && Object.keys(shopTotals(st, 3 - trip).tot).length)) return `${weekNav(st)}${grab || emptyBlock(`Nothing to buy for ${fmtRange(st)} yet.`)}`;
   const low = w.low || {}, stocked = i => S.stock[i] && !low[i], ids = all.filter(i => !stocked(i)), inStock = all.filter(stocked);
   const seg = mode === 'two' ? `<div class="seg">${[[1, `${DOW[dayIndex(sess[0].date)]} shop`], [2, `${DOW[dayIndex(sess[1].date)]} shop`]].map(([v, l]) => `<button data-a="trip" data-v="${v}" aria-pressed="${UI.trip === v}">${l}</button>`).join('')}</div><p class="small muted" style="margin:6px 0 0">${UI.trip === 1 ? `For ${sessName(sess[0])}'s prep and fresh meals ${dayList(weekDays(st).slice(0, 3))}.` : `For ${sessName(sess[1])}'s prep and fresh meals ${dayList(weekDays(st).slice(3))}.`}</p>` : `<p class="small muted" style="margin:8px 0 0">One shop for the week, before ${sessName(sess[0])}'s prep. Tap ${ic('swap', false, 'inl')} if something's missing.</p>`;
   const key = i => `${trip}:${i}`;
+  // ticked off here, or already in for every meal that uses it
+  const gotAll = i => got[i] > 0 && got[i] >= tot[i] - 0.5, isOn = i => !!w.shop[key(i)] || gotAll(i);
   const item = i => {
-    const ing = ING[i], on = !!w.shop[key(i)], subs = from[i] ? [...from[i]].map(shortN) : null;
-    const hint = subs ? `Instead of ${subs.join(', ')}` : S.stock[i] && low[i] ? 'Running low, so it’s back on the list' : fromLast[i] ? `Plus about ${fmtQ(i, fromLast[i])} spare from last week` : (ing.sb || '');
+    const ing = ING[i], on = isOn(i), subs = from[i] ? [...from[i]].map(shortN) : null, part = !on && got[i] > 0;
+    const hint = part ? `Already in for ${joinAnd([...gotAt[i]])}` : on && !w.shop[key(i)] ? `In for ${joinAnd([...gotAt[i]])}` : subs ? `Instead of ${subs.join(', ')}` : S.stock[i] && low[i] ? 'Running low, so it’s back on the list' : fromLast[i] ? `Plus about ${fmtQ(i, fromLast[i])} spare from last week` : (ing.sb || '');
     const canSwap = subOptions(i).length || subs;
-    return `<div class="sitem"><button class="sbox" role="checkbox" aria-checked="${on}" data-a="shopck" data-i="${i}"><span class="box">${ic('check')}</span><span class="n">${esc(ing.n)}${hint ? `<span class="h ${subs ? 'sw' : ''}">${esc(hint)}</span>` : ''}</span><span class="q">${fmtQ(i, tot[i], true)}</span></button>${canSwap ? `<button class="iconbtn swapbtn" data-a="swap" data-i="${i}" aria-label="Can't find ${esc(ing.n)}? Swap it">${ic('swap')}</button>` : '<span></span>'}</div>`;
+    return `<div class="sitem"><button class="sbox" role="checkbox" aria-checked="${on}" data-a="shopck" data-i="${i}"><span class="box">${ic('check')}</span><span class="n">${esc(ing.n)}${hint ? `<span class="h ${subs ? 'sw' : ''}">${esc(hint)}</span>` : ''}</span><span class="q">${fmtQ(i, part ? tot[i] - got[i] : tot[i], true)}</span></button>${canSwap ? `<button class="iconbtn swapbtn" data-a="swap" data-i="${i}" aria-label="Can't find ${esc(ing.n)}? Swap it">${ic('swap')}</button>` : '<span></span>'}</div>`;
   };
-  const main = ids.filter(i => !ING[i].pantry), pantry = ids.filter(i => ING[i].pantry), done = ids.filter(i => w.shop[key(i)]).length;
+  const main = ids.filter(i => !ING[i].pantry), pantry = ids.filter(i => ING[i].pantry), done = ids.filter(isOn).length;
   const swaps = Object.entries(w.swaps || {}).flatMap(([rid, sw]) => Object.entries(sw).map(([o, k]) => ({ rid, o, k }))).filter(x => R[x.rid] && ING[isAmt(x.o) ? x.o.slice(3) : x.o]);
   const nAmt = swaps.filter(x => isAmt(x.o)).length, nSw = swaps.length - nAmt;
   const swapBox = swaps.length ? `<details class="more swaps"><summary>${joinAnd([nSw ? `${nSw} swap${nSw > 1 ? 's' : ''}` : '', nAmt ? `${nAmt} amount${nAmt > 1 ? 's' : ''} changed` : ''].filter(Boolean))} this week${ic('chev')}</summary><div class="swaplist">${swaps.map(x => { const am = isAmt(x.o), opt = !am && subOpt(x.o, x.k); return `<div class="swaprow"><span><b>${esc(shortN(am ? x.o.slice(3) : x.o))}</b> → ${am ? (+x.k ? 'your amount' : 'left out') : esc(opt ? subLabel(opt) : x.k)}<small>${esc(R[x.rid].n)}</small></span><button class="btn sm ghost" data-a="unswap" data-r="${x.rid}" data-o="${x.o}">Undo</button></div>`; }).join('')}</div></details>` : '';
@@ -5935,7 +6036,7 @@ function renderSheet(fresh) {
   const root = $('sheet-root');
   if (!SH) { root.innerHTML = ''; return; }
   const old = root.querySelector('.sheet'), top = old && !fresh ? old.scrollTop : 0;
-  const html = ({ wgoal: shWGoal, ckitems: shCkItems, cupboard: shCupboard, recipe: shRecipe, pick: shPick, xadd: shAdd, custom: shCustom, target: shTarget, settings: shSettings, confirm: shConfirm, setwhen: shSetWhen, leftadd: shLeftAdd, pack: shPack, backup: shBackup, lift: shLift, trswap: shTrSwap, trset: shTrSet, tvpick: shTvPick, tvaddex: shTvAddEx, weekmenu: shWeekMenu, night: shNight, swap: shSwap })[SH.type]();
+  const html = ({ wgoal: shWGoal, ckitems: shCkItems, cupboard: shCupboard, recipe: shRecipe, pick: shPick, xadd: shAdd, custom: shCustom, target: shTarget, settings: shSettings, confirm: shConfirm, setwhen: shSetWhen, leftadd: shLeftAdd, pack: shPack, backup: shBackup, lift: shLift, trswap: shTrSwap, trset: shTrSet, tvpick: shTvPick, tvaddex: shTvAddEx, tradd: shTrAdd, have: shHave, weekmenu: shWeekMenu, night: shNight, swap: shSwap })[SH.type]();
   root.innerHTML = `<div class="scrim" data-scrim="1"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(SH.title || 'Details')}"><div class="grab"></div>${html}</div></div>`;
   if (!fresh) root.querySelector('.scrim').style.animation = 'none';
   const sh = root.querySelector('.sheet'); if (!fresh) sh.style.animation = 'none';
@@ -6690,7 +6791,7 @@ function freezeEaten(st) {
   const sw = (S.weeks[st] && S.weeks[st].swaps) || {};
   weekDays(st).forEach(k => { const dd = S.days[k]; if (!dd) return; SLOTS.forEach(s => { const dn = dd.done[s]; if (dn && dn.m && !dn.sw && R[dd.sl[s]]) dn.sw = Object.assign({}, sw[dd.sl[s]] || {}); }); });
 }
-function setSlot(k, s, v) { const d = D(k); d.sl[s] = v; delete d.done[s]; if (v !== '@c') delete d.cu[s]; if (d.sw) { delete d.sw[s]; if (!Object.keys(d.sw).length) delete d.sw; } save(); }
+function setSlot(k, s, v) { const d = D(k); d.sl[s] = v; delete d.done[s]; if (v !== '@c') delete d.cu[s]; ['sw', 'got'].forEach(f => { if (d[f]) { delete d[f][s]; if (!Object.keys(d[f]).length) delete d[f]; } }); save(); }
 function applyBatch(st, key, s, rid, only) {
   const se = sessions(st, weekMode(st)).find(x => x.key === key), tk = todayKey();
   // leave past days, eaten meals, your own entries and boxes already packed alone; a snack batch changes only its own days
@@ -6837,7 +6938,31 @@ const ACT = {
   },
   packreset() { const i = SH.i; if (S.packs) delete S.packs[i]; applyPacks(); save(); closeSheet(); render(); toast(`${shortN(i)}: back to the usual pack`); },
   grabck(d) { const w = W(UI.week); if (w.shop[d.v]) delete w.shop[d.v]; else w.shop[d.v] = 1; save(); render(); },
-  shopck(d) { const w = W(UI.week), key = `${weekMode(UI.week) === 'two' ? UI.trip : 0}:${d.i}`; if (w.shop[key]) delete w.shop[key]; else w.shop[key] = 1; save(); render(); },
+  shopck(d) {
+    const st = UI.week, w = W(st), trip = weekMode(st) === 'two' ? UI.trip : 0, key = `${trip}:${d.i}`, L = shopList(st, trip), viaMeals = L.got[d.i] > 0 && L.got[d.i] >= (L.tot[d.i] || 0) - 0.5;
+    // unticking takes it off every meal too, so the meals and the list never disagree
+    if (w.shop[key] || viaMeals) { delete w.shop[key]; clearGot(st, trip, d.i); } else w.shop[key] = 1;
+    save(); render();
+  },
+  haveopen(d) { openSheet({ type: 'have', k: d.k, s: d.s }); },
+  havetog(d) {
+    if (!SH || SH.type !== 'have' || !ING[d.i]) return;
+    const k = SH.k, s = SH.s, o = dayCalc(k).slots[s]; if (!haveable(k, s, o)) return;
+    const x = mealHave(k, s, o).find(y => y.i === d.i); if (!x) return;
+    const st = startOf(k), grp = haveGroup(k, s, o), nm = shortN(d.i);
+    let msg = '';
+    if (!x.src) grp.forEach(k2 => setGot(k2, s, d.i, true));
+    else if (x.src === 'meal') grp.forEach(k2 => setGot(k2, s, d.i, false));
+    else if (x.src === 'shop') { const w = W(st), t = mealTrip(st, k, s, o); delete w.shop[`${t}:${d.i}`]; clearGot(st, t, d.i); msg = `${nm} is back on the shopping list`; }
+    else if (x.src === 'stock') { const w = W(st); w.low = w.low || {}; w.low[d.i] = 1; msg = `${nm}: running low, so it's back on the shopping list`; }
+    save(); render(); renderSheet(); if (msg) toast(msg);
+  },
+  haveall() {
+    if (!SH || SH.type !== 'have') return;
+    const k = SH.k, s = SH.s, o = dayCalc(k).slots[s]; if (!haveable(k, s, o)) return;
+    const grp = haveGroup(k, s, o); mealHave(k, s, o).forEach(x => { if (!x.src) grp.forEach(k2 => setGot(k2, s, x.i, true)); });
+    save(); render(); closeSheet(); toast(`Everything in for ${o.r.n.toLowerCase()}`);
+  },
   swap(d) { openSheet({ type: 'swap', i: d.i }); },
   swapsel(d) { SH.sel[d.g] = d.v; renderSheet(); },
   swapapply() {
@@ -6859,7 +6984,7 @@ const ACT = {
     save(); closeSheet(); render(); toast(n ? `Swapped in ${n} dish${n > 1 ? 'es' : ''}` : 'Nothing changed');
   },
   unswap(d) { if (isAmt(d.o)) { setAmt({ st: UI.week, rid: d.r, key: d.o }, null); save(); render(); toast('Back to the recipe amount'); return; } const w = W(UI.week); freezeEaten(UI.week); if (w.swaps && w.swaps[d.r]) { delete w.swaps[d.r][d.o]; if (!Object.keys(w.swaps[d.r]).length) delete w.swaps[d.r]; } save(); render(); toast('Swap undone'); },
-  untick() { W(UI.week).shop = {}; save(); render(); },
+  untick() { W(UI.week).shop = {}; weekDays(UI.week).forEach(k => { if (S.days[k]) delete S.days[k].got; }); save(); render(); },
   cupboard() { openSheet({ type: 'cupboard', q: '' }); },
   stockck(d, el) {
     if (S.stock[d.i]) delete S.stock[d.i]; else S.stock[d.i] = 1;
@@ -6880,10 +7005,10 @@ const ACT = {
   plantfind(d) { if (UI.mode !== 'meals') { UI.mode = 'meals'; try { localStorage.setItem('tp.mode', 'meals'); } catch (e) { /* ignore */ } } UI.rplant = d.v; UI.rq = ''; UI.rslot = 'all'; UI.rtag = ''; setTab('recipes'); render(); window.scrollTo(0, 0); },
   rplantx() { UI.rplant = ''; render(); },
   copyshop() {
-    const st = UI.week, mode = weekMode(st), trip = mode === 'two' ? UI.trip : 0, tot = shopList(st, trip).tot, w = W(st);
+    const st = UI.week, mode = weekMode(st), trip = mode === 'two' ? UI.trip : 0, { tot, got } = shopList(st, trip), w = W(st);
     const lines = [`Thirty Plants · shopping for ${fmtRange(st)}`];
-    const low = w.low || {};
-    AISLES.forEach(([a, name]) => { const its = Object.keys(tot).filter(i => ING[i].a === a && !ING[i].pantry && !w.shop[`${trip}:${i}`] && !(S.stock[i] && !low[i])); if (!its.length) return; lines.push('', name.toUpperCase()); its.forEach(i => lines.push(`- ${ING[i].n}: ${fmtQ(i, tot[i], true)}`)); });
+    const low = w.low || {}, inAll = i => got[i] > 0 && got[i] >= tot[i] - 0.5, left = i => tot[i] - (got[i] || 0);
+    AISLES.forEach(([a, name]) => { const its = Object.keys(tot).filter(i => ING[i].a === a && !ING[i].pantry && !w.shop[`${trip}:${i}`] && !inAll(i) && !(S.stock[i] && !low[i])); if (!its.length) return; lines.push('', name.toUpperCase()); its.forEach(i => lines.push(`- ${ING[i].n}: ${fmtQ(i, left(i), true)}`)); });
     copyText(lines.join('\n'));
   },
   recipes() { closeSheet(); setTab('recipes'); render(); window.scrollTo(0, 0); },
@@ -7463,7 +7588,9 @@ function trNormalise(s) {
   t.n = t.n === 3 ? 3 : 4;
   t.dose = t.dose === 'min' ? 'min' : 'eff';
   t.rest = t.rest !== false;
-  ['swaps', 'nope', 'weeks', 'logs'].forEach(f => { if (!isObj(t[f])) t[f] = {}; });
+  ['swaps', 'nope', 'weeks', 'logs', 'adds'].forEach(f => { if (!isObj(t[f])) t[f] = {}; });
+  // sets added to a week's ledger by hand: { id: { id, date, ex, sets, at } }
+  Object.keys(t.adds).forEach(id => { const a = t.adds[id]; if (!isObj(a) || !DAY_KEY.test(a.date || '') || !EX[a.ex] || !(Math.round(+a.sets) >= 1)) { delete t.adds[id]; return; } a.id = id; a.sets = Math.min(30, Math.round(+a.sets)); a.at = +a.at || 0; });
   Object.keys(t.swaps).forEach(sl => { if (!SLOTDEF[sl] || !EX[t.swaps[sl]]) delete t.swaps[sl]; });
   Object.keys(t.nope).forEach(id => { if (!EX[id]) delete t.nope[id]; });
   Object.keys(t.weeks).forEach(st => {
@@ -7645,7 +7772,7 @@ function vTrain() {
     <div class="wchead" style="margin-top:2px"><span class="small muted">Dose this week</span><div class="seg mini3" role="group" aria-label="Dose">${['min', 'eff'].map(v => `<button data-a="trdose" data-v="${v}" aria-pressed="${dose === v}" ${del ? 'disabled' : ''}>${DOSE_N[v]}</button>`).join('')}</div></div>
     ${delNote}</section>`;
   const imp = !Object.keys(S.tr.logs).length ? `<div class="callout">${ic('info')}<div>Logged in Cut log so far? Export a backup from its Setup tab, then <button class="link" data-a="backup" data-v="hist">bring those sessions in here</button> so the weights carry on.</div></div>` : '';
-  return `${imp}${week}${trLiftsCard()}${trHistCard()}${trPlanCard(phase, dose, split)}${trWhyCard()}`;
+  return `${imp}${week}${trLedgerCard()}${trLiftsCard()}${trHistCard()}${trPlanCard(phase, dose, split)}${trWhyCard()}`;
 }
 // main lifts first, in session order, then anything else you've logged
 function trLiftOrder() {
@@ -7892,6 +8019,22 @@ function trImportCutLog(h) {
 
 /* ── actions ── */
 Object.assign(ACT, {
+  trlw(d) { UI.trLw = d.v === '1'; render(); },
+  trlx(d, el) { const det = el.closest('details'); UI.trLx = det ? !det.open : true; },
+  tradd(d) {
+    const st = trLwSt(), tk = todayKey(), k = st === startOf(tk) ? tk : addDays(st, 6);
+    openSheet({ type: 'tradd', ex: EX[d.v] ? d.v : 'bench', n: Math.max(1, Math.min(10, +d.n || 3)), k });
+  },
+  traddn(d) { SH.n = Math.max(1, Math.min(10, SH.n + +d.v)); renderSheet(); },
+  traddday(d) { SH.k = d.k; renderSheet(); },
+  traddgo() {
+    if (!SH || !EX[SH.ex] || !DAY_KEY.test(SH.k || '')) return;
+    let id = `a${Date.now().toString(36)}`; for (let i = 2; S.tr.adds[id]; i++) id = `a${Date.now().toString(36)}${i}`;
+    S.tr.adds[id] = { id, date: SH.k, ex: SH.ex, sets: SH.n, at: Date.now() };
+    const msg = `${SH.n} set${SH.n === 1 ? '' : 's'} of ${EX[SH.ex].n.toLowerCase()} added to ${DOWL[dayIndex(SH.k)]}`;
+    trSave(); closeSheet(); render(); toast(msg);
+  },
+  trdeladd(d) { const a = S.tr.adds[d.v]; if (!a) return; delete S.tr.adds[d.v]; trSave(); render(); toast(`Removed ${exName(a.ex).toLowerCase()} from ${DOWL[dayIndex(a.date)]}`); },
   trday(d) {
     const st = startOf(d.k), w = trWk(st), days = trDays(st), i = days.indexOf(d.k);
     if (i >= 0) days.splice(i, 1); else { if (days.length >= 4) { toast('Four days is the most: untick one first'); return; } days.push(d.k); }
@@ -7960,6 +8103,78 @@ function tvSwapTo(l, i, x) {
   e.ex = x;
   if (!e.sets.some(s => tnum(s.reps) > 0 || s.done)) { const g = trSuggest(x, e.slot, l.phase, l.date, l.id).kg; e.sets.forEach(s => { s.kg = g !== null ? String(g) : ''; }); }
 }
+/* ── the week's ledger: every set done, from sessions or added by hand, counted against the doses muscle by muscle ── */
+const trAddsIn = st => Object.values(S.tr.adds).filter(a => startOf(a.date) === st).sort((a, b) => (a.date === b.date ? a.at - b.at : a.date < b.date ? -1 : 1));
+const setsDone = e => e.sets.filter(x => x.done || tnum(x.reps) > 0).length;
+// every lot of sets done in a week: from sessions (with the slot they filled) and added by hand
+function trDoneIn(st) {
+  const out = [];
+  trLogsIn(st).forEach(l => l.ex.forEach(e => { const n = setsDone(e); if (n && EX[e.ex]) out.push({ ex: e.ex, slot: e.slot, n, date: l.date, lab: SESS[l.sess].n }); }));
+  trAddsIn(st).forEach(a => out.push({ ex: a.ex, slot: null, n: a.sets, date: a.date, lab: null, id: a.id }));
+  return out;
+}
+// the doses are the plan's own sets for each muscle (full for the muscles an exercise is aimed at, half for the ones helping);
+// each muscle counts only up to its own target, so extra chest can't make up for missed legs
+function trLedger(st) {
+  const phase = trPhase(), split = SPLITS[trDays(st).length >= 4 ? 4 : 3];
+  const tMin = trVolume(split, phase, 'min'), tEff = trVolume(split, phase, 'eff'), done = {}, lots = trDoneIn(st);
+  Object.keys(MUSC).forEach(m => { done[m] = 0; });
+  lots.forEach(x => { EX[x.ex].p.forEach(m => { done[m] += x.n; }); EX[x.ex].s.forEach(m => { done[m] += x.n / 2; }); });
+  const pct = t => { let a = 0, sum = 0; Object.keys(MUSC).forEach(m => { sum += t[m]; a += Math.min(done[m], t[m]); }); return sum ? Math.floor((a / sum) * 100) : 0; };
+  // the plan's exercises for the week, with the sets the week's dose asks of each
+  const plan = [], dose = trDose(st), extra = [];
+  split.forEach(sess => sessSlots(sess, phase).forEach(sl => { const n = slotSets(sl, phase, dose), ex = slotEx(sl); if (!n) return; const p = plan.find(x => x.ex === ex); if (p) { p.need += n; p.slots.push(sl); } else plan.push({ ex, need: n, slots: [sl], done: 0, from: [] }); }));
+  // sets done tick off the plan's exercise for the slot they filled, or one they're an alternative to; the rest are extras
+  const alt = (p, ex) => p.slots.some(sl => SLOTDEF[sl] && [SLOTDEF[sl].ex, ...SLOTDEF[sl].alts].includes(ex));
+  lots.forEach(x => {
+    let row = (x.slot && plan.find(p => p.slots.includes(x.slot))) || plan.find(p => p.ex === x.ex) || plan.find(p => alt(p, x.ex));
+    if (!row) { row = extra.find(p => p.ex === x.ex); if (!row) extra.push(row = { ex: x.ex, need: 0, done: 0, from: [] }); }
+    row.done += x.n; row.from.push(x);
+  });
+  return { done, tMin, tEff, min: pct(tMin), eff: pct(tEff), plan, extra, split, phase, dose };
+}
+const trLwSt = () => addDays(startOf(todayKey()), UI.trLw ? -7 : 0);
+function trLedgerCard() {
+  const st = trLwSt(), L = trLedger(st), last = !!UI.trLw;
+  const tile = (v, lab) => `<div class="mini ${v >= 100 ? 'good' : ''}"><b>${v}%</b><span>${lab}</span></div>`;
+  const mus = Object.keys(MUSC).filter(m => L.tEff[m] > 0).map(m => {
+    const d = L.done[m], e = L.tEff[m], mi = L.tMin[m], cls = d >= e ? 'eff' : d >= mi ? 'min' : 'low';
+    return `<div class="lmus ${cls}"><span class="n">${MUSC[m]}</span><span class="bar" aria-hidden="true"><i style="width:${Math.min(100, (d / e) * 100).toFixed(1)}%"></i>${mi > 0 && mi < e ? `<u style="left:${((mi / e) * 100).toFixed(1)}%"></u>` : ''}</span><span class="v">${frac(Math.round(d * 2) / 2, 0.5)}<small>/${frac(Math.round(e * 2) / 2, 0.5)}</small></span></div>`;
+  }).join('');
+  // "3 on Thu (Upper A)", naming the exercise when it was a swap for the planned one
+  const where = r => r.from.map(f => `${f.ex !== r.ex ? `${exName(f.ex)}: ` : ''}${f.n} on ${DOW[dayIndex(f.date)]}${f.lab ? ` (${f.lab})` : ', added'}`).join(' · ');
+  const row = r => {
+    const full = r.need ? r.done >= r.need : true;
+    return `<li><button class="lex ${full ? 'on' : ''}" data-a="tradd" data-v="${r.ex}" data-n="${r.need ? Math.max(1, r.need - r.done) : 3}" aria-label="${esc(exName(r.ex))}: ${r.done}${r.need ? ` of ${r.need}` : ''} sets. Add sets"><span class="box" aria-hidden="true">${full ? ic('check') : ''}</span><span class="n"><b>${esc(exName(r.ex))}</b><small>${r.done ? esc(where(r)) : 'Not done yet'}</small></span><span class="v">${r.done}${r.need ? `<small>/${r.need}</small>` : ''}</span></button></li>`;
+  };
+  const extra = L.extra, ticked = L.plan.filter(r => r.done >= r.need).length;
+  const adds = trAddsIn(st);
+  const addList = adds.length ? `<div class="eyebrow" style="margin-top:4px">Added by hand</div><ul class="ladds">${adds.map(a => `<li><span>${DOW[dayIndex(a.date)]} ${parse(a.date).getDate()} · ${esc(exName(a.ex))} · ${a.sets} set${a.sets === 1 ? '' : 's'}</span><button class="iconbtn" data-a="trdeladd" data-v="${a.id}" aria-label="Remove ${esc(exName(a.ex))} on ${fmtDay(a.date)}">${ic('x')}</button></li>`).join('')}</ul>` : '';
+  const note = L.eff >= 100 ? 'Every muscle has had its full week.' : L.min >= 100 ? 'Everything is covered at the minimal dose; the rest is gain.' : last ? '' : `The minimal dose keeps what you have; the effective dose builds on it.`;
+  return `<section class="wsum ledger"><div class="wchead"><div class="eyebrow">Ledger · w/c ${shortD(st)}</div><div class="seg mini3" role="group" aria-label="Which week"><button data-a="trlw" data-v="0" aria-pressed="${!last}">This week</button><button data-a="trlw" data-v="1" aria-pressed="${last}">Last week</button></div></div>
+    <div class="minis ldose">${tile(L.min, 'of the minimal dose')}${tile(L.eff, 'of the effective dose')}</div>
+    <p class="small muted" style="margin:0">${note ? `${note} ` : ''}Counted muscle by muscle: a set counts in full for the muscles it's aimed at and half for the ones helping, and extra on one muscle doesn't cover another.</p>
+    <div class="lmuss">${mus}</div><p class="small muted" style="margin:-4px 0 0">Bars run to the effective dose; the tick marks the minimal one.</p>
+    <details class="more lexd" ${UI.trLx === false ? '' : 'open'}><summary data-a="trlx"><span>The plan's exercises · ${ticked} of ${L.plan.length} done</span>${ic('chev')}</summary>
+      <p class="small muted" style="margin:2px 0 4px">Sets at the ${DOSE_N[L.dose].toLowerCase()} dose. Tap one to add sets you did outside a logged session.</p><ul class="lexs">${L.plan.map(row).join('')}</ul></details>
+    ${extra.length ? `<div class="eyebrow" style="margin-top:4px">Also done</div><ul class="lexs">${extra.map(row).join('')}</ul>` : ''}
+    ${addList}
+    <button class="btn" data-a="tradd" data-v="">${ic('plus')}Add sets</button></section>`;
+}
+function shTrAdd() {
+  SH.title = 'Add to the ledger';
+  const st = trLwSt(), days = weekDays(st), e = EX[SH.ex] || EX.bench, tk = todayKey();
+  const groups = Object.entries(MUSC).map(([m, nm]) => [nm, EX_ROWS.filter(r => r[2][0] === m && !EX[r[0]].hide).map(r => r[0])]).filter(g => g[1].length);
+  const helps = e.s.map(m => MUSC[m].toLowerCase());
+  return `<div class="sheethead"><div><span class="eyebrow">${UI.trLw ? 'Last week' : 'This week'}</span><h2>Add sets</h2></div>${closeBtn}</div>
+    <div class="field"><label for="ta-ex">Exercise</label><select id="ta-ex">${groups.map(([nm, ids]) => `<optgroup label="${esc(nm)}">${ids.map(id => `<option value="${id}" ${id === e.id ? 'selected' : ''}>${esc(EX[id].n)}</option>`).join('')}</optgroup>`).join('')}</select></div>
+    <p class="small muted" style="margin:-4px 0 10px">Counts for ${esc(joinAnd(e.p.map(m => MUSC[m].toLowerCase())))}${helps.length ? `, and half for ${esc(joinAnd(helps))}` : ''}.</p>
+    <div class="field"><label>Hard sets</label><div class="stepper" style="width:max-content"><button data-a="traddn" data-v="-1" aria-label="One set fewer">−</button><span>${SH.n}</span><button data-a="traddn" data-v="1" aria-label="One set more">+</button></div></div>
+    <div class="field"><label>Day</label><div class="daypick" role="group" aria-label="Day">${days.map(k => `<button data-a="traddday" data-k="${k}" aria-pressed="${k === SH.k}" ${k > tk ? 'class="past"' : ''}><span>${DOW[dayIndex(k)].slice(0, 2)}</span><b>${parse(k).getDate()}</b></button>`).join('')}</div></div>
+    <button class="btn primary" style="width:100%;margin-top:6px" data-a="traddgo">${ic('plus')}Add ${SH.n} set${SH.n === 1 ? '' : 's'} of ${esc(e.n.toLowerCase())}</button>`;
+}
+document.addEventListener('change', e => { if (e.target && e.target.id === 'ta-ex' && SH && SH.type === 'tradd') { SH.ex = e.target.value; renderSheet(); } });
+
 function shTvPick() {
   SH.title = 'Log a session';
   return `<div class="sheethead"><div><span class="eyebrow">Training</span><h2>Log a session</h2></div>${closeBtn}</div>
@@ -8012,7 +8227,7 @@ function liftLight() {
 const TABS = [['today', 'Today', 'today'], ['week', 'Week', 'week'], ['out', 'Out', 'glass'], ['prep', 'Prep', 'prep'], ['shop', 'Shop', 'shop']];
 function render() {
   lockMode(startOf(todayKey())); if (UI.week !== startOf(todayKey())) lockMode(UI.week);
-  TC = null; MCACHE = null; SETC = {}; CARRYC = {}; LOC = {}; FOODC = {}; TRW = null; applyPacks();
+  TC = null; MCACHE = null; SETC = {}; CARRYC = {}; LOC = {}; FOODC = {}; HAVEC = {}; TRW = null; applyPacks();
   const wc = weekCalc(startOf(todayKey())), g = setAt(todayKey()).plantGoal, ph = pillHtml(wc, g);
   $('pill').innerHTML = ph.html; $('pill').setAttribute('aria-label', ph.label); $('pill').setAttribute('aria-pressed', UI.trends);
   $('gear').innerHTML = ic('gear'); $('wandbtn').innerHTML = ic('wand');

@@ -1,4 +1,4 @@
-THIRTY PLANTS 3.5.3: putting it on your Android phone
+THIRTY PLANTS 3.7.0: putting it on your Android phone
 
 The app has to be opened from a web address (not as a file) for Chrome to install it.
 Free route with GitHub Pages:
