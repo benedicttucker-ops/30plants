@@ -1450,7 +1450,7 @@ body.tvon .toast { bottom: calc(150px + env(safe-area-inset-bottom, 0px)); }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.9.0';</script>
+<script>window.TP_VERSION = '3.9.1';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -3273,7 +3273,7 @@ const DEF = { target: 2000, latteK: 150, latteP: 11, latteMl: 300, latteOn: true
 const OLD_BUD = { b: 175, l: 525, s: 125, d: 625, p: 200 };
 /* settings that belong to the days they were in force: portions and goals. A change starts on a chosen day and every
    day before it keeps what it had. S.setPast holds the earlier values, each in force until the day it names. */
-const DATED = ['target', 'latteOn', 'latteK', 'latteP', 'latteMl', 'bud', 'loSalt', 'protGoal', 'fibreGoal', 'fsMax', 'naMax', 'sfMax', 'plantGoal', 'colourGoal', 'oilyGoal', 'redMax', 'sleepGoal'];
+const DATED = ['target', 'latteOn', 'latteK', 'latteP', 'latteMl', 'bud', 'loSalt', 'protGoal', 'fibreGoal', 'fsMax', 'naMax', 'sfMax', 'plantGoal', 'colourGoal', 'oilyGoal', 'redMax', 'sleepGoal', 'drinkMode'];
 const PORTION_KEYS = ['target', 'latteOn', 'latteK', 'bud'];
 let SETC = {};
 function setAt(k) {
@@ -3303,7 +3303,7 @@ function batchCooked(k, s) {
 }
 // the next day a saved change comes into force, if one is waiting
 const setNext = () => { const p = (S.setPast || []).find(x => x.until > todayKey()); return p ? p.until : null; };
-const SET_LAB = { target: ['Calories', v => fmtN(v)], latteOn: ['Latte', v => (v ? 'on' : 'off')], latteK: ['Latte kcal', v => fmtN(v)], latteP: ['Latte protein', v => `${v}g`], latteMl: ['Latte milk', v => `${v} ml`], loSalt: ['LoSalt at the table', v => (v ? fmtLo(v) : 'none')], protGoal: ['Protein', v => `${v}g`], fibreGoal: ['Fibre', v => `${v}g`], fsMax: ['Added sugar', v => `${v}g`], naMax: ['Sodium', v => `${v}g`], sfMax: ['Sat fat', v => `${v}g`], plantGoal: ['Plant points', v => `${v}`], colourGoal: ['Colour groups', v => `${v}`], oilyGoal: ['Oily fish', v => `${v}`], redMax: ['Red meat', v => `${v}`], sleepGoal: ['Sleep', v => `${v} h`] };
+const SET_LAB = { target: ['Calories', v => fmtN(v)], latteOn: ['Latte', v => (v ? 'on' : 'off')], latteK: ['Latte kcal', v => fmtN(v)], latteP: ['Latte protein', v => `${v}g`], latteMl: ['Latte milk', v => `${v} ml`], loSalt: ['LoSalt at the table', v => (v ? fmtLo(v) : 'none')], protGoal: ['Protein', v => `${v}g`], fibreGoal: ['Fibre', v => `${v}g`], fsMax: ['Added sugar', v => `${v}g`], naMax: ['Sodium', v => `${v}g`], sfMax: ['Sat fat', v => `${v}g`], plantGoal: ['Plant points', v => `${v}`], colourGoal: ['Colour groups', v => `${v}`], oilyGoal: ['Oily fish', v => `${v}`], redMax: ['Red meat', v => `${v}`], sleepGoal: ['Sleep', v => `${v} h`], drinkMode: ['Drinks', v => (v === 'spread' ? 'spread over the week' : 'counted on the night')] };
 // what a change does, as "Lunch 575 → 475"
 function setDiff(a, b) {
   const out = [];
@@ -3342,6 +3342,8 @@ function mendDay(d) {
   d.x.forEach(x => { x.n = typeof x.n === 'string' && x.n ? x.n : 'Extra'; ['k', 'p'].forEach(f => { x[f] = Number.isFinite(+x[f]) ? +x[f] : 0; }); x.pl = (Array.isArray(x.pl) ? x.pl : []).filter(p => PLANTS[p]); });
   if (d.t !== null && d.t !== undefined && !(+d.t > 0)) d.t = null;
   if (d.out !== undefined && !isObj(d.out)) delete d.out;
+  // drinks already taken off this day, by the night they came from, fixed once a later change could have moved them
+  if (d.dfx !== undefined) { if (!isObj(d.dfx)) delete d.dfx; else { Object.keys(d.dfx).forEach(nk => { if (!DAY_KEY.test(nk) || !Number.isFinite(+d.dfx[nk])) delete d.dfx[nk]; else d.dfx[nk] = +d.dfx[nk]; }); if (!Object.keys(d.dfx).length) delete d.dfx; } }
   if (d.sw !== undefined) { if (!isObj(d.sw)) delete d.sw; else { Object.keys(d.sw).forEach(s => { const z = d.sw[s]; if (!isObj(z) || typeof z.r !== 'string' || z.r !== d.sl[s] || !isObj(z.sw)) { delete d.sw[s]; return; } Object.keys(z.sw).forEach(i => { const v = z.sw[i]; if (!ING[i] || !(v === 'omit' || v === '@orig' || (typeof v === 'string' && v[0] !== '@' && subOptions(i).some(o => o.key === v)))) delete z.sw[i]; }); if (!Object.keys(z.sw).length) delete d.sw[s]; }); if (!Object.keys(d.sw).length) delete d.sw; } }
   // ingredients ticked off as in for one meal: d.got[slot] = { r: recipe, i: { ingredient: 1 } }
   if (d.got !== undefined) { if (!isObj(d.got)) delete d.got; else { Object.keys(d.got).forEach(s => { const z = d.got[s]; if (!isObj(z) || typeof z.r !== 'string' || z.r !== d.sl[s] || !isObj(z.i)) { delete d.got[s]; return; } Object.keys(z.i).forEach(i => { if (!ING[i] || z.i[i] !== 1) delete z.i[i]; }); if (!Object.keys(z.i).length) delete d.got[s]; }); if (!Object.keys(d.got).length) delete d.got; } }
@@ -3365,6 +3367,7 @@ const foodCopy = e => { const x = { n: e.n, k: e.k, p: e.p, pl: (e.pl || []).sli
 function normalise(s) {
   if (!isObj(s) || s.v !== 1) s = { v: 1, set: {}, days: {}, weeks: {}, favs: {} };
   s.set = isObj(s.set) ? s.set : {};
+  if (s.fix !== undefined && !isObj(s.fix)) s.fix = {};
   ['days', 'weeks', 'favs', 'nope', 'stock', 'wt'].forEach(f => { if (s[f] !== undefined && !isObj(s[f])) s[f] = {}; });
   Object.keys(s.days || {}).forEach(k => { const d = DAY_KEY.test(k) ? mendDay(s.days[k]) : null; if (d) s.days[k] = d; else delete s.days[k]; });
   Object.keys(s.weeks || {}).forEach(k => { const w = s.weeks[k]; if (!DAY_KEY.test(k) || !isObj(w)) { delete s.weeks[k]; return; } if (!isObj(w.shop)) w.shop = {}; if (w.swaps !== undefined && !isObj(w.swaps)) delete w.swaps; if (!w.mode) w.mode = 'auto'; });
@@ -3438,6 +3441,7 @@ function normalise(s) {
       const y = x.v[f];
       if (f === 'bud') { if (isObj(y)) { v.bud = {}; SLOTS.forEach(sl => { v.bud[sl] = Number.isFinite(+y[sl]) && +y[sl] >= 0 ? +y[sl] : s.set.bud[sl]; }); } }
       else if (f === 'latteOn') { if (typeof y === 'boolean') v.latteOn = y; }
+      else if (f === 'drinkMode') { if (y === 'spread' || y === 'day') v.drinkMode = y; }
       else if (y !== null && y !== '' && typeof y !== 'boolean' && Number.isFinite(+y) && +y >= 0) v[f] = +y;
     });
     x.v = v;
@@ -3459,8 +3463,9 @@ function normalise(s) {
   trNormalise(s); // training sessions, swaps and weeks
   return s;
 }
+let NSC = {}; // drinks: night shares and the nights near each week, cleared on every save and render
 function load() { let s = null; try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) { s = null; } return normalise(s); }
-function save() { SETC = {}; CARRYC = {}; LOC = {}; FOODC = {}; HAVEC = {}; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } }
+function save() { SETC = {}; CARRYC = {}; LOC = {}; FOODC = {}; HAVEC = {}; NSC = {}; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } }
 let S = load();
 // the stock you buy changes the sodium in every recipe that uses it
 const STOCKS = { reg: ['Stock (from cube or pot)', 0.8, 'Regular'], red: ['Reduced-salt stock (cube or pot)', 0.45, 'Reduced salt'], low: ['Very low salt stock cubes', 0.1, 'Very low salt'] };
@@ -3570,16 +3575,55 @@ function nightSpan(nk, from) {
   const st = startOf(nk), f = from && from > st ? from : st, span = weekDays(startOf(f)).filter(d => d >= f);
   return span.length ? span : [nk];
 }
+// one night's drinks, day by day. What was planned spreads from when it was planned; any difference the check-in logged
+// spreads from the day it was logged. Days that have gone since keep what they gave up (fixed by holdPast before any
+// change), so a change only ever moves today and the days after: more drinks come off the days left, fewer give them back.
+const nightParts = nk => { const o = outOf(S.days[nk]); if (!o) return []; if (o.units === undefined) return [[drinkK(o), o.from]]; const pk = drinkPlanK(o); return [[pk, o.from], [drinkK(o) - pk, o.unitsFrom || o.from]]; };
+const nightWin = nk => weekDays(startOf(nk)).concat(weekDays(addDays(startOf(nk), 7)));
+function nightShare(nk) {
+  const ck = 'n' + nk; if (NSC[ck]) return NSC[ck];
+  return (NSC[ck] = nightShare0(nk));
+}
+function nightShare0(nk) {
+  const dyn = {};
+  nightParts(nk).forEach(([kc, from]) => { if (!kc) return; const sp = nightSpan(nk, from); sp.forEach(k => { dyn[k] = (dyn[k] || 0) + kc / sp.length; }); });
+  const fixed = {}; let fsum = 0;
+  nightWin(nk).forEach(k => { const f = S.days[k] && S.days[k].dfx; if (f && nk in f) { fixed[k] = f[nk]; fsum += f[nk]; } });
+  if (!Object.keys(fixed).length) return dyn;
+  const total = Object.values(dyn).reduce((a, v) => a + v, 0), rem = total - fsum, out = Object.assign({}, fixed);
+  if (Math.abs(rem) < 0.5) return out;
+  let free = Object.keys(dyn).filter(k => !(k in fixed)), w = free.reduce((a, k) => a + dyn[k], 0);
+  if (!free.length || w <= 0) { free = nightSpan(nk, todayKey()).filter(k => !(k in fixed)); w = free.length; free.forEach(k => { out[k] = rem / w; }); return out; }
+  free.forEach(k => { out[k] = rem * dyn[k] / w; });
+  return out;
+}
+// the nights that can reach a day: last week's and this week's, including any since called off that already took something
+function nightsNear(k) {
+  const ck = 'w' + startOf(k); if (NSC[ck]) return NSC[ck];
+  return (NSC[ck] = nightsNear0(k));
+}
+function nightsNear0(k) {
+  const st = startOf(k), ns = new Set(weekDays(addDays(st, -7)).concat(weekDays(st)).filter(nk => outOf(S.days[nk])));
+  weekDays(addDays(st, -7)).concat(weekDays(st), weekDays(addDays(st, 7))).forEach(x => { const f = S.days[x] && S.days[x].dfx; if (f) Object.keys(f).forEach(nk => { if (nk >= addDays(st, -7) && nk <= addDays(st, 6)) ns.add(nk); }); });
+  return [...ns];
+}
 function drinkShare(k) {
-  const st = startOf(k); let s = 0;
-  weekDays(addDays(st, -7)).concat(weekDays(st)).forEach(nk => {
-    const o = outOf(S.days[nk]); if (!o) return;
-    const add = (kc, from) => { const sp = nightSpan(nk, from); if (kc && sp.includes(k)) s += kc / sp.length; };
-    // what was planned spreads from when it was planned; any difference the check-in logged spreads from the day it was logged
-    if (o.units === undefined) add(drinkK(o), o.from);
-    else { const pk = drinkPlanK(o); add(pk, o.from); add(drinkK(o) - pk, o.unitsFrom || o.from); }
-  });
-  return Math.max(0, Math.min(s, (peekD(k).t || setAt(k).target) * SHARE_CAP));
+  let s = 0;
+  nightsNear(k).forEach(nk => { s += nightShare(nk)[k] || 0; });
+  const cap = (peekD(k).t || setAt(k).target) * SHARE_CAP;
+  return Math.max(-cap, Math.min(s, cap));
+}
+// before anything that changes drinks or a day's total: the days already gone keep what they gave up for drinks, and
+// batch portions already cooked keep their size, so only the meals still to cook take up the change
+function holdPast(around) {
+  const tk = todayKey(), st = startOf(around || tk), win = weekDays(addDays(st, -7)).concat(weekDays(st), weekDays(addDays(st, 7)));
+  const past = win.filter(k => k < tk && S.days[k]);
+  if (past.length) {
+    const nks = new Set(); win.forEach(k => nightsNear(k).forEach(nk => nks.add(nk)));
+    nks.forEach(nk => { const m = nightShare(nk); past.forEach(k => { const v = m[k]; if (v === undefined || Math.abs(v) < 0.5) return; const d = S.days[k]; d.dfx = d.dfx || {}; if (!(nk in d.dfx)) d.dfx[nk] = Math.round(v * 10) / 10; }); });
+    NSC = {}; FOODC = {};
+  }
+  cookedFrom(around && around < tk ? around : tk, true);
 }
 const SHARE_CAP = 0.25; // never take more than a quarter of a day's food for drinks (and food carried from earlier days)
 /* going over on food: whatever a day's own meals can't absorb comes off the days after it in the same week, from the day
@@ -5289,7 +5333,8 @@ function logDrinks(k, u) {
   const d = S.days[k] || (u > 0 ? D(k) : null); if (!d) return;
   const o = outOf(d), tk = todayKey();
   if (o ? (o.units === undefined ? Math.abs(drinkPlanU(o) - u) < 0.05 : Math.abs(o.units - u) < 0.05) : !(u > 0)) return; // as planned, or no change
-  if (S.set.drinkMode !== 'spread' && k < tk) rvFreezeDay(k); // drinks counted on the night: what was eaten stays as it was
+  holdPast(k);
+  if (setAt(k).drinkMode !== 'spread' && k < tk) rvFreezeDay(k); // drinks counted on the night: what was eaten stays as it was
   if (o) {
     if (o.logged && !(u > 0)) delete d.out; // a night only the check-in added, now none
     else { o.units = u; o.unitsFrom = tk; o.done = true; }
@@ -6119,6 +6164,17 @@ function vRecipes() {
 }
 
 
+// the drinks taken off each day, in runs: "Food is trimmed by 54 kcal a day Mon–Sat and 339 on Sun"; a day that gets
+// some back (a night called off after earlier days had already given up food for it) says so
+function drinkSegs(days, shares) {
+  const segs = [];
+  days.forEach((k, i) => { const v = Math.round(shares[i]); if (Math.abs(v) < 1) return; const l = segs[segs.length - 1]; if (l && l.v === v && daysBetween(l.to, k) === 1) l.to = k; else segs.push({ v, from: k, to: k }); });
+  if (segs.length < 2 && !segs.some(x => x.v < 0)) return '';
+  const when = x => (x.from === x.to ? DOW[dayIndex(x.from)] : `${DOW[dayIndex(x.from)]}–${DOW[dayIndex(x.to)]}`);
+  const pos = segs.filter(x => x.v > 0).map(x => `${fmtN(x.v)} kcal${x.from === x.to ? ` on ${when(x)}` : ` a day ${when(x)}`}`);
+  const neg = segs.filter(x => x.v < 0).map(x => `${when(x)} gets ${fmtN(-x.v)} kcal${x.from === x.to ? '' : ' a day'} back`);
+  return `${pos.length ? `Food is trimmed by ${joinAnd(pos)}` : 'No food is trimmed'}${neg.length ? `; ${joinAnd(neg)}` : ''}`;
+}
 function vOut() {
   const st = UI.week, wc = weekCalc(st), set = setAt(st);
   const shares = wc.days.map(drinkShare), onDays = wc.days.filter((k, i) => shares[i] > 0.5), applied = shares.reduce((a, x) => a + x, 0);
@@ -6128,9 +6184,9 @@ function vOut() {
   const units = wc.days.reduce((a, k) => a + drinkU(outOf(S.days[k])), 0);
   const count = wc.days.reduce((a, k) => a + drinkN(outOf(S.days[k])), 0);
   const note = set.drinkMode === 'spread'
-    ? (!wc.drinks ? `Drinks you add come off the food from that day to the end of the week, so it still averages ${fmtN(set.target)}.`
+    ? (!wc.drinks && !shares.some(v => Math.abs(v) >= 1) ? `Drinks you add come off the food from that day to the end of the week, so it still averages ${fmtN(set.target)}.`
       : capped ? `Food is trimmed by up to a quarter a day${spanTxt}, so the week averages about ${fmtN(avgT)} rather than ${fmtN(set.target)}.`
-      : `Food is trimmed by about ${fmtN(share)} kcal a day${spanTxt}, so the week still averages ${fmtN(set.target)}.`)
+      : `${drinkSegs(wc.days, shares) || `Food is trimmed by about ${fmtN(share)} kcal a day${spanTxt}`}, so the week still averages ${fmtN(set.target)}.`)
     : 'Drinks come off that day\'s food. Meals you haven\'t eaten yet that day shrink to fit.';
   const head = `<section class="wsum"><div class="wsum-top">${art({ type: 'pint', main: 'yellow' }, 72)}<div><div class="eyebrow">Drinks this week</div><div class="big">${counter('drinksK', Math.round(wc.drinks))}<small> kcal</small></div><div class="small muted">${wc.nights ? `${wc.nights} night${wc.nights > 1 ? 's' : ''} out · ${halfN(count)} drink${count > 0 && count <= 1 ? '' : 's'} · about ${Math.round(units)} units` : 'No nights out yet. Flip a switch below.'}</div></div></div>
     <div class="seg" role="group" aria-label="How drinks are counted"><button data-a="outmode" data-v="spread" aria-pressed="${set.drinkMode === 'spread'}">Spread over the week</button><button data-a="outmode" data-v="day" aria-pressed="${set.drinkMode === 'day'}">Count on the night</button></div>
@@ -6520,7 +6576,7 @@ function shTarget() {
   SH.title = 'Calorie target';
   const d = peekD(UI.day), v = d.t || setAt(UI.day).target;
   return `<div class="sheethead"><div><span class="eyebrow">${fmtDay(UI.day)}</span><h2>Calorie target</h2></div>${closeBtn}</div>
-  <p class="small muted">For this day only, e.g. a long run or a dinner out. Every portion that day rescales to fit.</p>
+  <p class="small muted">For this day only, e.g. a long run or a dinner out. The meals still to cook that day rescale to fit; batch boxes already made and anything you've logged stay as they are.</p>
   <div class="field"><label for="t-v">Target for ${fmtDay(UI.day)} (kcal)</label><input id="t-v" type="number" inputmode="numeric" value="${v}" autofocus></div>
   <div class="chips" style="margin-top:10px">${[1600, 1800, 2000, 2200, 2500, 2800].map(x => `<button class="chip" data-a="tpreset" data-v="${x}">${fmtN(x)}</button>`).join('')}</div>
   <div class="btnrow" style="margin-top:14px"><button class="btn primary" data-a="tsave">Save</button>${d.t ? `<button class="btn ghost" data-a="treset">Back to ${fmtN(setAt(UI.day).target)}</button>` : ''}</div>`;
@@ -6821,7 +6877,7 @@ function wzPatch(s, justId) {
 }
 function wzBuild() {
   const z = WZ, st = z.start;
-  wzOutInit();
+  wzOutInit(); holdPast(st);
   setWeekStart(dayIndex(st)); S.set.weekendBatch = z.wkb; S.set.prepSnacks = z.psn; S.set.usualDrink = z.usual;
   weekDays(st).forEach(k => {
     const d = D(k), w = z.out[k], prev = outOf(d);
@@ -6879,7 +6935,7 @@ function applyOut(k) {
 
 /* ───────────── toast & clipboard ───────────── */
 let toastT = null;
-function toast(msg) { const r = $('toast-root'); r.innerHTML = `<div class="toast">${esc(msg)}</div>`; clearTimeout(toastT); toastT = setTimeout(() => { r.innerHTML = ''; }, 2200); }
+function toast(msg, ms) { const r = $('toast-root'); r.innerHTML = `<div class="toast">${esc(msg)}</div>`; clearTimeout(toastT); toastT = setTimeout(() => { r.innerHTML = ''; }, ms || 2200); }
 function copyText(text, el, ok) {
   const fallback = () => { if (el) { el.focus(); el.select(); } toast('Select and copy the text'); };
   try { navigator.clipboard.writeText(text).then(() => { toast('Copied'); if (ok) ok(); }, fallback); } catch (e) { fallback(); }
@@ -6987,7 +7043,7 @@ const ACT = {
 
   night(d) { const o = outOf(peekD(d.k)); openSheet({ type: 'night', k: d.k, o: o ? JSON.parse(JSON.stringify(o)) : defaultNight() }); },
   outtoggle(d) {
-    const k = d.k, day = D(k);
+    const k = d.k, day = D(k); holdPast(k);
     if (outOf(day)) { delete day.out; applyOut(k); planWeek(startOf(k), false); toast(`Staying in on ${fmtDay(k)}`); render(); return; }
     day.out = defaultNight(); const moved = applyOut(k); render();
     if (moved) toast(`Oily fish moved to ${fmtDay(moved)}`);
@@ -6997,14 +7053,14 @@ const ACT = {
   drinkstep(d) { keepNightFields(); const dr = DR[d.id]; if (!dr) return; const n = Math.max(0, Math.min(30, Math.round(((SH.o.drinks[d.id] || 0) + +d.v * dr.step) * 2) / 2)); if (n) SH.o.drinks[d.id] = n; else delete SH.o.drinks[d.id]; renderSheet(); },
   nightdin(d) { keepNightFields(); SH.o.dinner = d.v; renderSheet(); },
   nightsave() {
-    keepNightFields(); const k = SH.k, day = D(k), was = outOf(day);
+    keepNightFields(); const k = SH.k, day = D(k), was = outOf(day); holdPast(k);
     day.out = Object.assign({}, SH.o, { on: true, done: was ? !!was.done : false });
     if (was && JSON.stringify(was.drinks || {}) !== JSON.stringify(SH.o.drinks || {})) { delete day.out.units; delete day.out.unitsFrom; delete day.out.logged; }
     const moved = applyOut(k); planWeek(startOf(k), false);
     closeSheet(); render(); toast(moved ? `Saved. Oily fish moved to ${fmtDay(moved)}` : 'Night out saved');
   },
-  nightoff() { const k = SH.k; delete D(k).out; applyOut(k); planWeek(startOf(k), false); closeSheet(); render(); toast(`Staying in on ${fmtDay(k)}`); },
-  outmode(d) { S.set.drinkMode = d.v; save(); render(); },
+  nightoff() { const k = SH.k; holdPast(k); delete D(k).out; applyOut(k); planWeek(startOf(k), false); closeSheet(); render(); toast(`Staying in on ${fmtDay(k)}`); },
+  outmode(d) { if (d.v !== 'spread' && d.v !== 'day') return; holdPast(); setFrom(todayKey(), Object.assign(datedOf(S.set), { drinkMode: d.v })); save(); render(); },
   open(d) { openSheet({ type: 'recipe', r: d.r, k: d.k, s: d.s, n: 1 }); },
   pick(d) { openSheet({ type: 'pick', k: d.k, s: d.s, q: '' }); },
   bswap(d) { openSheet({ type: 'pick', st: UI.week, bkey: d.key, s: d.s, ks: d.ks ? d.ks.split(',') : null, q: '' }); },
@@ -7059,8 +7115,8 @@ const ACT = {
   xdel(d) { D(UI.day).x.splice(+d.i, 1); save(); render(); },
   target() { openSheet({ type: 'target' }); },
   tpreset(d) { $('t-v').value = d.v; },
-  tsave() { const v = Math.round(+$('t-v').value); if (v < 800 || v > 6000) { toast('Pick something between 800 and 6,000'); return; } D(UI.day).t = v === setAt(UI.day).target ? null : v; save(); closeSheet(); render(); },
-  treset() { D(UI.day).t = null; save(); closeSheet(); render(); },
+  tsave() { const v = Math.round(+$('t-v').value); if (v < 800 || v > 6000) { toast('Pick something between 800 and 6,000'); return; } holdPast(UI.day); D(UI.day).t = v === setAt(UI.day).target ? null : v; save(); closeSheet(); render(); },
+  treset() { holdPast(UI.day); D(UI.day).t = null; save(); closeSheet(); render(); },
   fill() { closeSheet(); const st = UI.tab === 'today' ? startOf(UI.day) : UI.week; planWeek(st, false); UI.anim = 'built'; toast('Week planned'); render(); },
   replan() { const st = UI.week; ask('Re-plan this week?', 'Every meal you haven\'t ticked off or set yourself will be replaced with a fresh plan.', 'Re-plan', () => { planWeek(st, true); UI.anim = 'built'; toast('New plan ready'); }); },
   weekmenu() { openSheet({ type: 'weekmenu' }); },
@@ -7246,7 +7302,7 @@ const ACT = {
     nv.plantGoal = pos(g('s-plants'), st.plantGoal); nv.colourGoal = Math.min(GROUPS.length, pos(g('s-col'), st.colourGoal)); nv.oilyGoal = Math.max(0, g('s-oily') || 0); nv.redMax = Math.max(0, g('s-red') || 0);
     st.stock = STOCKS[$('s-stock').value] ? $('s-stock').value : 'reg'; applyStock();
     setWeekStart(+$('s-ws').value || 0); st.weekendBatch = $('s-wkb').checked; st.prepSnacks = $('s-psn').checked; st.adapt = $('s-adapt').checked; st.snackShop = ['work', 'home', 'all'].includes($('s-snk').value) ? $('s-snk').value : 'work';
-    st.usualDrink = $('s-usual').value; st.drinkMode = $('s-dm').value; { const oc = $('s-oc').value === '1'; if (oc && !st.overCarry) st.carryFrom = todayKey(); st.overCarry = oc; } st.dinnerOutK = pos(g('s-dok'), st.dinnerOutK);
+    st.usualDrink = $('s-usual').value; nv.drinkMode = $('s-dm').value === 'day' ? 'day' : 'spread'; { const oc = $('s-oc').value === '1'; if (oc && !st.overCarry) st.carryFrom = todayKey(); st.overCarry = oc; } st.dinnerOutK = pos(g('s-dok'), st.dinnerOutK);
     UI.week = startOf(UI.day);
     save();
     if (datedSame(nv, datedOf(st))) { closeSheet(); toast('Settings saved'); render(); return; }
@@ -8835,7 +8891,7 @@ Object.assign(ACT, {
 const TABS = [['today', 'Today', 'today'], ['week', 'Week', 'week'], ['out', 'Out', 'glass'], ['prep', 'Prep', 'prep'], ['shop', 'Shop', 'shop']];
 function render() {
   lockMode(startOf(todayKey())); if (UI.week !== startOf(todayKey())) lockMode(UI.week);
-  TC = null; MCACHE = null; SETC = {}; CARRYC = {}; LOC = {}; FOODC = {}; HAVEC = {}; TRW = null; applyPacks();
+  TC = null; MCACHE = null; SETC = {}; CARRYC = {}; LOC = {}; FOODC = {}; HAVEC = {}; NSC = {}; TRW = null; applyPacks();
   const wc = weekCalc(startOf(todayKey())), g = setAt(todayKey()).plantGoal, ph = pillHtml(wc, g);
   $('pill').innerHTML = ph.html; $('pill').setAttribute('aria-label', ph.label); $('pill').setAttribute('aria-pressed', UI.trends);
   $('gear').innerHTML = ic('gear'); $('wandbtn').innerHTML = ic('wand');
@@ -8861,11 +8917,40 @@ function render() {
   else if (wm && !UI.trends && !WZ && !PM && !SH && S.revSeen !== todayKey() && !ckSaved(todayKey())) { const due = rvDue(); if (due) { S.revSeen = todayKey(); save(); openReview(due, 'auto'); } }
 }
 
+/* one-off repair (3.9.1). In the week of 12 Oct a night out went from 2 to 3½ pints by being taken off and put back,
+   which moved its drinks off the days already eaten. Those days get back the 2 pints spread over the week that they
+   had; the extra 1½ comes off from the day it was changed. Meals ticked since at the moved size go back to the size
+   they were planned at; logged food, packed boxes and anything else stay as they are. Runs once. */
+function repairDrinks() {
+  if (S.fix && S.fix.d1018) return '';
+  const st = '2026-10-12', days = weekDays(st), tk = todayKey();
+  if (tk < st || tk > addDays(st, 13)) return '';
+  (S.fix = S.fix || {}).d1018 = 1;
+  const pints = o => Object.entries(o.drinks || {}).reduce((a, [id, n]) => a + (DR[id] && DR[id].step === 0.5 ? n : 0), 0);
+  const cand = days.filter(k => { const o = outOf(S.days[k]); return o && Math.abs(pints(o) - 3.5) < 0.01 && DAY_KEY.test(o.from || '') && o.from > addDays(st, 2) && setAt(k).drinkMode === 'spread'; });
+  if (cand.length !== 1) { save(); return ''; }
+  const nk = cand[0], o = outOf(S.days[nk]), was = Object.assign({}, o, { drinks: {} });
+  delete was.units; delete was.unitsFrom;
+  Object.entries(o.drinks).forEach(([id, n]) => { was.drinks[id] = DR[id] && DR[id].step === 0.5 ? n * 2 / 3.5 : n; });
+  const per = drinkPlanK(was) / 7, back = days.filter(k => k < o.from && k < tk && S.days[k]);
+  if (!back.length || days.some(k => S.days[k] && S.days[k].dfx && nk in S.days[k].dfx)) { save(); return ''; }
+  // what each meal would be planned at, ignoring ticks: before the repair and after
+  const plannedM = k => { const d = S.days[k], keep = d.done; d.done = {}; FOODC = {}; const c = dayCalc(k), m = {}; SLOTS.forEach(s => { if (c.slots[s].kind === 'recipe') m[s] = c.slots[s].m; }); d.done = keep; FOODC = {}; return m; };
+  const before = {}; back.forEach(k => { before[k] = plannedM(k); });
+  back.forEach(k => { const d = S.days[k]; d.dfx = d.dfx || {}; d.dfx[nk] = Math.round(per * 10) / 10; }); NSC = {};
+  let fixed = 0;
+  back.forEach(k => { const d = S.days[k], after = plannedM(k); SLOTS.forEach(s => { const dn = d.done[s]; if (!isObj(dn) || !(dn.m > 0) || before[k][s] === undefined || after[s] === undefined || d.pk && d.pk[s]) return; if (Math.abs(dn.m - before[k][s]) < 0.004 && Math.abs(after[s] - dn.m) >= 0.004) { dn.m = +after[s].toFixed(3); fixed++; } }); });
+  holdPast(); save();
+  const lastBack = back[back.length - 1];
+  return `${DOWL[dayIndex(nk)]}'s drinks put back: ${DOW[dayIndex(back[0])]}–${DOW[dayIndex(lastBack)]} at 2 pints spread over the week (${fmtN(per)} kcal a day), the extra 1½ from ${DOWL[dayIndex(o.from)]}.${fixed ? ` ${fixed} meal${fixed === 1 ? '' : 's'} ticked since went back to ${fixed === 1 ? 'its' : 'their'} earlier size.` : ''}`;
+}
 (function init() {
   const st = startOf(todayKey());
+  const fixMsg = repairDrinks();
   if (!weekDays(st).some(k => S.days[k] && Object.keys(S.days[k].sl || {}).length)) planWeek(st, false);
   nudgeWeek(UI.tab);
   render();
+  if (fixMsg) toast(fixMsg, 9000);
   tloop();
 })();
 
