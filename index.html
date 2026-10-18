@@ -1450,7 +1450,7 @@ body.tvon .toast { bottom: calc(150px + env(safe-area-inset-bottom, 0px)); }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.9.1';</script>
+<script>window.TP_VERSION = '3.9.3';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -3971,7 +3971,8 @@ function candidate(st, days, prefs, carry, cUntil) {
     sess.forEach((se, j) => {
       const ds = sessDays(se, s).filter(k => !cur[days.indexOf(k)][s]);
       if (!ds.length) return;
-      let r = pp.length ? R[pp[Math.min(j, pp.length - 1)]] : null;
+      // two batches are always two recipes: a single pick is the first batch's, and the planner chooses a different one for the second
+      let r = pp[j] ? R[pp[j]] : null;
       if (!r) {
         const offs = ds.map(k => daysBetween(se.date, k));
         // red meat stays out of batches: a batch is eaten on several days
@@ -4530,20 +4531,6 @@ function weekColours(st) {
   return null;
 }
 // days this week's plan misses a daily target (protein, fibre) or goes over a limit (sodium, sugar, sat fat)
-function weekMisses(id, st) {
-  const cur = st || startOf(todayKey()); let miss = 0, n = 0;
-  weekDays(cur).forEach(k => {
-    const c = dcc(k); if (!c || !c.hasPlan) return; n++;
-    const set = setAt(k);
-    if (id === 'protein' && Math.round(c.planP) < set.protGoal) miss++;
-    if (id === 'fibre' && Math.round(c.planF) < set.fibreGoal) miss++;
-    if (id === 'sodium' && Math.round(c.planNa * 10) / 10 > set.naMax) miss++;
-    if (id === 'sugar' && Math.round(c.planFS) > set.fsMax) miss++;
-    if (id === 'satfat' && Math.round(c.planSF) > set.sfMax) miss++;
-  });
-  return { miss, n };
-}
-
 /* this week as a running budget for the daily food goals: the days so far, and what the rest of the plan does */
 const LEDGER = ['protein', 'fibre', 'sugar', 'sodium', 'satfat'];
 const LEDGER_NAME = { protein: 'protein', fibre: 'fibre', sugar: 'added sugar', sodium: 'sodium', satfat: 'sat fat' };
@@ -4560,8 +4547,10 @@ function weekLedger(id, st) {
     wk: (sp + sum(rest)) / n, need: past.length && rest.length ? (goal * n - sp) / rest.length : null };
 }
 // judged on the week as a whole: where the days so far and the rest of the plan leave the average
+// to the precision shown, so a week that reads "2.4g" against a 2.4g limit is never called over
+const ledgerR = (id, v) => (v === null ? null : id === 'sodium' ? Math.round(v * 10) / 10 : Math.round(v));
 function ledgerSt(L) {
-  const { goal: g, lo, so, wk } = L;
+  const g = L.goal, lo = L.lo, so = ledgerR(L.id, L.so), wk = ledgerR(L.id, L.wk);
   if (lo) return wk > g * 1.1 ? 'off' : wk > g || (so !== null && so > g) ? 'mid' : 'ok';
   return wk < g * 0.9 ? 'off' : wk < g ? 'mid' : 'ok';
 }
@@ -6784,7 +6773,9 @@ function wzSub(s) {
   if (s === 'b' || s === 'l') {
     const ses = wzSessions();
     if (WZ.mode === 'one') return `One batch on ${DOWL[dayIndex(ses.pre)]}. ${n ? 'Picked.' : 'Swipe and tap one.'}`;
-    return `First pick is cooked ${DOWL[dayIndex(ses.pre)]}, second ${DOWL[dayIndex(ses.mid)]}. ${n}/2 picked.`;
+    const pre = DOWL[dayIndex(ses.pre)], mid = DOWL[dayIndex(ses.mid)];
+    if (WZ.mode === 'two') return `Two batches, two recipes: the first pick is cooked ${pre}, the second ${mid}.${n === 1 ? ` With one pick, the planner chooses a different recipe for ${mid}.` : ''} ${n}/2 picked.`;
+    return `First pick is cooked ${pre}. If the week needs a second batch on ${mid}, it's your second pick or a different recipe the planner chooses. ${n}/2 picked.`;
   }
   if (s === 'd') { const oily = WZ.picks.d.filter(id => R[id].oily).length, mx = wzMax('d'); return `${n}/${mx} picked${mx < 7 ? ` (${7 - mx} out)` : ''} · ${oily} oily fish (aim ${setAt(WZ.start).oilyGoal})`; }
   return `${n} picked`;
@@ -8656,24 +8647,31 @@ function wkScore(st) {
       line: s === 'ok' ? (n < g ? `${n === 0 ? 'None at all' : nWord(n, 'red-meat meal')}, under the limit of ${g}.` : `${n}, right on the limit.`) : `${n} against a limit of ${g}.${s === 'mid' ? ' Just the one over.' : ''}`,
       short: `${n - g} over`, tip: 'Swap one red-meat dinner for chicken, fish or beans; the recipe swaps can do it without changing the meal.', gap: (n - g) / Math.max(1, g) });
   }
+  // the daily food goals are judged on the week's average, as in Trends and the Week tab: the evidence behind
+  // each goal is habitual intake, so a day over or under that the rest of the week balances out is no miss
+  const wkGoal = (vs, gk, id) => { const g = vs.reduce((a, x) => a + setAt(x.k)[gk], 0) / vs.length; return ledgerR(id, g); };
   [['protein', 'Protein', 'protGoal', 'protein', 'On the short days add a high-protein snack: Greek yoghurt, eggs or edamame.'],
     ['fibre', 'Fibre', 'fibreGoal', 'fibre', 'Beans, lentils, oats and wholegrain bread do the heavy lifting; a handful of beans in a lunch makes a real dent.']].forEach(([id, n, gk, art, tip]) => {
     const vs = fv(id); if (!vs.length) return;
-    const avg = sum(vs) / vs.length, sh = vs.filter(x => Math.round(x.v) < setAt(x.k)[gk]).map(x => x.k), g = set[gk], miss = weekMisses(id, st).miss, s = !miss ? 'ok' : miss === 1 ? 'mid' : 'off';
-    add({ id, grp: 'Food', n, art, st: s, fig: `${fmtN(avg)}g`, unit: `/ ${g}g a day`, txt: `${fmtN(avg)}g a day · ${!sh.length ? 'on target every day' : `${sh.length} day${sh.length > 1 ? 's' : ''} short`}`,
-      line: s === 'ok' ? `${g}g or more on every one of ${vs.length} days.` : s === 'mid' ? `Every day but ${DOWL[dayIndex(sh[0])]} hit ${g}g.` : `Short on ${sh.length} of ${vs.length} days: ${dayNames(sh)}.`,
-      short: `${nWord(sh.length, 'day')} short`, tip, gap: sh.length / vs.length });
+    const avg = sum(vs) / vs.length, a = ledgerR(id, avg), sh = vs.filter(x => Math.round(x.v) < setAt(x.k)[gk]).map(x => x.k), g = wkGoal(vs, gk, id), s = ledgerSt({ id, goal: g, lo: false, so: null, wk: avg });
+    const few = sh.length && sh.length <= 3 ? ` ${dayNames(sh)} came in under` : '';
+    add({ id, grp: 'Food', n, art, st: s, fig: `${fmtN(avg)}g`, unit: `/ ${g}g a day`, txt: `${fmtN(avg)}g a day on average · ${!sh.length ? 'on target every day' : `${nWord(sh.length, 'day')} under`}`,
+      line: s === 'ok' ? (!sh.length ? `${g}g or more on every one of ${vs.length} days.` : `${fmtN(avg)}g a day on average, ${fmtN(a - g)}g clear of ${g}g.${few ? `${few}, and the other days made up for it.` : ` ${nWord(sh.length, 'day')} came in under, and the rest made up for it.`}`)
+        : `${fmtN(avg)}g a day on average, ${fmtN(g - a)}g short of ${g}g.${few ? `${few}.` : sh.length ? ` Under on ${sh.length} of ${vs.length} days.` : ''}`,
+      short: `${fmtN(g - a)}g a day short`, tip, gap: Math.max(0, (g - a) / g) });
   });
   [['sodium', 'Sodium', 'naMax', 'na', v => `${v.toFixed(1)}g`, 'Stock cubes, soy sauce and shop-bought sauces carry most salt; LoSalt at the table instead of salt helps.'],
     ['sugar', 'Added sugar', 'fsMax', 'fs', fmtFS, 'Check the extras and drinks you log; the planned meals keep added sugar low.'],
     ['satfat', 'Saturated fat', 'sfMax', 'sf', v => `${fmtN(v)}g`, 'Cheese, butter, cream and processed meat are the usual sources; go lighter on them on the heavier days.']].forEach(([id, n, gk, f, fm, tip]) => {
     const vs = fv(id); if (!vs.length) return;
-    const avg = sum(vs) / vs.length, over = vs.filter(x => (id === 'sodium' ? Math.round(x.v * 10) / 10 : Math.round(x.v)) > setAt(x.k)[gk]), g = set[gk], miss = weekMisses(id, st).miss, s = !miss ? 'ok' : miss <= 2 ? 'mid' : 'off';
-    const worst = over.slice().sort((a, b) => b.v - a.v)[0], src = s !== 'ok' ? topSource(st, f) : null;
-    add({ id, grp: 'Food', n, art: id, st: s, lim: true, fig: fm(avg), unit: `/ under ${g}g a day`, txt: `${fm(avg)} a day · ${!over.length ? 'under every day' : `${over.length} day${over.length > 1 ? 's' : ''} over`}`,
-      line: s === 'ok' ? `Under ${g}g every day, ${fm(avg)} on average.` : `Over on ${over.length === 1 ? DOWL[dayIndex(over[0].k)] : `${over.length} days`}${worst ? `; ${DOWL[dayIndex(worst.k)]} was highest at ${fm(worst.v)}` : ''}.`,
+    const avg = sum(vs) / vs.length, a = ledgerR(id, avg), over = vs.filter(x => ledgerR(id, x.v) > setAt(x.k)[gk]), g = wkGoal(vs, gk, id), s = ledgerSt({ id, goal: g, lo: true, so: null, wk: avg });
+    const worst = over.slice().sort((x, y) => y.v - x.v)[0], src = s !== 'ok' ? topSource(st, f) : null;
+    const hi = !worst ? '' : over.length === 1 ? ` ${DOWL[dayIndex(worst.k)]} ran over at ${fm(worst.v)}` : ` ${capF(nWord(over.length, 'day'))} ran over, ${DOWL[dayIndex(worst.k)]} highest at ${fm(worst.v)}`;
+    add({ id, grp: 'Food', n, art: id, st: s, lim: true, fig: fm(avg), unit: `/ under ${g}g a day`, txt: `${fm(avg)} a day on average · ${!over.length ? 'under every day' : `${nWord(over.length, 'day')} over`}`,
+      line: s === 'ok' ? (!over.length ? `Under ${g}g every day, ${fm(avg)} on average.` : `${fm(avg)} a day on average, under ${g}g.${hi}, and the rest of the week balanced it out.`)
+        : `${fm(avg)} a day on average, ${s === 'mid' ? 'a little' : 'well'} over ${g}g.${hi ? `${hi}.` : ''}`,
       detail: src ? `Biggest source: ${src.n}, ${fm(src.v)} over the week` : '',
-      short: `${nWord(over.length, 'day')} over`, tip: src ? `${tip} The biggest source was ${src.n} (${fm(src.v)} over the week).` : tip, gap: over.length / vs.length });
+      short: `${fm(a - g)} a day over`, tip: src ? `${tip} The biggest source was ${src.n} (${fm(src.v)} over the week).` : tip, gap: Math.max(0, (a - g) / g) });
   });
   // drink
   const ak = days.filter(k => k in S.alc);
