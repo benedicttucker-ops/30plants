@@ -1499,7 +1499,7 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.11.1';</script>
+<script>window.TP_VERSION = '3.11.2';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -3515,6 +3515,10 @@ function normalise(s) {
     const [a, str] = WPD_HIST.split('|');
     [...str].forEach((c, i) => { if (c === '-') return; const k = addDays(a, i); if (!(k in s.wpd)) s.wpd[k] = parseInt(c, 36) / 2; });
     s.fix = isObj(s.fix) ? s.fix : {}; s.fix.wpd1 = 1;
+  }
+  if (!(s.fix && s.fix.wpd2)) { // v3.11.2: 12–20 Oct 2026 from the tracker sheet; anything already entered stays
+    Object.entries({ '2026-10-12': 2, '2026-10-13': 1, '2026-10-14': 1, '2026-10-15': 2, '2026-10-16': 2, '2026-10-17': 1, '2026-10-18': 2, '2026-10-19': 2, '2026-10-20': 2 }).forEach(([k, v]) => { if (!(k in s.wpd)) s.wpd[k] = v; });
+    s.fix = isObj(s.fix) ? s.fix : {}; s.fix.wpd2 = 1;
   }
   [s.alc, s.run, s.wpd].forEach(m => Object.keys(m).forEach(k => { const v = m[k]; if (!DAY_KEY.test(k) || v === null || v === '' || !Number.isFinite(+v)) delete m[k]; else m[k] = +v; }));
   if (!s.lsv) { if (s.set.loSalt === 0.25) s.set.loSalt = 0; s.stock = s.stock || {}; s.stock.losalt = true; s.lsv = 1; } // v1.19: LoSalt moved into the recipes; it's always in the cupboard
