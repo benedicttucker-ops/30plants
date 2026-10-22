@@ -1499,7 +1499,7 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.11.0';</script>
+<script>window.TP_VERSION = '3.11.1';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -3482,6 +3482,7 @@ function normalise(s) {
   s.set.overCarry = s.set.overCarry !== false;
   if (!DAY_KEY.test(s.set.carryFrom || '')) s.set.carryFrom = todayKey(); // going over carries forward from the day this arrived, so past weeks stay as they were
   s.wt = Object.assign({ log: {}, waist: {}, unit: 'lb', goal: 'lose', rate: 0.45, waistDay: s.set.weekStart || 0, target: null }, s.wt || {});
+  if (!DAY_KEY.test(s.wt.from || '')) s.wt.from = '2026-10-12'; // the calorie advice counts food from here: when meal planning began
   ['log', 'waist'].forEach(f => { if (!isObj(s.wt[f])) s.wt[f] = {}; });
   // readings that can't be real (a damaged file or a bad import) are dropped rather than wrecking the charts
   [['log', 20, 400], ['waist', 10, 100]].forEach(([f, lo, hi]) => Object.keys(s.wt[f]).forEach(k => { const raw = s.wt[f][k], v = typeof raw === 'number' || (typeof raw === 'string' && raw.trim()) ? +raw : NaN; if (!DAY_KEY.test(k) || !(v > lo && v < hi)) delete s.wt[f][k]; else s.wt[f][k] = v; }));
@@ -5397,11 +5398,14 @@ function waistTrend() {
 }
 // Advice: estimate maintenance from the trend and what the plan says was eaten, then the target that fits the goal pace.
 function wAdvice() {
-  const tk = todayKey(), span = 21, slope = wSlope(tk, span), g = WT().goal === 'maintain' ? 0 : (WT().goal === 'gain' ? 1 : -1) * WT().rate;
+  // food and weight over the same days: the last three weeks, or since food started being counted if that's sooner
+  const tk = todayKey(), from = WT().from || '0000', span = Math.max(1, Math.min(21, daysBetween(from, tk) + 1)), full = span >= 21;
+  const slope = wSlope(tk, span), g = WT().goal === 'maintain' ? 0 : (WT().goal === 'gain' ? 1 : -1) * WT().rate;
+  const per = full ? 'the last three weeks' : `the ${span} days since ${shortD(from)}`, trendN = full ? 'three-week trend' : `trend since ${shortD(from)}`;
   const nW = wDays().filter(k => daysBetween(k, tk) < span).length;
-  if (slope === null) return { need: `Weigh in most mornings for two weeks and advice appears here. ${nW} weigh-in${nW === 1 ? '' : 's'} in the last three weeks so far.` };
+  if (slope === null) return { need: span < 11 ? `Food counts from ${shortD(from)}, so advice appears once there are ten days of weigh-ins and meals since then. ${nW} weigh-in${nW === 1 ? '' : 's'} so far.` : `Weigh in most mornings for two weeks and advice appears here. ${nW} weigh-in${nW === 1 ? '' : 's'} in ${per} so far.` };
   let tot = 0, n = 0;
-  for (let i = 1; i <= span; i++) { const c = dayCalc(addDays(tk, -i)); if (c.hasPlan) { tot += c.planK; n++; } }
+  for (let i = 1; i <= span; i++) { const k = addDays(tk, -i); if (k < from) break; const c = dayCalc(k); if (c.hasPlan) { tot += c.planK; n++; } }
   if (n < 7) return { need: 'Plan or tick off your meals for at least a week alongside your weigh-ins and advice appears here.' };
   const intake = tot / n, rate = slope * 7, maint = intake - slope * KCAL_KG, cur = S.set.target, now = wAvg(tk) || { v: WT().log[wDays().slice(-1)[0]] };
   let want = Math.round((maint + g * KCAL_KG / 7) / 50) * 50, floor = false;
@@ -5416,11 +5420,11 @@ function wAdvice() {
   const a0 = wAvg(tk), a1 = wAvg(addDays(tk, -7)), wk = a0 && a1 && a0.n >= 3 && a1.n >= 3 ? a0.v - a1.v : null;
   const split = wk !== null && (rate - g) * (wk - g) < 0 && Math.abs(wk - rate) > Math.max(0.2, Math.abs(g) * 0.5);
   const mv = (x, tail) => (Math.abs(x) < 0.05 ? `level${tail ? ` ${tail}` : ''}` : `${x < 0 ? 'down' : 'up'} ${fmtW(Math.abs(x), dp)}${tail ? ` ${tail}` : ''}`);
-  const both = wk === null ? '' : `Last week's average was ${mv(wk, 'on the week before')}, and the three-week trend is ${mv(rate, Math.abs(rate) < 0.05 ? '' : 'a week')}; the advice follows the trend. `;
-  const basis = `${both}Over the last three weeks your plan and ticks average ${fmtN(intake)} kcal a day, which puts maintenance at about ${fmtN(Math.round(maint / 50) * 50)} kcal.`;
+  const both = wk === null ? '' : `Last week's average was ${mv(wk, 'on the week before')}, and the ${trendN} is ${mv(rate, Math.abs(rate) < 0.05 ? '' : 'a week')}; the advice follows the trend. `;
+  const basis = `${both}${full ? 'Over the last three weeks' : `Since ${shortD(from)}`} your plan and ticks average ${fmtN(intake)} kcal a day, which puts maintenance at about ${fmtN(Math.round(maint / 50) * 50)} kcal.`;
   let head, body, act = null;
   if (onPace || Math.abs(want - cur) < 75) { head = 'On track'; body = `${pace}, in line with ${goalOf}. Keep the daily target at ${fmtN(cur)} kcal.`; }
-  else if (split) { head = 'Hold for now'; body = `Last week you were ${mv(wk)}, ${wk - g < 0 ? 'ahead of' : 'behind'} ${goalOf}, but over three weeks you're ${mv(rate, 'a week')}. Single weeks swing with water, salt and drink, so give it another week before changing the target from ${fmtN(cur)} kcal.`; }
+  else if (split) { head = 'Hold for now'; body = `Last week you were ${mv(wk)}, ${wk - g < 0 ? 'ahead of' : 'behind'} ${goalOf}, but ${full ? 'over three weeks' : `since ${shortD(from)}`} you're ${mv(rate, 'a week')}. Single weeks swing with water, salt and drink, so give it another week before changing the target from ${fmtN(cur)} kcal.`; }
   else if (g < 0 && rate > g && waistDown) { head = 'Hold for now'; body = `${pace}, slower than ${goalOf}, but your waist is down ${Math.abs(wt.d).toFixed(2).replace(/0$/, '')} in over ${wt.wks} weeks. That usually means fat is going while muscle holds, so give it another week before changing the target.`; }
   else {
     head = want < cur ? 'Eat a little less' : 'Eat a little more';
@@ -5633,6 +5637,8 @@ function shWGoal() {
       <div class="field"><label for="wg-unit">Units</label><select id="wg-unit"><option value="lb" ${uu === 'lb' ? 'selected' : ''}>Pounds (lb)</option><option value="kg" ${uu === 'kg' ? 'selected' : ''}>Kilograms (kg)</option></select></div></div>
     <div class="fieldrow"><div class="field"><label for="wg-sleep">Sleep goal (hours)</label><input id="wg-sleep" type="number" inputmode="decimal" step="0.25" value="${kp ? esc(kp.sl) : S.set.sleepGoal}"></div>
       <div class="field"><label for="wg-day">Waist check-in day</label><select id="wg-day">${DOWL.map((d, i) => `<option value="${i}" ${wd === i ? 'selected' : ''}>${d}</option>`).join('')}</select></div></div>
+    <div class="field"><label for="wg-from">Count food for the calorie advice from</label><input id="wg-from" type="date" value="${esc(WT().from || '')}" max="${todayKey()}"></div>
+    <p class="small muted" style="margin:-4px 0 0">The day your meal planning started. Weigh-ins and meals before it are left out of the maintenance estimate.</p>
     <button class="btn primary" style="width:100%;margin-top:16px" data-a="wgsave">Save</button>`;
 }
 function shCkItems() {
@@ -7694,7 +7700,7 @@ const ACT = {
   wgsave() {
     const w = WT(), t = $('wg-target').value.trim(); w.unit = $('wg-unit').value === 'kg' ? 'kg' : 'lb';
     w.target = t ? (() => { const kg = w.unit === 'lb' ? +t / LB : +t; return kg > 30 && kg < 300 ? kg : null; })() : null;
-    w.waistDay = +$('wg-day').value || 0; const sg = Math.round(+$('wg-sleep').value * 4) / 4; if (sg >= 3 && sg <= 14 && sg !== S.set.sleepGoal) setFrom(todayKey(), Object.assign(datedOf(S.set), { sleepGoal: sg }));
+    w.waistDay = +$('wg-day').value || 0; { const f = $('wg-from') && $('wg-from').value; if (DAY_KEY.test(f || '') && f <= todayKey()) w.from = f; } const sg = Math.round(+$('wg-sleep').value * 4) / 4; if (sg >= 3 && sg <= 14 && sg !== S.set.sleepGoal) setFrom(todayKey(), Object.assign(datedOf(S.set), { sleepGoal: sg }));
     save(); closeSheet(); render(); toast('Settings saved');
   },
   wtarget(d) { const v = +d.v; if (!(v >= 1200 && v <= 5000)) return; openSheet({ type: 'setwhen', vals: Object.assign(datedOf(S.set), { target: v }) }); },
