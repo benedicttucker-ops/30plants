@@ -1632,6 +1632,63 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 .fslg { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: var(--muted); margin-top: 2px; }
 .fslg i { width: 18px; border-top: 1.6px dashed var(--shink, var(--accent)); }
 
+/* 3.17 the nose: the morning check, the tip on Today, the patterns in Trends and the guide */
+.nosecard, .nosetr { display: grid; gap: 10px; }
+.nshead { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.nshead b { display: block; font-size: 17px; line-height: 1.2; }
+.nshead small { display: block; color: var(--muted); font-size: 13px; }
+.nscale { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
+.nscale button { font: inherit; font-size: 12.5px; font-weight: 700; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 12px; padding: 8px 2px 6px; display: grid; justify-items: center; gap: 4px; cursor: pointer; min-height: 52px; }
+.nscale button i { width: 18px; height: 18px; border-radius: 50%; display: block; }
+.nscale button[aria-pressed="true"] { border-color: var(--ink); background: var(--surface-2); }
+.nlbl { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: -4px; }
+.ngrp { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 6px 0 4px; }
+.nosecard .chip.known { background: var(--surface-2); border-color: transparent; cursor: default; }
+.nosecard .chip.known.ok { background: var(--leaf-soft); color: var(--leaf); }
+.nosecard .chip.known.warn { background: var(--warn-soft); color: var(--warn); }
+.nosecard .chip.known svg { width: 14px; height: 14px; }
+.nosecard .chip.more { border-style: dashed; color: var(--muted); }
+.nadv { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 10px; }
+.nadvt { font-size: 15.5px; }
+.nblk { display: grid; gap: 3px; border-left: 4px solid var(--line); padding-left: 10px; font-size: 14px; }
+.nblk.now { border-left-color: var(--accent); } .nblk.avoid { border-left-color: var(--warn); }
+.nblk p { margin: 0; } .nblk ul, .nlater ul { margin: 0; padding-left: 18px; } .nblk li, .nlater li { margin: 2px 0; }
+.nlater { font-size: 14px; }
+.fxst.nose { background: color-mix(in srgb, var(--fishblue) 22%, var(--surface)); padding: 1px; }
+.fxst.nose svg { width: 24px; height: 24px; }
+.nline { width: 100%; height: auto; display: block; }
+.nline .ng { stroke: var(--line); stroke-width: 1; fill: none; }
+.nline .nl { fill: none; stroke: var(--fishblue); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.nline .na { fill: color-mix(in srgb, var(--fishblue) 14%, transparent); }
+.nline circle { fill: var(--surface); stroke: var(--fishblue); stroke-width: 2; }
+.nline text { fill: var(--muted); font-size: 10px; font-family: var(--f-body); }
+.nkey { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--muted); }
+.nkey i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+.nkey i.w, .nbar i.w { background: var(--c-red); } .nkey i.b, .nbar i.b { background: var(--leaf); } .nkey i.u, .nbar i.u { background: color-mix(in srgb, var(--ink) 28%, transparent); } .nbar i.n { background: var(--fishblue); }
+.ncmp { display: grid; gap: 10px; }
+.ncr { display: grid; gap: 3px; }
+.ncr .t { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; }
+.ncr .t span { color: var(--muted); font-size: 12.5px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.nbar { height: 8px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.nbar i { display: block; height: 100%; border-radius: 99px; }
+.nsum { margin: 0; font-size: 14px; background: var(--surface-2); border-radius: 12px; padding: 8px 10px; }
+.nguide { display: grid; gap: 8px; }
+.nguide .ngd { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; }
+.nguide .ngb { display: grid; gap: 8px; font-size: 14px; padding-top: 6px; }
+.nguide .ngb p, .nguide .ngb ul { margin: 0; } .nguide .ngb ul { padding-left: 18px; }
+.ngclock { list-style: none; margin: 0; padding: 0; display: grid; }
+.ngclock li { display: grid; grid-template-columns: 4.4rem minmax(0, 1fr); gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+.ngclock li:last-child { border: 0; }
+.ngclock .time { font-size: 11.5px; font-weight: 800; color: var(--fishblue); letter-spacing: .04em; padding-top: 2px; }
+.ngclock .what b { display: block; }
+.ngnote { background: var(--warn-soft); border-radius: 10px; padding: 8px 10px; }
+.ngnote b { display: block; }
+.nghd { margin: 4px 0 0; }
+.ngtable { overflow-x: auto; }
+.ngtable table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.ngtable th, .ngtable td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.ngtable th { font-size: 11.5px; color: var(--muted); }
+
 </style>
 </head>
 <body>
@@ -1657,7 +1714,7 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.16.0';</script>
+<script>window.TP_VERSION = '3.17.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -3681,6 +3738,8 @@ function normalise(s) {
   [s.alc, s.run, s.wpd].forEach(m => Object.keys(m).forEach(k => { const v = m[k]; if (!DAY_KEY.test(k) || v === null || v === '' || !Number.isFinite(+v)) delete m[k]; else m[k] = +v; }));
   if (!s.lsv) { if (s.set.loSalt === 0.25) s.set.loSalt = 0; s.stock = s.stock || {}; s.stock.losalt = true; s.lsv = 1; } // v1.19: LoSalt moved into the recipes; it's always in the cupboard
   // weekly focus: week start -> { ids: up to three goal ids, from: the week it was picked from, at: when }
+  s.nose = isObj(s.nose) ? s.nose : {};
+  Object.keys(s.nose).forEach(k => { const n = s.nose[k]; if (!DAY_KEY.test(k) || !isObj(n)) { delete s.nose[k]; return; } n.r = Number.isInteger(n.r) && n.r >= 1 && n.r <= 5 ? n.r : n.imp ? 0 : 3; ['sy', 'cx'].forEach(f => { n[f] = Array.isArray(n[f]) ? [...new Set(n[f].filter(x => typeof x === 'string' && /^[a-z][a-z0-9_]{1,20}$/.test(x)))].slice(0, f === 'sy' ? 3 : 25) : []; }); });
   s.focus = isObj(s.focus) ? s.focus : {};
   Object.keys(s.focus).forEach(k => { const f = s.focus[k]; if (!DAY_KEY.test(k) || !isObj(f) || !Array.isArray(f.ids)) { delete s.focus[k]; return; } f.ids = [...new Set(f.ids.filter(x => typeof x === 'string' && /^(h:)?[a-z][a-z0-9_-]{1,30}$/.test(x)))].slice(0, 3); if (!DAY_KEY.test(f.from || '')) f.from = addDays(k, -7); });
   s.rev = s.rev && typeof s.rev === 'object' ? s.rev : {}; // weeks reviewed: week start -> the day it was done
@@ -5570,9 +5629,10 @@ function vTrends() {
   const nGap = gapCount(), also = [];
   if (nGap !== null) also.push(['gaps', 'Still to fill in', nGap ? `${nGap} week${nGap === 1 ? '' : 's'} with gaps` : 'Nothing missing', nGap, () => gapCard(true)]);
   if (top.length) also.push(['top', 'Most often on your plan', `Last 8 weeks · ${esc(R[top[0][0]].n.split(/ with | & |,/)[0].toLowerCase())} tops it, ${top[0][1]} time${top[0][1] > 1 ? 's' : ''}`, 0, () => `<div class="alsobody">${topHtml}</div>`]);
+  also.push(['nose', 'Nose care guide', 'The routine and the reference from the nose app', 0, noseGuide]);
   if (missing.length) also.push(['miss', 'Not on your plan for four weeks', `${missing.length} plant${missing.length > 1 ? 's' : ''}, ${esc(PLANTS[missing[0]][0].toLowerCase())} to ${esc(PLANTS[missing[missing.length - 1]][0].toLowerCase())}`, 0, () => `<div class="alsobody">${missHtml}</div>`]);
   const alsoHtml = also.length ? `<section class="trsec"><h3 class="eyebrow">Also here</h3><div class="trlist">${also.map(([k, n, sub, badge, body]) => { const open = !!(UI.tAlso || {})[k]; return `<div class="also ${open ? 'open' : ''}"><button class="alsohead" data-a="talso" data-v="${k}" aria-expanded="${open}"><span class="trn"><b>${n}</b><small>${sub}</small></span>${badge ? `<span class="abadge">${badge}</span>` : ''}${ic('chev', false, 'chev')}</button>${open ? body() : ''}</div>`; }).join('')}</div></section>` : '';
-  return `${head}${tabs}${summary}${win === 'wk' ? fxBenefits() : ''}${legend}${body}${alsoHtml}`;
+  return `${head}${tabs}${summary}${win === 'wk' ? fxBenefits() : ''}${legend}${body}${noseTrends()}${alsoHtml}`;
 }
 /* weeks with something still to fill in, from where each record starts to the end of last week */
 const GAPNAME = { plants: 'Plant points', cols: 'Colour groups', food: 'Food', alc: 'Alcohol', run: 'Cardio', ck: 'Check-ins' };
@@ -5867,7 +5927,7 @@ function checksCard() {
 }
 function vWeight() {
   const tk = todayKey(), w = WT(), ks = wDays();
-  const card = rvBanner() + ckCard();
+  const card = rvBanner() + ckCard() + noseCard(ckK());
   const all = [...new Set([...ks, ...Object.keys(S.ck), ...Object.keys(w.waist)])].filter(ckSaved).sort().reverse();
   const list = all.length ? `<details class="more aisle"><summary>All check-ins · ${all.length}${ic('chev')}</summary><div class="shoplist" style="margin-top:6px">${all.slice(0, 90).map(k => { const c = S.ck[k] || {}, yes = S.ckItems.filter(it => c.c && c.c[it.id] === 1).length; return `<button class="crow ckline" data-a="ckopen" data-k="${k}"><span class="n">${fmtDay(k)}<span class="h">${[w.log[k] ? fmtW(w.log[k]) : '', c.sl ? fmtH(c.sl) + ' sleep' : '', w.waist[k] ? `${w.waist[k]} in waist` : ''].filter(Boolean).join(' · ') || 'Checks only'}</span></span><span class="wlr">${S.ckItems.length && c.c ? `<b>${yes}/${S.ckItems.length}</b>` : ''}${ic('chev')}</span></button>`; }).join('')}</div></details>` : '';
   if (!ks.length) return `${card}${sleepCard()}${checksCard()}<div class="empty">${art({ type: 'calendar', main: 'green' }, 90)}<p>Check in a few mornings and your weight trend and calorie advice appear here.</p></div>${wGoalCard()}${wWaistCard()}${list}`;
@@ -8017,7 +8077,7 @@ const ACT = {
   ckopen(d) { UI.ckDate = d.k; UI.ckEdit = !ckSaved(d.k); UI.ckWaist = false; ckReset(); render(); window.scrollTo(0, 0); },
   ckdelday() {
     const k = ckK();
-    ask(`Delete ${fmtDay(k)}?`, 'Its weight, sleep, checks, the alcohol and cardio for the day before, and any waist measurement will be removed.', 'Delete', () => { delete WT().log[k]; delete WT().waist[k]; delete S.ck[k]; delete S.alc[addDays(k, -1)]; delete S.run[addDays(k, -1)]; save(); UI.ckEdit = false; ckReset(); toast('Deleted'); }, true);
+    ask(`Delete ${fmtDay(k)}?`, 'Its weight, sleep, checks, nose, the alcohol and cardio for the day before, and any waist measurement will be removed.', 'Delete', () => { delete WT().log[k]; delete WT().waist[k]; delete S.ck[k]; delete S.nose[k]; delete S.alc[addDays(k, -1)]; delete S.run[addDays(k, -1)]; save(); UI.ckEdit = false; ckReset(); toast('Deleted'); }, true);
   },
   ckitems() { openSheet({ type: 'ckitems', back: SH && SH.type === 'wgoal' ? 'wgoal' : null }); },
   ckmove(d) { keepCkNames(); const i = +d.i, a = S.ckItems; if (i > 0) { [a[i - 1], a[i]] = [a[i], a[i - 1]]; save(); } renderSheet(); },
@@ -10222,11 +10282,13 @@ function fxLine(id, k) {
 }
 function fxCard(k) {
   const tk = todayKey(); if (k !== tk) return '';
-  const now = fxNow(startOf(tk)); if (!now) return '';
-  const rows = now.ids.map(id => { let l = null; try { l = fxLine(id, k); } catch (e) { l = null; } return l ? `<div class="fxrow"><span class="fxst ${l.st}" aria-hidden="true">${FX_ST[l.st] || ''}</span><span><b>${esc(l.b)}</b><small>${esc(l.sm)}</small></span></div>` : ''; }).join('');
+  const now = fxNow(startOf(tk)); let nt = null; try { nt = noseTip(tk); } catch (e) { nt = null; }
+  if (!now && !nt) return '';
+  const nose = nt ? `<div class="fxrow nose"><span class="fxst nose" aria-hidden="true">${shArt('nose', 24)}</span><span><b>${esc(nt.b)}</b><small>${esc(nt.sm)}</small></span></div>` : '';
+  const rows = nose + (now ? now.ids : []).map(id => { let l = null; try { l = fxLine(id, k); } catch (e) { l = null; } return l ? `<div class="fxrow"><span class="fxst ${l.st}" aria-hidden="true">${FX_ST[l.st] || ''}</span><span><b>${esc(l.b)}</b><small>${esc(l.sm)}</small></span></div>` : ''; }).join('');
   if (!rows) return '';
-  return `<section class="fxtoday" aria-label="This week's focus"><div class="wchead"><div class="eyebrow">This week's focus · ${DOWL[dayIndex(k)]}</div><button class="link" data-a="fxedit">${now.auto ? 'Pick' : 'Change'}</button></div>${rows}
-    ${now.auto ? '<p class="small muted" style="margin:0">Picked from last week\'s numbers. The wrap-up lets you choose.</p>' : ''}</section>`;
+  return `<section class="fxtoday" aria-label="${now ? 'This week\'s focus' : 'This morning'}"><div class="wchead"><div class="eyebrow">${now ? 'This week\'s focus' : 'This morning'} · ${DOWL[dayIndex(k)]}</div>${now ? `<button class="link" data-a="fxedit">${now.auto ? 'Pick' : 'Change'}</button>` : ''}</div>${rows}
+    ${now && now.auto ? '<p class="small muted" style="margin:0">Picked from last week\'s numbers. The wrap-up lets you choose.</p>' : ''}</section>`;
 }
 function shFx() {
   SH.title = 'This week\'s focus';
@@ -10572,6 +10634,352 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') { e.preventDefault(); ACT.fsnext(); } else if (e.key === 'ArrowLeft') { e.preventDefault(); ACT.fsback(); } else if (e.key === 'Escape') fsClose();
 });
 
+/* the nose app's advice, brought across (smell training left out) */
+const NA = {};
+NA.d_crust={why:"Mucosa dried out and mucus hardened in place. The front dries fastest because it meets outside air first. Worth knowing: dryness, crusting and septal irritation are the most commonly reported side effects of nasal steroids — so your nightly spray is likely a contributor, not a sign you're doing it wrong.",now:["Soften before touching it. Gel or saline, leave five minutes.","Then rinse — Sinopulse carries softened crust away without tearing.","Steam if you've no kit.","Gel again after as a barrier."],later:["Humidity to 40–50%. Crusting is a humidity problem first.","Gel nightly rather than reactively.","If it persists, ask about a different steroid formulation — some are gentler on the septum."],avoid:["Picking. However satisfying."]};
+NA.d_tight={why:"Low-grade mucosal dehydration. Airflow's fine so it won't feel urgent, but the mucus layer your receptors sit in is thinner than it should be — which is why smell drops before anything else does.",now:["Saline spray, not a full flush. You need moisture, not volume.","Water, and something warm.","Gel on the front half-inch."],later:["Hygrometer in the bedroom. You're guessing otherwise.","This is the early warning for crusting. Much easier to catch here."],avoid:["High-volume rinsing on dry tissue — it strips further."]};
+NA.d_burn={why:"Dryness plus inflammation. The tissue is dry enough that airflow itself has become an irritant.",now:["Gel first, not saline — saline on raw dry tissue stings.","Steam five minutes.","Skip tonight's steroid if it's genuinely raw. One night won't undo your consistency."],later:["Humidity up — same root cause as crusting, further along.","Check rinse solution: body temperature, correct sachet ratio. Cold or wrong concentration burns."],avoid:["Decongestant sprays — nothing to decongest, and they dry you further."]};
+NA.d_blood={why:"The front of the septum carries fragile vessels just under thin tissue. Dry it or scratch it and it bleeds. Common, not usually serious — but it's a loop, because the scab feels like a crust and invites picking.",now:["Leave it alone 24 hours. No rinse, no picking, no hard blowing.","Gel only, gently.","Pause the steroid a couple of nights while it heals.","Actively bleeding: pinch the soft part, lean forward, ten minutes."],later:["Humidity and consistent gel are the whole prevention strategy.","Check your spray angle hasn't drifted inward over the months."],flag:"More than once a week, or a bleed taking over 20 minutes to stop, is a GP appointment rather than management."};
+NA.d_open={why:"Paradoxical congestion — feeling short of air despite the nose being wide open. It's cooling and moisture receptors, not volume, that create the sensation of a satisfying breath, and dryness disrupts them.",now:["Humidify what you're breathing. Steam is fastest.","Gel to restore the surface.","Warm drink — genuinely helps."],later:["Sit at 45–50% rather than the bottom of the range.","If it becomes constant rather than occasional, mention it to an ENT rather than assuming."]};
+NA.c_mucus={why:"Mucus present and too thick to clear. Thickened secretions usually mean fluid content has dropped — so this is often a hydration problem presenting as its opposite.",now:["Full Sinopulse rinse. Exactly what it's for.","Steam after to thin what's left, then rinse again if needed.","Ten minutes of brisk movement — exercise is a genuine decongestant.","Drink more than feels necessary."],later:["If dairy is heavy, trial two weeks lower. It doesn't create mucus but thickens what's there.","Consistent hydration is the boring right answer."],avoid:["Blowing hard — forces pressure into the sinuses, achieves less than a rinse."]};
+NA.c_swell={why:"Tissue swelling rather than mucus — turbinates engorged and narrowing the airway. Rinsing won't fix it because there's nothing to wash out. This is the type steroids treat and saline doesn't.",now:["Move. Exercise constricts nasal vessels within minutes — fastest non-drug decongestant you have.","Sit upright and stay upright.","Warm compress across bridge and cheeks.","Accept this one has a slow fix."],later:["This is your steroid's actual job and it works over days. You're already nightly, so the answer is patience, not a change.","Track what precedes it — alcohol, temperature swings and strong odours are classic triggers for this type.","Near-constant despite months of consistent steroid use is the strongest argument here for an ENT referral. Turbinate swelling and polyps present exactly like this and both are treatable."],avoid:["OTC decongestant sprays beyond 3 days. Rebound congestion is real and miserable."]};
+NA.c_watery={why:"Neural rather than inflammatory — secretory glands over-stimulated. Classic triggers are temperature change, spicy food, alcohol and strong smells. Itching and sneezing are usually absent, which separates it from an allergic response.",now:["Warm up if you've come in from cold — often resolves in 20 minutes.","Gentle blow, one nostril at a time.","Ride it out. Nothing's being damaged."],later:["Log what preceded it. This type is highly trigger-driven and usually identifiable in a few episodes.","If frequent and disruptive, an anticholinergic spray targets this exact mechanism where steroids don't. Pharmacist conversation."]};
+NA.c_drip={why:"Mucus draining backward. Two very different causes: genuinely excess or thickened mucus, or reflux irritating the throat and creating the same sensation with little actual mucus. Given your eating pattern, reflux deserves first consideration.",now:["Rinse — it tells you a lot. If it runs clear and the sensation persists, suspect reflux rather than mucus.","Water, sipped steadily.","Stop clearing your throat — it irritates and perpetuates."],later:["The reflux protocol: 2.5h before lying down, bed raised, lozenges earlier.","Two weeks of that identifies the cause better than any test."]};
+NA.c_lying={why:"Almost diagnostic. Lying flat increases blood flow to nasal tissue and worsens any swelling — but it's also exactly when reflux happens. Given you eat late and sleep at 1–2am, this is the presentation most likely to be food-timing related.",now:["Prop yourself up — extra pillow tonight, raised frame long-term.","Steroid as normal.","Strip on."],later:["This is the strongest signal for the reflux hypothesis. Two-week trial: nothing after 10pm, bed raised a couple of inches, no late lozenges.","If the pattern breaks you've found your main lever. If not, you've eliminated a variable and can stop wondering."]};
+NA.c_side={why:"Usually just the nasal cycle — nostrils alternate congestion every few hours and everyone does this. You've simply started noticing.",now:["Check whether it swaps over the next few hours. If it does, nothing to fix.","Lie on the opposite side for a few minutes to shift it.","Otherwise ignore it."],later:["Only worth pursuing if it's stuck."],flag:"A blockage that stays one side for weeks and never swaps is the single thing here most worth having looked at. Deviated septum and polyps both present this way and neither is fixable from your bathroom cabinet."};
+NA.c_morning={why:"Overnight accumulation plus whatever the bedroom air did to you for eight hours. Dry air, aircon, heating and lying flat all compound. Clearing within an hour or two of getting up points to environment rather than structure.",now:["Rinse on waking — the routine's whole purpose.","Hot shower after.","Move about. Upright and active clears it fastest."],later:["The bedroom is the variable. 40–50%, purifier on, aircon off or moderate, filter clean.","If you're mouth-breathing overnight the strips are doing more than you realise — keep them on.","Log bedroom humidity against morning severity for two weeks. Most likely of all your patterns to show a clean correlation."]};
+NA.i_sting={why:"Chemical or particulate irritation. The nose is doing its job — it's the filter, and it's telling you what it caught.",now:["Get away from the source. Everything else is secondary.","Gentle saline at body temperature to wash it off.","Gel after as a barrier.","Skip tonight's steroid if the tissue is raw."],later:["Vape exposure, own or passive, is your known worst trigger. This symptom is the clearest signal you get.","Purifier running, filter checked."]};
+NA.i_itch={why:"Itching and sneezing in runs is specifically the allergic pattern — it's what separates it from the non-allergic types. Something is triggering histamine release.",now:["Rinse to physically remove the allergen.","Change clothes and shower if you've been outside in pollen.","An antihistamine is the right tool, and it's a different mechanism from your steroid — they work fine together."],later:["Identify the trigger. Seasonal points to pollen, year-round to dust mites or something at home.","Dust mites thrive above 60% humidity, so don't overcorrect with the humidifier. 40–50% serves both problems.","Hot-wash bedding weekly if you suspect mites."]};
+NA.i_sore={why:"The loop you know about. Tear the tissue, get a scab, the scab feels like a crust, pick it, stay inflamed. Inflamed tissue swells, swelling blocks airflow, blocked airflow dulls smell — so it costs you exactly what you're trying to protect.",now:["Hands off completely, 48 hours.","Gel only. It'll soften anything that needs to come away on its own.","Pause the steroid a night or two.","Damp cotton bud on the front only if you genuinely must. Never a fingernail."],later:["Treat the urge as a sign your dryness management slipped, not a habit to resist by willpower. More gel and better humidity and it mostly disappears.","Keep gel where you'd otherwise pick — bedside, desk, jacket."],flag:"Broken skin inside the nose is a real infection route — it's a natural staph reservoir. Spreading redness, swelling or a boil-like lump needs a pharmacist or GP, not more gel."};
+NA.i_press={why:"Suggests the sinus openings are blocked and pressure is building rather than draining. Different from simple nasal congestion.",now:["Steam, generously.","Warm compress over the area.","Rinse after steaming, not before.","Upright and hydrated."],later:["Recurring regularly means investigating rather than managing. Recurrent obstruction has causes that are checkable."],flag:"Facial pain with fever, or pressure persisting past ten days and worsening rather than improving, needs a GP — that's the bacterial sinusitis picture."};
+NA.s_flat={why:"The frustrating one — mechanically fine, signal weak. Usually either a thin mucus film you can't feel, or genuine olfactory underperformance from cumulative inflammation.",now:["Steam, wait 20 minutes, test again. Improvement means it was a film, not true loss.","Short sharp sniffs rather than one long inhale."],later:["Check the last 48 hours for the usual suspects — alcohol lag, passive vape, late meal, aircon night.","Regular exercise is linked to a lower risk of losing your sense of smell over the years: in a 10-year study of people over 50, those who exercised hard enough to sweat at least weekly were about a quarter less likely to lose it."]};
+NA.s_partial={why:"Patchy loss is a good sign — the nerve is functioning but underperforming rather than absent. The nerve is working; something is dampening it.",now:["Note which kinds are missing: floral, citrus, spicy, resinous. Genuinely useful information."],later:["Watch it in Trends over weeks rather than days. Patchy days that cluster after drinking or dry air point to the cause."]};
+NA.s_weird={why:"Parosmia. Counterintuitively often a sign of recovery rather than deterioration — the nerve regenerating and wiring up imperfectly on the way. Unpleasant, but usually a stage rather than an endpoint.",now:["Avoid specific triggers rather than fighting them. Coffee, meat and onion are the classics.","Stick to familiar, clean smells you know well rather than chasing the distorted ones."],later:["Typically resolves over months.","If severe or affecting eating, an ENT referral is reasonable — there are adjuncts worth discussing."]};
+NA.s_good={why:"Good days are the most useful data you'll collect — they tell you what to reproduce rather than what to avoid.",now:["Tap anything else that happened yesterday, while you remember it."],later:["After a few good days, look for what they share. Humidity, meal timing, days since alcohol, location.","Reproducing good conditions is easier than eliminating bad ones."]};
+
+NA.c_valve={why:"The sidewall of the nostril collapsing inward on a strong inhale is nasal valve collapse \u2014 the airway narrowing dynamically under the pressure of breathing in, rather than being blocked by tissue or mucus. Here's the thing worth knowing: nasal dilator strips are the standard conservative treatment for exactly this, so the fact that your strips help a lot is itself a meaningful clue rather than just a nice result.",now:["Strips on \u2014 they're doing real structural work here, not just a comfort thing.","Don't sniff hard. The harder the inhale, the more it collapses.","Short gentle breaths through the nose instead."],later:["Try the Cottle test on yourself: gently pull the cheek outward, away from the nose, and breathe in. If breathing clearly improves, that points to valve collapse \u2014 it's the manoeuvre clinicians use to confirm it.","Internal nasal dilators (cones that sit inside the nostril) are the other conservative option and some people find them better overnight than strips.","Worth understanding that strips and dilators manage the symptom without addressing the cause. If it bothers you enough, surgical repair is what actually fixes it."],flag:"This is a structural thing, not an inflammation thing \u2014 no rinse, steroid or humidity change will resolve it. If the strips are doing heavy lifting every night, that's a reasonable thing to raise with an ENT, especially since valve collapse often sits alongside a deviated septum."};
+NA.d_wake={why:"Dry mouth and throat on waking means you've been mouth-breathing overnight \u2014 the nose wasn't passing enough air, so the mouth took over. It also means eight hours of unhumidified air straight past your throat, which is why the dryness is worse than anything daytime produces.",now:["Rinse and rehydrate on waking.","Warm drink before coffee.","Gel, since the nasal lining has had a dry night too."],later:["Strips are the first-line fix and you're already using them \u2014 note whether the dry-mouth mornings are the nights you skipped.","Bedroom humidity to 45\u201350%.","If it happens most nights despite strips, that's worth investigating. Persistent overnight mouth-breathing has structural causes, and it's also worth ruling out snoring and sleep apnoea if anyone's ever mentioned it."]};
+NA.s_phantom={why:"Phantosmia \u2014 smelling something with no source at all, as opposed to real smells coming through distorted. Smoke, burning and chemical smells are the common ones. It's less common than distortion, making up a minority of smell disorders, and it's often associated with sinusitis and nasal polyps rather than anything more sinister.",now:["Note whether it's one nostril or both \u2014 this genuinely matters and is the main thing a clinician will ask.","Rinse. Where phantosmia comes from the nose rather than the brain, saline rinses often reduce it.","Don't chase the smell around trying to identify it."],later:["The distinction that matters: nose-related phantosmia tends to be stronger in one nostril and responds to rinsing. When it comes from the brain it's usually constant, present in both nostrils, and doesn't shift with saline.","One-off or short-lived episodes are usually nothing. Log them so you know which you're dealing with."],flag:"Phantom smells persisting beyond a few weeks, or constant in both nostrils and unaffected by rinsing, should be seen by a GP rather than managed \u2014 that pattern warrants a proper look."};
+const NOSE_MODS=[
+ {when:c=>c.alc_last,add:{now:"Alcohol last night: hydrate harder than feels necessary. Dehydration plus vessel dilation, and it will resolve.",tag:"alcohol"}},
+ {when:c=>c.alc_2||(c.alc_last&&c.alc_heavy),add:{why:"A heavy night can still show the morning after next. Trends will tell you whether your nose is one that lags.",tag:"alcohol lag"}},
+ {when:c=>c.alc_wine,add:{why:"Wine is the drink most often behind alcohol-triggered blocked noses: red for most people, then white.",later:"On nights out, beer or a spirit with a mixer is the swap.",tag:"wine"}},
+ {when:c=>c.alc_beer,add:{later:"Beer is histamine-heavy and volume adds dehydration. Worse than spirits, better than wine.",tag:"beer"}},
+ {when:c=>c.aircon,add:{later:"Aircon overnight likely costs more than the cooling is worth. The dehumidifying is the problem, not the cold. Humidifier alongside, or run it less.",tag:"aircon"}},
+ {when:c=>c.heating||c.dryair,add:{later:"Dry indoor air is the root cause behind most of your dryness presentations. Hygrometer, hold 40–50%.",tag:"dry air"}},
+ {when:c=>c.vape_self||c.vape_passive,add:{now:"Vape exposure is your identified worst trigger. Nothing else here will outweigh removing it — treat this as the answer, not one factor among several.",tag:"vape"}},
+ {when:c=>c.city,add:{later:"City days: windows shut rather than open, purifier running.",tag:"city"}},
+ {when:c=>c.latefood||c.bigmeal,add:{now:"Late or heavy eating before lying down is your most likely reflux driver. Tonight: nothing after 10pm, prop the bed up.",tag:"late food"}},
+ {when:c=>c.nic_late,add:{later:"Nicotine relaxes the valve keeping stomach acid down. Late lozenges compound the reflux picture — move them earlier.",tag:"late nicotine"}},
+ {when:c=>c.dairy,add:{later:"Dairy doesn't create mucus but thickens what's there. Two-week trial lower if congestion is your recurring type.",tag:"dairy"}},
+ {when:c=>c.spicy,add:{why:"Spicy food is a classic trigger for the watery streaming type specifically — neural, not inflammatory, and it passes.",tag:"spicy"}},
+ {when:c=>c.picked,add:{now:"You picked. Hands off 48 hours — most likely the thing driving today's symptom.",tag:"picking"}},
+ {when:c=>c.norinse,add:{now:"Skipped rinse: do one now if the symptom is congestion or crusting. Skip it if the tissue is dry, raw or bleeding.",tag:"no rinse"}},
+ {when:c=>c.nogel,add:{later:"Gel nightly rather than reactively. Prevention is far cheaper than fixing crusting once it's set in.",tag:"no gel"}},
+ {when:c=>c.badsleep,add:{later:"Poor sleep raises inflammatory markers across the board. A real contributor even though it feels unrelated.",tag:"poor sleep"}},
+ {when:c=>c.cold,add:{why:"Cold air constricts nasal vessels and is dry in absolute terms — a temporary dip after being outside is normal and self-resolving.",tag:"cold air"}},
+ {when:c=>c.exercise,add:{later:"Training is a net positive: exercise is a natural decongestant, and regular exercise is linked to a lower risk of losing your sense of smell over the years. Just replace the fluid.",tag:"trained"}},
+ {when:c=>c.ill,add:{flag:"Fighting something off means a week or two of noise in the data. Don't draw conclusions about your baseline from an illness week.",tag:"ill"}},
+ {when:c=>c.dusty,add:{now:"Rinse to physically remove the particulate, and change clothes if you've been in it.",tag:"dust"}},
+ {when:c=>c.humid,add:{why:"High ambient humidity is doing a lot of the work for you — it's why hits that would normally cost you a day are getting absorbed. This is the headroom effect in action.",tag:"humid"}},
+ {when:c=>c.massage,add:{later:"Worth logging deliberately. Steam, aromatics and a parasympathetic shift all at once — the reproducible version at home is a long eucalyptus bath, unhurried, no phone.",tag:"massage"}}
+];
+const NOSE_SYM=[
+ {g:"DRYNESS",items:[
+  {id:"d_crust",t:"Dry and crusty",d:"Scabs or hard bits at the front"},
+  {id:"d_tight",t:"Dry and tight, no crust",d:"Papery, airflow fine"},
+  {id:"d_burn",t:"Dry and burning",d:"Stings on the inhale"},
+  {id:"d_blood",t:"Dry with blood",d:"Streaks on tissue or gel"},
+  {id:"d_wake",t:"Wake with a dry mouth and throat",d:"Been breathing through the mouth overnight"},
+  {id:"d_open",t:"Too open, can't get a satisfying breath",d:"Wide open but unsatisfying"}]},
+ {g:"CONGESTION",items:[
+  {id:"c_mucus",t:"Thick and mucusy",d:"Something there, won't shift"},
+  {id:"c_swell",t:"Blocked, nothing comes out",d:"Rinse runs clear, still blocked"},
+  {id:"c_watery",t:"Streaming and watery",d:"Clear fluid, lots of it"},
+  {id:"c_drip",t:"Draining down the throat",d:"Constant throat clearing"},
+  {id:"c_lying",t:"Only blocked lying down",d:"Fine upright, blocks in bed"},
+  {id:"c_valve",t:"Nostril caves in when I sniff hard",d:"The side of the nose sucks inward on a strong inhale"},
+  {id:"c_side",t:"One side only",d:"Other side clear"},
+  {id:"c_morning",t:"Blocked mornings, clears later",d:"Reliably worse on waking"}]},
+ {g:"IRRITATION",items:[
+  {id:"i_sting",t:"Burning or stinging",d:"Raw, after exposure to something"},
+  {id:"i_itch",t:"Itchy and sneezy",d:"Tickly, sneezing in runs"},
+  {id:"i_sore",t:"Sore from picking",d:"You know why"},
+  {id:"i_press",t:"Pressure in the face",d:"Cheeks, forehead, behind eyes"}]},
+ {g:"SMELL ITSELF",items:[
+  {id:"s_flat",t:"Nose fine, smell flat",d:"No blockage, just muted"},
+  {id:"s_partial",t:"Some smells but not others",d:"Patchy rather than absent"},
+  {id:"s_phantom",t:"Smelling something that isn't there",d:"Smoke, burning or chemical with no source"},
+  {id:"s_weird",t:"Smells wrong or distorted",d:"Familiar things smell off"},
+  {id:"s_good",t:"Actually good today",d:"Good days are the data"}]}
+];
+// the nose app's routine and reference guide, as it was (smell training left out)
+const noseGuide = () => `<div class="alsobody nguide"><details class="more ngd" open><summary>The routine${ic('chev')}</summary><div class="ngb">    <ul class="ngclock">
+<li><span class="time">WAKING</span><span class="what"><b>Sinopulse rinse</b>Best smell window is 15–30 min after.</span></li>
+<li><span class="time">THEN</span><span class="what"><b>Hot shower</b>Steam on cleared passages. Cheapest reliable boost you have.</span></li>
+<li><span class="time">AFTER</span><span class="what"><b>NasoGel</b>Front half-inch. Nightly as prevention, not only when dry.</span></li>
+<li><span class="time">−2.5H</span><span class="what"><b>Last food</b>The single biggest lever. Nothing after this.</span></li>
+<li><span class="time">BED</span><span class="what"><b>Steroid, then strip</b>Aimed outward toward the ear. Gentle breath, don't sniff hard.</span></li>
+<li><span class="time">NIGHT</span><span class="what"><b>Humidity 40–50%</b>Purifier on, aircon off or moderate, head of bed raised.</span></li>
+</ul>
+<div class="ngnote">
+<b>Your steroid is already dialled</b>
+Nightly, correct angle. That makes it a stable background variable — so when smell swings, look at humidity, air, alcohol lag and meal timing instead.
+</div>
+<div class="ngnote">
+<b>But it cuts both ways</b>
+Dryness, crusting and septal irritation are the most commonly reported side effects of nasal steroids. Your spray is likely feeding the crusting that drives the picking urge. That's an argument for nightly gel, not for stopping the spray.
+</div>
+<h4 class="nghd">Drinks, ranked for your nose</h4>
+<div class="ngtable"><table>
+<tr><th>Drink</th><th>Why</th></tr>
+<tr><td>Clear spirits</td><td>Lowest histamine and congener load. Least bad.</td></tr>
+<tr><td>Dark spirits</td><td>More congeners, worse next-day.</td></tr>
+<tr><td>Beer</td><td>Histamine-heavy, volume adds dehydration.</td></tr>
+<tr><td>White wine</td><td>High histamine.</td></tr>
+<tr><td>Red wine</td><td>Histamines and tannins both. Reliably worst.</td></tr>
+</table></div>
+<div class="ngnote">
+<b>The headroom model</b>
+Why the same two pints sometimes costs you a day and sometimes doesn't: when humidity is good and inflammation low, you have reserve and the hit gets absorbed. In dry city air you're already near the ceiling, so the same input tips you over. The target isn't drinking less so much as keeping more headroom.
+</div>
+<p class="small muted">Drinks: red wine is the trigger most often named by people whose nose reacts to alcohol, then white (Nihlén et al. 2005, Respiratory Medicine).</p></div></details>
+<details class="more ngd"><summary>Food and reflux${ic('chev')}</summary><div class="ngb">
+<p>Most of your calories land after 6pm and you sleep at 1–2am. Food still in the stomach at bedtime, lying flat, is the classic setup for silent reflux — acid travelling far enough to inflame throat and nasal lining without heartburn you'd notice. That inflammation sits on exactly the tissue smell depends on.</p>
+<ul>
+<li>2.5 hours between last food and lying down.</li>
+<li>Raise the head of the bed a couple of inches.</li>
+<li>Nicotine relaxes the valve holding acid down — move lozenges earlier.</li>
+<li>Alcohol does the same. Late drinking plus late eating is the worst combination available to you.</li>
+</ul>
+<p><b>The tell:</b> if you're blocked only when lying down, that's the strongest evidence for this. Two weeks of nothing after 10pm settles the question.</p>
+</div></details>
+<details class="more ngd"><summary>Humidity and temperature${ic('chev')}</summary><div class="ngb">
+<p>Two competing effects. Dry air concentrates odour molecules, so in principle it should smell stronger. But dry mucosa degrades the mucus layer those molecules must dissolve into before reaching the receptors at all. For a healthy nose these roughly cancel and studies find little effect. For yours, with existing inflammation, the tissue side dominates — which is why humidity matters more to you than to most people.</p>
+<ul>
+<li><b>40–50% indoors.</b> Top of the range given your dryness tendency.</li>
+<li><b>Below 35%</b> is where crusting and picking urges start.</li>
+<li><b>Above 60%</b> indoors brings dust mites and mould. That ceiling is about the house, not your nose — tropical outdoor air at 80% does you nothing but good.</li>
+<li><b>Warmth</b> raises odour volatility. Winter heating is the real problem, not the cold — it drops relative humidity through the floor.</li>
+</ul>
+</div></details>
+<details class="more ngd"><summary>Air and vaping${ic('chev')}</summary><div class="ngb">
+<p>Vape exposure, own or passive, directly irritates the olfactory epithelium. You've identified it as your worst trigger and you're right — nothing else here outweighs removing it.</p>
+<ul>
+<li>Purifier running consistently, filter clean.</li>
+<li>City days: windows shut rather than open. Counterintuitive, correct in SE14.</li>
+<li>Aircon dehumidifies aggressively — the cooling is fine, the drying isn't.</li>
+</ul>
+</div></details>
+<details class="more ngd"><summary>Massage, baths and why Sri Lanka works${ic('chev')}</summary><div class="ngb">
+<p>Four mechanisms stacking:</p>
+<ul>
+<li><b>Steam and humidity</b> — a herbal bath is the most thorough version of the hot-shower trick. Probably the biggest contributor.</li>
+<li><b>Volatile aromatics</b> — eucalyptus, camphor, cardamom. Some act on cold receptors creating a sensation of openness; eucalyptus has genuine anti-inflammatory and mucus-thinning effects.</li>
+<li><b>The massage</b> — the swelling and streaming congestion types are autonomic dysregulation. A deep parasympathetic shift is a real intervention on that mechanism, not just relaxation.</li>
+<li><b>Incidental smell training</b> — an hour of varied aromatics is functionally a session.</li>
+</ul>
+<p>Reproducible at home: a long hot eucalyptus bath, unhurried, no phone. Most of the effect without the flight.</p>
+</div></details>
+<details class="more ngd"><summary>Worth checking once, not every time${ic('chev')}</summary><div class="ngb">
+<p><b>The Cottle test.</b> Gently pull the cheek outward, away from the nose, and breathe in. If breathing clearly improves, that points to nasal valve collapse — it's the manoeuvre clinicians actually use. Relevant to you because nasal dilator strips are the standard conservative treatment for valve collapse, so strips helping you a lot is a clue rather than just a result. Valve collapse commonly sits alongside a deviated septum, and neither responds to rinses, steroids or humidity.</p>
+<p><b>The NSAID question.</b> If ibuprofen or aspirin reliably triggers congestion or wheeze, that alongside asthma and nasal polyps is the aspirin-exacerbated respiratory disease picture. Its consistent features are persistent smell loss and excess postnasal mucus, and sufferers seldom complain of sinus pressure despite extensive sinus involvement. Uncommon in the general population but far more common among people with asthma and polyps. Worth ruling in or out because it changes what treatment is appropriate.</p>
+<p><b>Distorted versus phantom.</b> Real smells coming through wrong is parosmia, usually a sign of nerve regeneration. Smelling something with no source at all is phantosmia — less common, and if it's persistent, constant in both nostrils and unmoved by rinsing, worth a GP rather than managing.</p>
+</div></details>
+<details class="more ngd"><summary>Nose picking — the loop${ic('chev')}</summary><div class="ngb">
+<p>The front of the septum carries a dense network of fragile vessels under thin tissue. Picking tears it, you get a scab, the scab feels like a crust, you pick the crust. Inflamed tissue swells, swelling blocks airflow, blocked airflow dulls smell — so it costs you the exact thing you're protecting. It's also an infection route, since the area is a natural staph reservoir.</p>
+<p>Soften first, always — gel or saline, wait five minutes, then rinse and let it carry away. Never dry, never a fingernail.</p>
+<p>Treat a strong urge as a signal your dryness management has slipped, not a habit to white-knuckle. Keep gel where you'd otherwise pick.</p>
+</div></details>
+<details class="more ngd"><summary>Worth getting looked at${ic('chev')}</summary><div class="ngb">
+<ul>
+<li>Blockage stuck one side for weeks that never swaps</li>
+<li>Nosebleeds more than once a week</li>
+<li>Congestion unchanged after months of consistent steroid use</li>
+<li>Sudden total smell loss rather than gradual and variable</li>
+<li>Facial pain with fever, or pressure worsening past ten days</li>
+</ul>
+<p>Given how long you've managed this, an ENT referral is reasonable regardless. Deviated septum and polyps are both common, both easily checked, both treatable — and either explains persistent one-sided symptoms far better than anything a rinse fixes.</p>
+</div></details><p class="small muted" style="margin:0">General guidance, not medical advice. Worth running the steroid schedule past your GP or pharmacist.</p></div>`;
+
+/* ───────────── the nose: a morning check in the check-in, tips on Today, patterns in Trends ─────────────
+   S.nose[day] = { r: 1–5, sy: [what it's like], cx: [anything else from yesterday], at }. What the app already
+   knows (drinks and which, sleep, training, rinse and spray) is read from its own records, never asked. */
+const NOSE_R = [[1, 'Blocked', 'red'], [2, 'Poor', 'orange'], [3, 'OK', 'yellow'], [4, 'Good', 'green'], [5, 'Great', 'leaf']];
+const NOSE_X = [['vape', 'Vape or smoke around'], ['heating', 'Heating on'], ['aircon', 'Aircon overnight'], ['dryair', 'Hygrometer under 35%'], ['city', 'City traffic'], ['latefood', 'Ate late or heavy'], ['picked', 'Picked or blew hard'], ['nogel', 'No gel last night'], ['ill', 'Fighting something off'],
+  ['dusty', 'Dust, pollen or chalk'], ['fragrance', 'Strong fragrance or cleaning stuff'], ['cold', 'Out in cold air'], ['humid', 'Humid or tropical air'], ['flight', 'Flown in the last day or two'], ['nic_late', 'Late nicotine lozenge'], ['dairy', 'Lots of dairy'], ['spicy', 'Spicy food'], ['nsaid', 'Ibuprofen or aspirin'], ['massage', 'Massage or a long hot bath'], ['weather', 'Big weather change'], ['chlorine', 'Swimming pool']];
+const NOSE_X_SHOWN = 9;
+const NOSE_SY_COMMON = ['c_swell', 'c_mucus', 'd_crust', 's_flat', 'c_drip', 'd_tight'];
+const NOSE_SYM_ALL = NOSE_SYM.flatMap(g => g.items.map(i => Object.assign({ g: g.g }, i)));
+const noseSym = id => NOSE_SYM_ALL.find(x => x.id === id);
+const WINE_IDS = ['wine', 'winel', 'prosecco'], BEER_IDS = ['lager', 'ipa', 'guinness', 'cider', 'bottle'];
+// what was drunk on a night, by kind, from a night out's drinks
+function noseDrinks(k) {
+  const o = outOf(S.days[k]), dr = (o && o.drinks) || {}, has = ids => ids.some(id => (dr[id] || 0) > 0);
+  return { wine: has(WINE_IDS), beer: has(BEER_IDS) };
+}
+function noseTrained(k) { if (S.run[k] === 1) return true; try { return !!liftDays().m[k]; } catch (e) { return false; } }
+// what the app already knows about the day before a morning
+function noseKnown(k) {
+  const y = addDays(k, -1), y2 = addDays(k, -2), cond = {}, chips = [], set = setAt(k);
+  if (y in S.alc) {
+    const u = +S.alc[y], dk = noseDrinks(y);
+    if (u > 0) { cond.alc_last = true; if (u >= 6) cond.alc_heavy = true; if (dk.wine) cond.alc_wine = true; if (dk.beer) cond.alc_beer = true;
+      chips.push([`${fmtU(u)} units last night${dk.wine ? ' · wine' : dk.beer ? ' · beer' : ''}`, u >= 6 ? 'warn' : '']); }
+    else chips.push(['Dry last night', 'ok']);
+  }
+  if (+S.alc[y2] >= 3) { cond.alc_2 = true; chips.push([`${fmtU(+S.alc[y2])} units two nights ago`, +S.alc[y2] >= 6 ? 'warn' : '']); }
+  if (noseTrained(y)) { cond.exercise = true; chips.push(['Trained yesterday', 'ok']); }
+  const sl = (S.ck[k] || {}).sl || (UI.ckDraft && UI.ckDraft.k === k && +UI.ckDraft.sl) || 0;
+  if (sl) { if (sl < set.sleepGoal - 1) cond.badsleep = true; chips.push([`Slept ${fmtH(sl)}`, sl < set.sleepGoal - 1 ? 'warn' : '']); }
+  const c = (S.ck[k] || {}).c || {}; // saved checks only: an unsaved switch is just its starting position
+  if ('rinse' in c || 'rinsepm' in c) { const ok = c.rinse === 1 || c.rinsepm === 1; if (!ok) cond.norinse = true; chips.push([ok ? 'Rinsed' : 'No rinse', ok ? 'ok' : 'warn']); }
+  if ('steroid' in c) chips.push([c.steroid === 1 ? 'Steroid last night' : 'No steroid last night', c.steroid === 1 ? 'ok' : '']);
+  return { cond, chips };
+}
+function noseCond(k) {
+  const n = S.nose[k] || {}, cond = Object.assign({}, noseKnown(k).cond);
+  (n.cx || []).forEach(x => { cond[x] = true; if (x === 'vape') cond.vape_passive = true; if (x === 'latefood') cond.bigmeal = true; });
+  return cond;
+}
+// the nose app's advice for one symptom, with what happened yesterday folded in
+function noseAdvice(id, cond) {
+  const base = NA[id]; if (!base) return '';
+  const now = [...base.now], later = [...(base.later || [])], whys = [base.why], flags = base.flag ? [base.flag] : [];
+  NOSE_MODS.forEach(m => { if (!m.when(cond)) return; if (m.add.now) now.unshift(m.add.now); if (m.add.later) later.push(m.add.later); if (m.add.why) whys.push(m.add.why); if (m.add.flag) flags.push(m.add.flag); });
+  const li = a => a.map(x => `<li>${esc(x)}</li>`).join('');
+  return `<div class="nadv"><b class="nadvt">${esc(noseSym(id).t)}</b>
+    <div class="nblk"><span class="eyebrow">Likely going on</span>${whys.map(w => `<p>${esc(w)}</p>`).join('')}</div>
+    <div class="nblk now"><span class="eyebrow">Do now</span><ul>${li(now)}</ul></div>
+    ${base.avoid ? `<div class="nblk avoid"><span class="eyebrow">Don't</span><ul>${li(base.avoid)}</ul></div>` : ''}
+    ${later.length ? `<details class="more nlater"><summary>Over the coming weeks${ic('chev')}</summary><ul>${li(later)}</ul></details>` : ''}
+    ${flags.map(f => `<div class="callout warn">${ic('info')}<div><b>Worth getting looked at.</b> ${esc(f)}</div></div>`).join('')}</div>`;
+}
+function noseCard(k) {
+  const n = S.nose[k] && !S.nose[k].imp ? S.nose[k] : null, r = n ? n.r : 0, kn = noseKnown(k), sy = n ? n.sy : [], cx = n ? n.cx : [];
+  const scale = `<div class="nscale" role="group" aria-label="How's your nose">${NOSE_R.map(([v, l, c]) => `<button data-a="nrate" data-v="${v}" aria-pressed="${r === v}"><i style="background:${c === 'leaf' ? 'var(--leaf)' : `var(--c-${c})`}"></i>${l}</button>`).join('')}</div>`;
+  let more = '';
+  if (r) {
+    const showAll = !!UI.nSyAll, common = NOSE_SY_COMMON.concat(sy.filter(x => !NOSE_SY_COMMON.includes(x)));
+    const syChip = id => { const s = noseSym(id); return s ? `<button class="chip" data-a="nsym" data-v="${id}" aria-pressed="${sy.includes(id)}">${esc(s.t)}</button>` : ''; };
+    const syHtml = showAll ? NOSE_SYM.map(g => `<div class="ngrp">${esc(capFirst(g.g.toLowerCase()))}</div><div class="chips">${g.items.map(i => syChip(i.id)).join('')}</div>`).join('') + `<button class="btn link sm" data-a="nsyall">Fewer</button>`
+      : `<div class="chips">${common.map(syChip).join('')}<button class="chip more" data-a="nsyall">More…</button></div>`;
+    const xShow = UI.nXAll ? NOSE_X : NOSE_X.slice(0, NOSE_X_SHOWN).concat(NOSE_X.slice(NOSE_X_SHOWN).filter(([id]) => cx.includes(id)));
+    more = `${r <= 3 || sy.length ? `<div class="nlbl">What's it like?</div>${syHtml}` : ''}
+      ${kn.chips.length ? `<div class="nlbl">The app already knows</div><div class="chips">${kn.chips.map(([t, c]) => `<span class="chip known ${c}">${c === 'ok' ? ic('check') : ''}${esc(t)}</span>`).join('')}</div>` : ''}
+      <div class="nlbl">Anything else yesterday?</div><div class="chips">${xShow.map(([id, t]) => `<button class="chip" data-a="nx" data-v="${id}" aria-pressed="${cx.includes(id)}">${esc(t)}</button>`).join('')}${UI.nXAll ? '' : '<button class="chip more" data-a="nxall">More…</button>'}</div>
+      ${sy.length ? sy.map(id => noseAdvice(id, noseCond(k))).join('') : r >= 4 ? '<p class="small muted" style="margin:0">Logged. Good mornings show what to reproduce, so tap anything from yesterday that might explain it.</p>' : ''}`;
+  }
+  return `<section class="wsum nosecard" aria-label="Nose"><div class="nshead">${idl(shArt('nose', 52))}<div><div class="eyebrow">Nose · ${fmtDay(k)}</div><b>How's your nose this morning?</b></div>${r ? '<button class="btn link sm" data-a="nclear">Clear</button>' : ''}</div>${scale}${more}</section>`;
+}
+function noseEntry(k) { let n = S.nose[k]; if (!n || n.imp) n = S.nose[k] = { r: 3, sy: [], cx: [] }; n.at = todayKey(); return n; }
+Object.assign(ACT, {
+  nrate(d) { const k = ckK(), n = noseEntry(k); n.r = +d.v; if (n.r >= 4) n.sy = n.sy.filter(x => x === 's_good'); save(); render(); },
+  nsym(d) { const k = ckK(), n = noseEntry(k), i = n.sy.indexOf(d.v); if (i >= 0) n.sy.splice(i, 1); else { if (n.sy.length >= 3) { toast('Three at most: take one off first'); return; } n.sy.push(d.v); } save(); render(); },
+  nx(d) { const k = ckK(), n = noseEntry(k), i = n.cx.indexOf(d.v); if (i >= 0) n.cx.splice(i, 1); else n.cx.push(d.v); save(); render(); },
+  nsyall() { UI.nSyAll = !UI.nSyAll; render(); },
+  nxall() { UI.nXAll = true; render(); },
+  nclear() { const k = ckK(); delete S.nose[k]; save(); render(); }
+});
+
+/* Trends: your mornings against what happened the day before */
+const noseRated = () => Object.keys(S.nose).filter(k => S.nose[k].r && !S.nose[k].imp).sort();
+const noseHas = (k, ids) => (S.nose[k].cx || []).some(x => ids.includes(x));
+function noseRinse(k) { const c = (S.ck[k] || {}).c || {}; return 'rinse' in c || 'rinsepm' in c ? c.rinse === 1 || c.rinsepm === 1 : null; }
+const NOSE_F = [
+  ['alc6', '6+ units the night before', k => { const y = addDays(k, -1); return y in S.alc ? +S.alc[y] >= 6 : null; }],
+  ['alc2', '6+ units two nights before', k => { const y = addDays(k, -2); return y in S.alc ? +S.alc[y] >= 6 : null; }],
+  ['wine', 'Wine the night before', k => { const y = addDays(k, -1); return y in S.alc ? +S.alc[y] > 0 && noseDrinks(y).wine : null; }],
+  ['dry', 'Heating, aircon or dry air', k => noseHas(k, ['heating', 'aircon', 'dryair'])],
+  ['vape', 'Vape or smoke around', k => noseHas(k, ['vape'])],
+  ['late', 'Ate late or heavy', k => noseHas(k, ['latefood'])],
+  ['sleep', 'Short night', k => { const s = (S.ck[k] || {}).sl; return s ? s < setAt(k).sleepGoal - 1 : null; }],
+  ['rinse', 'No rinse', k => { const v = noseRinse(k); return v === null ? null : !v; }],
+  ['picked', 'Picked or blew hard', k => noseHas(k, ['picked'])],
+  ['trained', 'A run or lifting the day before', k => noseTrained(addDays(k, -1))]
+];
+function noseStats(days) {
+  days = days || noseRated().filter(k => k >= addDays(todayKey(), -180));
+  const av = a => a.reduce((x, y) => x + y, 0) / a.length, all = days.map(k => S.nose[k].r), out = [];
+  NOSE_F.forEach(([id, n, f]) => {
+    const yes = [], no = []; days.forEach(k => { const v = f(k); if (v === true) yes.push(S.nose[k].r); else if (v === false) no.push(S.nose[k].r); });
+    if (yes.length >= 3 && no.length >= 3) out.push({ id, n, a: av(yes), b: av(no), ny: yes.length, d: av(yes) - av(no) });
+  });
+  return { n: days.length, avg: all.length ? av(all) : null, f: out };
+}
+function noseLine(rated) {
+  const tk = todayKey(), cur = startOf(tk), pts = [];
+  for (let i = 25; i >= 0; i--) { const st = addDays(cur, -7 * i), v = rated.filter(k => k >= st && k <= addDays(st, 6)).map(k => S.nose[k].r); if (v.length >= 2) pts.push({ st, v: v.reduce((a, b) => a + b, 0) / v.length }); }
+  if (pts.length < 3) return '';
+  const W = 300, H = 96, L = 44, R = 10, T = 8, B = 18, x = i => L + ((W - L - R) * i) / (pts.length - 1), y = v => T + (H - T - B) * (1 - (v - 1) / 4);
+  const d = pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(p.v).toFixed(1)}`).join('');
+  const g = [[5, 'Great'], [3, 'OK'], [1, 'Blocked']].map(([v, l]) => `<path class="ng" d="M${L} ${y(v)}H${W - R}"/><text x="${L - 6}" y="${y(v) + 3.5}" text-anchor="end">${l}</text>`).join('');
+  return `<svg class="nline" viewBox="0 0 ${W} ${H}" role="img" aria-label="Nose, weekly average, from ${shortD(pts[0].st)}: ${pts[0].v.toFixed(1)} then, ${pts[pts.length - 1].v.toFixed(1)} lately">${g}<path class="na" d="${d}L${x(pts.length - 1).toFixed(1)} ${y(1)}L${x(0).toFixed(1)} ${y(1)}Z"/><path class="nl" d="${d}"/><circle cx="${x(pts.length - 1).toFixed(1)}" cy="${y(pts[pts.length - 1].v).toFixed(1)}" r="4"/>
+    <text x="${L}" y="${H - 3}">${shortD(pts[0].st)}</text><text x="${W - R}" y="${H - 3}" text-anchor="end">This week</text></svg>`;
+}
+function noseTrends() {
+  const keys = Object.keys(S.nose); if (!keys.length) return '';
+  const tk = todayKey(), rated = noseRated(), imp = keys.filter(k => S.nose[k].imp);
+  const l14 = rated.filter(k => k > addDays(tk, -14)), good = l14.filter(k => S.nose[k].r >= 4).length;
+  const av = a => (a.length ? a.reduce((x, k) => x + S.nose[k].r, 0) / a.length : null);
+  const a4 = av(rated.filter(k => k > addDays(tk, -28))), b4 = av(rated.filter(k => k <= addDays(tk, -28) && k > addDays(tk, -56)));
+  const st = noseStats(), sorted = st.f.slice().sort((p, q) => Math.abs(q.d) - Math.abs(p.d));
+  const worse = sorted.filter(f => f.d <= -0.4), better = sorted.filter(f => f.d >= 0.4), flat = sorted.filter(f => Math.abs(f.d) < 0.25);
+  const head = rated.length ? `${good} good morning${good === 1 ? '' : 's'} of the last ${l14.length} logged` : 'Nothing rated yet';
+  const sub = a4 !== null ? `Averaging ${a4.toFixed(1)} out of 5 over 4 weeks${b4 !== null && Math.abs(a4 - b4) >= 0.2 ? `, ${a4 > b4 ? 'up' : 'down'} from ${b4.toFixed(1)}` : ''}` : 'Rate it in the check-in each morning';
+  const bar = (v, cls) => `<div class="nbar"><i class="${cls}" style="width:${((v / 5) * 100).toFixed(1)}%"></i></div>`;
+  const rows = sorted.map(f => `<div class="ncr"><div class="t"><b>${esc(f.n)}</b><span>${f.a.toFixed(1)} · ${f.ny} morning${f.ny === 1 ? '' : 's'}</span></div>${bar(f.a, f.d <= -0.4 ? 'w' : f.d >= 0.4 ? 'b' : 'n')}${bar(f.b, 'u')}</div>`).join('');
+  const lst = a => joinAnd(a.slice(0, 3).map(f => (/^[A-Z][a-z ]/.test(f.n) ? f.n.charAt(0).toLowerCase() + f.n.slice(1) : f.n)));
+  const sum = st.f.length ? `${worse.length ? `<b>Worse after:</b> ${esc(lst(worse))}. ` : ''}${better.length ? `<b>Better after:</b> ${esc(lst(better))}. ` : ''}${flat.length ? `No clear difference from ${esc(lst(flat))} so far.` : ''}` : '';
+  const need = NOSE_F.length - st.f.length;
+  return `<section class="wsum nosetr" id="tr-nose"><div class="nshead">${idl(shArt('nose', 52))}<div><div class="eyebrow">Nose</div><b>${head}</b><small>${esc(sub)}</small></div></div>
+    ${noseLine(rated)}
+    ${st.f.length ? `<div class="eyebrow">Mornings after…</div><div class="nkey"><span><i class="w"></i>worse than usual</span><span><i class="b"></i>better</span><span><i class="u"></i>the other mornings</span></div><div class="ncmp">${rows}</div><p class="nsum">${sum}</p>` : ''}
+    ${need ? `<p class="small muted" style="margin:0">${st.f.length ? `${need} more thing${need === 1 ? '' : 's'} to compare` : 'The comparisons start'} once there are at least 3 mornings with ${need === 1 && st.f.length ? 'it' : 'each'} and 3 without.</p>` : ''}
+    ${imp.length ? `<p class="small muted" style="margin:0">Plus ${imp.length} day${imp.length === 1 ? '' : 's'} from the nose app's log, before mornings were rated, so they're left out of the averages.</p>` : ''}
+    ${st.f.some(f => f.id === 'wine') ? '<p class="small muted" style="margin:0;font-style:italic">Wine: Nihlén et al. 2005, Respiratory Medicine</p>' : ''}</section>`;
+}
+
+/* Today: a line at the top on mornings it has something to say */
+function noseTip(tk) {
+  const n = S.nose[tk] && !S.nose[tk].imp ? S.nose[tk] : null, y = addDays(tk, -1), u = y in S.alc ? +S.alc[y] : 0, dk = noseDrinks(y);
+  const st = noseStats(), f = id => st.f.find(x => x.id === id), a6 = f('alc6'), wn = f('wine');
+  const own = a6 && a6.d <= -0.3 ? `On your logs, mornings after 6+ units average ${a6.a.toFixed(1)} out of 5 against ${a6.b.toFixed(1)} otherwise.` : '';
+  if (n && n.r <= 2) {
+    const dry = (n.cx || []).some(x => ['heating', 'aircon', 'dryair'].includes(x)), vape = (n.cx || []).includes('vape');
+    const cause = u >= 3 ? `${fmtU(u)} units${dk.wine ? ' of wine' : ''}` : vape ? 'vape or smoke' : dry ? 'dry air' : '';
+    const fix = u >= 3 ? `${dk.wine ? 'Wine is the drink most often behind alcohol-triggered blocked noses. ' : ''}${own ? `${own} ` : ''}Rinse, steam in the shower, and more water than feels necessary.` : vape ? 'Vape smoke is your worst trigger: rinse it off, gel after.' : dry ? 'Gel and steam today, and get the room back to 40–50% tonight.' : 'The check-in has what to do for it.';
+    return { st: 'go', b: `Nose: rough morning${cause ? ` after ${cause}` : ''}`, sm: fix };
+  }
+  const out = outOf(S.days[tk]);
+  if (out && !(tk in S.alc) && !out.done) {
+    const wineBad = wn && wn.d <= -0.4;
+    return { st: 'up', b: 'Nose: out tonight', sm: `${wineBad ? `Your worst mornings follow wine (${wn.a.toFixed(1)} out of 5). ` : own ? `${own} ` : ''}Beer or a spirit with a mixer rather than wine, water between rounds, and a rinse before bed.` };
+  }
+  if (!n && u >= 6) return { st: 'up', b: 'Nose: how is it this morning?', sm: `${fmtU(u)} units last night. Rate it in the check-in and Trends learns what drinking does to your nose.` };
+  return null;
+}
+
+/* the nose app's own log, if it was kept on this phone under the same address: brought in once */
+const NOSE_TAGS = { aircon: 'aircon', 'dry air': 'dryair', vape: 'vape', city: 'city', 'late food': 'latefood', 'late nicotine': 'nic_late', dairy: 'dairy', spicy: 'spicy', picking: 'picked', 'no gel': 'nogel', 'cold air': 'cold', ill: 'ill', dust: 'dusty', humid: 'humid', massage: 'massage' };
+function noseImport() {
+  if (S.fix && S.fix.nose1) return '';
+  let log = null; try { log = JSON.parse(localStorage.getItem('noselog') || 'null'); } catch (e) { log = null; }
+  if (!Array.isArray(log) || !log.length) return '';
+  (S.fix = S.fix || {}).nose1 = 1; let n = 0;
+  log.slice().reverse().forEach(e => {
+    if (!isObj(e) || !DAY_KEY.test(e.d || '')) return;
+    const sy = NOSE_SYM_ALL.find(x => x.t === e.s), cx = (Array.isArray(e.t) ? e.t : []).map(t => NOSE_TAGS[t]).filter(Boolean);
+    const cur = S.nose[e.d];
+    if (cur && !cur.imp) return;
+    if (!cur) n++;
+    const x = S.nose[e.d] = cur || { r: 0, sy: [], cx: [], imp: 1 };
+    if (sy && !x.sy.includes(sy.id)) x.sy.push(sy.id); cx.forEach(c => { if (!x.cx.includes(c)) x.cx.push(c); });
+  });
+  save();
+  return n ? `Brought in ${n} day${n === 1 ? '' : 's'} from the nose app's log` : '';
+}
+
 /* ───────────── shell ───────────── */
 const TABS = [['today', 'Today', 'today'], ['week', 'Week', 'week'], ['out', 'Out', 'glass'], ['prep', 'Prep', 'prep'], ['shop', 'Shop', 'shop']];
 function render() {
@@ -10633,11 +11041,11 @@ function repairDrinks() {
 }
 (function init() {
   const st = startOf(todayKey());
-  const fixMsg = repairDrinks();
+  const fixMsg = repairDrinks(), noseMsg = noseImport();
   if (!weekDays(st).some(k => S.days[k] && Object.keys(S.days[k].sl || {}).length)) planWeek(st, false);
   nudgeWeek(UI.tab);
   render();
-  if (fixMsg) toast(fixMsg, 9000);
+  if (fixMsg) toast(fixMsg, 9000); else if (noseMsg) toast(noseMsg, 7000);
   tloop();
 })();
 
