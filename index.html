@@ -1190,6 +1190,28 @@ body.tvon .scrim { z-index: 80; }
 /* the session view */
 .tv .pm-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-content: start; padding-top: 12px; }
 .tvrow.miss .n b { color: var(--muted); }
+/* the week list: sessions open in place */
+.trwsum { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.trbar { flex: 1; height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.trbar i { display: block; height: 100%; background: var(--leaf); border-radius: 999px; }
+.tvrow.today { background: var(--surface-2); border-radius: 12px; padding: 9px 8px; margin: 2px -8px; width: calc(100% + 16px); border-top-color: transparent; }
+.tvlist li:has(> .tvrow.today) + li > .tvrow { border-top-color: transparent; }
+.tvxs { list-style: none; margin: 0 0 0 60px; padding: 0; display: grid; }
+.tvx { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 0; font-size: 14px; border-top: 1px dashed var(--line); }
+.tvx .bx { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--line); display: grid; place-items: center; color: #fff; }
+.tvx .bx svg { width: 13px; height: 13px; }
+.tvx.on .bx { background: var(--leaf); border-color: var(--leaf); }
+.tvx.part .bx { border-color: var(--leaf); }
+.tvx .v { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; }
+.tvx.on .v { color: var(--leaf); font-weight: 700; }
+.tvxgo { margin: 4px 0 8px 60px; }
+.tvxgo .btn { flex: 1; }
+.trbtns .btn { flex: 1; }
+details.more.trpw > summary { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; width: 100%; color: var(--ink); padding: 9px 0; border-top: 1px solid var(--line); }
+details.more.trpw:first-child > summary { border-top: 0; }
+.trpw summary .n { display: grid; min-width: 0; }
+.trpw summary .n small { color: var(--muted); font-size: 12.5px; font-weight: 400; }
+.trpw .tvlist { padding-left: 10px; border-left: 3px solid var(--line); margin-bottom: 6px; }
 .tvcard, .tvex { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px 14px; }
 .tvcard h3 { margin: 0; font-size: 16px; }
 .tvcard .lab { font-size: 13px; font-weight: 700; }
@@ -1475,6 +1497,43 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 .seg.trtabs { display: flex; margin: 12px 0 2px; }
 .seg.trtabs button { flex: 1; }
 
+/* drinking: the trend line and the number to beat */
+.alv { display: flex; gap: 12px; align-items: center; }
+.alv .arr { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; flex: none; background: var(--surface-2); color: var(--muted); }
+.alv .arr svg { width: 24px; height: 24px; }
+.alv .arr.down { background: var(--leaf-soft); color: var(--leaf); }
+.alv .arr.up { background: var(--warn-soft); color: var(--warn); }
+.alv b { font-size: 16px; display: block; }
+.alv small { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
+.alch .ala { fill: var(--leaf); opacity: .1; }
+.alch .all { fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
+.alch .alp { fill: var(--ink); }
+.alch .aln { fill: var(--surface); stroke: var(--ink); stroke-width: 2; }
+.alch .allab { fill: var(--ink); font-size: 10px; font-weight: 700; }
+.alch .algd { stroke: var(--accent); stroke-width: 1.4; stroke-dasharray: 5 4; }
+.alch .algt { fill: var(--accent); }
+.albeat { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
+.albig { display: flex; align-items: baseline; gap: 10px; }
+.albig b { font-family: var(--f-display); font-size: 40px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.albig span { color: var(--muted); font-size: 14px; }
+.alto { margin: -2px 0 0; font-size: 15px; }
+.almeter { position: relative; height: 14px; border-radius: 999px; background: var(--surface-2); margin-top: 4px; }
+.almeter i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; background: var(--leaf); }
+.almeter i.over { background: var(--warn); }
+.almeter u { position: absolute; top: -5px; bottom: -5px; width: 3px; margin-left: -1.5px; border-radius: 2px; background: var(--ink); }
+.almeter s { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--muted); opacity: .6; }
+.almk { position: relative; height: 18px; font-size: 12px; color: var(--muted); }
+.almk span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.almk span:first-child { left: 0; transform: none; }
+.almk b { color: var(--ink); }
+.alfold > summary { margin-top: 2px; }
+.alfold[open] { display: grid; gap: 10px; }
+.allg { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: -6px; }
+.allg span { display: inline-flex; align-items: center; gap: 6px; }
+.allg i { display: inline-block; width: 18px; height: 0; }
+.allg i.l { border-top: 2.5px solid var(--ink); }
+.allg i.d { border-top: 2px dashed var(--accent); }
+
 </style>
 </head>
 <body>
@@ -1499,7 +1558,7 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.11.2';</script>
+<script>window.TP_VERSION = '3.13.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -5116,6 +5175,7 @@ function trDetail(m) {
   const f = trFirst(m), span = f ? daysBetween(startOf(f), startOf(todayKey())) / 7 + 1 : 99, short = span < 26;
   const nW = short ? Math.max(4, span) : UI.tlong ? 52 : 26, ser = weekSeries(m, nW);
   const rows = WINS.filter(([w]) => w === 'wk' || w === 'all' || !trPartial(m, w)).map(([w, lab]) => { const r = aggWin(m, w), [a] = winRange(m, w); return `<div class="trw"><span>${lab}${w === 'all' && r ? `<small>since ${shortD(a)}${a.slice(0, 4) !== todayKey().slice(0, 4) ? ` ${a.slice(0, 4)}` : ''}</small>` : ''}</span><b>${r ? m.fmt(r.v) : '–'}</b><small>${r ? `${r.n} ${m.kind === 'week' ? (r.n === 1 ? 'week' : 'weeks') : (r.n === 1 ? 'day' : 'days')}` : ''}</small></div>`; }).join('');
+  if (m.id === 'alcohol') return alcDetail(m, ser, rows, short, f);
   let extra = '';
   if (m.id === 'alcohol') {
     const al = alcLight(), B = alcBinges(), yr = todayKey().slice(0, 4), bigs = B.bigs[yr] || [], prev = B.bigs[String(+yr - 1)] || [];
@@ -5131,6 +5191,77 @@ function trDetail(m) {
     ${trChart(m, ser)}
     <div class="trwins">${rows}</div>
     <p class="small muted" style="margin:0">Goal: ${esc(m.goalTxt)}. ${basis} ${src || ''}</p></div>`;
+}
+/* drinking: the trend is your 3-month average, week by week, and the one to beat is where it stands now. It moves: every week you
+   finish under it pulls it down, so next week's is lower still. The guideline of 14 and the binge limits stay alongside. */
+function alcTrend() {
+  const m = (MCACHE || (MCACHE = metrics())).find(x => x.id === 'alcohol'), ser = weekSeries(m, 65), cur = ser[ser.length - 1], full = ser.slice(0, -1);
+  const avgOf = a => { const v = a.filter(x => x !== null); return v.length >= 6 ? v.reduce((p, q) => p + q, 0) / v.length : null; };
+  // each completed week's 3-month average: that week and the 12 before it
+  const pts = full.map((p, i) => ({ st: p.st, v: i >= 12 ? avgOf(full.slice(i - 12, i + 1).map(x => x.v)) : null })).slice(-52);
+  const live = pts.filter(p => p.v !== null), last = live[live.length - 1] || null;
+  if (!last) return null;
+  const peak = live.reduce((a, p) => (p.v > a.v ? p : a), live[0]), ago = live[Math.max(0, live.length - 14)];
+  const now = cur.v || 0, tgt = last.v, after = avgOf([...full.slice(-12).map(x => x.v), now]);
+  return { m, pts, live, now, tgt, after, peak, ago, days: cur.n || 0 };
+}
+const alcR = v => Math.round(v * 10) / 10;
+function alcChart(T) {
+  const p = T.pts, W0 = 340, H0 = 190, L = 30, R = 40, Tp = 24, B = 22, vs = T.live.map(x => x.v), hi = Math.ceil(Math.max(...vs, ALC.week) / 5) * 5 + 5;
+  const y = v => Tp + (H0 - Tp - B) * (1 - v / hi), band = (W0 - L - R) / p.length, x = i => L + band * i + band / 2, step = hi > 40 ? 10 : 5;
+  let g = '';
+  for (let v = 0; v <= hi; v += step) g += `<line x1="${L}" x2="${W0 - R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" class="hgrid"/><text x="${L - 6}" y="${(y(v) + 3.5).toFixed(1)}" class="htick" text-anchor="end">${v}</text>`;
+  g += `<line x1="${L}" x2="${W0 - R}" y1="${y(ALC.week).toFixed(1)}" y2="${y(ALC.week).toFixed(1)}" class="algd"/>`;
+  let path = '', first = null, lastI = null, top = null;
+  p.forEach((q, i) => { if (q.v === null) { return; } if (first === null) first = i; lastI = i; if (top === null || q.v > p[top].v) top = i; path += `${path ? 'L' : 'M'}${x(i).toFixed(1)} ${y(q.v).toFixed(1)}`; });
+  g += `<path d="${path}L${x(lastI).toFixed(1)} ${y(0).toFixed(1)}L${x(first).toFixed(1)} ${y(0).toFixed(1)}Z" class="ala"/><path d="${path}" class="all"/>`;
+  if (top !== lastI) g += `<circle cx="${x(top).toFixed(1)}" cy="${y(p[top].v).toFixed(1)}" r="3.5" class="alp"/><text x="${Math.min(W0 - R - 30, Math.max(L + 30, x(top))).toFixed(1)}" y="${(y(p[top].v) - 8).toFixed(1)}" class="allab" text-anchor="middle">${fmtU(alcR(p[top].v))} · ${shortD(p[top].st)}</text>`;
+  g += `<circle cx="${x(lastI).toFixed(1)}" cy="${y(p[lastI].v).toFixed(1)}" r="5" class="aln"/><text x="${(x(lastI) + 8).toFixed(1)}" y="${(y(p[lastI].v) + 4).toFixed(1)}" class="allab">${fmtU(alcR(p[lastI].v))}</text>`;
+  const every = p.length > 30 ? 13 : p.length > 12 ? 4 : 2;
+  p.forEach((q, i) => { if ((p.length - 1 - i) % every === 0) g += `<text x="${x(i).toFixed(1)}" y="${H0 - 6}" class="htick" text-anchor="middle">${shortD(q.st)}</text>`; });
+  p.forEach((q, i) => { if (q.v !== null) g += `<rect x="${(L + band * i).toFixed(1)}" y="0" width="${band.toFixed(1)}" height="${H0}" fill="transparent"><title>w/c ${fmtDay(q.st)}: 3-month average ${fmtU(alcR(q.v))} units a week</title></rect>`; });
+  return `<svg class="hchart alch" viewBox="0 0 ${W0} ${H0}" role="img" aria-label="Your 3-month average units a week, week by week: ${fmtU(alcR(T.peak.v))} at its highest, ${fmtU(alcR(T.tgt))} now">${g}</svg>`;
+}
+// the headline: down from the year's high, up on three months ago, or holding steady
+function alcVerdict(T) {
+  const mon = st => MONS[parse(st).getMonth()], d13 = T.tgt - T.ago.v, dPk = T.peak.v - T.tgt;
+  if (d13 >= 1) return { dir: 'up', t: `Up ${fmtU(alcR(d13))} units a week since ${mon(T.ago.st)}`, s: `Your 3-month average, week by week: ${fmtU(alcR(T.ago.v))} then, ${fmtU(alcR(T.tgt))} now.` };
+  if (dPk >= 1) return { dir: 'down', t: `Down ${fmtU(alcR(dPk))} units a week since ${mon(T.peak.st)}`, s: `Your 3-month average, week by week: ${fmtU(alcR(T.peak.v))} at its highest, ${fmtU(alcR(T.tgt))} now.` };
+  return { dir: 'flat', t: `Holding steady at about ${fmtU(Math.round(T.tgt))} a week`, s: `Your 3-month average, week by week, has stayed within a unit of ${fmtU(alcR(T.tgt))}.` };
+}
+// this week against the one to beat
+function alcBeat(T) {
+  const tgt = T.tgt, now = T.now, top = Math.max(ALC.week, tgt, now) * 1.15, pc = v => `${Math.min(100, (v / top) * 100).toFixed(1)}%`;
+  const after = T.after, down = after !== null && after < tgt - 0.05, tp = Math.min(100, (tgt / top) * 100), wp = Math.min(100, (ALC.week / top) * 100);
+  const txt = now < tgt
+    ? `${fmtU(alcR(tgt - now))} unit${alcR(tgt - now) === 1 ? '' : 's'} of room before you match it. ${after === null ? '' : down ? `Finish the week here and your 3-month average drops to <b>${fmtU(alcR(after))}</b>, so next week's number to beat is lower still.` : `Finish the week here and your 3-month average holds at about <b>${fmtU(alcR(after))}</b>.`}`
+    : `${fmtU(alcR(now - tgt))} over your 3-month average this week. Keeping the rest of the week dry holds it there.`;
+  return `<div class="albeat"><div class="eyebrow">Drink less than your recent self</div>
+    <div class="albig"><b>${fmtU(alcR(now))}</b><span>unit${now === 1 ? '' : 's'} so far this week</span></div>
+    <p class="alto">The one to beat: <b>${fmtU(alcR(tgt))}</b>, your 3-month average</p>
+    <div class="almeter" role="img" aria-label="${fmtU(alcR(now))} units so far against ${fmtU(alcR(tgt))}"><i class="${now < tgt ? '' : 'over'}" style="width:${pc(now)}"></i><u style="left:${pc(tgt)}"></u><s style="left:${pc(ALC.week)}"></s></div>
+    <div class="almk"><span>0</span><span style="left:${pc(tgt)};transform:translateX(${tp < 28 ? -10 : tp > 72 ? -90 : -50}%)"><b>${fmtU(alcR(tgt))}</b> your average</span>${Math.abs(wp - tp) > 24 ? `<span style="left:${pc(ALC.week)}">${ALC.week}</span>` : ''}</div>
+    <p class="small" style="margin:0">${txt}</p></div>`;
+}
+function alcDetail(m, ser, rows, short, f) {
+  const T = alcTrend(), al = alcLight(), B = alcBinges(), yr = todayKey().slice(0, 4), bigs = B.bigs[yr] || [], prev = B.bigs[String(+yr - 1)] || [];
+  const src = 'Logged the morning after. A blank day in your old tracker counts as none; days marked "td" are left out until you fill them in.';
+  const weeks = `<details class="more alfold" ${UI.alWk ? 'open' : ''}><summary data-a="alwk">Week by week${ic('chev')}</summary>
+    <div class="wchead"><div class="eyebrow">By week${short ? ` · since ${shortD(f)}` : ''}</div>${short ? '' : `<div class="seg mini3" role="group" aria-label="Chart range"><button data-a="tlong" data-v="0" aria-pressed="${!UI.tlong}">6 mo</button><button data-a="tlong" data-v="1" aria-pressed="${!!UI.tlong}">12 mo</button></div>`}</div>
+    ${trChart(m, ser)}<div class="trwins">${rows}</div></details>`;
+  const limits = `<details class="more alfold" ${UI.alLim ? 'open' : ''}><summary data-a="allim">The three limits and binges a month${ic('chev')}</summary>
+    <div class="trrules">${al.parts.map(p => `<div class="trrule">${stDot(p.st)}<span><b>${p.rule}</b><small>${esc(p.txt)}</small></span><em>${TR_ST[p.st]}</em></div>`).join('')}</div>
+    <div class="eyebrow" style="margin-top:4px">Binges a month</div>${binChart()}
+    <p class="small muted" style="margin:0">A binge is a day over ${ALC.binge} units. Each of the first three weeks of 32+ units in a year counts as one binge, however many heavy days it had; after that, every day over ${ALC.binge} counts.</p>
+    <p class="small" style="margin:0"><b>32+ weeks in ${yr}:</b> ${bigs.length ? bigs.map(x => `w/c ${shortD(x.st)}, ${fmtU(x.u)} units`).join('; ') : 'none'}.${prev.length ? ` In ${+yr - 1}: ${prev.length}.` : ''}</p></details>`;
+  if (!T) return `<div class="trdet"><p class="small muted" style="margin:0">The trend line starts once there are a few weeks logged.</p>${weeks}${limits}<p class="small muted" style="margin:0">Goal: ${esc(m.goalTxt)}. ${src}</p></div>`;
+  const v = alcVerdict(T), arr = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${{ down: 'M12 5v14M6 13l6 6 6-6', up: 'M12 19V5M6 11l6-6 6 6', flat: 'M5 12h14M13 6l6 6-6 6' }[v.dir]}"/></svg>`;
+  return `<div class="trdet">
+    <div class="alv"><span class="arr ${v.dir}">${arr}</span><span><b>${v.t}</b><small>${v.s}</small></span></div>
+    ${alcChart(T)}<div class="allg"><span><i class="l"></i>3-month average</span><span><i class="d"></i>${ALC.week} a week, the guideline</span></div>
+    <p class="small" style="margin:0">Each week you finish under the line pulls it lower. Under ${ALC.week} is the guideline; under ${fmtU(alcR(T.tgt))} beats your recent self.</p>
+    ${alcBeat(T)}${weeks}${limits}
+    <p class="small muted" style="margin:0">Goal: ${esc(m.goalTxt)}. ${src}</p></div>`;
 }
 /* other time frames: every figure becomes that period's average, judged against the same goals */
 const TWINS = [['wk', 'This week'], ['4w', 'Last month'], ['12m', 'Last year'], ['all', 'All time']];
@@ -6837,24 +6968,57 @@ function labelOut(l) { const o = {}; if (l.sa !== undefined) { o.na = +(l.sa / 2
 const OFF_FIELDS = 'code,product_name,brands,nutriments,serving_quantity,serving_size,quantity';
 function offItem(p) {
   const n = p.nutriments || {}, num = x => (x === undefined || x === null || x === '' || !isFinite(+x) ? undefined : +x);
+  const name = p.product_name || p.product_name_en, br = Array.isArray(p.brands) ? p.brands[0] : p.brands, brand = br ? String(br).split(',')[0].trim() : '';
+  if (!name) return null;
+  const nm = `${name}${brand ? ` (${brand})` : ''}`;
   const k = num(n['energy-kcal_100g']) !== undefined ? num(n['energy-kcal_100g']) : num(n.energy_100g) !== undefined ? num(n.energy_100g) / 4.184 : undefined;
-  if (k === undefined || !p.product_name) return null;
-  return { src: 'off', code: p.code, n: `${p.product_name}${p.brands ? ` (${String(p.brands).split(',')[0].trim()})` : ''}`, per: { k, p: num(n.proteins_100g) || 0, f: num(n.fiber_100g), sa: num(n.salt_100g) !== undefined ? num(n.salt_100g) : num(n.sodium_100g) !== undefined ? num(n.sodium_100g) * 2.5 : undefined, fs: num(n['added-sugars_100g']), sf: num(n['saturated-fat_100g']) },
+  // a search hit without figures: listed by name, and its figures fetched by barcode when picked
+  if (k === undefined) return p.code ? { src: 'off', code: String(p.code), n: nm, lazy: true } : null;
+  return { src: 'off', code: p.code, n: nm, per: { k, p: num(n.proteins_100g) || 0, f: num(n.fiber_100g), sa: num(n.salt_100g) !== undefined ? num(n.salt_100g) : num(n.sodium_100g) !== undefined ? num(n.sodium_100g) * 2.5 : undefined, fs: num(n['added-sugars_100g']), sf: num(n['saturated-fat_100g']) },
     sugars: num(n.sugars_100g), serv: num(p.serving_quantity) > 0 && num(p.serving_quantity) < 2000 ? num(p.serving_quantity) : null, servTxt: p.serving_size || '', pl: [], fe: false };
 }
 const ingItem = id => { const g = ING[id]; return { src: 'ing', id, n: g.n, per: { k: g.k, p: g.p || 0, f: g.f, sa: g.sa, fs: g.fs, sf: g.sf }, serv: g.u && g.uw >= 4 ? g.uw : null, servTxt: g.u && g.uw >= 4 ? `1 ${g.u}, ${fmtN(g.uw)}${g.ml ? 'ml' : 'g'}` : '', pl: (g.pl || []).filter(x => PLANTS[x]), fe: !!g.fe, feMin: g.fe ? g.fe * 0.9 : 0 }; };
-async function offGet(url) {
-  const ac = typeof AbortController !== 'undefined' ? new AbortController() : null, t = ac ? setTimeout(() => ac.abort(), 12000) : null;
+async function offGet(url, ms = 12000) {
+  const ac = typeof AbortController !== 'undefined' ? new AbortController() : null, t = ac ? setTimeout(() => ac.abort(), ms) : null;
   try { const r = await fetch(url, ac ? { signal: ac.signal } : {}); if (!r.ok) throw new Error(`HTTP ${r.status}`); return await r.json(); } finally { if (t) clearTimeout(t); }
+}
+// searching by name: Open Food Facts' newer search service first (quick, made for apps), then its older search page, which is slow
+// and rate-limited. UK products come first; anything listed without figures gets them by barcode when picked.
+const OFF_SFIELDS = `${OFF_FIELDS},product_name_en,countries_tags`;
+async function offFind(q) {
+  let err = null;
+  try {
+    const j = await offGet(`https://search.openfoodfacts.org/search?q=${encodeURIComponent(q)}&langs=en&page_size=30&fields=${OFF_SFIELDS}`, 10000);
+    if (j && Array.isArray(j.hits) && j.hits.length) return j.hits;
+  } catch (e) { err = e; }
+  try {
+    const j = await offGet(`https://uk.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=20&fields=${OFF_SFIELDS}`, 25000);
+    return (j && j.products) || [];
+  } catch (e) { throw err || e; }
 }
 async function offSearch(q) {
   SH.off = { q, busy: true, list: [] }; lkRender();
   try {
-    const j = await offGet(`https://uk.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=20&fields=${OFF_FIELDS}`);
+    const hits = await offFind(q);
     if (!SH || !SH.off || SH.off.q !== q) return;
-    SH.off = { q, list: (j.products || []).map(offItem).filter(Boolean).slice(0, 15) };
-  } catch (e) { if (SH && SH.off) SH.off = { q, err: true, list: [] }; }
+    const uk = p => (Array.isArray(p.countries_tags) && p.countries_tags.includes('en:united-kingdom') ? 0 : 1), seen = new Set();
+    const list = hits.slice().sort((a, b) => uk(a) - uk(b)).map(offItem).filter(x => x && !seen.has(x.code || x.n) && seen.add(x.code || x.n));
+    SH.off = { q, list: list.sort((a, b) => !!a.lazy - !!b.lazy).slice(0, 15) };
+  } catch (e) { if (SH && SH.off && SH.off.q === q) SH.off = { q, err: true, list: [] }; }
   lkRender();
+}
+// a name-search hit that came without figures: fetch them by its barcode, then fill the form
+async function offPickLazy(i) {
+  const o = SH && SH.off, it = o && o.list[i]; if (!it) return;
+  o.getting = i; lkRender();
+  try {
+    const j = await offGet(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(it.code)}.json?fields=${OFF_FIELDS}`);
+    if (!SH || SH.off !== o) return;
+    const full = j && j.status === 1 && j.product ? offItem(Object.assign({ code: it.code }, j.product)) : null;
+    if (full && !full.lazy) { lkPick(full); return; }
+    o.list.splice(i, 1); toast('No figures for that one on Open Food Facts');
+  } catch (e) { if (SH && SH.off === o) toast("Couldn't reach Open Food Facts"); }
+  if (SH && SH.off === o) { o.getting = null; lkRender(); }
 }
 async function offCode(code) {
   code = String(code || '').replace(/\D/g, ''); if (code.length < 6) { toast('That barcode looks too short'); return; }
@@ -6863,7 +7027,7 @@ async function offCode(code) {
     const j = await offGet(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=${OFF_FIELDS}`);
     if (!SH) return;
     const it = j && j.status === 1 && j.product ? offItem(Object.assign({ code }, j.product)) : null;
-    if (it) { SH.off = null; lkPick(it); return; }
+    if (it && !it.lazy) { SH.off = null; lkPick(it); return; }
     SH.off = { q: code, list: [], none: true };
   } catch (e) { if (SH) SH.off = { q: code, err: true, list: [] }; }
   lkRender();
@@ -6896,7 +7060,7 @@ function lkBox() {
     const o = SH.off && SH.off.q === q ? SH.off : null;
     if (o && o.busy) out += '<p class="small muted">Searching Open Food Facts…</p>';
     else if (o && o.err) out += `<p class="small muted">Couldn't reach Open Food Facts. Check the connection, or type the figures in from the label.</p>`;
-    else if (o) out += o.list.length ? `<div class="lklist">${o.list.map((x, i) => `<button class="lkrow" data-a="lkpick" data-v="off:${i}">${esc(x.n)}<small>${fmtN(x.per.k)} kcal per 100g · Open Food Facts</small></button>`).join('')}</div>` : '<p class="small muted">Nothing on Open Food Facts by that name.</p>';
+    else if (o) out += o.list.length ? `<div class="lklist">${o.list.map((x, i) => `<button class="lkrow" data-a="lkpick" data-v="off:${i}">${esc(x.n)}<small>${o.getting === i ? 'Getting the figures…' : x.lazy ? 'Open Food Facts · tap for the figures' : `${fmtN(x.per.k)} kcal per 100g · Open Food Facts`}</small></button>`).join('')}</div>` : '<p class="small muted">Nothing on Open Food Facts by that name.</p>';
     else out += `<button class="btn sm ghost" data-a="offsearch" style="margin-top:6px">Search Open Food Facts for “${esc(q)}”</button>`;
   } else if (SH.off && /^\d+$/.test(SH.off.q || '')) {
     const o = SH.off; out += o.busy ? '<p class="small muted">Looking up the barcode…</p>' : o.err ? "<p class=\"small muted\">Couldn't reach Open Food Facts. Check the connection, or type the figures in from the label.</p>" : `<p class="small muted">Barcode ${esc(o.q)} isn't on Open Food Facts yet. Type the figures in from the label.</p>`;
@@ -7470,7 +7634,7 @@ const ACT = {
   pfclear() { if (!SH) return; SH.pf = []; renderSheet(); },
   offsearch() { if (!SH) return; const q = (SH.lq || '').trim(); if (q.length >= 2) offSearch(q); },
   offcode() { const el = $('lq-code'); if (el) offCode(el.value); },
-  lkpick(d) { if (!SH) return; const [src, v] = String(d.v).split(':'); const it = src === 'ing' ? (ING[v] ? ingItem(v) : null) : SH.off && SH.off.list ? SH.off.list[+v] : null; if (it) lkPick(it); },
+  lkpick(d) { if (!SH) return; const [src, v] = String(d.v).split(':'); const it = src === 'ing' ? (ING[v] ? ingItem(v) : null) : SH.off && SH.off.list ? SH.off.list[+v] : null; if (!it) return; if (it.lazy) { if (SH.off.getting == null) offPickLazy(+v); return; } lkPick(it); },
   lkclear() { if (!SH) return; SH.lk = null; renderSheet(); const el = $('lq'); if (el) el.focus(); },
   lkserv() { if (!SH || !SH.lk) return; const g = SH.lk.serv; const el = $('lk-g'); if (el) el.value = g; lkFill(g); lkRender(); },
   scanstart() { if (SH) startScan(); },
@@ -7611,6 +7775,8 @@ const ACT = {
   stocklow(d) { const w = W(UI.week); w.low = w.low || {}; w.low[d.i] = 1; save(); render(); toast(`${shortN(d.i)} is back on this week's list`); },
   trends() { closeSheet(); if (UI.trends) { window.scrollTo(0, 0); return; } UI.trends = true; UI.anim = 'enter'; render(); window.scrollTo(0, 0); syncHistory(); },
   trback() { UI.trends = false; UI.anim = 'enter'; render(); window.scrollTo(0, 0); syncHistory(); },
+  alwk(d, el) { const det = el.closest('details'); UI.alWk = det ? !det.open : true; },
+  allim(d, el) { const det = el.closest('details'); UI.alLim = det ? !det.open : true; },
   topen(d) { UI.topen = UI.topen === d.v ? null : d.v; UI.tbar = null; render(); },
   twin(d) { UI.twin = d.v; UI.topen = null; UI.tbar = null; render(); },
   tjump(d) { UI.topen = d.v; UI.tbar = null; render(); const el = document.getElementById(`tr-${d.v}`); if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' }); },
@@ -8408,56 +8574,88 @@ function trApplyDose(l, dose) {
 }
 const exTgt = (l, e) => e.n || (SLOTDEF[e.slot] ? slotSets(e.slot, l.phase, l.dose) : e.sets.length);
 const tvTarget = l => l.ex.reduce((a, e) => a + exTgt(l, e), 0);
-const tvDone = l => l.ex.reduce((a, e) => a + e.sets.filter(x => x.done).length, 0);
+const tvDone = l => l.ex.reduce((a, e) => a + e.sets.filter(x => !!x.done || tnum(x.reps) > 0).length, 0);
 function trSave(l) { if (l) l.updated = Date.now(); TRW = null; clearTimeout(TRS); save(); }
 let TRS = null; // typing saves a moment after the last key
 function trSaveSoon(l) { if (l) l.updated = Date.now(); TRW = null; clearTimeout(TRS); TRS = setTimeout(save, 400); }
 
 /* ── the Train page ── */
+// a set counts as done once it's ticked or has its reps filled in, everywhere: sessions, the week and the ledger
+const setDone = x => !!x.done || tnum(x.reps) > 0;
+const exDone = e => e.sets.filter(setDone).length;
+const phaseTxt = phase => ({ cut: 'Cutting, so the weights stay heavy and the volume moderate: the job is to keep every bit of muscle while the fat comes off.', maint: 'Holding steady: heavy weights, moderate volume, and a rep or two added wherever it comes.', bulk: 'Bulking: more sets and a few more reps, adding weight as soon as the top of each range comes easily.' }[phase]);
+// a planned session's exercises and sets at a dose, before it's started
+function trSesEx(id, phase, dose) {
+  if (SESS[id]) return sessSlots(id, phase).map(sl => ({ ex: slotEx(sl), n: slotSets(sl, phase, dose) })).filter(e => e.n > 0);
+  const x = trReSes(id); return x ? x.ex.map(e => ({ ex: slotOk(e.ex) ? e.ex : slotEx(e.sl), n: e.n })) : [];
+}
+// which session is open on the week list: the one you picked, else the one to do next
+function trOpenKey(st) {
+  if (UI.trOpen !== undefined && UI.trOpenWk === st) return UI.trOpen;
+  const nx = trNext(st); return nx ? (nx.log ? nx.log.id : nx.k ? `p${nx.k}` : '') : '';
+}
+// one day's session: a logged one with its exercises ticked or still to do, or a planned one with what's in it
+function trWeekRow(r, o) {
+  const { tk, phase, dose, open } = o, l = r.log, key = l ? l.id : `p${r.k}`, isOpen = open === key, today = r.k === tk;
+  const day = `<b class="d">${DOW[dayIndex(r.k)]} ${parse(r.k).getDate()}</b>`;
+  let sub, chip, body;
+  if (l) {
+    const did = tvDone(l), tgt = tvTarget(l), left = l.ex.filter(e => exTgt(l, e) > 0 && exDone(e) < exTgt(l, e)), all = !left.length;
+    sub = `${r.extra ? 'Extra · ' : ''}${did} of ${tgt} sets · ${all ? (l.fin ? 'finished' : 'every set in') : `${left.length} exercise${left.length === 1 ? '' : 's'} left`}`;
+    chip = all && l.fin ? `<span class="wt wt-ok">${ic('check')}Done</span>` : !l.fin ? '<span class="wt wt-warn">Started</span>' : `<span class="wt wt-warn">${left.length} left</span>`;
+    const items = l.ex.filter(e => exTgt(l, e) > 0 || e.sets.length).map(e => { const d = exDone(e), n = Math.max(exTgt(l, e), 1), full = d >= n; return `<li class="tvx ${full ? 'on' : d ? 'part' : ''}"><span class="bx" aria-hidden="true">${full ? ic('check') : ''}</span><span>${esc(exName(e.ex))}</span><span class="v">${d}/${n}</span></li>`; }).join('');
+    body = `<ul class="tvxs">${items}</ul><div class="btnrow tvxgo">${!l.fin || !all ? `<button class="btn sm primary" data-a="tvstart" data-s="${esc(l.sess)}" data-id="${l.id}">${ic('play')}Carry on</button>` : `<button class="btn sm" data-a="tvopen" data-id="${l.id}">Open the session</button>`}</div>`;
+  } else {
+    const se = trSesInfo(r.sess, phase, dose, null), list = trSesEx(r.sess, phase, dose);
+    sub = `${esc(se.d)}${se.nEx ? ` · ${se.nEx} exercise${se.nEx === 1 ? '' : 's'}${se.mins ? ` · about ${se.mins} min` : ''}` : ''}`;
+    chip = today ? '<span class="wt">Today</span>' : ic('chev');
+    body = `<ul class="tvxs">${list.map(e => `<li class="tvx"><span class="bx" aria-hidden="true"></span><span>${esc(exName(e.ex))}</span><span class="v">${e.n} set${e.n === 1 ? '' : 's'}</span></li>`).join('')}</ul><div class="btnrow tvxgo"><button class="btn sm primary" data-a="tvstart" data-s="${esc(r.sess)}">${ic('play')}${today ? 'Start' : 'Start it today'}</button></div>`;
+  }
+  const name = l ? trSN(l.sess, l) : trSesInfo(r.sess, phase, dose, null).n;
+  return `<li class="${isOpen ? 'open' : ''}"><button class="tvrow ${today ? 'today' : ''}" data-a="tropen" data-v="${key}" aria-expanded="${isOpen}">${day}<span class="n"><b>${esc(name)}</b><small>${sub}</small></span>${isOpen ? ic('down') : chip}</button>${isOpen ? body : ''}</li>`;
+}
 function vTrain() {
   const tk = todayKey(), st = startOf(tk), phase = trPhase(), plan = trPlan(st), next = trNext(st), dose = trDose(st), del = trDeload(st);
-  const days = weekDays(st), picked = trDays(st), noDay = next && !next.k && !next.log ? plan.left.slice(1) : plan.left;
-  const w = WT(), goalTxt = w.goal === 'maintain' ? 'holding steady' : `${w.goal === 'lose' ? 'losing' : 'gaining'} ${fmtW(w.rate, w.unit === 'lb' ? 1 : 2)} a week`;
-  const phaseLine = { cut: 'Cutting, so the weights stay heavy and the volume moderate: the job is to keep every bit of muscle while the fat comes off.', maint: 'Holding steady: heavy weights, moderate volume, and a rep or two added wherever it comes.', bulk: 'Bulking: more sets and a few more reps, adding weight as soon as the top of each range comes easily.' }[phase];
+  const days = weekDays(st), picked = trDays(st), noDay = next && !next.k && !next.log ? plan.left.slice(1) : plan.left, open = trOpenKey(st);
   const pick = `<div class="daypick" role="group" aria-label="Training days">${days.map(k => `<button data-a="trday" data-k="${k}" aria-pressed="${picked.includes(k)}" ${k < tk && !picked.includes(k) ? 'class="past"' : ''}><span>${DOW[dayIndex(k)].slice(0, 2)}</span><b>${parse(k).getDate()}</b></button>`).join('')}</div>`;
-  const rows = plan.rows.map(r => {
-    if (!r.sess) return `<li><div class="tvrow miss"><b class="d">${DOW[dayIndex(r.k)]} ${parse(r.k).getDate()}</b><span class="n"><b>${r.missed ? 'Missed' : 'Spare day'}</b><small>${r.missed ? 'The sessions move along to the next days' : 'Every session already has a day'}</small></span></div></li>`;
-    const se = trSesInfo(r.sess, phase, dose, r.log), l = r.log, did = l ? tvDone(l) : 0;
-    const status = l ? (l.fin ? `<span class="wt wt-ok">${ic('check')}${did} set${did === 1 ? '' : 's'}</span>` : '<span class="wt wt-warn">Started</span>') : r.k === tk ? '<span class="wt">Today</span>' : '';
-    const inner = `<b class="d">${DOW[dayIndex(r.k)]} ${parse(r.k).getDate()}</b><span class="n"><b>${esc(se.n)}</b><small>${esc(se.d)}${se.nEx ? ` · ${se.nEx} exercise${se.nEx === 1 ? '' : 's'}${se.mins ? ` · about ${se.mins} min` : ''}` : ''}</small></span>${status}`;
-    return l ? `<li><button class="tvrow" data-a="tvopen" data-id="${l.id}">${inner}</button></li>` : `<li><div class="tvrow">${inner}</div></li>`;
-  }).join('') + plan.extra.map(l => `<li><button class="tvrow" data-a="tvopen" data-id="${l.id}"><b class="d">${DOW[dayIndex(l.date)]} ${parse(l.date).getDate()}</b><span class="n"><b>${esc(trSN(l.sess, l))}</b><small>Extra session</small></span><span class="wt wt-ok">${ic('check')}${tvDone(l)} sets</span></button></li>`).join('');
-  const go = next ? `<button class="btn primary tvgo" data-a="tvstart" data-s="${next.sess}" ${next.log ? `data-id="${next.log.id}"` : ''}>${ic('play')}${next.log ? 'Carry on with' : 'Start'} ${esc(trSN(next.sess, next.log))}</button>` : `<p class="small muted" style="margin:0">${plan.rows.length ? 'Every session this week is logged. Nice work.' : 'Pick some days above.'}</p>`;
-  const anyStart = next ? '' : `<div class="btnrow"><button class="btn sm" data-a="tvpick">${ic('plus')}Log another session</button></div>`;
+  const all = [...plan.rows, ...plan.extra.map(l => ({ k: l.date, sess: l.sess, log: l, extra: true }))].sort((a, b) => (a.k < b.k ? -1 : a.k > b.k ? 1 : 0));
+  const o = { tk, phase, dose, open };
+  const rows = all.map(r => (r.sess || r.log ? trWeekRow(r, o) : `<li><div class="tvrow miss"><b class="d">${DOW[dayIndex(r.k)]} ${parse(r.k).getDate()}</b><span class="n"><b>${r.missed ? 'Missed' : 'Spare day'}</b><small>${r.missed ? 'The sessions move along to the next days' : 'Every session already has a day'}</small></span></div></li>`)).join('');
+  // how far through the week: sessions finished, and sets done against everything planned
+  const ses = all.filter(r => r.sess || r.log), fin = ses.filter(r => r.log && r.log.fin).length;
+  const setsIn = ses.reduce((a, r) => a + (r.log ? tvDone(r.log) : 0), 0), setsAll = ses.reduce((a, r) => a + (r.log ? tvTarget(r.log) : trSesEx(r.sess, phase, dose).reduce((x, e) => x + e.n, 0)), 0);
+  const sum = ses.length ? `<div class="trwsum"><span><b>${fin} of ${ses.length}</b> done</span><span class="trbar" aria-hidden="true"><i style="width:${setsAll ? Math.min(100, (setsIn / setsAll) * 100).toFixed(1) : 0}%"></i></span><span class="small muted">${setsIn} of ${setsAll} sets</span></div>` : '';
+  const hint = plan.re ? `Rearranged ${plan.re.at === tk ? 'today' : `on ${DOWL[dayIndex(plan.re.at)]}`}: ${RE_LAY[plan.re.lay].n.toLowerCase()}, ${DOSE_N[plan.re.dose].toLowerCase()} dose. Changing the days goes back to the usual plan.` : picked.length < 3 ? `Pick ${3 - picked.length} more day${3 - picked.length === 1 ? '' : 's'}.` : trPicked(st) ? '' : 'Suggested days: tap to change.';
+  const doneAll = ses.length && !next ? '<p class="small muted" style="margin:0">Every session this week is logged. Nice work.</p>' : !ses.length ? '<p class="small muted" style="margin:0">Pick some days above.</p>' : '';
   const delNote = del ? `<div class="callout">${ic('info')}<div><b>Deload week.</b> Minimal dose at your usual weights, stopping 3 or 4 reps short. It lets the tiredness of the last few weeks clear so the next block starts fresh.<div class="btnrow"><button class="btn sm ghost" data-a="trdeload" data-v="0">Make it a normal week</button></div></div></div>`
     : trDeloadDue(st) ? `<div class="callout warn">${ic('info')}<div><b>Five hard weeks in a row.</b> A lighter week now usually pays you back: minimal dose, same weights, stopping further short.<div class="btnrow"><button class="btn sm primary" data-a="trdeload" data-v="1">Make this a deload week</button><button class="btn sm ghost" data-a="trdeload" data-v="0">Not yet</button></div></div></div>` : '';
   const week = `<section class="wsum trweek"><div class="wchead"><div class="eyebrow">This week · w/c ${shortD(st)}</div><span class="phasechip p-${phase}">${PHASE_N[phase]}</span></div>
-    <p class="small" style="margin:0">${phaseLine} <span class="muted">Follows your weight goal (${goalTxt}).</span></p>
-    ${pick}<p class="small muted" style="margin:-2px 0 0">${plan.re ? `Rearranged ${plan.re.at === tk ? 'today' : `on ${DOWL[dayIndex(plan.re.at)]}`}: ${RE_LAY[plan.re.lay].n.toLowerCase()}, ${DOSE_N[plan.re.dose].toLowerCase()} dose. Changing the days goes back to the usual plan.` : `${trPicked(st) ? '' : 'Suggested days: tap to change. '}${picked.length >= 4 ? 'Four days: Upper A, Lower A, Upper B, Lower B.' : `Three days: Upper, Lower, Full body.${picked.length < 3 ? ` Pick ${3 - picked.length} more.` : ''}`}`}</p>
-    <ul class="tvlist">${rows}</ul>${noDay.length ? `<p class="small muted" style="margin:0">No day left this week for ${joinAnd(noDay.map(x => SESS[x].n))}. The big lifts come first, so ${noDay.length > 1 ? 'those are' : 'that\'s'} the one${noDay.length > 1 ? 's' : ''} to skip, or log ${noDay.length > 1 ? 'them' : 'it'} on another day.</p>` : ''}${go}${anyStart}
-    <div class="btnrow" style="margin-top:2px"><button class="btn sm" data-a="trre">${ic('wand')}${plan.re ? 'Rearrange again' : 'Rearrange the rest of the week'}</button>${plan.re ? '<button class="btn sm ghost" data-a="trreundo">Back to the usual plan</button>' : ''}</div>
-    ${plan.re ? '' : `<div class="wchead" style="margin-top:2px"><span class="small muted">Dose this week</span><div class="seg mini3" role="group" aria-label="Dose">${['min', 'eff'].map(v => `<button data-a="trdose" data-v="${v}" aria-pressed="${dose === v}" ${del ? 'disabled' : ''}>${DOSE_N[v]}</button>`).join('')}</div></div>`}
+    ${pick}${hint ? `<p class="small muted" style="margin:-2px 0 0">${hint}</p>` : ''}${sum}
+    <ul class="tvlist">${rows}</ul>${noDay.length ? `<p class="small muted" style="margin:0">No day left this week for ${joinAnd(noDay.map(x => SESS[x].n))}. The big lifts come first, so ${noDay.length > 1 ? 'those are' : 'that\'s'} the one${noDay.length > 1 ? 's' : ''} to skip, or log ${noDay.length > 1 ? 'them' : 'it'} on another day.</p>` : ''}${doneAll}
+    <div class="btnrow trbtns"><button class="btn sm" data-a="trre">${ic('wand')}${plan.re ? 'Rearrange again' : 'Rearrange'}</button><button class="btn sm" data-a="tvpick">${ic('plus')}Log a session</button></div>
+    ${plan.re ? '<div class="btnrow" style="margin-top:-4px"><button class="btn sm ghost" data-a="trreundo">Back to the usual plan</button></div>' : `<div class="wchead"><span class="small muted">Dose this week</span><div class="seg mini3" role="group" aria-label="Dose">${['min', 'eff'].map(v => `<button data-a="trdose" data-v="${v}" aria-pressed="${dose === v}" ${del ? 'disabled' : ''}>${DOSE_N[v]}</button>`).join('')}</div></div>`}
     ${delNote}</section>`;
   const imp = !Object.keys(S.tr.logs).length ? `<div class="callout">${ic('info')}<div>Logged in Cut log so far? Export a backup from its Setup tab, then <button class="link" data-a="backup" data-v="hist">bring those sessions in here</button> so the weights carry on.</div></div>` : '';
   const tab = TR_TABS.some(([v]) => v === UI.trTab) ? UI.trTab : 'week';
   const bar = `<div class="seg trtabs" role="tablist" aria-label="Training">${TR_TABS.map(([v, l]) => `<button role="tab" data-a="trtab" data-v="${v}" aria-selected="${tab === v}" aria-pressed="${tab === v}">${l}</button>`).join('')}</div>`;
-  if (tab === 'sessions') return `${bar}${trSessionsTab()}`;
-  if (tab === 'progress') { const pr = `${trLedgerCard()}${trLiftsCard()}`; return `${bar}${pr.trim() ? pr : '<section class="wsum"><p class="small muted" style="margin:0">Log a session or two and your lifts and weekly sets show up here.</p></section>'}`; }
+  if (tab === 'progress') { const pr = `${trLedgerCard()}${trPastCard()}${trLiftsCard()}`; return `${bar}${pr.trim() ? pr : '<section class="wsum"><p class="small muted" style="margin:0">Log a session or two and your lifts and weekly sets show up here.</p></section>'}`; }
   return `${bar}${imp}${week}`;
 }
-// the Train page in three tabs: this week, every session you've done, and how the lifts are going
-const TR_TABS = [['week', 'Week'], ['sessions', 'Sessions'], ['progress', 'Progress']];
+// the Train page in two tabs: this week, and how it's going (with every earlier week)
+const TR_TABS = [['week', 'This week'], ['progress', 'Progress']];
 try { const t = localStorage.getItem('tp.trtab'); if (t) UI.trTab = t; } catch (e) { /* ignore */ }
-// one session in a list: tap to reopen it, change sets or add more
-const trSessRow = l => `<li><button class="tvrow" data-a="tvopen" data-id="${l.id}"><b class="d">${DOW[dayIndex(l.date)]} ${parse(l.date).getDate()}</b><span class="n"><b>${esc(trSN(l.sess, l))}${l.deload ? ' · deload' : ''}</b><small>${shortD(l.date)} · ${tvDone(l)} of ${tvTarget(l)} sets${l.readiness ? ` · readiness ${l.readiness}` : ''}${!l.fin ? ' · not finished' : ''}</small></span>${ic('chev')}</button></li>`;
-function trSessionsTab() {
-  const all = trLogsAll().slice().sort((a, b) => b.date.localeCompare(a.date) || (b.updated || 0) - (a.updated || 0));
-  const head = `<section class="wsum"><p class="small muted" style="margin:0">Tap a session to reopen it: change weights and reps, add sets or exercises, or finish it off. Missed logging one? Add it for the day you did it.</p><div class="btnrow"><button class="btn sm" data-a="tvpick">${ic('plus')}Log a session</button></div></section>`;
-  if (!all.length) return `${head}<section class="wsum"><p class="small muted" style="margin:0">No sessions yet.</p></section>`;
-  const byWk = {}; all.forEach(l => { const st = startOf(l.date); (byWk[st] = byWk[st] || []).push(l); });
-  const wks = Object.keys(byWk).sort().reverse(), tk = startOf(todayKey()), shown = UI.trAll ? wks : wks.slice(0, 8);
-  return `${head}${shown.map(st => `<section class="wsum"><div class="eyebrow">${st === tk ? 'This week' : `Week of ${shortD(st)}`} · ${nWord(byWk[st].length, 'session')}</div><ul class="tvlist">${byWk[st].map(trSessRow).join('')}</ul></section>`).join('')}
-    ${wks.length > shown.length ? `<button class="btn ghost" style="width:100%" data-a="trall">Show ${wks.length - shown.length} older week${wks.length - shown.length === 1 ? '' : 's'}</button>` : ''}`;
+// one session in a list: tap to reopen it
+const trSessRow = l => `<li><button class="tvrow" data-a="tvopen" data-id="${l.id}"><b class="d">${DOW[dayIndex(l.date)]} ${parse(l.date).getDate()}</b><span class="n"><b>${esc(trSN(l.sess, l))}${l.deload ? ' · deload' : ''}</b><small>${tvDone(l)} of ${tvTarget(l)} sets${l.readiness ? ` · readiness ${l.readiness}` : ''}${!l.fin ? ' · not finished' : ''}</small></span>${ic('chev')}</button></li>`;
+// earlier weeks, newest first; the latest one open
+function trPastCard() {
+  const cur = startOf(todayKey()), byWk = {};
+  trLogsAll().forEach(l => { const w = startOf(l.date); if (w < cur) (byWk[w] = byWk[w] || []).push(l); });
+  const wks = Object.keys(byWk).sort().reverse(); if (!wks.length) return '';
+  const shown = UI.trAll ? wks : wks.slice(0, 8);
+  return `<section class="wsum trpast"><div class="eyebrow">Past weeks</div><div>${shown.map((w, i) => {
+    const ls = byWk[w], sets = ls.reduce((a, l) => a + tvDone(l), 0);
+    return `<details class="more trpw" ${i ? '' : 'open'}><summary><span class="n"><b>W/c ${shortD(w)}</b><small>${esc(ls.map(l => trSN(l.sess, l)).join(' · '))}</small></span><span class="small muted">${ls.length} · ${sets} sets</span>${ic('chev')}</summary><ul class="tvlist">${ls.map(trSessRow).join('')}</ul></details>`;
+  }).join('')}</div>${wks.length > shown.length ? `<button class="btn ghost" style="width:100%" data-a="trall">Show ${wks.length - shown.length} older week${wks.length - shown.length === 1 ? '' : 's'}</button>` : ''}</section>`;
 }
 // a session's name, what it is, how many exercises and roughly how long
 function trSesInfo(id, phase, dose, l) {
@@ -8572,7 +8770,8 @@ function shTrSet() {
   SH.title = 'Training settings';
   const opt = (a, v, label, on, d) => `<button class="opt" role="radio" data-a="${a}" data-v="${v}" aria-checked="${on}"><span class="rd"></span><b>${label}</b>${d ? `<span class="d">${d}</span>` : ''}</button>`;
   return `<div class="sheethead"><div><span class="eyebrow">Training${VER}</span><h2>Settings</h2></div>${closeBtn}</div>
-    <h4>Usual days a week</h4><div class="opts" role="radiogroup">${opt('trn', 3, '3 days', S.tr.n === 3, 'Upper, Lower, Full body')}${opt('trn', 4, '4 days', S.tr.n === 4, 'Upper A, Lower A, Upper B, Lower B')}</div>
+    <h4>${PHASE_N[trPhase()]}</h4><p class="small" style="margin:0">${phaseTxt(trPhase())} <span class="muted">It follows your weight goal, so it changes when that does.</span></p>
+    <h4 style="margin-top:14px">Usual days a week</h4><div class="opts" role="radiogroup">${opt('trn', 3, '3 days', S.tr.n === 3, 'Upper, Lower, Full body')}${opt('trn', 4, '4 days', S.tr.n === 4, 'Upper A, Lower A, Upper B, Lower B')}</div>
     <p class="small muted" style="margin:6px 0 0">Used to suggest days for a new week; picking the days on the Train page decides each week.</p>
     <h4 style="margin-top:14px">Usual dose</h4><div class="opts" role="radiogroup">${opt('trdosedef', 'min', 'Minimal', S.tr.dose === 'min', 'Two sets on the big lifts, the bare minimum to keep what you have. About 35 to 40 minutes.')}${opt('trdosedef', 'eff', 'Effective', S.tr.dose === 'eff', 'Enough to keep building. About an hour.')}</div>
     <h4 style="margin-top:14px">Rest timer</h4><div class="opts" role="radiogroup">${opt('trrest', 1, 'Start a rest timer when I tick a set', S.tr.rest)}${opt('trrest', 0, 'No timer', !S.tr.rest)}</div>
@@ -8589,7 +8788,7 @@ function renderTV() {
   const root = $('tv-root'), l = tvLog();
   if (!l) { if (TV) TV = null; root.innerHTML = ''; return; }
   const old = $('tv-body'), keep = old ? old.scrollTop : 0, se = { n: trSN(l.sess, l) }, done = tvDone(l), tgt = tvTarget(l);
-  const left = l.ex.reduce((a, e) => a + Math.max(0, e.sets.length - e.sets.filter(x => x.done).length) * (40 + roleOf(e.slot).rest), 0);
+  const left = l.ex.reduce((a, e) => a + Math.max(0, e.sets.length - exDone(e)) * (40 + roleOf(e.slot).rest), 0);
   const ckw = WT().log[l.date], bwTxt = ckw ? `${fmtW(ckw)} at the morning check-in` : l.bw ? `${l.bw} kg logged in Cut log` : '';
   const scale = Array.from({ length: 10 }, (_, i) => `<button data-a="tvready" data-v="${i + 1}" aria-pressed="${l.readiness === i + 1}">${i + 1}</button>`).join('');
   const head = `<section class="tvcard"><h3>Before you lift</h3>
@@ -8636,7 +8835,7 @@ function tvCard(l, e, i) {
 function tvProg() {
   const l = tvLog(); if (!l) return;
   const done = tvDone(l), tgt = tvTarget(l), p = $('tv-prog'), bar = document.querySelector('.tv .pm-prog .bar i');
-  const left = l.ex.reduce((a, e) => a + Math.max(0, e.sets.length - e.sets.filter(x => x.done).length) * (40 + roleOf(e.slot).rest), 0);
+  const left = l.ex.reduce((a, e) => a + Math.max(0, e.sets.length - exDone(e)) * (40 + roleOf(e.slot).rest), 0);
   if (p) p.textContent = `${done} of ${tgt} sets${done < tgt ? ` · about ${Math.max(5, Math.round(left / 300) * 5)} min left` : ''}`;
   const pos = $('tv-pos'); if (pos) pos.textContent = `${done}/${tgt}`;
   if (bar) bar.style.width = `${tgt ? Math.min(100, done / tgt * 100).toFixed(1) : 0}%`;
@@ -8721,7 +8920,7 @@ Object.assign(ACT, {
     const tk = todayKey(), st = startOf(tk), R0 = trReBuild(st, SH.dose, SH.days, SH.lay); if (!R0.ses.length) return;
     const w = trWk(st), old = trRe(st), logs = trLogsIn(st), logDays = logs.map(l => l.date);
     const base = Math.max(old ? old.base + old.ses.length : 0, ...logs.map(l => { const m = RE_ID.exec(l.sess); return m ? +m[2] + 1 : 0; }));
-    w.re = { n: R0.n >= 4 ? 4 : 3, dose: SH.dose, lay: SH.days.length === 1 ? 'full' : SH.lay, at: tk, base, prevDays: old ? old.prevDays : w.days, ses: R0.ses.map(x => ({ k: x.k, type: x.type, lab: x.lab, mins: x.mins, ex: x.ex })) };
+    w.re = { n: R0.n >= 4 ? 4 : 3, dose: SH.dose, lay: SH.days.length === 1 ? 'full' : SH.lay, at: tk, atMs: Date.now(), base, prevDays: old ? old.prevDays : w.days, ses: R0.ses.map(x => ({ k: x.k, type: x.type, lab: x.lab, mins: x.mins, ex: x.ex })) };
     w.days = [...new Set([...logDays, ...R0.ses.map(x => x.k)])].sort();
     trSave(); closeSheet(); render(); toast(`Rest of the week rearranged: ${R0.ses.length} session${R0.ses.length === 1 ? '' : 's'}`);
   },
@@ -8764,6 +8963,7 @@ Object.assign(ACT, {
   },
   tvpick() { openSheet({ type: 'tvpick' }); },
   tvpickgo(d) { const el = $('tvp-date'), v = el && DAY_KEY.test(el.value) ? el.value : todayKey(), dt = v > todayKey() ? todayKey() : v; closeSheet(); const l = trNewLog(dt, d.v); S.tr.logs[l.id] = l; trSave(l); tvOpen(l.id); },
+  tropen(d) { const st = startOf(todayKey()), cur = trOpenKey(st); UI.trOpen = cur === d.v ? '' : d.v; UI.trOpenWk = st; render(); },
   trtab(d) { UI.trTab = d.v; try { localStorage.setItem('tp.trtab', d.v); } catch (e) { /* ignore */ } render(); window.scrollTo(0, 0); },
   trall() { UI.trAll = true; render(); },
   tvopen(d) { if (S.tr.logs[d.id]) tvOpen(d.id); },
@@ -8822,11 +9022,10 @@ function tvSwapTo(l, i, x) {
 }
 /* ── the week's ledger: every set done, from sessions or added by hand, counted against the doses muscle by muscle ── */
 const trAddsIn = st => Object.values(S.tr.adds).filter(a => startOf(a.date) === st).sort((a, b) => (a.date === b.date ? a.at - b.at : a.date < b.date ? -1 : 1));
-const setsDone = e => e.sets.filter(x => x.done || tnum(x.reps) > 0).length;
 // every lot of sets done in a week: from sessions (with the slot they filled) and added by hand
 function trDoneIn(st) {
   const out = [];
-  trLogsIn(st).forEach(l => l.ex.forEach(e => { const n = setsDone(e); if (n && EX[e.ex]) out.push({ ex: e.ex, slot: e.slot, n, date: l.date, lab: trSN(l.sess, l), re: RE_ID.test(l.sess) }); }));
+  trLogsIn(st).forEach(l => l.ex.forEach(e => { const n = exDone(e); if (n && EX[e.ex]) out.push({ ex: e.ex, slot: e.slot, n, date: l.date, lab: trSN(l.sess, l), re: RE_ID.test(l.sess), created: l.created || 0 }); }));
   trAddsIn(st).forEach(a => out.push({ ex: a.ex, slot: null, n: a.sets, date: a.date, lab: null, id: a.id }));
   return out;
 }
@@ -8846,8 +9045,8 @@ function trLedger(st) {
   // sets done tick off the plan's exercise for the slot they filled, or one they're an alternative to; the rest are extras
   const alt = (p, ex) => p.slots.some(sl => SLOTDEF[sl] && [SLOTDEF[sl].ex, ...SLOTDEF[sl].alts].includes(ex));
   lots.forEach(x => {
-    // after a rearrangement, its list only counts what was done in its sessions (or added by hand since)
-    const fits = !re || x.re || (x.id && x.date >= re.at);
+    // after a rearrangement, its list only counts what was done in its sessions, or logged or added by hand since
+    const fits = !re || x.re || (x.id ? x.date >= re.at : re.atMs ? x.created > re.atMs : x.date > re.at);
     let row = fits && ((x.slot && plan.find(p => p.slots.includes(x.slot))) || plan.find(p => p.ex === x.ex) || plan.find(p => alt(p, x.ex)));
     if (!row) { row = extra.find(p => p.ex === x.ex); if (!row) extra.push(row = { ex: x.ex, need: 0, done: 0, from: [] }); }
     row.done += x.n; row.from.push(x);
