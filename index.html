@@ -1578,6 +1578,60 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 .pclist li { display: flex; justify-content: space-between; gap: 10px; }
 .pclist li span:last-child { color: var(--muted); white-space: nowrap; }
 
+/* 3.16 motion: drawings sit still, then do their own small move every few seconds; screens slide in from the side you picked */
+.idle { display: inline-flex; line-height: 0; }
+.idle > svg { overflow: visible; }
+@keyframes idlehop { 0% { transform: none; } 30% { transform: translateY(-5px) scale(1.04); } 60% { transform: translateY(1px) scale(.99, 1.01); } 100% { transform: none; } }
+@keyframes tapPop { 40% { transform: scale(1.25) rotate(-6deg); } 100% { transform: none; } }
+@keyframes pillBump { 30% { transform: scale(1.12); } 100% { transform: none; } }
+@keyframes tickDraw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+@keyframes fsdraw { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: no-preference) {
+  .idle:not(.go) [class*="sha-"], .idle:not(.go) [class*="sha-"] > * { animation: none !important; }
+  .idle.go [class*="sha-"], .idle.go [class*="sha-"] > * { animation-iteration-count: 1 !important; }
+  .idle.go > svg { animation: idlehop .9s cubic-bezier(.3, 1.6, .5, 1); }
+  #main.in-r { animation: slideR .32s var(--ease); } #main.in-l { animation: slideL .32s var(--ease); }
+  .fxtoday.in-r, .hero.in-r, .meals.in-r, .extras.in-r, .tiles.in-r { animation: slideR .3s var(--ease); }
+  .fxtoday.in-l, .hero.in-l, .meals.in-l, .extras.in-l, .tiles.in-l { animation: slideL .3s var(--ease); }
+  .nav.justtab button[aria-current="page"] svg, .modesw.justtab button[aria-selected="true"] svg { animation: tapPop .45s cubic-bezier(.3, 1.6, .5, 1); }
+  .plantpill.bump { animation: pillBump .6s cubic-bezier(.3, 1.6, .5, 1); }
+  .tick.pop[aria-checked="true"] span svg path { stroke-dasharray: 24; animation: tickDraw .35s .08s both var(--ease); }
+  .fsblk:active { transform: scale(.98); }
+  .fsblk { transition: transform .15s var(--ease); }
+  .fsshow .shart .idle > svg, .fstrio.big .idle > svg { animation: shpop .6s .05s both cubic-bezier(.2, 1.4, .4, 1); }
+  .fsshow .shart .idle.go > svg, .fstrio.big .idle.go > svg { animation: shpop .6s .05s both cubic-bezier(.2, 1.4, .4, 1), idlehop .9s .7s cubic-bezier(.3, 1.6, .5, 1); }
+  .fstrio.big .idle:nth-child(2) > svg { animation-delay: .15s; } .fstrio.big .idle:nth-child(3) > svg { animation-delay: .3s; }
+  .fsln path.l { stroke-dasharray: 900; stroke-dashoffset: 900; animation: fsdraw 1.4s .35s var(--ease) forwards; }
+  .fsln circle, .fsln text.v { animation: shup .3s 1.6s both var(--ease); }
+  .fsst, .fsaimln, .fsgraph { animation: shup .45s .4s both var(--ease); }
+  .fsaim { animation: shup .4s both var(--ease); } .fsaim:nth-child(2) { animation-delay: .12s; } .fsaim:nth-child(3) { animation-delay: .24s; }
+}
+
+/* the Week tab's focus block and its slideshow */
+.fsblk { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; background: color-mix(in srgb, var(--c-purple) 10%, var(--surface)); border: 1px solid color-mix(in srgb, var(--c-purple) 30%, var(--line)); border-radius: 16px; padding: 12px 12px 12px 14px; margin: 0 0 12px; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.fsbt { display: grid; gap: 2px; min-width: 0; }
+.fsbt b { font-size: 16.5px; } .fsbt small { color: var(--muted); font-size: 13px; line-height: 1.35; }
+.fstrio { display: flex; align-items: center; }
+.fstrio .idle + .idle { margin-left: -10px; }
+.fstrio.big { justify-content: center; margin: 6px 0; }
+.fstrio.big .idle + .idle { margin-left: -14px; }
+.fsgraph { width: 100%; max-width: 340px; }
+.fsln { width: 100%; height: auto; display: block; overflow: visible; }
+.fsln path.l { fill: none; stroke: var(--ink); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.fsln path.g { fill: none; stroke: var(--shink, var(--accent)); stroke-width: 1.4; stroke-dasharray: 5 4; }
+.fsln circle { fill: var(--surface); stroke: var(--ink); stroke-width: 2; }
+.fsln text { fill: var(--muted); font-size: 10.5px; font-family: var(--f-body); }
+.fsln text.v { fill: var(--ink); font-weight: 800; font-size: 12px; }
+.fsst { display: inline-block; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; padding: 3px 10px; border-radius: 999px; background: var(--surface); color: var(--shink, var(--ink)); }
+.fsaimln { margin: 0; font-size: 14.5px; line-height: 1.4; max-width: 36ch; background: var(--surface); border-radius: 12px; padding: 8px 12px; text-align: left; }
+.fssrc { font-style: italic; }
+.fsaims { width: 100%; display: grid; gap: 8px; text-align: left; cursor: auto; }
+.fsaim { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; align-items: center; background: var(--surface); border-radius: 14px; padding: 8px 12px; }
+.fsaim b { display: block; font-size: 15px; } .fsaim small { color: var(--muted); font-size: 13px; line-height: 1.35; display: block; }
+.fsshow .shart.sm { width: min(30vw, 120px); }
+.fslg { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.fslg i { width: 18px; border-top: 1.6px dashed var(--shink, var(--accent)); }
+
 </style>
 </head>
 <body>
@@ -1596,13 +1650,14 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 <div id="sheet-root"></div>
 <div id="wz-root"></div>
 <div id="rv-root"></div>
+<div id="fs-root"></div>
 <div id="prep-root"></div>
 <div id="tv-root"></div>
 <div id="tmr-root"></div>
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.15.0';</script>
+<script>window.TP_VERSION = '3.16.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -4575,11 +4630,38 @@ function animateIn(root) {
     requestAnimationFrame(step);
   });
 }
-function burst(el) {
+// which way a screen slides in: towards the one picked
+function slideDir(order, from, to) { const a = order.indexOf(from), b = order.indexOf(to); return a < 0 || b < 0 || a === b ? 'enter' : b > a ? 'r' : 'l'; }
+// the plant pill counts up when something eaten adds plants, with a little bump
+let PILLV = null;
+function pillAnim(v, g) {
+  const was = PILLV; PILLV = v; const pill = $('pill'), el = pill.querySelector('.pnum');
+  if (was === null || v <= was || !el || reduced()) return;
+  pill.classList.remove('bump'); void pill.offsetWidth; pill.classList.add('bump'); setTimeout(() => pill.classList.remove('bump'), 700);
+  const t0 = performance.now();
+  const step = t => { const p = Math.min(1, (t - t0) / 650), e = 1 - Math.pow(1 - p, 3), x = $('pill').querySelector('.pnum'); if (!x || PILLV !== v) return; x.textContent = `${fmtPts(Math.round((was + (v - was) * e) * 4) / 4)}/${g}`; if (p < 1) requestAnimationFrame(step); };
+  el.textContent = `${fmtPts(was)}/${g}`; requestAnimationFrame(step);
+  burst(pill, 5);
+}
+/* the drawings: still, then one cycle of their own small move every 4.5 to 6.5 seconds, each on its own clock so they
+   never all go at once. Anything wrapped in .idle takes part; reduced motion keeps them still. */
+const idl = (svg, cls) => `<span class="idle ${cls || ''}">${svg}</span>`;
+function idlePlay(el) { el.classList.remove('go'); void el.offsetWidth; el.classList.add('go'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('go'), 2600); }
+setInterval(() => {
+  if (document.hidden || reduced()) return;
+  const now = Date.now();
+  document.querySelectorAll('.idle').forEach(el => {
+    if (el.offsetParent === null) return;
+    if (!el._n) { el._n = now + 800 + Math.random() * 4000; return; }
+    if (now >= el._n) { idlePlay(el); el._n = now + 4500 + Math.random() * 2000; }
+  });
+}, 250);
+function burst(el, n) {
   if (reduced() || !el) return;
   const r = el.getBoundingClientRect(), fx = $('fx'), cols = ['green', 'yellow', 'red', 'orange', 'purple', 'green'];
-  for (let i = 0; i < 9; i++) {
-    const s = document.createElement('i'), a = (i / 9) * Math.PI * 2 + Math.random() * 0.6, d = 24 + Math.random() * 24;
+  const N = n || 9;
+  for (let i = 0; i < N; i++) {
+    const s = document.createElement('i'), a = (i / N) * Math.PI * 2 + Math.random() * 0.6, d = 24 + Math.random() * 24;
     s.className = 'leafbit';
     s.style.cssText = `left:${r.left + r.width / 2 - 5}px;top:${r.top + r.height / 2 - 3}px;background:var(--c-${cols[i % cols.length]});--dx:${Math.round(Math.cos(a) * d)}px;--dy:${Math.round(Math.sin(a) * d)}px;--rot:${Math.round(Math.random() * 360)}deg`;
     fx.appendChild(s); setTimeout(() => s.remove(), 800);
@@ -4593,7 +4675,7 @@ function weekNav(st) {
   return `<div class="weeknav"><button class="iconbtn" data-a="wk" data-v="-1" aria-label="Previous week">${ic('left')}</button><div class="lbl">${fmtRange(st)}</div>${st !== cur ? `<button class="btn sm ghost" data-a="gotoday">This week</button>` : ''}<button class="iconbtn" data-a="wk" data-v="1" aria-label="Next week">${ic('chev')}</button></div>`;
 }
 function emptyBlock(msg) {
-  return `<div class="empty">${art({ type: 'calendar', main: 'green' }, 96)}<p>${msg}</p><div class="btnrow" style="width:100%;max-width:340px"><button class="btn primary" data-a="wizard">${ic('wand')}Set up week</button><button class="btn" data-a="fill">Quick plan</button></div></div>`;
+  return `<div class="empty">${idl(art({ type: 'calendar', main: 'green' }, 96))}<p>${msg}</p><div class="btnrow" style="width:100%;max-width:340px"><button class="btn primary" data-a="wizard">${ic('wand')}Set up week</button><button class="btn" data-a="fill">Quick plan</button></div></div>`;
 }
 
 function vToday() {
@@ -4677,7 +4759,7 @@ function todayPrompts() {
       if (M.fin || se.date < tk) M.groups.forEach(gr => gr.entries.forEach(e => { if (e.store === 'freezer' && addDays(e.k, -1) === tk) defrost.push(`${DOWL[dayIndex(e.k)]}'s ${SLOTNAME[gr.s].toLowerCase()}`); }));
       if (se.date === tk && !M.fin) {
         const n = M.all.length, covers = [se.lunch.length ? `Lunches ${dayList(se.lunch)}` : '', `breakfasts ${dayList(se.bfast)}`].filter(Boolean).join(' · ');
-        cards.push(`<button class="tprep" data-a="pmopen" data-st="${st}" data-key="${se.key}">${art({ type: 'box', main: 'green', cols: ['green', 'orange', 'red'] }, 48)}<span class="t"><span class="eyebrow">Prep day</span><b>${sessName(se)} prep · ${M.done ? `${M.done} of ${n} steps done` : `about ${fmtMins(M.mins)}`}</b><small>${esc(capF(covers))}</small></span><span class="go">${ic('play')}</span></button>`);
+        cards.push(`<button class="tprep" data-a="pmopen" data-st="${st}" data-key="${se.key}">${idl(art({ type: 'box', main: 'green', cols: ['green', 'orange', 'red'] }, 48))}<span class="t"><span class="eyebrow">Prep day</span><b>${sessName(se)} prep · ${M.done ? `${M.done} of ${n} steps done` : `about ${fmtMins(M.mins)}`}</b><small>${esc(capF(covers))}</small></span><span class="go">${ic('play')}</span></button>`);
       }
     });
   });
@@ -4687,7 +4769,7 @@ function todayPrompts() {
 }
 function mealRow(o) {
   const label = unesc(o.nm.replace(/<[^>]+>/g, ''));
-  const inner = `<span>${o.art}</span><span class="mtext"><span class="slot">${o.slot}</span><span class="nm">${o.nm}</span></span><span class="kc">${o.kc || ''}</span>`;
+  const inner = `<span class="idle">${o.art}</span><span class="mtext"><span class="slot">${o.slot}</span><span class="nm">${o.nm}</span></span><span class="kc">${o.kc || ''}</span>`;
   return `<div class="meal ${o.done ? 'done' : ''} ${o.have ? 'hashave' : ''}"><button class="tick" role="checkbox" aria-checked="${!!o.on}" aria-label="Mark ${esc(label)} eaten" ${o.disabled ? 'disabled' : `data-a="tick" data-s="${o.tick}"`}><span>${ic('check')}</span></button>${o.open ? `<button class="mealbody" ${o.open}>${inner}</button>` : `<div class="mealbody">${inner}</div>`}${o.have || ''}</div>`;
 }
 
@@ -4722,7 +4804,7 @@ function vWeekPlan() {
     }).join('')}${c.night ? `<button class="drow ${c.night.done ? 'done' : ''}" data-a="night" data-k="${k}">${nightArt(c.night, 36)}<span class="n"><small>Night out</small>${esc(drinkSummary(c.night))}</span><span class="kc">${fmtN(c.dK)}</span></button>` : ''}</div>` : '';
     return `<article class="dayacc ${k === tk ? 'today' : ''} ${open ? 'open' : ''}" style="--i:${i}"><button class="dayhead" data-a="dayacc" data-v="${k}" aria-expanded="${open}"><span class="d">${DOW[dayIndex(k)]}<small>${parse(k).getDate()} ${MONS[parse(k).getMonth()]}</small></span><span class="pv">${cdots(c.colours)}${c.night ? '<span class="tape">Out</span> ' : ''}${pv}</span><span class="k">${fmtN(c.planK)}${d.t ? '*' : ''}</span>${ic('chev', false, 'chev')}</button>${body}</article>`;
   }).join('');
-  return `${weekNav(st)}${actions}${sum}<div class="days ${UI.anim === 'built' ? 'stagger' : ''}">${cards}</div>${wrapCard(st)}`;
+  return `${weekNav(st)}${fsBlock(st)}${actions}${sum}<div class="days ${UI.anim === 'built' ? 'stagger' : ''}">${cards}</div>${wrapCard(st)}`;
 }
 
 /* ───────────── trends: every goal over time ─────────────
@@ -5555,8 +5637,8 @@ const PILL_GOALS = ['protein', 'sodium', 'sugar', 'satfat', 'ferm', 'fish', 'alc
 function pillHtml(wc, g) {
   const L = metrics(); MCACHE = L;
   const dots = PILL_GOALS.map(id => { const m = L.find(x => x.id === id); let l; try { l = m.light(); } catch (e) { l = { st: 'none' }; } return { n: m.n, st: l.st }; });
-  const label = `Trends. ${fmtPts(wc.ptsPlan)} of ${g} plant points planned this week. ${dots.map(d => `${d.n}: ${TR_ST[d.st].toLowerCase()}`).join('. ')}.`;
-  return { html: `<span class="ptxt"><span class="pnum">${fmtPts(wc.ptsPlan)}/${g}</span><span class="pdots">${dots.map(d => stDot(d.st)).join('')}</span></span>`, label };
+  const label = `Trends. ${fmtPts(wc.ptsEat)} of ${g} plant points eaten this week. ${dots.map(d => `${d.n}: ${TR_ST[d.st].toLowerCase()}`).join('. ')}.`;
+  return { html: `<span class="ptxt"><span class="pnum">${fmtPts(wc.ptsEat)}/${g}</span><span class="pdots">${dots.map(d => stDot(d.st)).join('')}</span></span>`, label };
 }
 
 /* ───────────── weight ───────────── */
@@ -6260,7 +6342,7 @@ function syncHistory() {
   if (window.TP_PREVIEW) return;
   setTimeout(() => {
     try {
-      const open = !!(SH || WZ || PM || RV || TV || UI.trends);
+      const open = !!(SH || WZ || PM || RV || TV || FS || UI.trends);
       if (open && !ARMED) { history.pushState({ tp: 1 }, ''); ARMED = true; }
       else if (!open && ARMED) { ARMED = false; SKIPPOP = true; history.back(); }
     } catch (e) { /* history unavailable */ }
@@ -6270,7 +6352,7 @@ window.addEventListener('popstate', () => {
   if (SKIPPOP) { SKIPPOP = false; return; }
   if (!ARMED) return;
   ARMED = false;
-  if (SH) closeSheet(); else if (TV) ACT.tvclose(); else if (RV) closeReview(); else if (WZ) closeWizard(); else if (PM) closePrep(); else if (UI.trends) ACT.trback();
+  if (SH) closeSheet(); else if (FS) fsClose(); else if (TV) ACT.tvclose(); else if (RV) closeReview(); else if (WZ) closeWizard(); else if (PM) closePrep(); else if (UI.trends) ACT.trback();
 });
 
 const AISLES = [['veg', 'Fruit, veg & herbs'], ['meat', 'Meat'], ['fish', 'Fish'], ['dairy', 'Dairy & eggs'], ['chilled', 'Chilled'], ['bakery', 'Bakery'], ['frozen', 'Frozen'], ['dry', 'Pasta, rice & grains'], ['tins', 'Tins & jars'], ['world', 'World foods'], ['nuts', 'Nuts, seeds & dried fruit'], ['baking', 'Baking'], ['drinks', 'Drinks'], ['oils', 'Oils & sauces'], ['spices', 'Herbs & spices']];
@@ -7653,7 +7735,7 @@ function nudgeWeek(v) {
   // from the second prep day on, the Shop tab opens on the second shop
   if (v === 'shop' && weekMode(UI.week) === 'two') UI.trip = tk >= sessions(UI.week, 'two')[1].date ? 2 : 1;
 }
-function setTab(v) { if (UI.trends) { UI.trends = false; syncHistory(); } if (v === 'recipes' && UI.tab !== 'recipes') UI.back = UI.tab; UI.tab = v; UI.anim = 'enter'; try { sessionStorage.setItem('tp.tab', v); } catch (e) { /* ignore */ } if (v === 'today') UI.week = startOf(UI.day); nudgeWeek(v); }
+function setTab(v) { if (UI.trends) { UI.trends = false; syncHistory(); } if (v === 'recipes' && UI.tab !== 'recipes') UI.back = UI.tab; UI.anim = slideDir(TABS.map(t => t[0]), UI.tab, v); if (UI.tab !== v) UI.navPop = 'nav'; UI.tab = v; try { sessionStorage.setItem('tp.tab', v); } catch (e) { /* ignore */ } if (v === 'today') UI.week = startOf(UI.day); nudgeWeek(v); }
 function ckReset() { UI.ckDraft = null; UI.ckSkip = true; }
 // keep what's typed in the check-in when something else redraws the page
 function keepCk() {
@@ -7670,9 +7752,9 @@ function addCkItem() {
 }
 const ACT = {
   tab(d) { closeSheet(); setTab(d.v); render(); window.scrollTo(0, 0); },
-  wk(d) { const n = +d.v; UI.week = addDays(UI.week, 7 * n); UI.day = addDays(UI.day, 7 * n); UI.anim = 'enter'; render(); },
-  gotoday() { UI.day = todayKey(); UI.week = startOf(UI.day); UI.anim = 'enter'; render(); },
-  day(d) { UI.day = d.v; render(); },
+  wk(d) { const n = +d.v; UI.week = addDays(UI.week, 7 * n); UI.day = addDays(UI.day, 7 * n); UI.anim = n > 0 ? 'r' : 'l'; render(); },
+  gotoday() { const was = UI.day; UI.day = todayKey(); UI.week = startOf(UI.day); UI.anim = UI.day > was ? 'r' : UI.day < was ? 'l' : 'enter'; render(); },
+  day(d) { if (d.v !== UI.day) UI.dayDir = d.v > UI.day ? 'r' : 'l'; UI.day = d.v; render(); },
   heromore() { UI.heroMore = !UI.heroMore; render(); },
   flagopen(d) { UI.flag = UI.flag === d.v ? null : d.v; render(); },
   weekmore() { UI.weekMore = !UI.weekMore; render(); },
@@ -7889,7 +7971,7 @@ const ACT = {
     try { localStorage.setItem('tp.ring', UI.ringEat ? 'eat' : 'left'); } catch (e) { /* ignore */ }
     render(); UI.ringFlip = false;
   },
-  appmode(d) { closeSheet(); if (UI.trends) { UI.trends = false; syncHistory(); } if (d.v === 'weight' && UI.mode !== 'weight') { UI.ckDate = null; UI.ckEdit = false; UI.ckWaist = false; ckReset(); } UI.mode = d.v; UI.anim = 'enter'; try { localStorage.setItem('tp.mode', d.v); } catch (e) { /* ignore */ } render(); window.scrollTo(0, 0); },
+  appmode(d) { closeSheet(); if (UI.trends) { UI.trends = false; syncHistory(); } if (d.v === 'weight' && UI.mode !== 'weight') { UI.ckDate = null; UI.ckEdit = false; UI.ckWaist = false; ckReset(); } UI.anim = slideDir(['meals', 'weight', 'train'], UI.mode, d.v); if (UI.mode !== d.v) UI.navPop = 'modesw'; UI.mode = d.v; try { localStorage.setItem('tp.mode', d.v); } catch (e) { /* ignore */ } render(); window.scrollTo(0, 0); },
   ckstep(d) {
     const el = $(d.f); if (!el) return;
     const row = $(`${d.f}-row`); if (row && row.classList.contains('na')) { row.classList.remove('na'); el.value = ''; }
@@ -9585,11 +9667,15 @@ const SHART = {
       <path d="M44 28v12c0 7 3 13 8 17" fill="none" stroke="var(--surface)" stroke-width="3" stroke-linecap="round" opacity=".6"/>${star4(60, 42, 9, 'var(--surface)')}
       <path d="M54 70h12v12H54z" fill="${C('yellow')}" ${SWB}/><rect x="40" y="82" width="40" height="12" rx="3" fill="${C('white')}" ${SWB}/><rect x="32" y="94" width="56" height="12" rx="3" fill="var(--surface-2)" ${SWB}/>
       ${star4(18, 22, 6, C('yellow'), 'sha-tw')}${star4(102, 18, 7, C('yellow'), 'sha-tw2')}${star4(104, 66, 5, 'var(--surface)', 'sha-tw')}${star4(14, 72, 4.5, 'var(--surface)', 'sha-tw2')}`],
+  nose: ['fishblue', () => `<path d="M22 6c12 12 17 22 19 32l29 31c6 7 2 15-6 15h-6c-2 2-1 6 2 8c-2 4-4 6-2 10l-2 14H20q-12 0-12-12V18q0-12 12-12z" fill="color-mix(in srgb, var(--c-orange) 38%, var(--surface))" ${SWB}/>
+      <path d="M51 79c3 3 8 3 11 0" ${INK(2.2)}/><path d="M38 40c-6 2-11 2-15 0" ${INK(1.8, 0.4)}/><path d="M34 33c-5-3-11-3-15 0" ${INK(2.2)}/>
+      <g class="sha-dash"><path d="M114 58c-14-2-26 4-38 18" ${INK(2.4, 0.75)}/><path d="M112 76c-10-2-20 0-30 6" ${INK(2.4, 0.55)}/><path d="M116 94c-12-4-22-4-32-2" ${INK(2.4, 0.4)}/></g>
+      ${star4(98, 30, 7, C('yellow'), 'sha-tw')}${star4(106, 108, 5, C('green'), 'sha-tw2')}${star4(84, 44, 4.5, 'var(--surface)', 'sha-tw2')}`],
   focus: ['red', () => `<circle cx="56" cy="64" r="46" fill="var(--surface)" ${SWB}/><circle cx="56" cy="64" r="34" fill="${C('red')}" ${SWB}/><circle cx="56" cy="64" r="22" fill="var(--surface)" ${SWB}/><circle cx="56" cy="64" r="10" fill="${C('red')}" ${SWB}/>
       <g class="sha-arrow"><path d="M57 63L106 14" ${INK(3.2)}/><path d="M100 10l12-2-2 12-6 2-6-6z" fill="${C('yellow')}" ${SWB}/><path d="M57 63l10-3-7-7z" fill="var(--ink)"/></g>`]
 };
 function shArt(key, size, cls) {
-  const a = SHART[key] || SHART.check, col = a[0] === 'accent' ? 'var(--accent)' : C(a[0]);
+  const a = SHART[key] || SHART.check, col = a[0] === 'accent' ? 'var(--accent)' : a[0] === 'fishblue' ? 'var(--fishblue)' : C(a[0]);
   return `<svg class="shsvg ${cls || ''}" viewBox="0 0 120 120" width="${size}" height="${size}" aria-hidden="true"><circle cx="60" cy="62" r="56" fill="${col}" opacity=".16"/>${a[1]()}</svg>`;
 }
 
@@ -9648,7 +9734,7 @@ function wrapCard(st) {
   const lastD = addDays(st, 6), tk = todayKey();
   if (lastD > tk || st < rvFirst() || !rvHasData(st)) return '';
   const done = S.rev[st];
-  return `<section class="wsum wrapcard ${done ? 'done' : ''}">${shArt(done ? 'score' : 'intro', 60)}<div class="wrapt"><div class="eyebrow">${lastD === tk ? 'Today' : DOWL[dayIndex(lastD)]} · end of the week</div><b>${done ? 'Week wrapped up' : 'Wrap up the week'}</b>
+  return `<section class="wsum wrapcard ${done ? 'done' : ''}">${idl(shArt(done ? 'score' : 'intro', 60))}<div class="wrapt"><div class="eyebrow">${lastD === tk ? 'Today' : DOWL[dayIndex(lastD)]} · end of the week</div><b>${done ? 'Week wrapped up' : 'Wrap up the week'}</b>
     <span class="small muted">${done ? `Reviewed ${done === tk ? 'today' : `on ${fmtDay(done)}`}. The slides are there to see again.` : 'Confirm what you ate, drank and did, then see how it went, goal by goal.'}</span></div>
     <button class="btn sm ${done ? '' : 'primary'}" data-a="wrapup" data-v="${st}">${done ? 'See the slides' : 'Wrap up'}</button></section>`;
 }
@@ -10165,7 +10251,7 @@ function fxBenefits() {
   const was = (v, e, f, unit) => (e === null || v === null || Math.abs(v - e) < (unit === 'pts' ? 1 : 0.2) ? '' : `, ${v > e ? 'up' : 'down'} from ${f(e)} three to six months ago`);
   const lock = (ids, txt) => { const hit = ids.find(id => focus.includes(id)); return hit ? `<p class="fxlock"><b>Locking in ${esc(fxName(hit).toLowerCase())}:</b> ${txt}</p>` : ''; };
   const tops = [];
-  const row = (art, area, st, you, res, lk) => { tops.push([area, st]); rows.push(`<div class="fxben">${shArt(art, 44)}<div><b>${area}</b>${tag(st)}<p class="you">${you}</p>${res.map(r => `<p class="res">${r}</p>`).join('')}${lk || ''}</div></div>`); };
+  const row = (art, area, st, you, res, lk) => { tops.push([area, st]); rows.push(`<div class="fxben">${idl(shArt(art, 44))}<div><b>${area}</b>${tag(st)}<p class="you">${you}</p>${res.map(r => `<p class="res">${r}</p>`).join('')}${lk || ''}</div></div>`); };
   // gut: plants, colours and something fermented
   const pl = fxNowAvg(M('plants')), plE = fxAvg(M('plants'), 13, 26), fe = fxNowAvg(M('ferm'));
   if (pl !== null || fe !== null) {
@@ -10309,13 +10395,190 @@ Object.assign(ACT, {
 // pasting (or typing) a code reads it straight away
 document.addEventListener('input', e => { if (e.target.id === 'pc-in' && SH && SH.type === 'xadd') pcApply(e.target.value); });
 
+/* ───────────── this week's focus, as a slideshow from the Week tab ─────────────
+   For each focus: where you stand on your own numbers, how this week is going, then what holding it does for you in the
+   short and the long run. Research lines are the checked ones from focus.js; anything about you comes from your own logs. */
+let FS = null;
+function fsBlock(st) {
+  const cur = startOf(todayKey()); if (st !== cur) return '';
+  const now = fxNow(cur); if (!now || !now.ids.length) return '';
+  const n = now.ids.length, names = now.ids.map(id => lcFirst(fxName(id, now.from)));
+  return `<button class="fsblk" data-a="fsopen"><span class="fsbt"><span class="eyebrow">This week's focus</span><b>${['', 'One thing', 'Two things', 'Three things'][n]}, and why</b><small>${esc(capFirst(joinAnd(names)))} · tap to go through ${n === 1 ? 'it' : 'them'}</small></span><span class="fstrio">${now.ids.map(id => idl(fxArt(id, 48))).join('')}</span></button>`;
+}
+
+// a weekly line, oldest first, drawn in on arrival: the dashed line is the goal
+function fsLine(pts, goal, lab, fmt, free) {
+  const W = 300, H = 132, L = 8, R = 44, T = 16, B = 22, vs = pts.map(p => p.v), mx = Math.max(...vs, goal || 0), mn = Math.min(...vs), pad = Math.max((mx - mn) * 0.25, mx * 0.01);
+  const hi = free ? mx + pad : mx * 1.12 || 1, lo = free ? mn - pad : 0;
+  const x = i => L + ((W - L - R) * i) / Math.max(1, pts.length - 1), y = v => T + (H - T - B) * (1 - (v - lo) / (hi - lo));
+  const d = pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(p.v).toFixed(1)}`).join(''), n = pts.length - 1;
+  const g = goal ? `<path class="g" d="M${L} ${y(goal).toFixed(1)}H${W - R}"/>` : '';
+  return `<svg class="fsln" viewBox="0 0 ${W} ${H}" role="img" aria-label="Week by week from ${fsMon(pts[0].st)}: ${esc(fmt(pts[0].v))} then, ${esc(fmt(pts[n].v))} lately">${g}<path class="l" d="${d}"/>
+    <circle cx="${x(n).toFixed(1)}" cy="${y(pts[n].v).toFixed(1)}" r="5"/><text class="v" x="${(x(n) + 8).toFixed(1)}" y="${(y(pts[n].v) + (goal && Math.abs(y(pts[n].v) - y(goal)) < 12 ? 14 : 4)).toFixed(1)}">${esc(fmt(pts[n].v))}</text>
+    <text x="${L}" y="${H - 5}">${fsMon(pts[0].st)}</text><text x="${x(n).toFixed(1)}" y="${H - 5}" text-anchor="end">Now</text></svg>${goal ? `<div class="fslg"><i></i>${esc(lab)}</div>` : ''}`;
+}
+// a goal's last six months, smoothed over four weeks so one odd week doesn't drive it
+function fsSeries(m) {
+  const ser = weekSeries(m, 31).slice(0, -1), out = []; // whole weeks only
+  ser.forEach((p, i) => { if (i < 3) return; const w = ser.slice(i - 3, i + 1).map(q => q.v).filter(v => v !== null && v !== undefined); if (w.length >= 2) out.push({ st: p.st, v: w.reduce((a, b) => a + b, 0) / w.length }); });
+  return out.length >= 4 ? out : null;
+}
+// nights after 6+ units against dry ones, from your own logs (the morning's sleep is the night before)
+function fsSleepGap() {
+  const tk = todayKey(), aft = [], dry = [];
+  for (let i = 1; i <= 84; i++) { const k = addDays(tk, -i), s = (S.ck[addDays(k, 1)] || {}).sl; if (!s || !(k in S.alc)) continue; (+S.alc[k] >= 6 ? aft : +S.alc[k] < 1 ? dry : []).push(s); }
+  if (aft.length < 3 || dry.length < 3) return null;
+  const av = a => a.reduce((x, y) => x + y, 0) / a.length, g = av(dry) - av(aft);
+  return g > 0.15 ? { aft: av(aft), dry: av(dry), gap: g, n: aft.length } : null;
+}
+const FS_SHORT = { kcal: 'The prep', alcohol: 'Booze', run: 'Runs', lift: 'Lifting', plants: 'Plants', colours: 'Colours', ferm: 'Fermented', fish: 'Oily fish', protein: 'Protein', fibre: 'Fibre', sodium: 'Salt', sugar: 'Sugar', satfat: 'Sat fat', red: 'Red meat', sleep: 'Sleep' };
+const fsTag = (id, t) => `${FS_SHORT[id] || fxName(id).replace(/ every day$/, '')} · ${t}`;
+const fsSrc = k => FX_SRC[k];
+const fsMon = st => MONS[parse(st).getMonth()];
+
+// where you stand: your own line
+function fsWhere(id) {
+  if (id === 'alcohol') {
+    const T = alcTrend(); if (!T || T.live.length < 4) return null;
+    const v = alcVerdict(T), pts = T.live.slice(-52);
+    return { k: id, tag: fsTag(id, 'where you are'), h: v.t, html: fsLine(pts, ALC.week, `${ALC.week} a week, the guideline`, x => fmtU(alcR(x))),
+      p: `That's your 3-month average, week by week. It stands at ${fmtU(alcR(T.tgt))} units a week now, and that's the number to beat this week.${T.peak.v - T.tgt >= 1 ? ` At its highest, in ${fsMon(T.peak.st)}, it was ${fmtU(alcR(T.peak.v))}.` : ''}` };
+  }
+  if (id === 'kcal') {
+    const w = WT(), pts = [];
+    for (let i = 11; i >= 0; i--) { const k = addDays(todayKey(), -7 * i), a = wAvg(k); if (a && a.n >= 3) pts.push({ st: startOf(k), v: toU(a.v) }); }
+    if (pts.length < 4) return null;
+    const d = pts[pts.length - 1].v - pts[0].v, u = w.unit, f = x => `${x.toFixed(1)} ${u}`;
+    const h = Math.abs(d) < 0.3 ? `Steady at ${f(pts[pts.length - 1].v)}` : `${d < 0 ? 'Down' : 'Up'} ${Math.abs(d).toFixed(1)} ${u} since ${fsMon(pts[0].st)}`;
+    return { k: 'weight', tag: fsTag(id, 'where you are'), h, html: fsLine(pts, 0, '', f, true),
+      p: `Your weight, as a 7-day average. The plan is built for ${w.goal === 'lose' ? `losing ${fmtW(w.rate, u === 'lb' ? 1 : 2)} a week` : w.goal === 'gain' ? `gaining ${fmtW(w.rate, u === 'lb' ? 1 : 2)} a week` : 'holding steady'}, and that only happens in weeks that land on budget.` };
+  }
+  const m = METRIC(id); if (!m || !m.fmt) return null;
+  const pts = fsSeries(m); if (!pts) return null;
+  const a = pts[0], b = pts[pts.length - 1], f = v => `${m.fmt(v)}${m.unit ? ` ${m.unit}` : ''}`, rel = Math.abs(b.v - a.v) / Math.max(Math.abs(a.v), 1e-9);
+  const better = m.lo ? b.v < a.v : b.v > a.v, hit = m.goal ? (m.lo ? b.v <= m.goal : b.v >= m.goal) : false;
+  const h = rel < 0.06 ? `Holding at ${m.fmt(b.v)}${m.unit ? ` ${m.unit}` : ''}` : `${better ? 'Better' : 'Slipping'}: ${m.fmt(a.v)} to ${m.fmt(b.v)}${m.unit ? ` ${m.unit}` : ''}`;
+  return { k: id, tag: fsTag(id, 'where you are'), h, html: fsLine(pts, m.goal || 0, m.goal ? `Goal: ${m.goalShort || m.goalTxt}` : '', m.fmt),
+    p: `${capFirst(trName(m))} over the last ${pts.length > 20 ? 'six' : pts.length > 11 ? 'few' : 'couple of'} months, as a 4-week average: ${f(a.v)} in ${fsMon(a.st)}, ${f(b.v)} lately. ${hit ? 'Already on the goal, so this week is about keeping it there.' : m.goal ? `The goal is ${m.goalShort || m.goalTxt}.` : ''}` };
+}
+// this week: the same reading as the card on Today
+function fsNow(id, from) {
+  let l = null; try { l = fxLine(id, todayKey()); } catch (e) { l = null; }
+  if (!l) return null;
+  const head = l.b.replace(/^[^:]+:\s*/, ''), aim = fxAim(id, { st0: from });
+  return { k: id, tag: fsTag(id, 'this week'), st: l.st, h: capFirst(head), p: capFirst(l.sm), aim };
+}
+// what holding it does: the short run and the long run
+function fsWhy(id) {
+  const out = [], push = (when, o) => out.push(Object.assign({ k: id, tag: fsTag(id, when === 's' ? 'the short run' : 'the long run') }, o));
+  const res = k => FX_RES[k];
+  switch (id) {
+    case 'alcohol': {
+      const g = fsSleepGap();
+      push('s', { k: 'sleep', h: 'Better second halves', p: g ? `On your own logs, nights after 6 units or more came to ${fmtHM(g.aft)} of sleep, against ${fmtHM(g.dry)} after dry nights. ${res('ebrahim')}` : res('ebrahim'), src: fsSrc('ebrahim') });
+      const T = alcTrend(), drop = T ? T.peak.v - T.tgt : 0;
+      if (drop >= 1) { const kc = drop * 56; push('l', { big: `${fmtN(kc)}`, bigs: 'kcal a week', h: 'Less, every week', p: `Your average is ${fmtU(alcR(drop))} units a week lower than its high in ${fsMon(T.peak.st)}. From the alcohol alone (8g a unit at 7 kcal a gram) that's about ${fmtN(kc)} kcal a week, roughly ${(kc * 52 / KCAL_KG).toFixed(1)} kg of fat a year, before mixers or the food on a night out. Every week you beat it pulls the average down again.`, src: 'From your own logs' }); }
+      else push('l', { h: 'It compounds', p: 'Each unit is about 56 kcal from the alcohol alone, before mixers or the food on a night out. Every week you finish under your 3-month average pulls the average itself down, so next week\'s number to beat is lower still.', src: 'From your own logs' });
+      break;
+    }
+    case 'run': {
+      const m = METRIC('run'), now = m ? fxNowAvg(m) : null;
+      push('s', { k: 'run', h: 'Better mood, soon', p: `${now !== null ? `You're at ${oneDp(now)} a week lately. ` : ''}${res('singh')}`, src: fsSrc('singh') });
+      push('l', { big: '27%', h: 'lower risk of dying early', p: `${res('pedisic')} Two short ones a week is the whole job.`, src: fsSrc('pedisic') });
+      break;
+    }
+    case 'lift': {
+      push('s', { h: 'Lifting lifts mood', p: res('singh'), src: fsSrc('singh') });
+      const ser = typeof trLiftSeries === 'function' ? trLiftSeries('bench') : [], last = ser[ser.length - 1], base = ser.find(s => s.date >= addDays(todayKey(), -56));
+      const up = last && base && base !== last && last.e1 && base.e1 && last.e1 > base.e1 ? ` Your bench press estimated max is up ${Math.round(last.e1 - base.e1)} kg since ${shortD(base.date)}.` : '';
+      push('l', { k: 'protein', h: 'Keep the muscle', p: `${res('morton')}${up} Every session done keeps the muscle while the fat comes off.`, src: fsSrc('morton') });
+      break;
+    }
+    case 'plants': push('s', { h: 'A more varied gut', p: res('agp'), src: fsSrc('agp') }); push('l', { k: 'colours', h: 'Happier, slowly', p: res('mujcic'), src: fsSrc('mujcic') }); break;
+    case 'colours': push('s', { h: 'Skin that shows it', p: res('whitehead'), src: fsSrc('whitehead') }); push('l', { k: 'plants', h: 'Happier, slowly', p: res('mujcic'), src: fsSrc('mujcic') }); break;
+    case 'ferm': push('s', { big: '10', bigs: 'weeks', h: 'to a calmer gut', p: res('wastyk'), src: fsSrc('wastyk') }); break;
+    case 'fibre': push('l', { big: '15–30%', h: 'lower risk', p: res('reynolds'), src: fsSrc('reynolds') }); break;
+    case 'fish': push('l', { h: 'Omega-3 for the heart', p: res('fish'), src: fsSrc('fish') }); break;
+    case 'sodium': push('s', { h: 'Within a month', p: res('salt'), src: fsSrc('salt') }); break;
+    case 'satfat': push('l', { big: '17%', h: 'fewer heart attacks and strokes', p: res('hooper'), src: fsSrc('hooper') }); break;
+    case 'protein': push('l', { h: 'Enough, not more', p: res('morton'), src: fsSrc('morton') }); break;
+    case 'sleep': {
+      const g = fsSleepGap();
+      if (g) push('s', { h: 'Drinking costs you sleep', p: `On your own logs, nights after 6 units or more came to ${fmtHM(g.aft)}, against ${fmtHM(g.dry)} after dry nights. ${res('ebrahim')}`, src: fsSrc('ebrahim') });
+      push('l', { k: 'colours', h: 'It shows on your skin', p: `${res('oyetakin')} Sleep is also when the body does most of its repair after training.`, src: fsSrc('oyetakin') });
+      break;
+    }
+    case 'kcal': {
+      const w = WT();
+      if (w.goal !== 'maintain' && w.rate > 0) { const u = w.unit, tot = toU(w.rate * 12); push('l', { k: 'weight', big: `${tot.toFixed(u === 'lb' ? 0 : 1)} ${u}`, h: 'in twelve weeks on budget', p: `At the ${fmtW(w.rate, u === 'lb' ? 1 : 2)} a week your plan is built for, twelve weeks on budget is about ${tot.toFixed(u === 'lb' ? 0 : 1)} ${u}. Logging extras when they happen lets the days after soak them up, so one big meal doesn't cost the week.`, src: 'From your own plan' }); }
+      break;
+    }
+    default: if (id === 'h:vitd') push('l', { h: 'Through the winter', p: res('vitd'), src: fsSrc('vitd') });
+  }
+  return out;
+}
+function fsSlides() {
+  const cur = startOf(todayKey()), now = fxNow(cur); if (!now || !now.ids.length) return null;
+  const ids = now.ids, n = ids.length, out = [];
+  out.push({ t: 'intro', k: 'focus', tag: `Week of ${fmtRange(cur)}`, h: `${['', 'One thing', 'Two things', 'Three things'][n]} to lock in`, ids,
+    p: `${capFirst(joinAnd(ids.map(id => lcFirst(fxName(id, now.from)))))}. Here's where ${n === 1 ? 'it stands' : 'each one stands'}, and what holding ${n === 1 ? 'it' : 'them'} for the week does for you, now and later.` });
+  ids.forEach(id => { [fsWhere(id), fsNow(id, now.from), ...fsWhy(id)].filter(Boolean).forEach(s => out.push(Object.assign({ t: 'x', id }, s))); });
+  out.push({ t: 'end', k: 'score', tag: 'Locked in', h: n === 1 ? 'This week, this one' : 'This week, these', ids, from: now.from, auto: now.auto });
+  return out;
+}
+function fsSlide(s) {
+  const pic = s.k ? `<div class="shart ${s.html || s.big ? 'sm' : ''}">${idl(shArt(s.k, 170), 'go')}</div>` : '';
+  if (s.t === 'end') return `<div class="shslide"><div class="eyebrow shgrp">${esc(s.tag)}</div><h2 class="shname big">${esc(s.h)}</h2>
+    <div class="fsaims live">${s.ids.map(id => `<div class="fsaim">${idl(fxArt(id, 44))}<span><b>${esc(fxName(id, s.from))}</b><small>${esc(fxAim(id, { st0: s.from }))}</small></span></div>`).join('')}</div>
+    <p class="shdet">${s.auto ? 'Picked from last week\'s numbers. Lock them in and they stay at the top of Today all week, with how each is going.' : 'They\'re at the top of Today all week, with how each is going.'}</p></div>`;
+  if (s.t === 'intro') return `<div class="shslide"><div class="eyebrow shgrp">${esc(s.tag)}</div><h2 class="shname big">${esc(s.h)}</h2><div class="fstrio big">${s.ids.map(id => idl(fxArt(id, 92), 'go')).join('')}</div><p class="shline">${esc(s.p)}</p></div>`;
+  const stamp = s.st ? `<span class="fsst ${s.st}">${{ ok: 'On track', go: 'Needs a push', up: 'Early days' }[s.st]}</span>` : '';
+  return `<div class="shslide"><div class="eyebrow shgrp">${esc(s.tag)}</div>${pic}${s.big ? `<div class="shfig"><b>${esc(s.big)}</b>${s.bigs ? `<small>${esc(s.bigs)}</small>` : ''}</div>` : ''}<h2 class="shname">${esc(s.h)}</h2>${stamp}
+    ${s.html ? `<div class="fsgraph">${s.html}</div>` : ''}<p class="shline">${esc(s.p)}</p>${s.aim ? `<p class="fsaimln"><b>Aim:</b> ${esc(s.aim)}</p>` : ''}${s.src ? `<p class="shdet fssrc">${esc(s.src)}</p>` : ''}</div>`;
+}
+function fsRender() {
+  let root = $('fs-root'); if (!root) { root = document.createElement('div'); root.id = 'fs-root'; document.body.appendChild(root); }
+  if (!FS) { root.innerHTML = ''; return; }
+  const n = FS.slides.length, i = FS.si = Math.max(0, Math.min(FS.si, n - 1)), s = FS.slides[i], last = i === n - 1;
+  const tone = s.t === 'intro' ? 'focus' : s.t === 'end' ? 'score' : s.st === 'ok' ? 'ok' : s.st === 'go' ? 'mid' : 'intro';
+  root.innerHTML = `<div class="wz rv rvshow fsshow s-${tone}" role="dialog" aria-modal="true" aria-label="This week's focus" ${FS.fresh ? '' : 'style="animation:none"'}>
+    <div class="shtop"><div class="shprog" style="grid-template-columns:repeat(${n},1fr)">${FS.slides.map((_, j) => `<i class="${j < i ? 'done' : j === i ? 'on' : ''}"></i>`).join('')}</div>
+      <div class="shbar"><span class="small">This week's focus · ${i + 1} of ${n}</span><button class="iconbtn" data-a="fsclose" aria-label="Close">${ic('x')}</button></div></div>
+    <div class="shbody ${FS.anim ? (FS.dir > 0 ? 'in-r' : 'in-l') : ''}" id="fs-body" aria-live="polite">${fsSlide(s)}</div>
+    <div class="wz-foot"><button class="btn" data-a="fsback">${i ? 'Back' : 'Close'}</button><button class="btn primary" data-a="fsnext">${last ? (s.auto ? 'Lock them in' : 'Done') : 'Next'}</button></div></div>`;
+  FS.fresh = false; FS.anim = false;
+  document.body.style.overflow = 'hidden';
+  const body = $('fs-body');
+  body.addEventListener('click', e => { if (e.target.closest('button, a, input, .live')) return; const r = body.getBoundingClientRect(); if (e.clientX - r.left < r.width * 0.3) ACT.fsback(); else ACT.fsnext(); });
+  let x0 = null, y0 = null;
+  body.addEventListener('touchstart', e => { const t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
+  body.addEventListener('touchend', e => { if (x0 === null) return; const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0; x0 = null; if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) { e.preventDefault(); if (dx < 0) ACT.fsnext(); else ACT.fsback(); } });
+}
+function fsClose() { if (!FS) return; FS = null; fsRender(); if (!WZ && !PM && !SH && !RV) document.body.style.overflow = ''; syncHistory(); }
+Object.assign(ACT, {
+  fsopen() { TC = null; MCACHE = null; const sl = fsSlides(); if (!sl) return; FS = { slides: sl, si: 0, fresh: true, anim: false, dir: 1 }; fsRender(); syncHistory(); },
+  fsnext() {
+    if (!FS) return;
+    if (FS.si < FS.slides.length - 1) { FS.si++; FS.anim = true; FS.dir = 1; fsRender(); return; }
+    const s = FS.slides[FS.si], cur = startOf(todayKey());
+    if (s.auto) { fxSet(cur, s.ids, s.from); toast('Locked in for the week'); }
+    fsClose(); render();
+  },
+  fsback() { if (!FS) return; if (!FS.si) { fsClose(); return; } FS.si--; FS.anim = true; FS.dir = -1; fsRender(); },
+  fsclose() { fsClose(); }
+});
+document.addEventListener('keydown', e => {
+  if (!FS || SH) return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); ACT.fsnext(); } else if (e.key === 'ArrowLeft') { e.preventDefault(); ACT.fsback(); } else if (e.key === 'Escape') fsClose();
+});
+
 /* ───────────── shell ───────────── */
 const TABS = [['today', 'Today', 'today'], ['week', 'Week', 'week'], ['out', 'Out', 'glass'], ['prep', 'Prep', 'prep'], ['shop', 'Shop', 'shop']];
 function render() {
   lockMode(startOf(todayKey())); if (UI.week !== startOf(todayKey())) lockMode(UI.week);
   TC = null; MCACHE = null; SETC = {}; CARRYC = {}; LOC = {}; FOODC = {}; HAVEC = {}; NSC = {}; TRW = null; applyPacks();
   const wc = weekCalc(startOf(todayKey())), g = setAt(todayKey()).plantGoal, ph = pillHtml(wc, g);
-  $('pill').innerHTML = ph.html; $('pill').setAttribute('aria-label', ph.label); $('pill').setAttribute('aria-pressed', UI.trends);
+  $('pill').innerHTML = ph.html; $('pill').setAttribute('aria-label', ph.label); $('pill').setAttribute('aria-pressed', UI.trends); pillAnim(wc.ptsEat, g);
   $('gear').innerHTML = ic('gear'); $('wandbtn').innerHTML = ic('wand');
   // top level: meals or the daily check-in (kept as 'weight' internally)
   const wm = UI.mode === 'weight', tm = UI.mode === 'train';
@@ -10328,8 +10591,10 @@ function render() {
   $('nav').innerHTML = TABS.map(([v, l, i]) => `<button data-a="tab" data-v="${v}" ${UI.tab === v && !UI.trends ? 'aria-current="page"' : ''}>${ic(i)}<span>${l}</span></button>`).join('');
   const main = $('main');
   main.innerHTML = UI.trends ? vTrends() : wm ? vWeight() : tm ? vTrain() : ({ today: vToday, week: vWeek, out: vOut, prep: vPrep, shop: vShop, recipes: vRecipes }[UI.tab] || vToday)();
-  main.classList.remove('enter');
-  if (UI.anim === 'enter') { void main.offsetWidth; main.classList.add('enter'); }
+  main.classList.remove('enter', 'in-r', 'in-l'); $('nav').classList.remove('justtab'); $('modesw').classList.remove('justtab');
+  if (UI.anim === 'enter' || UI.anim === 'r' || UI.anim === 'l') { void main.offsetWidth; main.classList.add('enter'); if (UI.anim !== 'enter') main.classList.add(`in-${UI.anim}`); }
+  if (UI.navPop) { $(UI.navPop).classList.add('justtab'); UI.navPop = null; }
+  if (UI.dayDir) { if (!UI.trends && UI.mode === 'meals' && UI.tab === 'today') main.querySelectorAll('.fxtoday, .hero, .meals, .extras, .tiles').forEach(el => el.classList.add(`in-${UI.dayDir}`)); UI.dayDir = null; }
   animateIn(document);
   if (UI.pop) { const t = document.querySelector(`.tick[data-s="${UI.pop}"]`); if (t) { t.classList.add('pop'); if (t.getAttribute('aria-checked') === 'true') burst(t); } UI.pop = null; }
   UI.anim = null;
