@@ -1581,15 +1581,31 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 /* 3.16 motion: drawings sit still, then do their own small move every few seconds; screens slide in from the side you picked */
 .idle { display: inline-flex; line-height: 0; }
 .idle > svg { overflow: visible; }
-@keyframes idlehop { 0% { transform: none; } 30% { transform: translateY(-5px) scale(1.04); } 60% { transform: translateY(1px) scale(.99, 1.01); } 100% { transform: none; } }
 @keyframes tapPop { 40% { transform: scale(1.25) rotate(-6deg); } 100% { transform: none; } }
 @keyframes pillBump { 30% { transform: scale(1.12); } 100% { transform: none; } }
 @keyframes tickDraw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
 @keyframes fsdraw { to { stroke-dashoffset: 0; } }
 @media (prefers-reduced-motion: no-preference) {
-  .idle:not(.go) [class*="sha-"], .idle:not(.go) [class*="sha-"] > * { animation: none !important; }
-  .idle.go [class*="sha-"], .idle.go [class*="sha-"] > * { animation-iteration-count: 1 !important; }
-  .idle.go > svg { animation: idlehop .9s cubic-bezier(.3, 1.6, .5, 1); }
+  /* 3.18: still until played; the drawing only lifts a touch, its parts do the moving */
+  .idle:not(.go) [class*="sha-"], .idle:not(.go) [class*="sha-"] > *, .idle:not(.go) .tp, .idle:not(.go) .steam { animation: none !important; }
+  .idle.go > svg { animation: idlelift .7s var(--ease); }
+  .idle .tp, .idle svg .steam { transform-box: fill-box; }
+  .idle.go .tp { transform-origin: 50% 100%; animation: toss .7s calc(var(--i, 0) * 55ms) cubic-bezier(.3, 1.5, .5, 1) both; }
+  .idle.go .steam { animation: steamUp 1.6s ease-out both; }
+  .idle.go .sha-sway { animation: bsway 1.8s ease-in-out; }
+  .idle.go .sha-swim { animation: bswim 1.6s ease-in-out; }
+  .idle.go .sha-bub circle { animation: bbub 1.8s ease-in; } .idle.go .sha-bub circle:nth-child(2) { animation-delay: .25s; } .idle.go .sha-bub circle:nth-child(3) { animation-delay: .5s; }
+  .idle.go .sha-fall rect { animation: bfall 1.4s ease-in; } .idle.go .sha-fall rect:nth-child(2) { animation-delay: .2s; } .idle.go .sha-fall rect:nth-child(3) { animation-delay: .4s; } .idle.go .sha-fall rect:nth-child(4) { animation-delay: .6s; }
+  .idle.go .sha-tw, .idle.go .sha-tw2 { animation: btw 1.2s ease-in-out; } .idle.go .sha-tw2 { animation-delay: .3s; }
+  .idle.go .sha-knife, .idle.go .sha-wob, .idle.go .sha-moon { animation: bwob 1.4s ease-in-out; }
+  .idle.go .sha-flame { animation: bflick .35s ease-in-out 4 alternate; }
+  .idle.go .sha-clink1 { animation: bclink1 1.2s ease-in-out; } .idle.go .sha-clink2 { animation: bclink2 1.2s ease-in-out; }
+  .idle.go .sha-pop2 { animation: shpop2 1.4s ease-out; }
+  .idle.go .sha-dash { animation: bdash .5s linear 3; }
+  .idle.go .sha-step { animation: bstep .45s ease-in-out 3; }
+  .idle.go .sha-zz text { animation: bzz 1.6s ease-in-out; } .idle.go .sha-zz text:nth-child(2) { animation-delay: .25s; } .idle.go .sha-zz text:nth-child(3) { animation-delay: .5s; }
+  .idle.go .sha-needle { animation: bneedle 1.4s ease-in-out; }
+  .idle.go .sha-conf > * { animation: bconf 1.4s ease-in-out; } .idle.go .sha-conf > :nth-child(2n) { animation-delay: .2s; }
   #main.in-r { animation: slideR .32s var(--ease); } #main.in-l { animation: slideL .32s var(--ease); }
   .fxtoday.in-r, .hero.in-r, .meals.in-r, .extras.in-r, .tiles.in-r { animation: slideR .3s var(--ease); }
   .fxtoday.in-l, .hero.in-l, .meals.in-l, .extras.in-l, .tiles.in-l { animation: slideL .3s var(--ease); }
@@ -1599,7 +1615,9 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
   .fsblk:active { transform: scale(.98); }
   .fsblk { transition: transform .15s var(--ease); }
   .fsshow .shart .idle > svg, .fstrio.big .idle > svg { animation: shpop .6s .05s both cubic-bezier(.2, 1.4, .4, 1); }
-  .fsshow .shart .idle.go > svg, .fstrio.big .idle.go > svg { animation: shpop .6s .05s both cubic-bezier(.2, 1.4, .4, 1), idlehop .9s .7s cubic-bezier(.3, 1.6, .5, 1); }
+  .fsshow .shart .idle.go > svg, .fstrio.big .idle.go > svg { animation: shpop .6s .05s both cubic-bezier(.2, 1.4, .4, 1); }
+  .fsmap .fstile { animation: shup .4s both var(--ease); } .fsmap .fstile:nth-child(2) { animation-delay: .06s; } .fsmap .fstile:nth-child(3) { animation-delay: .12s; } .fsmap .fstile:nth-child(4) { animation-delay: .18s; } .fsmap .fstile:nth-child(5) { animation-delay: .24s; } .fsmap .fstile:nth-child(6) { animation-delay: .3s; }
+  .fsyou, .fsmore { animation: shup .45s .45s both var(--ease); }
   .fstrio.big .idle:nth-child(2) > svg { animation-delay: .15s; } .fstrio.big .idle:nth-child(3) > svg { animation-delay: .3s; }
   .fsln path.l { stroke-dasharray: 900; stroke-dashoffset: 900; animation: fsdraw 1.4s .35s var(--ease) forwards; }
   .fsln circle, .fsln text.v { animation: shup .3s 1.6s both var(--ease); }
@@ -1689,6 +1707,47 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 .ngtable th, .ngtable td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .ngtable th { font-size: 11.5px; color: var(--muted); }
 
+/* 3.18 motion keyframes: bigger moves inside the drawings */
+@keyframes idlelift { 40% { transform: translateY(-2px); } 100% { transform: none; } }
+@keyframes toss { 0% { transform: none; } 35% { transform: translateY(-9px) rotate(-14deg); } 65% { transform: translateY(1px) rotate(6deg); } 100% { transform: none; } }
+@keyframes steamUp { 0% { transform: translateY(4px); opacity: 0; } 40% { opacity: .7; } 100% { transform: translateY(-8px); opacity: .45; } }
+@keyframes bsway { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-10deg); } 60% { transform: rotate(8deg); } 85% { transform: rotate(-3deg); } }
+@keyframes bswim { 0%, 100% { transform: none; } 25% { transform: translateX(-7px) rotate(-6deg); } 60% { transform: translateX(7px) rotate(6deg); } }
+@keyframes bbub { 0% { transform: translateY(6px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-26px); opacity: 0; } }
+@keyframes bfall { 0% { transform: translateY(-10px); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(34px); opacity: 0; } }
+@keyframes btw { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.6) rotate(45deg); } }
+@keyframes bwob { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-12deg); } 60% { transform: rotate(10deg); } }
+@keyframes bflick { from { transform: scaleY(.85) skewX(-5deg); } to { transform: scaleY(1.15) skewX(5deg); } }
+@keyframes bclink1 { 0%, 100% { transform: none; } 45% { transform: rotate(16deg); } 60% { transform: rotate(10deg); } }
+@keyframes bclink2 { 0%, 100% { transform: none; } 45% { transform: rotate(-16deg); } 60% { transform: rotate(-10deg); } }
+@keyframes bdash { from { transform: translateX(10px); opacity: .2; } to { transform: translateX(-10px); opacity: 1; } }
+@keyframes bstep { 0%, 100% { transform: none; } 50% { transform: translateY(-9px) rotate(-8deg); } }
+@keyframes bzz { 0%, 100% { transform: none; opacity: .5; } 50% { transform: translateY(-10px); opacity: 1; } }
+@keyframes bneedle { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(-28deg); } 70% { transform: rotate(24deg); } }
+@keyframes bconf { 0%, 100% { transform: none; } 50% { transform: translateY(-10px) rotate(60deg); } }
+
+/* 3.18 the focus slides: a map of what it does for you, then a slide per area */
+.fsshow { --a-looks: #D9762A; --a-body: #C9423A; --a-mind: #7A49A0; --a-fit: #3C7A2C; --a-sleep: #4F7896; --a-nose: #A88A16; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .fsshow { --a-looks: #F0A060; --a-body: #EC7A70; --a-mind: #B48DD4; --a-fit: #8BC870; --a-sleep: #8FB2CC; --a-nose: #E2C65A; } }
+:root[data-theme="dark"] .fsshow { --a-looks: #F0A060; --a-body: #EC7A70; --a-mind: #B48DD4; --a-fit: #8BC870; --a-sleep: #8FB2CC; --a-nose: #E2C65A; }
+.a-looks { --ac: var(--a-looks); } .a-body { --ac: var(--a-body); } .a-mind { --ac: var(--a-mind); } .a-fit { --ac: var(--a-fit); } .a-sleep { --ac: var(--a-sleep); } .a-nose { --ac: var(--a-nose); }
+.fsmap { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; text-align: left; cursor: auto; }
+.fstile { background: var(--surface); border: 0; border-top: 4px solid var(--ac); border-radius: 14px; padding: 9px 10px; display: grid; gap: 3px; align-content: start; text-align: left; font: inherit; color: inherit; cursor: pointer; min-width: 0; }
+.fstile .t { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--ac); }
+.fstile .t svg { width: 18px; height: 18px; flex: none; }
+.fstile b { font-size: 14px; line-height: 1.25; }
+.fstile .w { font-size: 11.5px; font-weight: 700; color: var(--muted); }
+.fstile.none { border-top-color: var(--line); cursor: default; opacity: .75; }
+.fstile.none .t { color: var(--muted); } .fstile.none b { font-weight: 400; color: var(--muted); font-size: 13px; }
+.fsarea { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; padding: 4px 11px 4px 6px; border-radius: 999px; background: var(--surface); color: var(--ac); }
+.fsarea svg { width: 20px; height: 20px; }
+.fsshow .shart.xs { width: min(24vw, 96px); }
+.fsyou { width: 100%; max-width: 380px; text-align: left; background: var(--surface); border-radius: 14px; padding: 9px 12px; font-size: 14.5px; display: grid; gap: 2px; border-left: 4px solid var(--ac, var(--accent)); }
+.fsyou b { font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.fsmore { width: 100%; max-width: 380px; text-align: left; background: color-mix(in srgb, var(--surface) 70%, transparent); border-radius: 14px; padding: 8px 12px; font-size: 14px; cursor: auto; }
+.fsmore summary { cursor: pointer; font-weight: 700; color: var(--accent); }
+.fsmore p { margin: 6px 0 0; }
+
 </style>
 </head>
 <body>
@@ -1714,7 +1773,7 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.17.0';</script>
+<script>window.TP_VERSION = '3.18.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -4609,7 +4668,7 @@ const C = c => `var(--c-${c})`;
 const f1 = n => n.toFixed(1);
 function dots(rnd, cols, x0, y0, x1, y1, n, r0 = 2, r1 = 3.4) {
   let s = '';
-  for (let i = 0; i < n; i++) { const x = x0 + rnd() * (x1 - x0), y = y0 + rnd() * (y1 - y0), r = r0 + rnd() * (r1 - r0); s += `<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(r)}" fill="${C(cols[i % cols.length])}" stroke="var(--ink)" stroke-width="1.1"/>`; }
+  for (let i = 0; i < n; i++) { const x = x0 + rnd() * (x1 - x0), y = y0 + rnd() * (y1 - y0), r = r0 + rnd() * (r1 - r0); s += `<circle class="tp" style="--i:${i % 7}" cx="${f1(x)}" cy="${f1(y)}" r="${f1(r)}" fill="${C(cols[i % cols.length])}" stroke="var(--ink)" stroke-width="1.1"/>`; }
   return s;
 }
 const BOWL = m => `<path d="M12 50H84C84 68 68 81 48 81S12 68 12 50Z" fill="var(--surface)" ${SW}/><path d="M22 62H74" stroke="${C(m)}" stroke-width="5" stroke-linecap="round"/><path d="M38 86H58" fill="none" ${SW}/>`;
@@ -4702,19 +4761,17 @@ function pillAnim(v, g) {
   el.textContent = `${fmtPts(was)}/${g}`; requestAnimationFrame(step);
   burst(pill, 5);
 }
-/* the drawings: still, then one cycle of their own small move every 4.5 to 6.5 seconds, each on its own clock so they
-   never all go at once. Anything wrapped in .idle takes part; reduced motion keeps them still. */
+/* the drawings (3.18): each plays its move once when a screen opens, one after another, then stays still. Tapping a row,
+   on the drawing or the words beside it, plays it again. The drawing barely lifts; its parts do the moving. */
 const idl = (svg, cls) => `<span class="idle ${cls || ''}">${svg}</span>`;
-function idlePlay(el) { el.classList.remove('go'); void el.offsetWidth; el.classList.add('go'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('go'), 2600); }
-setInterval(() => {
-  if (document.hidden || reduced()) return;
-  const now = Date.now();
-  document.querySelectorAll('.idle').forEach(el => {
-    if (el.offsetParent === null) return;
-    if (!el._n) { el._n = now + 800 + Math.random() * 4000; return; }
-    if (now >= el._n) { idlePlay(el); el._n = now + 4500 + Math.random() * 2000; }
-  });
-}, 250);
+function idlePlay(el) { if (reduced()) return; el.classList.remove('go'); void el.offsetWidth; el.classList.add('go'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('go'), 2600); }
+function idleOpen(root) {
+  if (reduced()) return;
+  const els = [...(root || document).querySelectorAll('.idle')].filter(el => el.offsetParent !== null && el.getBoundingClientRect().top < innerHeight + 40);
+  els.slice(0, 14).forEach((el, i) => { clearTimeout(el._o); el._o = setTimeout(() => idlePlay(el), 180 + i * 130); });
+}
+const IDLE_ROWS = '.meal, .fxrow, .fsblk, .wrapcard, .fxben, .nshead, .tprep, .fsaim, .empty, .fstile';
+document.addEventListener('click', e => { const row = e.target.closest && e.target.closest(IDLE_ROWS); if (row) row.querySelectorAll('.idle').forEach(idlePlay); }, true);
 function burst(el, n) {
   if (reduced() || !el) return;
   const r = el.getBoundingClientRect(), fx = $('fx'), cols = ['green', 'yellow', 'red', 'orange', 'purple', 'green'];
@@ -10284,7 +10341,7 @@ function fxCard(k) {
   const tk = todayKey(); if (k !== tk) return '';
   const now = fxNow(startOf(tk)); let nt = null; try { nt = noseTip(tk); } catch (e) { nt = null; }
   if (!now && !nt) return '';
-  const nose = nt ? `<div class="fxrow nose"><span class="fxst nose" aria-hidden="true">${shArt('nose', 24)}</span><span><b>${esc(nt.b)}</b><small>${esc(nt.sm)}</small></span></div>` : '';
+  const nose = nt ? `<div class="fxrow nose"><span class="fxst nose" aria-hidden="true">${idl(shArt('nose', 24))}</span><span><b>${esc(nt.b)}</b><small>${esc(nt.sm)}</small></span></div>` : '';
   const rows = nose + (now ? now.ids : []).map(id => { let l = null; try { l = fxLine(id, k); } catch (e) { l = null; } return l ? `<div class="fxrow"><span class="fxst ${l.st}" aria-hidden="true">${FX_ST[l.st] || ''}</span><span><b>${esc(l.b)}</b><small>${esc(l.sm)}</small></span></div>` : ''; }).join('');
   if (!rows) return '';
   return `<section class="fxtoday" aria-label="${now ? 'This week\'s focus' : 'This morning'}"><div class="wchead"><div class="eyebrow">${now ? 'This week\'s focus' : 'This morning'} · ${DOWL[dayIndex(k)]}</div>${now ? `<button class="link" data-a="fxedit">${now.auto ? 'Pick' : 'Change'}</button>` : ''}</div>${rows}
@@ -10458,8 +10515,8 @@ Object.assign(ACT, {
 document.addEventListener('input', e => { if (e.target.id === 'pc-in' && SH && SH.type === 'xadd') pcApply(e.target.value); });
 
 /* ───────────── this week's focus, as a slideshow from the Week tab ─────────────
-   For each focus: where you stand on your own numbers, how this week is going, then what holding it does for you in the
-   short and the long run. Research lines are the checked ones from focus.js; anything about you comes from your own logs. */
+   For each focus: where you stand on your own numbers, how this week is going, then a map of what holding it does for you
+   (looks and skin, body, mind, fitness, sleep, your nose) and a slide for each area with good evidence. Research lines are the checked ones from focus.js; anything about you comes from your own logs. */
 let FS = null;
 function fsBlock(st) {
   const cur = startOf(todayKey()); if (st !== cur) return '';
@@ -10495,7 +10552,6 @@ function fsSleepGap() {
 }
 const FS_SHORT = { kcal: 'The prep', alcohol: 'Booze', run: 'Runs', lift: 'Lifting', plants: 'Plants', colours: 'Colours', ferm: 'Fermented', fish: 'Oily fish', protein: 'Protein', fibre: 'Fibre', sodium: 'Salt', sugar: 'Sugar', satfat: 'Sat fat', red: 'Red meat', sleep: 'Sleep' };
 const fsTag = (id, t) => `${FS_SHORT[id] || fxName(id).replace(/ every day$/, '')} · ${t}`;
-const fsSrc = k => FX_SRC[k];
 const fsMon = st => MONS[parse(st).getMonth()];
 
 // where you stand: your own line
@@ -10530,54 +10586,132 @@ function fsNow(id, from) {
   const head = l.b.replace(/^[^:]+:\s*/, ''), aim = fxAim(id, { st0: from });
   return { k: id, tag: fsTag(id, 'this week'), st: l.st, h: capFirst(head), p: capFirst(l.sm), aim };
 }
-// what holding it does: the short run and the long run
-function fsWhy(id) {
-  const out = [], push = (when, o) => out.push(Object.assign({ k: id, tag: fsTag(id, when === 's' ? 'the short run' : 'the long run') }, o));
-  const res = k => FX_RES[k];
-  switch (id) {
-    case 'alcohol': {
-      const g = fsSleepGap();
-      push('s', { k: 'sleep', h: 'Better second halves', p: g ? `On your own logs, nights after 6 units or more came to ${fmtHM(g.aft)} of sleep, against ${fmtHM(g.dry)} after dry nights. ${res('ebrahim')}` : res('ebrahim'), src: fsSrc('ebrahim') });
-      const T = alcTrend(), drop = T ? T.peak.v - T.tgt : 0;
-      if (drop >= 1) { const kc = drop * 56; push('l', { big: `${fmtN(kc)}`, bigs: 'kcal a week', h: 'Less, every week', p: `Your average is ${fmtU(alcR(drop))} units a week lower than its high in ${fsMon(T.peak.st)}. From the alcohol alone (8g a unit at 7 kcal a gram) that's about ${fmtN(kc)} kcal a week, roughly ${(kc * 52 / KCAL_KG).toFixed(1)} kg of fat a year, before mixers or the food on a night out. Every week you beat it pulls the average down again.`, src: 'From your own logs' }); }
-      else push('l', { h: 'It compounds', p: 'Each unit is about 56 kcal from the alcohol alone, before mixers or the food on a night out. Every week you finish under your 3-month average pulls the average itself down, so next week\'s number to beat is lower still.', src: 'From your own logs' });
-      break;
-    }
-    case 'run': {
-      const m = METRIC('run'), now = m ? fxNowAvg(m) : null;
-      push('s', { k: 'run', h: 'Better mood, soon', p: `${now !== null ? `You're at ${oneDp(now)} a week lately. ` : ''}${res('singh')}`, src: fsSrc('singh') });
-      push('l', { big: '27%', h: 'lower risk of dying early', p: `${res('pedisic')} Two short ones a week is the whole job.`, src: fsSrc('pedisic') });
-      break;
-    }
-    case 'lift': {
-      push('s', { h: 'Lifting lifts mood', p: res('singh'), src: fsSrc('singh') });
-      const ser = typeof trLiftSeries === 'function' ? trLiftSeries('bench') : [], last = ser[ser.length - 1], base = ser.find(s => s.date >= addDays(todayKey(), -56));
-      const up = last && base && base !== last && last.e1 && base.e1 && last.e1 > base.e1 ? ` Your bench press estimated max is up ${Math.round(last.e1 - base.e1)} kg since ${shortD(base.date)}.` : '';
-      push('l', { k: 'protein', h: 'Keep the muscle', p: `${res('morton')}${up} Every session done keeps the muscle while the fat comes off.`, src: fsSrc('morton') });
-      break;
-    }
-    case 'plants': push('s', { h: 'A more varied gut', p: res('agp'), src: fsSrc('agp') }); push('l', { k: 'colours', h: 'Happier, slowly', p: res('mujcic'), src: fsSrc('mujcic') }); break;
-    case 'colours': push('s', { h: 'Skin that shows it', p: res('whitehead'), src: fsSrc('whitehead') }); push('l', { k: 'plants', h: 'Happier, slowly', p: res('mujcic'), src: fsSrc('mujcic') }); break;
-    case 'ferm': push('s', { big: '10', bigs: 'weeks', h: 'to a calmer gut', p: res('wastyk'), src: fsSrc('wastyk') }); break;
-    case 'fibre': push('l', { big: '15–30%', h: 'lower risk', p: res('reynolds'), src: fsSrc('reynolds') }); break;
-    case 'fish': push('l', { h: 'Omega-3 for the heart', p: res('fish'), src: fsSrc('fish') }); break;
-    case 'sodium': push('s', { h: 'Within a month', p: res('salt'), src: fsSrc('salt') }); break;
-    case 'satfat': push('l', { big: '17%', h: 'fewer heart attacks and strokes', p: res('hooper'), src: fsSrc('hooper') }); break;
-    case 'protein': push('l', { h: 'Enough, not more', p: res('morton'), src: fsSrc('morton') }); break;
-    case 'sleep': {
-      const g = fsSleepGap();
-      if (g) push('s', { h: 'Drinking costs you sleep', p: `On your own logs, nights after 6 units or more came to ${fmtHM(g.aft)}, against ${fmtHM(g.dry)} after dry nights. ${res('ebrahim')}`, src: fsSrc('ebrahim') });
-      push('l', { k: 'colours', h: 'It shows on your skin', p: `${res('oyetakin')} Sleep is also when the body does most of its repair after training.`, src: fsSrc('oyetakin') });
-      break;
-    }
-    case 'kcal': {
-      const w = WT();
-      if (w.goal !== 'maintain' && w.rate > 0) { const u = w.unit, tot = toU(w.rate * 12); push('l', { k: 'weight', big: `${tot.toFixed(u === 'lb' ? 0 : 1)} ${u}`, h: 'in twelve weeks on budget', p: `At the ${fmtW(w.rate, u === 'lb' ? 1 : 2)} a week your plan is built for, twelve weeks on budget is about ${tot.toFixed(u === 'lb' ? 0 : 1)} ${u}. Logging extras when they happen lets the days after soak them up, so one big meal doesn't cost the week.`, src: 'From your own plan' }); }
-      break;
-    }
-    default: if (id === 'h:vitd') push('l', { h: 'Through the winter', p: res('vitd'), src: fsSrc('vitd') });
+/* what it does for you: a map across six areas, then a slide for each area with good evidence. The research is the
+   checked set; "Your numbers" come from your own logs and are left out when there isn't enough to say anything. */
+const FS_AREA = { looks: ['Looks & skin', 'looks'], body: ['Body & health', 'body'], mind: ['Mind & mood', 'mind'], fit: ['Fitness & strength', 'fit'], sleep: ['Sleep', 'sleep'], nose: ['Your nose', 'nose'] };
+const FS_AORD = ['looks', 'body', 'mind', 'fit', 'sleep', 'nose'];
+const FS_AIC = {
+  looks: '<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5c1 1.4 2.2 2 3.5 2s2.5-.6 3.5-2M9 9.5h.01M15 9.5h.01"/>',
+  body: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/><path d="M8 12h2l1-2 2 4 1-2h2"/>',
+  mind: '<path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 3 5 3 3 0 0 0 5 1V5a2 2 0 0 0-3-1z"/><path d="M15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-3 5 3 3 0 0 1-5 1"/>',
+  fit: '<path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10"/>',
+  sleep: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  nose: '<path d="M11 3c0 4-1 7-4 11a2.5 2.5 0 0 0 2 4h3"/><path d="M15 9c2 1 4 1 6 0M15 13c2 1 4 1 6 0"/>'
+};
+const fsAic = a => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${FS_AIC[a]}</svg>`;
+const FS_REF = {
+  goodman: 'Goodman et al. 2019, Dermatologic Surgery', axelsson: 'Axelsson et al. 2010, BMJ', cmo: 'UK Chief Medical Officers, 2016', mehta: 'Mehta et al. 2018, BMJ Open',
+  parr: 'Parr et al. 2014, PLoS ONE', mah: 'Mah et al. 2011, Sleep', nihlen: 'Nihlén et al. 2005, Respiratory Medicine', moynihan: 'Moynihan and Kelly 2014, Journal of Dental Research',
+  temorenga: 'Te Morenga et al. 2013, BMJ', jacka: 'Jacka et al. 2017, BMC Medicine', iarc: 'International Agency for Research on Cancer, 2015', schubert: 'Schubert et al. 2013, JAMA Otolaryngology'
+};
+// your own numbers, as plain sentences
+const fsAvg = id => { const m = METRIC(id); return m ? fxNowAvg(m) : null; };
+const fsWas = id => { const m = METRIC(id); return m ? fxAvg(m, 13, 26) : null; };
+function fsDays(n, f) { const tk = todayKey(); let a = 0, b = 0; for (let i = 1; i <= n; i++) { const v = f(addDays(tk, -i)); if (v === true) a++; else if (v === false) b++; } return { yes: a, of: a + b }; }
+function fsBooze() {
+  const T = alcTrend(), m = METRIC('alcohol'), wk = m ? weekSeries(m, 14).slice(0, -1).map(p => p.v).filter(v => v !== null) : [];
+  const top = wk.slice().sort((a, b) => b - a).filter(v => v >= ALC.week).slice(0, 2);
+  const dry = fsDays(28, k => (k in S.alc ? +S.alc[k] === 0 : null));
+  let lift = 0, heavy = 0; const LD = liftDays().m; for (let i = 1; i <= 28; i++) { const k = addDays(todayKey(), -i); if (+S.alc[k] >= 6) { heavy++; if (LD[k] || S.run[k] === 1) lift++; } }
+  return { T, top, dry, lift, heavy };
+}
+const FS_BEN = {
+  alcohol: { looks: ['Fewer lines, less puffiness', 'Months'], body: ['Lower cancer risk; a dry month shows fast', 'Weeks to years'], fit: ['More muscle from each session', 'Each session'], sleep: ['Better second halves', 'That night'], nose: ['Fewer blocked mornings', 'Next day'] },
+  sugar: { looks: ['Fewer fillings', 'Years'], body: ['Lighter, from the calories', 'Months'] },
+  run: { body: ['A lower risk of dying early', 'Years'], mind: ['Less low mood and anxiety', 'Weeks'], fit: ['Fitter, run by run', 'Weeks'], nose: ['Keeping your sense of smell', 'Years'] },
+  lift: { mind: ['Lifting helps low mood most', 'Weeks'], fit: ['Keep the muscle while you cut', 'Weeks'] },
+  plants: { looks: ['A warmer, healthier skin tone', '6 weeks'], body: ['A more varied gut; a healthier heart', 'Weeks to years'], mind: ['Better mood', 'Weeks to 2 years'] },
+  colours: { looks: ['A warmer, healthier skin tone', '6 weeks'], mind: ['Happier, a portion at a time', 'Up to 2 years'] },
+  ferm: { body: ['A more varied gut, less inflammation', '10 weeks'] },
+  fibre: { body: ['Less heart disease, stroke and diabetes', 'Years'] },
+  fish: { body: ['Omega-3 for the heart', 'Years'] },
+  sodium: { body: ['Lower blood pressure', 'A month'] },
+  satfat: { body: ['Fewer heart attacks and strokes', 'Years'] },
+  red: { body: ['Less bowel cancer risk', 'Years'] },
+  protein: { fit: ['Muscle kept while the fat comes off', 'Weeks'] },
+  sleep: { looks: ['A healthier-looking face', 'Next day'], fit: ['Faster and more accurate', 'Weeks'] },
+  kcal: { looks: ['A smaller waist', 'Weeks'], body: ['The weight your plan is built for', 'Weeks'] },
+  'h:vitd': { body: ['Vitamin D through the winter', 'Months'] }
+};
+// one area's slide for one focus
+function fsArea(id, a) {
+  const set = setAt(todayKey()), o = { k: id, area: a };
+  const R = (h, p, src, more, you, x) => Object.assign(o, { h, p, src, more, you: you || '' }, x || {});
+  if (id === 'alcohol') {
+    const B = fsBooze(), avg = B.T ? alcR(B.T.tgt) : null;
+    if (a === 'looks') return R('Lines and puffiness', 'In 3,267 women, 8 or more drinks a week went with more forehead and frown lines, puffier under-eyes, loss of volume in the mid-face and more broken veins. Even moderate drinking went with the puffiness and volume loss.', FS_REF.goodman,
+      'Women only, from photos taken at one point in time, so it shows a link rather than proof. Sleep plays in too: strangers rated people\'s faces as less healthy and less attractive after a sleepless night (Axelsson et al. 2010, BMJ).',
+      avg !== null ? `Eight US drinks is about 14 UK units. Your 3-month average is ${fmtU(avg)}${avg < ALC.week ? ', under that' : ', over that'}${B.top.length ? `; your heaviest recent week${B.top.length > 1 ? 's were' : ' was'} ${joinAnd(B.top.map(v => fmtU(Math.round(v))))}` : ''}.` : '', { big: '8+', bigs: 'drinks a week' });
+    if (a === 'body') { const drop = B.T ? B.T.peak.v - B.T.tgt : 0;
+      return R('Less risk, and it shows fast', 'The risk of some cancers starts at any regular drinking and climbs with the amount. The UK guideline is under 14 units a week, spread over three or more days, with several drink-free days.', FS_REF.cmo,
+        'It shows within weeks too: people who gave up for a month saw insulin resistance fall by about a quarter, blood pressure by 6% and weight by 1.5%, while those who kept drinking saw no change. They drank about 32 units a week to start and chose to stop, so it\'s a link, not proof (Mehta et al. 2018, BMJ Open).',
+        [B.dry.of >= 7 ? `${B.dry.yes} drink-free days in the last ${B.dry.of} logged.` : '', drop >= 1 ? `Your average is ${fmtU(alcR(drop))} units a week below its high in ${fsMon(B.T.peak.st)}: about ${fmtN(drop * 56)} kcal a week from the alcohol alone.` : ''].filter(Boolean).join(' ')); }
+    if (a === 'fit') return R('After a session', 'Drinking heavily after training cut the muscle built from that session by 24% even with a protein shake, and by 37% without one.', FS_REF.parr,
+      'Eight men, about 12 standard drinks (around 15 UK units) after weights and cycling. That\'s a big night; smaller amounts haven\'t been measured the same way.',
+      B.heavy ? `${B.lift} of your ${B.heavy} nights of 6+ units in the last four weeks came on a training day.${B.lift ? ' Moving them to a rest day keeps the session\'s work.' : ''}` : '', { big: '24%', bigs: 'less muscle built' });
+    if (a === 'sleep') { const g = fsSleepGap();
+      return R('Better second halves', FX_RES.ebrahim, FX_SRC.ebrahim, 'Sleep feeds back into training: when basketball players stretched their sleep for several weeks, they sprinted faster and shot about 9% better (Mah et al. 2011, Sleep).',
+        g ? `Nights after 6+ units: ${fmtHM(g.aft)} on average. After dry nights: ${fmtHM(g.dry)}.` : ''); }
+    if (a === 'nose') { const st = typeof noseStats === 'function' ? noseStats() : { f: [] }, a6 = st.f.find(f => f.id === 'alc6'), wn = st.f.find(f => f.id === 'wine');
+      return R('Fewer rough mornings', 'Red wine is the drink most often behind alcohol-triggered blocked noses, then white.', FS_REF.nihlen, 'In that study about 3 in 100 people had nose symptoms from alcohol, mostly blockage. Your own Trends show whether you\'re one.',
+        a6 ? `Your mornings after 6+ units: ${a6.a.toFixed(1)} out of 5, against ${a6.b.toFixed(1)} otherwise.${wn ? ` After wine: ${wn.a.toFixed(1)}.` : ''}` : ''); }
   }
-  return out;
+  if (id === 'sugar') {
+    const now = fsAvg('sugar'), was = fsWas('sugar'), d = fsDays(28, k => { const v = foodVal('sugar', k); return v === null || v === undefined ? null : v <= set.fsMax; });
+    if (a === 'looks') return R('Your teeth', 'Tooth decay was consistently higher when added sugar was above about 10% of calories, and lower below it. Your limit is about 5%, which may cut it further.', FS_REF.moynihan,
+      'From 55 studies, mostly in children and with no trials, so the evidence is rated moderate. The 5% is the authors\' cautious reading; the UK\'s 30g limit sits at about the same.',
+      now !== null ? `${fmtFS(now)} a day over the last month${d.of ? `, under your ${set.fsMax}g on ${d.yes} of ${d.of} days` : ''}.` : '');
+    if (a === 'body') return R('lighter, on average', 'In trials where people cut down sugar without being told to eat less overall, they lost about 0.8 kg. When people ate more sugar, they gained about the same.', FS_REF.temorenga,
+      'From 30 trials. Where sugar was swapped for other carbs at the same calories, weight didn\'t change, so it\'s the calories that come with sugar, not sugar itself.',
+      now !== null && was !== null && was - now >= 2 ? `Down from ${fmtFS(was)} to ${fmtFS(now)} a day since ${fsMon(addDays(todayKey(), -182))}: about ${fmtN((was - now) * 4)} kcal a day, roughly ${((was - now) * 4 * 365 / KCAL_KG).toFixed(1)} kg a year if nothing else changes.` : now !== null ? `${fmtFS(now)} a day lately: every 10g less is about 40 kcal a day.` : '', { big: '0.8', bigs: 'kg' });
+  }
+  if (id === 'run') {
+    const now = fsAvg('run'), was = fsWas('run'), you = now !== null ? `${oneDp(now)} runs a week lately${was !== null && Math.abs(now - was) >= 0.3 ? `, ${now > was ? 'up' : 'down'} from ${oneDp(was)} three to six months ago` : ''}.` : '';
+    if (a === 'body') return R('lower risk of dying early', `${FX_RES.pedisic} Two short ones a week is the whole job.`, FX_SRC.pedisic, 'Pooled from studies of over 230,000 people followed for years. It shows a link; people who run may differ in other ways too.', you, { big: '27%' });
+    if (a === 'mind') return R('Better mood, soon', FX_RES.singh, FX_SRC.singh, 'Exercise improved depression and anxiety about one and a half times as much as talking therapy or medication in these reviews, across all kinds of people.', you);
+    if (a === 'fit') return now !== null ? R('Fitter, run by run', 'Two a week is the goal, and short ones count. Every run you do builds on the last.', 'From your own logs', 'Your runs come from the morning check-in, so a run only counts once it\'s logged there.', you) : null;
+    if (a === 'nose') return R('Keeping your sense of smell', 'In 1,611 people over 50 followed for ten years, those who exercised hard enough to sweat at least weekly were about a quarter less likely to lose their sense of smell.', FS_REF.schubert, 'Older adults, and a link rather than proof. Men were more likely to lose it than women.', you);
+  }
+  if (id === 'lift') {
+    const now = fsAvg('lift'), ser = typeof trLiftSeries === 'function' ? trLiftSeries('bench') : [], last = ser[ser.length - 1], base = ser.find(x => x.date >= addDays(todayKey(), -56));
+    const bench = last && base && base !== last && last.e1 && base.e1 ? `Bench press estimated max ${last.e1 >= base.e1 ? 'up' : 'down'} ${Math.abs(Math.round(last.e1 - base.e1))} kg since ${shortD(base.date)}.` : '';
+    if (a === 'mind') return R('Lifting lifts mood', FX_RES.singh, FX_SRC.singh, 'Of all the kinds of exercise in these reviews, resistance training did the most for depression.', now !== null ? `${oneDp(now)} sessions a week lately.` : '');
+    if (a === 'fit') return R('Keep the muscle', `${FX_RES.morton} Every session done keeps the muscle while the fat comes off.`, FX_SRC.morton, 'Pooled from 49 trials. The protein matters most alongside the training, not instead of it.', bench);
+  }
+  if (id === 'plants' || id === 'colours') {
+    const pl = fsAvg('plants'), co = fsAvg('colours');
+    const you = [pl !== null ? `${fmtPts(Math.round(pl))} plant points a week lately.` : '', co !== null ? `${oneDp(co)} of ${set.colourGoal} colour groups a week.` : ''].filter(Boolean).join(' ');
+    if (a === 'looks') return R('Skin that shows it', FX_RES.whitehead, FX_SRC.whitehead, 'A small study of 35 people. The colour comes from carotenoids, the pigments in orange, red and green veg, building up in the skin.', you);
+    if (a === 'body') return R('A more varied gut', `${FX_RES.agp} And the people eating the most fibre had a 15 to 30% lower risk of heart disease, stroke, type 2 diabetes and early death.`, `${FX_SRC.agp} · ${FX_SRC.reynolds}`, 'The gut finding comes from comparing thousands of people rather than a trial; the fibre one pools long-term studies and trials.', you);
+    if (a === 'mind' && id === 'plants') return R('recovered', 'In a 12-week trial, people with depression who moved to a diet of veg, fruit, beans, wholegrains, fish and olive oil recovered far more often (32%) than those given social support instead (8%).', FS_REF.jacka,
+      `A small trial: 67 people, 56 finished. Separately: ${FX_RES.mujcic.charAt(0).toLowerCase() + FX_RES.mujcic.slice(1)} (Mujcic and Oswald 2016)`, you, { big: '32%', bigs: 'vs 8%' });
+    if (a === 'mind') return R('Happier, a portion at a time', FX_RES.mujcic, FX_SRC.mujcic, 'A link from following people over time, not a trial. The trial evidence for diet and mood is the SMILES trial (Jacka et al. 2017).', you);
+  }
+  const one = (k, h, more, big, bigs) => { const m = METRIC(k), v = m ? fxNowAvg(m) : null; return R(h, FX_RES[k === 'red' ? '' : k] || '', FX_SRC[k] || '', more, v !== null && m ? `${capFirst(trName(m))}: ${m.fmt(v)} ${m.unit || ''} lately${m.goal ? `, against ${m.goalShort || m.goalTxt}` : ''}.` : '', big ? { big, bigs } : null); };
+  if (id === 'ferm' && a === 'body') return Object.assign(one('ferm', 'to a calmer gut', 'Thirty-six adults; the high-fibre group in the same trial didn\'t see the same fall in inflammation.', '10', 'weeks'), { p: FX_RES.wastyk, src: FX_SRC.wastyk });
+  if (id === 'fibre' && a === 'body') return Object.assign(one('fibre', 'lower risk', 'Pooled from 185 long-term studies and 58 trials. Most of the benefit came at 25 to 29g a day; more may help further.', '15–30%'), { p: FX_RES.reynolds, src: FX_SRC.reynolds });
+  if (id === 'fish' && a === 'body') return Object.assign(one('fish', 'Omega-3 for the heart', 'Oily fish is the main source of the long-chain omega-3 fats; plant sources like flax and walnuts give a different kind the body converts poorly.'), { p: FX_RES.fish, src: FX_SRC.fish });
+  if (id === 'sodium' && a === 'body') return Object.assign(one('sodium', 'Within a month', 'Pooled trials lasting four weeks or more. The bigger the cut, the bigger the fall.'), { p: FX_RES.salt, src: FX_SRC.salt });
+  if (id === 'satfat' && a === 'body') return Object.assign(one('satfat', 'fewer heart attacks and strokes', 'From trials lasting two years or more. The benefit was clearest where it was swapped for polyunsaturated fats: nuts, seeds, oily fish and vegetable oils.', '17%'), { p: FX_RES.hooper, src: FX_SRC.hooper });
+  if (id === 'red' && a === 'body') return Object.assign(one('red', 'for each 50g a day', 'That\'s a rise in relative risk. Red meat is a probable cause; processed meat (bacon, ham, salami) is a definite one, so it\'s the one to cut first.', '18%'), { p: 'Each 50g of processed meat eaten every day raises the risk of bowel cancer by 18%. Red meat is a probable cause too.', src: FS_REF.iarc });
+  if (id === 'protein' && a === 'fit') return Object.assign(one('protein', 'Enough, not more', 'Pooled from 49 trials of people lifting. Spread it across the day rather than one big meal.'), { p: FX_RES.morton, src: FX_SRC.morton });
+  if (id === 'sleep') { const now = fsAvg('sleep'), you = now !== null ? `${now.toFixed(1)} hours a night lately, against your goal of ${set.sleepGoal}.` : '';
+    if (a === 'looks') return R('Rested faces', 'Strangers rated people\'s faces as less healthy, less attractive and more tired after a sleepless night than after a normal one.', FS_REF.axelsson, `23 people, one night without sleep. Over longer stretches: ${FX_RES.oyetakin.charAt(0).toLowerCase() + FX_RES.oyetakin.slice(1)}`, you);
+    if (a === 'fit') return R('faster and more accurate', 'When basketball players stretched their sleep for several weeks, they sprinted faster and shot about 9% better, and felt less tired.', FS_REF.mah, 'Eleven college players aiming for 10 hours a night. A small study.', you, { big: '9%' }); }
+  if (id === 'kcal') { const w = WT(), u = w.unit, wt = waistTrend(), sl = wSlope(todayKey(), 28);
+    if (a === 'looks') return wt && wt.wks ? R('A smaller waist', `Your waist is ${Math.abs(wt.d) < 0.01 ? 'unchanged' : `${wt.d < 0 ? 'down' : 'up'} ${+Math.abs(wt.d).toFixed(2)} in`} over ${wt.wks} week${wt.wks > 1 ? 's' : ''}. Weeks on budget are where it moves.`, 'From your own logs', 'The scale swings with water and food from day to day; your waist moves more slowly and steadily.', '') : null;
+    if (a === 'body') return w.goal !== 'maintain' && w.rate > 0 ? R(`in twelve weeks on budget`, `At the ${fmtW(w.rate, u === 'lb' ? 1 : 2)} a week your plan is built for, twelve weeks on budget is about ${toU(w.rate * 12).toFixed(u === 'lb' ? 0 : 1)} ${u}. Logging extras when they happen lets the days after soak them up, so one big meal doesn't cost the week.`, 'From your own plan', 'Weight swings day to day with water and food; the 7-day average on the Check-in page is the one to watch.', sl !== null ? `Your 4-week trend: ${fmtDW(sl * 7)} a week.` : '', { big: `${toU(w.rate * 12).toFixed(u === 'lb' ? 0 : 1)} ${u}` }) : null; }
+  if (id === 'h:vitd' && a === 'body') return R('Through the winter', FX_RES.vitd, FX_SRC.vitd, 'It\'s hard to get enough from food alone; oily fish and eggs give a little.', '');
+  return null;
+}
+const FS_WHAT = { alcohol: 'less booze', sugar: 'less sugar', run: 'running', lift: 'lifting', plants: 'more plants', colours: 'more colour', ferm: 'fermented food', fibre: 'more fibre', fish: 'oily fish', sodium: 'less salt', satfat: 'less sat fat', red: 'less red meat', protein: 'enough protein', sleep: 'more sleep', kcal: 'sticking to the prep', 'h:vitd': 'vitamin D' };
+function fsWhy(id) {
+  const map = FS_BEN[id]; if (!map) return [];
+  const areas = FS_AORD.map(a => (map[a] ? fsArea(id, a) : null)).filter(Boolean);
+  if (!areas.length) return [];
+  const tag = FS_SHORT[id] || fxName(id);
+  return [{ t: 'map', k: id, id, tag: fsTag(id, 'what it does for you'), h: `What ${FS_WHAT[id] || lcFirst(fxName(id))} does for you`, map, has: areas.map(x => x.area) },
+    ...areas.map(x => Object.assign(x, { t: 'area', tag: `${tag} · ${FS_AREA[x.area][0]}`, k: id === 'kcal' ? 'weight' : { fit: 'lift', sleep: 'sleep', nose: 'nose' }[x.area] || FX_ICON[id] || 'check' }))];
 }
 function fsSlides() {
   const cur = startOf(todayKey()), now = fxNow(cur); if (!now || !now.ids.length) return null;
@@ -10594,6 +10728,18 @@ function fsSlide(s) {
     <div class="fsaims live">${s.ids.map(id => `<div class="fsaim">${idl(fxArt(id, 44))}<span><b>${esc(fxName(id, s.from))}</b><small>${esc(fxAim(id, { st0: s.from }))}</small></span></div>`).join('')}</div>
     <p class="shdet">${s.auto ? 'Picked from last week\'s numbers. Lock them in and they stay at the top of Today all week, with how each is going.' : 'They\'re at the top of Today all week, with how each is going.'}</p></div>`;
   if (s.t === 'intro') return `<div class="shslide"><div class="eyebrow shgrp">${esc(s.tag)}</div><h2 class="shname big">${esc(s.h)}</h2><div class="fstrio big">${s.ids.map(id => idl(fxArt(id, 92), 'go')).join('')}</div><p class="shline">${esc(s.p)}</p></div>`;
+  if (s.t === 'map') {
+    const tiles = FS_AORD.map(a => { const m = s.map[a], [n, c] = FS_AREA[a], has = s.has.includes(a);
+      return has ? `<button class="fstile a-${c}" data-a="fsgo" data-v="${esc(s.id)}|${a}"><span class="t">${fsAic(a)}${n}</span><b>${esc(m[0])}</b><span class="w">${esc(m[1])}</span></button>`
+        : `<div class="fstile none"><span class="t">${fsAic(a)}${n}</span><b>No good evidence yet</b></div>`; }).join('');
+    return `<div class="shslide"><div class="eyebrow shgrp">${esc(s.tag)}</div><div class="shart sm">${idl(shArt(FX_ICON[s.id] || 'check', 170), 'go')}</div><h2 class="shname">${esc(s.h)}</h2><div class="fsmap live">${tiles}</div><p class="shdet">Tap an area, or Next to go through them.</p></div>`;
+  }
+  if (s.t === 'area') {
+    const [n, c] = FS_AREA[s.area];
+    return `<div class="shslide"><span class="fsarea a-${c}">${fsAic(s.area)}${n}</span><div class="shart ${s.big ? 'xs' : 'sm'}">${idl(shArt(s.k, 170), 'go')}</div>${s.big ? `<div class="shfig"><b>${esc(s.big)}</b>${s.bigs ? `<small>${esc(s.bigs)}</small>` : ''}</div>` : ''}<h2 class="shname">${esc(s.h)}</h2>
+      <p class="shline">${esc(s.p)}</p>${s.you ? `<div class="fsyou a-${c}"><b>Your numbers</b><span>${esc(s.you)}</span></div>` : ''}${s.src ? `<p class="shdet fssrc">${esc(s.src)}</p>` : ''}
+      ${s.more ? `<details class="fsmore live"><summary>More detail</summary><p>${esc(s.more)}</p></details>` : ''}</div>`;
+  }
   const stamp = s.st ? `<span class="fsst ${s.st}">${{ ok: 'On track', go: 'Needs a push', up: 'Early days' }[s.st]}</span>` : '';
   return `<div class="shslide"><div class="eyebrow shgrp">${esc(s.tag)}</div>${pic}${s.big ? `<div class="shfig"><b>${esc(s.big)}</b>${s.bigs ? `<small>${esc(s.bigs)}</small>` : ''}</div>` : ''}<h2 class="shname">${esc(s.h)}</h2>${stamp}
     ${s.html ? `<div class="fsgraph">${s.html}</div>` : ''}<p class="shline">${esc(s.p)}</p>${s.aim ? `<p class="fsaimln"><b>Aim:</b> ${esc(s.aim)}</p>` : ''}${s.src ? `<p class="shdet fssrc">${esc(s.src)}</p>` : ''}</div>`;
@@ -10602,7 +10748,7 @@ function fsRender() {
   let root = $('fs-root'); if (!root) { root = document.createElement('div'); root.id = 'fs-root'; document.body.appendChild(root); }
   if (!FS) { root.innerHTML = ''; return; }
   const n = FS.slides.length, i = FS.si = Math.max(0, Math.min(FS.si, n - 1)), s = FS.slides[i], last = i === n - 1;
-  const tone = s.t === 'intro' ? 'focus' : s.t === 'end' ? 'score' : s.st === 'ok' ? 'ok' : s.st === 'go' ? 'mid' : 'intro';
+  const tone = s.t === 'intro' || s.t === 'map' ? 'focus' : s.t === 'end' ? 'score' : s.st === 'ok' ? 'ok' : s.st === 'go' ? 'mid' : 'intro';
   root.innerHTML = `<div class="wz rv rvshow fsshow s-${tone}" role="dialog" aria-modal="true" aria-label="This week's focus" ${FS.fresh ? '' : 'style="animation:none"'}>
     <div class="shtop"><div class="shprog" style="grid-template-columns:repeat(${n},1fr)">${FS.slides.map((_, j) => `<i class="${j < i ? 'done' : j === i ? 'on' : ''}"></i>`).join('')}</div>
       <div class="shbar"><span class="small">This week's focus · ${i + 1} of ${n}</span><button class="iconbtn" data-a="fsclose" aria-label="Close">${ic('x')}</button></div></div>
@@ -10626,6 +10772,7 @@ Object.assign(ACT, {
     if (s.auto) { fxSet(cur, s.ids, s.from); toast('Locked in for the week'); }
     fsClose(); render();
   },
+  fsgo(d) { if (!FS) return; const [id, a] = String(d.v).split('|'), i = FS.slides.findIndex(x => x.t === 'area' && x.id === id && x.area === a); if (i < 0) return; FS.dir = i > FS.si ? 1 : -1; FS.si = i; FS.anim = true; fsRender(); },
   fsback() { if (!FS) return; if (!FS.si) { fsClose(); return; } FS.si--; FS.anim = true; FS.dir = -1; fsRender(); },
   fsclose() { fsClose(); }
 });
@@ -10982,6 +11129,7 @@ function noseImport() {
 
 /* ───────────── shell ───────────── */
 const TABS = [['today', 'Today', 'today'], ['week', 'Week', 'week'], ['out', 'Out', 'glass'], ['prep', 'Prep', 'prep'], ['shop', 'Shop', 'shop']];
+let RENDERED = false;
 function render() {
   lockMode(startOf(todayKey())); if (UI.week !== startOf(todayKey())) lockMode(UI.week);
   TC = null; MCACHE = null; SETC = {}; CARRYC = {}; LOC = {}; FOODC = {}; HAVEC = {}; NSC = {}; TRW = null; applyPacks();
@@ -10999,6 +11147,7 @@ function render() {
   $('nav').innerHTML = TABS.map(([v, l, i]) => `<button data-a="tab" data-v="${v}" ${UI.tab === v && !UI.trends ? 'aria-current="page"' : ''}>${ic(i)}<span>${l}</span></button>`).join('');
   const main = $('main');
   main.innerHTML = UI.trends ? vTrends() : wm ? vWeight() : tm ? vTrain() : ({ today: vToday, week: vWeek, out: vOut, prep: vPrep, shop: vShop, recipes: vRecipes }[UI.tab] || vToday)();
+  const opening = !!UI.anim || !!UI.dayDir || !RENDERED; RENDERED = true;
   main.classList.remove('enter', 'in-r', 'in-l'); $('nav').classList.remove('justtab'); $('modesw').classList.remove('justtab');
   if (UI.anim === 'enter' || UI.anim === 'r' || UI.anim === 'l') { void main.offsetWidth; main.classList.add('enter'); if (UI.anim !== 'enter') main.classList.add(`in-${UI.anim}`); }
   if (UI.navPop) { $(UI.navPop).classList.add('justtab'); UI.navPop = null; }
@@ -11006,6 +11155,7 @@ function render() {
   animateIn(document);
   if (UI.pop) { const t = document.querySelector(`.tick[data-s="${UI.pop}"]`); if (t) { t.classList.add('pop'); if (t.getAttribute('aria-checked') === 'true') burst(t); } UI.pop = null; }
   UI.anim = null;
+  if (opening) idleOpen(main);
   renderDock();
   if (TV) renderTV();
   if (RV) renderRV();
