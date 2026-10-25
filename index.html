@@ -1796,7 +1796,7 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.19.0';</script>
+<script>window.TP_VERSION = '3.20.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -4992,21 +4992,25 @@ const FOOD = {
   fish: c => SLOTS.filter(s => c.slots[s].kind === 'recipe' && c.slots[s].r.oily).length,
   red: c => SLOTS.filter(s => c.slots[s].kind === 'recipe' && c.slots[s].r.red).length
 };
+// food is counted from the day tracking began (the check-in setting); weeks planned before it weren't followed
+const foodFrom = () => (S.wt && S.wt.from) || '0000';
+let TDC = null, TDN = -1;
+function trackedDays() { if (TDN !== SAVEN || !TDC) { const f = foodFrom(); TDC = {}; Object.keys(S.days).forEach(k => { if (k >= f) TDC[k] = 1; }); TDN = SAVEN; } return TDC; }
 function foodVal(id, k) {
-  const c = dcc(k); if (c && c.hasPlan) return FOOD[id](c);
+  const c = k >= foodFrom() ? dcc(k) : null; if (c && c.hasPlan) return FOOD[id](c);
   const h = S.hist.d[k]; if (!h) return null;
   if (id === 'ferm' && h.fe !== undefined) return h.fe >= 1 ? 1 : 0;
   if (id === 'fish' && h.fish !== undefined) return h.fish;
   return null;
 }
 function weekPlants(st) {
-  const wc = weekCalc(st); if (wc.planned >= 4) return wc.ptsPlan;
+  const wc = weekCalc(st); if (wc.planned >= 4 && addDays(st, 6) >= foodFrom()) return wc.ptsPlan;
   for (let i = 0; i < 7; i++) { const v = S.hist.w[addDays(st, i)]; if (v) return v; }
   return null;
 }
 // colour groups across a week: the plan if 4+ days are planned, otherwise the old tracker
 function weekColours(st) {
-  const wc = weekCalc(st); if (wc.planned >= 4) return wc.cols.size;
+  const wc = weekCalc(st); if (wc.planned >= 4 && addDays(st, 6) >= foodFrom()) return wc.cols.size;
   for (let i = 0; i < 7; i++) { const v = S.hist.wc[addDays(st, i)]; if (v !== undefined) return v; }
   return null;
 }
@@ -5100,18 +5104,18 @@ function ledgerStory() {
 /* the goals. kind 'day' averages day values; 'week' averages whole weeks. agg 'rate' turns a daily mean into a weekly figure */
 function metrics() {
   const tk = todayKey(), set = setAt(tk), cur = startOf(tk), w = WT();
-  const food = (id, n, agg, fmt, goalTxt, light, extra) => Object.assign({ id, n, grp: 'Food', kind: 'day', agg, end: 'week', val: k => foodVal(id, k), first: () => minKey(S.days, id === 'fish' || id === 'ferm' ? S.hist.d : null), fmt, goalTxt, light }, extra || {});
+  const food = (id, n, agg, fmt, goalTxt, light, extra) => Object.assign({ id, n, grp: 'Food', kind: 'day', agg, end: 'week', val: k => foodVal(id, k), first: () => minKey(trackedDays(), id === 'fish' || id === 'ferm' ? S.hist.d : null), fmt, goalTxt, light }, extra || {});
   const missLight = id => () => { const L = weekLedger(id); if (!L) return { st: 'none', txt: 'Nothing planned this week' }; return { st: ledgerSt(L), txt: capFirst(ledgerTxt(L)) }; };
   const wkRate = (m) => { const r = aggWin(m, 'wk'); return r ? r.v : null; };
   const L = [];
-  L.push({ id: 'plants', n: 'Plant points', grp: 'Food', kind: 'week', end: 'week', wval: weekPlants, first: () => minKey(S.days, S.hist.w), fmt: v => fmtPts(Math.round(v * 4) / 4), unit: 'a week', goal: set.plantGoal, goalTxt: `${set.plantGoal} a week`,
+  L.push({ id: 'plants', n: 'Plant points', grp: 'Food', kind: 'week', end: 'week', wval: weekPlants, first: () => minKey(trackedDays(), S.hist.w), fmt: v => fmtPts(Math.round(v * 4) / 4), unit: 'a week', goal: set.plantGoal, goalTxt: `${set.plantGoal} a week`,
     light() { const v = weekPlants(cur); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; return { st: v >= set.plantGoal ? 'ok' : v >= set.plantGoal - 5 ? 'mid' : 'off', txt: `${fmtPts(v)} in this week's plan` }; } });
   L.push(food('fish', 'Oily fish', 'rate', v => oneDp(v), `${set.oilyGoal} a week`, function () { const v = wkRate(this); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; const r = Math.round(v); return { st: r >= set.oilyGoal ? 'ok' : r >= set.oilyGoal - 1 ? 'mid' : 'off', txt: `${r} in this week's plan` }; }, { unit: 'a week', goal: set.oilyGoal }));
   L.push(food('ferm', 'Fermented days', 'rate', v => oneDp(v), 'every day', function () { const v = wkRate(this); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; const r = Math.round(v); return { st: r >= 7 ? 'ok' : r >= 5 ? 'mid' : 'off', txt: `${r} of 7 days in this week's plan` }; }, { unit: 'days a week', goal: 7, cap: 7 }));
   L.push(food('red', 'Red meat', 'rate', v => oneDp(v), `${set.redMax} a week at most`, function () { const v = wkRate(this); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; const r = Math.round(v); return { st: r <= set.redMax ? 'ok' : r <= set.redMax + 1 ? 'mid' : 'off', txt: `${r} in this week's plan` }; }, { unit: 'a week', goal: set.redMax, lo: true }));
   L.push(food('protein', 'Protein', 'avg', v => `${fmtN(v)}g`, `${set.protGoal}g a day`, missLight('protein'), { unit: 'a day', goal: set.protGoal }));
   L.push(food('fibre', 'Fibre', 'avg', v => `${fmtN(v)}g`, `${set.fibreGoal}g a day`, missLight('fibre'), { unit: 'a day', goal: set.fibreGoal }));
-  L.push({ id: 'colours', n: 'Colour groups', grp: 'Food', kind: 'week', end: 'week', wval: weekColours, first: () => minKey(S.days, S.hist.wc), fmt: v => (Number.isInteger(v) ? String(v) : v.toFixed(1)), unit: `of ${set.colourGoal}`, goal: set.colourGoal, cap: set.colourGoal, goalTxt: `all ${set.colourGoal} every week`,
+  L.push({ id: 'colours', n: 'Colour groups', grp: 'Food', kind: 'week', end: 'week', wval: weekColours, first: () => minKey(trackedDays(), S.hist.wc), fmt: v => (Number.isInteger(v) ? String(v) : v.toFixed(1)), unit: `of ${set.colourGoal}`, goal: set.colourGoal, cap: set.colourGoal, goalTxt: `all ${set.colourGoal} every week`,
     light() { const v = weekColours(cur); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; return { st: v >= set.colourGoal ? 'ok' : v >= set.colourGoal - 1 ? 'mid' : 'off', txt: `${v} of ${set.colourGoal} in this week's plan` }; } });
   L.push(food('sodium', 'Sodium', 'avg', v => `${v.toFixed(1)}g`, `under ${set.naMax}g a day`, missLight('sodium'), { unit: 'a day', goal: set.naMax, lo: true }));
   L.push(food('sugar', 'Added sugar', 'avg', v => fmtFS(v), `under ${set.fsMax}g a day`, missLight('sugar'), { unit: 'a day', goal: set.fsMax, lo: true }));
@@ -5719,7 +5723,7 @@ const GAPNAME = { plants: 'Plant points', cols: 'Colour groups', food: 'Food', a
 // where each record starts: nothing before it counts as missing
 function gapFrom() {
   let pf = '9999';
-  Object.keys(S.days).forEach(k => { const d = S.days[k]; if (k < pf && d && SLOTS.some(s => R[d.sl[s]] || d.sl[s] === '@c')) pf = k; });
+  Object.keys(trackedDays()).forEach(k => { const d = S.days[k]; if (k < pf && d && SLOTS.some(s => R[d.sl[s]] || d.sl[s] === '@c')) pf = k; });
   const mn = (...xs) => xs.reduce((a, b) => (b < a ? b : a), '9999');
   return { plants: mn(minKey(S.hist.w), pf), cols: mn(minKey(S.hist.wc), pf), food: mn(minKey(S.hist.d), pf), alc: minKey(S.alc), run: minKey(S.run), ck: minKey(S.ck) };
 }
@@ -5937,7 +5941,7 @@ function ckCard() {
   const when = k === tk ? "Today's check-in" : k === addDays(tk, -1) ? "Yesterday's check-in" : 'Check-in';
   const head = `<div class="ckhead"><div><div class="eyebrow">${when}</div><h3>${fmtDay(k)}</h3></div><label class="ckdate">${ic('week')}<span class="sr-only">Check-in date</span><input id="ck-date" type="date" value="${k}" max="${tk}"></label></div>`;
   if (saved && !UI.ckEdit) {
-    const yk = addDays(k, -1), runP = yk in S.run ? `<span class="ckpill ${S.run[yk] ? 'yes' : 'no'}">${ic(S.run[yk] ? 'check' : 'x')}Cardio or run yesterday</span>` : '';
+    const yk = addDays(k, -1), runP = (yk in S.run ? `<span class="ckpill ${S.run[yk] ? 'yes' : 'no'}">${ic(S.run[yk] ? 'check' : 'x')}Cardio or run yesterday</span>` : '') + (S.run[k] === 1 ? `<span class="ckpill yes">${ic('check')}Cardio or run ${k === todayKey() ? 'today' : `on ${DOW[dayIndex(k)]}`}</span>` : '');
     const chk = runP + items.map(it => { const v = c.c && it.id in c.c ? c.c[it.id] : null; return `<span class="ckpill ${v === 1 ? 'yes' : v === 0 ? 'no' : ''}">${ic(v === 1 ? 'check' : v === 0 ? 'x' : 'dots')}${esc(it.n)}</span>`; }).join('');
     return `<section class="wsum ckcard saved">${head}
       <div class="cksum"><div><b>${w.log[k] ? toU(w.log[k]).toFixed(1) : 'n/a'}</b><span>${w.log[k] ? w.unit : 'no weigh-in'}</span></div><div><b>${c.sl ? +c.sl.toFixed(2) : '–'}</b><span>${c.sl ? 'hours sleep' : 'no sleep logged'}</span></div><div><b>${yk in S.alc ? fmtU(S.alc[yk]) : '–'}</b><span>units yesterday</span></div>${yk in S.wpd ? `<div><b>${+S.wpd[yk]}</b><span>WPD yesterday</span></div>` : ''}${w.waist[k] ? `<div><b>${w.waist[k]}</b><span>in waist</span></div>` : ''}</div>
@@ -5953,7 +5957,7 @@ function ckCard() {
   const checks = items.length ? `<div class="ckf"><div class="cklbl">Checks</div>${items.map(it => { const orig = !!(c.c && c.c[it.id] === 1), on = dr && it.id in dr.c ? dr.c[it.id] === 1 : orig; return `<div class="ckrow"><span id="ckn-${it.id}">${esc(it.n)}</span><button class="switch" role="switch" aria-checked="${on}" aria-labelledby="ckn-${it.id}" data-a="cktog"><span></span></button><input type="hidden" data-ck="${it.id}" data-init="${orig ? 1 : 0}" value="${on ? 1 : 0}"></div>`; }).join('')}</div>` : '';
   const y = addDays(k, -1), night = outOf(S.days[y]);
   const av0 = y in S.alc ? +(+S.alc[y]).toFixed(1) : night ? +drinkU(night).toFixed(1) : '', av = dr && dr.u !== undefined ? dr.u : av0;
-  const ran0 = S.run[y] === 1, ran = dr && dr.run !== undefined ? dr.run : ran0;
+  const ran0 = S.run[y] === 1, ran = dr && dr.run !== undefined ? dr.run : ran0, rt0 = S.run[k] === 1, rt = dr && dr.runt !== undefined ? dr.runt : rt0;
   const wp0 = y in S.wpd ? String(S.wpd[y]) : '', wp = dr && dr.wpd !== undefined ? dr.wpd : wp0;
   const wpdF = ckField('ck-wpd', 'WPD', '', 0.5, wp, '0').replace('id="ck-wpd"', `id="ck-wpd" data-init="${wp0}"`).replace('aria-label="WPD in "', 'aria-label="WPD yesterday"');
   const usual = DR[S.set.usualDrink] || DR.lager, quick = [usual, DR.wine, DR.winel, DR.spiritdiet].filter((x, i, a) => x && a.indexOf(x) === i && x.u > 0).slice(0, 4);
@@ -5961,7 +5965,8 @@ function ckCard() {
     ${ckField('ck-u', 'Alcohol', 'units', 0.5, av, '0').replace('id="ck-u"', `id="ck-u" data-init="${av0}"`)}
     <div class="chips ckq">${quick.map(d => `<button class="chip" data-a="ckaddu" data-v="${d.u}">+ ${esc(d.sh)} <small>${d.u}</small></button>`).join('')}<button class="chip" data-a="ckzero">None</button></div>
     ${wpdF}
-    <div class="ckrow"><span id="ckn-run">Cardio or a run</span><button class="switch" role="switch" aria-checked="${ran}" aria-labelledby="ckn-run" data-a="cktog"><span></span></button><input type="hidden" data-ckrun="1" data-init="${ran0 ? 1 : 0}" value="${ran ? 1 : 0}"></div></div>`;
+    <div class="ckrow"><span id="ckn-run">Cardio or a run yesterday</span><button class="switch" role="switch" aria-checked="${ran}" aria-labelledby="ckn-run" data-a="cktog"><span></span></button><input type="hidden" data-ckrun="1" data-init="${ran0 ? 1 : 0}" value="${ran ? 1 : 0}"></div>
+    <div class="ckrow"><span id="ckn-runt">Cardio or a run ${k === todayKey() ? 'today' : `on ${DOW[dayIndex(k)]}`} <small class="muted">if you've done it</small></span><button class="switch" role="switch" aria-checked="${rt}" aria-labelledby="ckn-runt" data-a="cktog"><span></span></button><input type="hidden" data-ckrunt="1" data-init="${rt0 ? 1 : 0}" value="${rt ? 1 : 0}"></div></div>`;
   const waist = due ? `${ckField('ck-ww', 'Waist', 'in', 0.25, dr && dr.ww !== undefined ? dr.ww : w.waist[k] || '', lastWaist || 32)}<p class="small muted ckhint">${w.waist[k] ? '' : 'Weekly. '}Around the middle at the belly button, relaxed, after breathing out.</p>` : `<button class="btn link ckadd" data-a="ckwaist">${ic('plus')}Add a waist measurement</button>`;
   return `<section class="wsum ckcard">${head}
     ${ckField('ck-w', 'Weight', w.unit, 0.1, wv, lastW ? toU(lastW).toFixed(1) : '', wNa)}
@@ -6047,8 +6052,8 @@ function shWGoal() {
       <div class="field"><label for="wg-unit">Units</label><select id="wg-unit"><option value="lb" ${uu === 'lb' ? 'selected' : ''}>Pounds (lb)</option><option value="kg" ${uu === 'kg' ? 'selected' : ''}>Kilograms (kg)</option></select></div></div>
     <div class="fieldrow"><div class="field"><label for="wg-sleep">Sleep goal (hours)</label><input id="wg-sleep" type="number" inputmode="decimal" step="0.25" value="${kp ? esc(kp.sl) : S.set.sleepGoal}"></div>
       <div class="field"><label for="wg-day">Waist check-in day</label><select id="wg-day">${DOWL.map((d, i) => `<option value="${i}" ${wd === i ? 'selected' : ''}>${d}</option>`).join('')}</select></div></div>
-    <div class="field"><label for="wg-from">Count food for the calorie advice from</label><input id="wg-from" type="date" value="${esc(WT().from || '')}" max="${todayKey()}"></div>
-    <p class="small muted" style="margin:-4px 0 0">The day your meal planning started. Weigh-ins and meals before it are left out of the maintenance estimate.</p>
+    <div class="field"><label for="wg-from">Food tracking started</label><input id="wg-from" type="date" value="${esc(WT().from || '')}" max="${todayKey()}"></div>
+    <p class="small muted" style="margin:-4px 0 0">The day you started following the plan. Meals planned before it don't count in Trends, the wrap-ups or the calorie advice.</p>
     <button class="btn primary" style="width:100%;margin-top:16px" data-a="wgsave">Save</button>`;
 }
 function shCkItems() {
@@ -7882,8 +7887,8 @@ function ckReset() { UI.ckDraft = null; UI.ckSkip = true; }
 function keepCk() {
   if (!$('ck-w') || UI.mode !== 'weight') return;
   const c = {}; document.querySelectorAll('#main [data-ck]').forEach(el => { c[el.dataset.ck] = +el.value ? 1 : 0; });
-  const rn = document.querySelector('#main [data-ckrun]');
-  UI.ckDraft = { k: ckK(), wna: !!($('ck-w-row') && $('ck-w-row').classList.contains('na')), w: $('ck-w').value, sl: $('ck-sl').value, ww: $('ck-ww') ? $('ck-ww').value : undefined, u: $('ck-u') ? $('ck-u').value : undefined, wpd: $('ck-wpd') ? $('ck-wpd').value : undefined, run: rn ? +rn.value === 1 : undefined, c };
+  const rn = document.querySelector('#main [data-ckrun]'), rnt = document.querySelector('#main [data-ckrunt]');
+  UI.ckDraft = { k: ckK(), wna: !!($('ck-w-row') && $('ck-w-row').classList.contains('na')), w: $('ck-w').value, sl: $('ck-sl').value, ww: $('ck-ww') ? $('ck-ww').value : undefined, u: $('ck-u') ? $('ck-u').value : undefined, wpd: $('ck-wpd') ? $('ck-wpd').value : undefined, run: rn ? +rn.value === 1 : undefined, runt: rnt ? +rnt.value === 1 : undefined, c };
 }
 function keepCkNames() { S.ckItems.forEach((it, i) => { const el = $(`cki-${i}`); if (el && el.value.trim()) it.n = el.value.trim().slice(0, 40); }); }
 function addCkItem() {
@@ -8148,6 +8153,8 @@ const ACT = {
     const yk = addDays(k, -1), uEl = $('ck-u'), rn = document.querySelector('#main [data-ckrun]');
     if (!wasSaved || !uEl || uEl.value.trim() !== (uEl.dataset.init || '')) { S.alc[yk] = uv ? Math.round(+uv * 10) / 10 : 0; logDrinks(yk, S.alc[yk]); }
     if (rn && (!wasSaved || rn.value !== rn.dataset.init)) S.run[yk] = +rn.value ? 1 : 0;
+    // today's cardio only when ticked (it may still happen later); unticking one that was ticked records no
+    const rnt = document.querySelector('#main [data-ckrunt]'); if (rnt && rnt.value !== rnt.dataset.init) S.run[k] = +rnt.value ? 1 : 0;
     if (wpEl && wpv !== (wpEl.dataset.init || '')) { if (wpv === '') delete S.wpd[yk]; else S.wpd[yk] = Math.round(+wpv * 2) / 2; }
     save(); UI.ckEdit = false; UI.ckWaist = false; UI.wsel = kg ? k : UI.wsel; ckReset(); render(); window.scrollTo(0, 0);
     toast(k === todayKey() ? 'Checked in for today' : `Saved ${fmtDay(k)}`);
@@ -8309,7 +8316,7 @@ let RV = null;
 const rvPlanned = st => weekDays(st).some(k => { const d = S.days[k]; return !!d && SLOTS.some(s => R[d.sl[s]] || d.sl[s] === '@c'); });
 const rvHasData = st => rvPlanned(st) || weekDays(st).some(k => S.ck[k] || k in S.alc || k in S.run);
 const rvSteps = st => (rvPlanned(st) ? ['meals'] : []).concat(['plants', 'alc', 'run', 'checks', 'sum']);
-const rvFirst = () => { const f = minKey(S.days, S.ck, S.alc, S.run, S.hist.w); return f === '9999' ? addDays(startOf(todayKey()), -7) : startOf(f); };
+const rvFirst = () => { const f = minKey(trackedDays(), S.ck, S.alc, S.run, S.hist.w); return f === '9999' ? addDays(startOf(todayKey()), -7) : startOf(f); };
 const rvHistKey = (map, st) => weekDays(st).find(k => k in map) || st;
 // the week before, on the first day of a new week, until it's been reviewed
 function rvDue() {
@@ -8326,7 +8333,7 @@ function closeReview() {
   UI.day = RV.day0; UI.week = RV.week0; RV = null; $('rv-root').innerHTML = ''; document.body.classList.remove('rvon');
   if (!WZ && !PM && !SH) document.body.style.overflow = '';
   // the check-in's alcohol and cardio for yesterday may have just changed: show the saved values, keep anything else typed
-  keepCk(); if (UI.ckDraft) { delete UI.ckDraft.u; delete UI.ckDraft.run; } UI.ckSkip = true;
+  keepCk(); if (UI.ckDraft) { delete UI.ckDraft.u; delete UI.ckDraft.run; delete UI.ckDraft.runt; } UI.ckSkip = true;
   syncHistory(); render();
 }
 // marks a past day's meals as eaten, at the portions they have now
@@ -9582,7 +9589,7 @@ function wkScore(st) {
   const sum = xs => xs.reduce((a, x) => a + x.v, 0);
 
   // calories: the week's food and drink against the days' own totals
-  const pd = days.map(k => dcc(k)).filter(c => c && c.hasPlan), goal = WT().goal;
+  const pd = days.map(k => (k >= foodFrom() ? dcc(k) : null)).filter(c => c && c.hasPlan), goal = WT().goal;
   if (pd.length >= 4) {
     const budget = pd.reduce((a, c) => a + c.B, 0), eaten = pd.reduce((a, c) => a + c.planK, 0), diff = eaten - budget, p = diff / budget, per = Math.abs(diff) / pd.length;
     const s = goal === 'gain' ? (p >= -0.01 ? 'ok' : p >= -0.05 ? 'mid' : 'off') : goal === 'maintain' ? (Math.abs(p) <= 0.03 ? 'ok' : Math.abs(p) <= 0.07 ? 'mid' : 'off') : (p <= 0.01 ? 'ok' : p <= 0.05 ? 'mid' : 'off');
