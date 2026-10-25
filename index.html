@@ -1747,6 +1747,29 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 .fsmore { width: 100%; max-width: 380px; text-align: left; background: color-mix(in srgb, var(--surface) 70%, transparent); border-radius: 14px; padding: 8px 12px; font-size: 14px; cursor: auto; }
 .fsmore summary { cursor: pointer; font-weight: 700; color: var(--accent); }
 .fsmore p { margin: 6px 0 0; }
+/* 3.19 the nose check sits inside the check-in card, above Save */
+.ckcard .nosecard { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 2px; }
+.ckcard .nosecard .nshead { grid-template-columns: 44px minmax(0, 1fr) auto; }
+.ckcard .nosecard .nshead .cklbl { margin: 0; }
+/* 3.19 are you at the level the research saw the benefit? */
+.lvl { display: grid; gap: 4px; margin: 2px 0; }
+.lvlt { display: grid; gap: 1px; font-size: 13.5px; line-height: 1.35; }
+.lvlt b { font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; }
+.lvl.at .lvlt b { color: var(--leaf); } .lvl.close .lvlt b { color: var(--warn); } .lvl.not .lvlt b { color: var(--c-red); }
+.lvlbar { position: relative; height: 8px; border-radius: 99px; background: var(--surface-2); }
+.lvlbar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 99px; background: var(--leaf); }
+.lvl.close .lvlbar i { background: var(--st-mid, var(--warn)); } .lvl.not .lvlbar i { background: var(--c-red); }
+.lvlbar u { position: absolute; top: -3px; bottom: -3px; width: 3px; margin-left: -1.5px; border-radius: 2px; background: var(--ink); }
+.lvls { display: grid; gap: 8px; margin: 6px 0; padding: 8px 10px; background: var(--surface-2); border-radius: 12px; }
+.lvls .lvlbar { background: var(--surface); }
+.lvsum { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; padding: 0 2px; }
+.lvsum b { font-family: var(--f-display); font-weight: 800; font-size: 26px; line-height: 1; }
+.lvsum span { font-size: 13.5px; color: var(--muted); }
+.lvdots { display: inline-flex; gap: 3px; flex-basis: 100%; }
+.lvdots i { width: 14px; height: 6px; border-radius: 3px; background: var(--c-red); } .lvdots i.at { background: var(--leaf); } .lvdots i.close { background: var(--st-mid, var(--warn)); }
+.fsyou .lvl { margin-bottom: 4px; }
+@media (prefers-reduced-motion: no-preference) { .lvlbar i { animation: grow .8s .3s var(--ease) both; transform-origin: left; } }
+@keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
 </style>
 </head>
@@ -1773,7 +1796,7 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.18.0';</script>
+<script>window.TP_VERSION = '3.19.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -5919,6 +5942,7 @@ function ckCard() {
     return `<section class="wsum ckcard saved">${head}
       <div class="cksum"><div><b>${w.log[k] ? toU(w.log[k]).toFixed(1) : 'n/a'}</b><span>${w.log[k] ? w.unit : 'no weigh-in'}</span></div><div><b>${c.sl ? +c.sl.toFixed(2) : '–'}</b><span>${c.sl ? 'hours sleep' : 'no sleep logged'}</span></div><div><b>${yk in S.alc ? fmtU(S.alc[yk]) : '–'}</b><span>units yesterday</span></div>${yk in S.wpd ? `<div><b>${+S.wpd[yk]}</b><span>WPD yesterday</span></div>` : ''}${w.waist[k] ? `<div><b>${w.waist[k]}</b><span>in waist</span></div>` : ''}</div>
       ${chk ? `<div class="ckpills">${chk}</div>` : ''}
+      ${noseCard(k)}
       <div class="ckdone">${ic('check')}<span>Checked in</span><button class="btn sm" data-a="ckedit">${ic('edit')}Edit</button></div></section>`;
   }
   const lastW = w.log[k] || (lastBefore(w.log, k, v => v > 0) || 0), lastS = c.sl || ((lastBefore(S.ck, k, v => v.sl > 0) || {}).sl) || '';
@@ -5942,7 +5966,7 @@ function ckCard() {
   return `<section class="wsum ckcard">${head}
     ${ckField('ck-w', 'Weight', w.unit, 0.1, wv, lastW ? toU(lastW).toFixed(1) : '', wNa)}
     ${ckField('ck-sl', 'Sleep last night', 'h', 0.25, sv, lastS || S.set.sleepGoal)}
-    ${yest}${checks}${waist}
+    ${yest}${checks}${waist}${noseCard(k)}
     <button class="btn primary ckgo" data-a="cksave">${saved ? 'Save changes' : 'Save check-in'}</button>
     <p class="small muted" style="margin:0">Weigh at the same time each morning, before breakfast. If you didn't weigh, tap No weigh-in today or type 0. Leave sleep empty to skip it; an empty alcohol box saves as none.</p>
     ${saved ? `<div class="btnrow"><button class="btn sm ghost" data-a="ckcancel">Cancel</button><button class="btn sm ghost danger" data-a="ckdelday">Delete this day</button></div>` : ''}</section>`;
@@ -5984,7 +6008,7 @@ function checksCard() {
 }
 function vWeight() {
   const tk = todayKey(), w = WT(), ks = wDays();
-  const card = rvBanner() + ckCard() + noseCard(ckK());
+  const card = rvBanner() + ckCard();
   const all = [...new Set([...ks, ...Object.keys(S.ck), ...Object.keys(w.waist)])].filter(ckSaved).sort().reverse();
   const list = all.length ? `<details class="more aisle"><summary>All check-ins · ${all.length}${ic('chev')}</summary><div class="shoplist" style="margin-top:6px">${all.slice(0, 90).map(k => { const c = S.ck[k] || {}, yes = S.ckItems.filter(it => c.c && c.c[it.id] === 1).length; return `<button class="crow ckline" data-a="ckopen" data-k="${k}"><span class="n">${fmtDay(k)}<span class="h">${[w.log[k] ? fmtW(w.log[k]) : '', c.sl ? fmtH(c.sl) + ' sleep' : '', w.waist[k] ? `${w.waist[k]} in waist` : ''].filter(Boolean).join(' · ') || 'Checks only'}</span></span><span class="wlr">${S.ckItems.length && c.c ? `<b>${yes}/${S.ckItems.length}</b>` : ''}${ic('chev')}</span></button>`; }).join('')}</div></details>` : '';
   if (!ks.length) return `${card}${sleepCard()}${checksCard()}<div class="empty">${art({ type: 'calendar', main: 'green' }, 90)}<p>Check in a few mornings and your weight trend and calorie advice appear here.</p></div>${wGoalCard()}${wWaistCard()}${list}`;
@@ -10157,7 +10181,9 @@ const FX_SRC = {
   salt: 'He, Li and MacGregor 2013, BMJ',
   hooper: 'Hooper et al. 2020, Cochrane review',
   fish: 'NHS and British Heart Foundation advice',
-  vitd: 'NHS advice'
+  vitd: 'NHS advice',
+  knuppel: 'Knüppel et al. 2017, Scientific Reports',
+  noordam: 'Noordam et al. 2013, Age'
 };
 const FX_RES = {
   agp: 'People eating 30 or more different plants a week had more varied gut bacteria than those eating 10 or fewer.',
@@ -10173,7 +10199,9 @@ const FX_RES = {
   salt: 'Cutting salt for a month or more lowered blood pressure, by about 2 points in people with normal blood pressure and 5 in people with high.',
   hooper: 'Eating less saturated fat for two years or more cut the risk of heart attacks and strokes by about 17%.',
   fish: 'Two portions of fish a week, one of them oily, is the advice for the omega-3 the heart needs and other foods can\'t supply.',
-  vitd: 'From October to March the UK sun is too weak for your skin to make vitamin D, so 10 micrograms a day is the advice for everyone.'
+  vitd: 'From October to March the UK sun is too weak for your skin to make vitamin D, so 10 micrograms a day is the advice for everyone.',
+  knuppel: 'In over 5,000 men followed for five years, those eating more than 67g of sugar a day from sweet foods and drinks were 23% more likely to develop anxiety or depression than those eating under 40g.',
+  noordam: 'In 602 people, those with higher blood sugar were judged older from photos of their faces, about five months for each 1 mmol/L.'
 };
 const fxRes = (...ks) => ks.filter(k => FX_RES[k]).map(k => `${FX_RES[k]}<span class="fxsrc">${FX_SRC[k]}</span>`);
 
@@ -10358,6 +10386,36 @@ function shFx() {
     <div class="fxalt">${opts.map(id => `<button class="chip ${ids.includes(id) ? 'on' : ''}" data-a="fxtog" data-v="${esc(id)}" aria-pressed="${ids.includes(id)}">${ms.length ? stDot(stOf(id)) : ''}${esc(fxName(id, prev))}</button>`).join('')}</div>`;
 }
 
+/* are you at the level the research saw the benefit? Your last four weeks (booze: your 3-month average) against it */
+function lvOf(key) {
+  const set = setAt(todayKey()), av = id => { const m = METRIC(id); return m ? fxNowAvg(m) : null; }, wl = WT().log, wk = Object.keys(wl).sort().pop(), kg = wk ? +wl[wk] : null;
+  const L = {
+    plants: () => ({ you: av('plants'), need: 30, close: 25, unit: 'plant points a week', txt: '30 or more plants a week', fmt: v => fmtPts(Math.round(v)) }),
+    colours: () => ({ you: av('colours'), need: set.colourGoal, close: set.colourGoal - 1, unit: `of ${set.colourGoal} colour groups a week`, txt: 'all the colours, every week', fmt: oneDp }),
+    fibre: () => ({ you: av('fibre'), need: 25, close: 20, unit: 'g of fibre a day', txt: '25 to 29g of fibre a day', fmt: v => fmtN(v) }),
+    alcohol: () => { const T = alcTrend(); return { you: T ? T.tgt : av('alcohol'), need: ALC.week, close: ALC.week + 3, lo: true, unit: 'units a week, your 3-month average', txt: `under ${ALC.week} units a week`, fmt: v => fmtU(alcR(v)) }; },
+    sugar: () => ({ you: av('sugar'), need: set.fsMax, close: 40, lo: true, unit: 'g of added sugar a day', txt: `under ${set.fsMax}g of added sugar a day`, fmt: v => fmtN(v) }),
+    sugarmind: () => ({ you: av('sugar'), need: 39.5, close: 67, lo: true, unit: 'g of added sugar a day', txt: 'under 40g of added sugar a day, the lowest group', fmt: v => fmtN(v) }),
+    sodium: () => ({ you: av('sodium'), need: set.naMax, close: set.naMax + 0.4, lo: true, unit: 'g of sodium a day', txt: `under ${set.naMax}g of sodium a day (${(set.naMax * 2.5).toFixed(0)}g of salt)`, fmt: v => v.toFixed(1) }),
+    satfat: () => ({ you: av('satfat'), need: set.sfMax, close: set.sfMax + 5, lo: true, unit: 'g of sat fat a day', txt: `under your ${set.sfMax}g of sat fat a day`, fmt: v => fmtN(v) }),
+    fish: () => ({ you: av('fish'), need: 1, close: 0.5, unit: 'oily fish a week', txt: 'at least one oily fish a week', fmt: oneDp }),
+    red: () => ({ you: av('red'), need: set.redMax, close: set.redMax + 1, lo: true, unit: 'red-meat meals a week', txt: `your limit of ${set.redMax} red-meat meal${set.redMax === 1 ? '' : 's'} a week`, fmt: oneDp }),
+    protein: () => { const p = av('protein'); return kg && p !== null ? { you: p / kg, need: 1.6, close: 1.3, unit: 'g of protein per kg a day', txt: 'about 1.6g of protein per kg a day', fmt: v => v.toFixed(1) } : null; },
+    run: () => ({ you: av('run'), need: 1, close: 0.5, unit: 'runs a week', txt: 'running at all, even once a week', fmt: oneDp }),
+    sleep: () => ({ you: av('sleep'), need: set.sleepGoal, close: set.sleepGoal - 0.5, unit: 'hours a night', txt: `${set.sleepGoal} hours a night, your goal`, fmt: v => v.toFixed(1) })
+  };
+  const o = L[key] ? L[key]() : null; if (!o || o.you === null || o.you === undefined) return null;
+  o.st = o.lo ? (o.you <= o.need ? 'at' : o.you <= o.close ? 'close' : 'not') : (o.you >= o.need ? 'at' : o.you >= o.close ? 'close' : 'not');
+  return o;
+}
+const LV_ST = { at: 'At the level', close: 'Close', not: 'Not yet' };
+function lvHtml(key) {
+  const o = lvOf(key); if (!o) return '';
+  const top = Math.max(o.need, o.you, o.close || 0) * 1.2 || 1, pc = v => `${Math.min(100, Math.max(0, (v / top) * 100)).toFixed(1)}%`;
+  const gap = o.lo ? o.you - o.need : o.need - o.you, more = o.st === 'at' ? '' : ` · ${o.fmt(Math.abs(gap))} ${o.lo ? 'over' : 'short'}`;
+  return `<div class="lvl ${o.st}"><div class="lvlt"><b>${LV_ST[o.st]}</b><span>Seen at ${esc(o.txt)}. You: ${esc(o.fmt(o.you))} ${esc(o.unit)}${more}.</span></div><div class="lvlbar" role="img" aria-label="${esc(o.fmt(o.you))} against ${esc(o.fmt(o.need))}"><i style="width:${pc(o.you)}"></i><u style="left:${pc(o.need)}"></u></div></div>`;
+}
+
 /* Trends: what your habits are doing for you, against what research links them to */
 function fxAvg(m, from, to) { // weeks [from, to) back from this week, e.g. 13..26 = three to six months ago
   const ser = weekSeries(m, to), v = ser.slice(0, to - from).map(p => p.v).filter(x => x !== null);
@@ -10370,13 +10428,15 @@ function fxBenefits() {
   const was = (v, e, f, unit) => (e === null || v === null || Math.abs(v - e) < (unit === 'pts' ? 1 : 0.2) ? '' : `, ${v > e ? 'up' : 'down'} from ${f(e)} three to six months ago`);
   const lock = (ids, txt) => { const hit = ids.find(id => focus.includes(id)); return hit ? `<p class="fxlock"><b>Locking in ${esc(fxName(hit).toLowerCase())}:</b> ${txt}</p>` : ''; };
   const tops = [];
-  const row = (art, area, st, you, res, lk) => { tops.push([area, st]); rows.push(`<div class="fxben">${idl(shArt(art, 44))}<div><b>${area}</b>${tag(st)}<p class="you">${you}</p>${res.map(r => `<p class="res">${r}</p>`).join('')}${lk || ''}</div></div>`); };
+  const lvAll = [];
+  const row = (art, area, st, you, res, lk, lv) => { tops.push([area, st]); const ls = (lv || []).map(k => { const o = lvOf(k); if (o) lvAll.push(o.st); return lvHtml(k); }).join('');
+    rows.push(`<div class="fxben">${idl(shArt(art, 44))}<div><b>${area}</b>${tag(st)}<p class="you">${you}</p>${ls ? `<div class="lvls">${ls}</div>` : ''}${res.map(r => `<p class="res">${r}</p>`).join('')}${lk || ''}</div></div>`); };
   // gut: plants, colours and something fermented
   const pl = fxNowAvg(M('plants')), plE = fxAvg(M('plants'), 13, 26), fe = fxNowAvg(M('ferm'));
   if (pl !== null || fe !== null) {
     const st = pl !== null && pl >= set.plantGoal && (fe === null || fe >= 6) ? 'ok' : pl !== null && pl >= set.plantGoal - 8 ? 'mid' : 'off';
     row('plants', 'Gut', st, `${pl !== null ? `Plants: <b>${fmtPts(Math.round(pl))} points a week</b> lately${was(pl, plE, v => fmtPts(Math.round(v)), 'pts')}.` : ''}${fe !== null ? ` Something fermented ${oneDp(fe)} days a week.` : ''}`,
-      fxRes('agp', 'wastyk'), lock(['plants', 'ferm', 'colours'], 'more of the variety and the fermented foods these studies tie to a healthier gut.'));
+      fxRes('agp', 'wastyk'), lock(['plants', 'ferm', 'colours'], 'more of the variety and the fermented foods these studies tie to a healthier gut.'), ['plants']);
   }
   // heart: fibre, oily fish, salt and saturated fat
   const fi = fxNowAvg(M('fibre')), fs = fxNowAvg(M('fish')), na = fxNowAvg(M('sodium')), sf = fxNowAvg(M('satfat'));
@@ -10384,14 +10444,14 @@ function fxBenefits() {
     const bad = [na !== null && na > set.naMax ? 'salt' : '', sf !== null && sf > set.sfMax ? 'hooper' : '', fs !== null && fs < set.oilyGoal - 0.25 ? 'fish' : ''].filter(Boolean);
     const st = fi >= set.fibreGoal && !bad.length ? 'ok' : fi >= 25 && bad.length <= 1 ? 'mid' : 'off';
     row('fibre', 'Heart', st, `Fibre <b>${fmtN(fi)}g a day</b> over the last month${fs !== null ? `; oily fish ${oneDp(fs)} times a week` : ''}${na !== null ? `; sodium ${na.toFixed(1)}g a day` : ''}${sf !== null ? `; sat fat ${fmtN(sf)}g` : ''}.`,
-      fxRes('reynolds', bad[0] || null), lock(['fibre', 'fish', 'sodium', 'satfat'], 'the habits these studies link to a healthier heart and blood pressure.'));
+      fxRes('reynolds', bad[0] || null), lock(['fibre', 'fish', 'sodium', 'satfat'], 'the habits these studies link to a healthier heart and blood pressure.'), ['fibre', 'fish', 'sodium', 'satfat']);
   }
   // mood and mind: moving, and fruit and veg
   const rn = fxNowAvg(M('run')), rnE = fxAvg(M('run'), 13, 26), lf = fxNowAvg(M('lift'));
   if (rn !== null || lf !== null) {
     const st = (rn || 0) >= 2 || (lf || 0) >= 3 ? ((rn || 0) >= 2 && (lf || 0) >= 2 ? 'ok' : 'mid') : 'off';
     row('run', 'Mood and mind', st, `${rn !== null ? `Runs: <b>${oneDp(rn)} a week</b> lately${was(rn, rnE, oneDp)}.` : ''}${lf !== null ? ` Lifting ${oneDp(lf)} sessions a week.` : ''}`,
-      fxRes('singh', pl !== null && pl >= 25 ? 'mujcic' : null), lock(['run', 'lift'], 'the regular exercise these reviews found eases low mood and anxiety.'));
+      fxRes('singh', pl !== null && pl >= 25 ? 'mujcic' : null, 'knuppel'), lock(['run', 'lift'], 'the regular exercise these reviews found eases low mood and anxiety.'), ['run', 'sugarmind']);
   }
   // sleep: the nights after drinking against the rest, from your own logs
   const sl = fxNowAvg(M('sleep'));
@@ -10401,14 +10461,14 @@ function fxBenefits() {
     const av = a => a.reduce((x, y) => x + y, 0) / a.length, gap = aft.length >= 3 && dry.length >= 3 ? av(dry) - av(aft) : null;
     const st = sl >= set.sleepGoal ? 'ok' : sl >= set.sleepGoal - 0.5 ? 'mid' : 'off';
     row('sleep', 'Sleep', st, `<b>${sl.toFixed(1)} hours</b> a night over the last month.${gap !== null && gap > 0.15 ? ` After nights of 6 units or more you slept ${fmtHM(av(aft))}, against ${fmtHM(av(dry))} after dry nights.` : ''}`,
-      fxRes('ebrahim'), lock(['alcohol', 'sleep'], gap !== null && gap > 0.15 ? `fewer of those shorter nights after drinking: on your own logs they cost about ${fmtHM(gap)}.` : 'fewer of the broken nights that heavier evenings bring.'));
+      fxRes('ebrahim'), lock(['alcohol', 'sleep'], gap !== null && gap > 0.15 ? `fewer of those shorter nights after drinking: on your own logs they cost about ${fmtHM(gap)}.` : 'fewer of the broken nights that heavier evenings bring.'), ['sleep', 'alcohol']);
   }
   // skin: colour, vitamin D and skincare, sleep
   const skinH = habits().filter(h => h.ids.some(x => x === 'skin' || x === 'vitd') || /skin|vitamin d/i.test(h.n)), co = fxNowAvg(M('colours')), hs = skinH.map(h => ({ h, m: M('h:' + h.id) })).filter(x => x.m), hv = hs.map(x => ({ n: x.h.n, v: fxNowAvg(x.m) })).filter(x => x.v !== null);
   if (co !== null || hv.length) {
     const st = co !== null && co >= set.colourGoal - 0.25 && hv.every(x => x.v >= 80) ? 'ok' : co !== null && co >= set.colourGoal - 1 ? 'mid' : 'off';
     row('colours', 'Skin', st, `${co !== null ? `${oneDp(co)} of ${set.colourGoal} colour groups a week.` : ''}${hv.length ? ` ${hv.map(x => `${x.n} ${Math.round(x.v)}% of days`).join('; ')}.` : ''}`,
-      fxRes('whitehead', sl !== null && sl < set.sleepGoal - 0.25 ? 'oyetakin' : null), lock(['colours', 'plants', 'sleep', ...skinH.map(h => 'h:' + h.id)], 'the colour, sleep and daily care that research links to healthier-looking skin.'));
+      fxRes('whitehead', sl !== null && sl < set.sleepGoal - 0.25 ? 'oyetakin' : null, 'noordam'), lock(['colours', 'plants', 'sleep', ...skinH.map(h => 'h:' + h.id)], 'the colour, sleep and daily care that research links to healthier-looking skin.'), ['colours', 'sugar']);
   }
   // strength: protein and lifting
   const pr = fxNowAvg(M('protein')), wl = WT().log, wk = Object.keys(wl).sort().pop(), kg = wk ? +wl[wk] : null;
@@ -10416,12 +10476,14 @@ function fxBenefits() {
     const perKg = kg ? pr / kg : null, ser = typeof trLiftSeries === 'function' ? trLiftSeries('bench') : [], last = ser[ser.length - 1], base = ser.find(s => s.date >= addDays(todayKey(), -56));
     const st = perKg !== null && perKg >= 1.55 && (lf || 0) >= 2 ? 'ok' : perKg !== null && perKg >= 1.3 ? 'mid' : 'off';
     row('lift', 'Strength', st, `Protein <b>${fmtN(pr)}g a day</b>${perKg ? `, ${perKg.toFixed(1)}g per kg` : ''}.${last && base && base !== last && last.e1 && base.e1 ? ` Bench press estimated max ${last.e1 >= base.e1 ? 'up' : 'down'} ${Math.abs(Math.round(last.e1 - base.e1))} kg since ${shortD(base.date)}.` : ''}`,
-      fxRes('morton'), lock(['protein', 'lift'], 'the protein and sessions that keep the muscle while the fat comes off.'));
+      fxRes('morton'), lock(['protein', 'lift'], 'the protein and sessions that keep the muscle while the fat comes off.'), ['protein']);
   }
   if (!rows.length) return '';
   const word = { ok: 'strong', mid: 'good', off: 'room to grow' }, open = !!UI.fxBen;
-  return `<section class="wsum fxbens" id="tr-benefits"><button class="fxbhead" data-a="fxben" aria-expanded="${open}"><span><span class="eyebrow">What it's doing for you</span><small>${esc(capFirst(tops.map(([a, s]) => `${a.toLowerCase()} ${word[s]}`).join(', ')))}</small></span>${ic('chev', false, 'chev')}</button>
-    ${open ? `<p class="small" style="margin:0">Your recent habits against what research links them to. These are likely effects, not promises: studies show averages across lots of people.</p>
+  const nAt = lvAll.filter(x => x === 'at').length, nCl = lvAll.filter(x => x === 'close').length;
+  const lvSum = lvAll.length ? `<div class="lvsum"><b>${nAt} of ${lvAll.length}</b><span>at the level the research saw the benefit${nCl ? `, ${nCl} close` : ''}</span><span class="lvdots">${lvAll.map(x => `<i class="${x}"></i>`).join('')}</span></div>` : '';
+  return `<section class="wsum fxbens" id="tr-benefits"><button class="fxbhead" data-a="fxben" aria-expanded="${open}"><span><span class="eyebrow">What it's doing for you</span><small>${esc(capFirst(tops.map(([a, s]) => `${a.toLowerCase()} ${word[s]}`).join(', ')))}</small></span>${ic('chev', false, 'chev')}</button>${lvSum}
+    ${open ? `<p class="small" style="margin:0">Your last four weeks against the level each study saw its benefit at, then what the research found. These are likely effects, not promises: studies show averages across lots of people.</p>
     <div>${rows.join('')}</div>${focus.length ? '<p class="small muted" style="margin:0">Green notes show what this week\'s focus adds.</p>' : ''}` : ''}</section>`;
 }
 
@@ -10602,7 +10664,8 @@ const fsAic = a => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" s
 const FS_REF = {
   goodman: 'Goodman et al. 2019, Dermatologic Surgery', axelsson: 'Axelsson et al. 2010, BMJ', cmo: 'UK Chief Medical Officers, 2016', mehta: 'Mehta et al. 2018, BMJ Open',
   parr: 'Parr et al. 2014, PLoS ONE', mah: 'Mah et al. 2011, Sleep', nihlen: 'Nihlén et al. 2005, Respiratory Medicine', moynihan: 'Moynihan and Kelly 2014, Journal of Dental Research',
-  temorenga: 'Te Morenga et al. 2013, BMJ', jacka: 'Jacka et al. 2017, BMC Medicine', iarc: 'International Agency for Research on Cancer, 2015', schubert: 'Schubert et al. 2013, JAMA Otolaryngology'
+  temorenga: 'Te Morenga et al. 2013, BMJ', noordam: 'Noordam et al. 2013, Age', smith: 'Smith et al. 2007, American Journal of Clinical Nutrition', knuppel: 'Knüppel et al. 2017, Scientific Reports',
+  spiegel: 'Spiegel et al. 2004, Annals of Internal Medicine', kredlow: 'Kredlow et al. 2015, Journal of Behavioral Medicine', jacka: 'Jacka et al. 2017, BMC Medicine', iarc: 'International Agency for Research on Cancer, 2015', schubert: 'Schubert et al. 2013, JAMA Otolaryngology'
 };
 // your own numbers, as plain sentences
 const fsAvg = id => { const m = METRIC(id); return m ? fxNowAvg(m) : null; };
@@ -10617,9 +10680,9 @@ function fsBooze() {
 }
 const FS_BEN = {
   alcohol: { looks: ['Fewer lines, less puffiness', 'Months'], body: ['Lower cancer risk; a dry month shows fast', 'Weeks to years'], fit: ['More muscle from each session', 'Each session'], sleep: ['Better second halves', 'That night'], nose: ['Fewer blocked mornings', 'Next day'] },
-  sugar: { looks: ['Fewer fillings', 'Years'], body: ['Lighter, from the calories', 'Months'] },
-  run: { body: ['A lower risk of dying early', 'Years'], mind: ['Less low mood and anxiety', 'Weeks'], fit: ['Fitter, run by run', 'Weeks'], nose: ['Keeping your sense of smell', 'Years'] },
-  lift: { mind: ['Lifting helps low mood most', 'Weeks'], fit: ['Keep the muscle while you cut', 'Weeks'] },
+  sugar: { looks: ['Younger-looking skin; fewer fillings', 'Months to years'], body: ['Lighter, from the calories', 'Months'], mind: ['Less risk of low mood', 'Years'] },
+  run: { body: ['A lower risk of dying early', 'Years'], mind: ['Less low mood and anxiety', 'Weeks'], fit: ['Fitter, run by run', 'Weeks'], sleep: ['Better sleep, quicker to drop off', 'Weeks'], nose: ['Keeping your sense of smell', 'Years'] },
+  lift: { mind: ['Lifting helps low mood most', 'Weeks'], fit: ['Keep the muscle while you cut', 'Weeks'], sleep: ['Better sleep, quicker to drop off', 'Weeks'] },
   plants: { looks: ['A warmer, healthier skin tone', '6 weeks'], body: ['A more varied gut; a healthier heart', 'Weeks to years'], mind: ['Better mood', 'Weeks to 2 years'] },
   colours: { looks: ['A warmer, healthier skin tone', '6 weeks'], mind: ['Happier, a portion at a time', 'Up to 2 years'] },
   ferm: { body: ['A more varied gut, less inflammation', '10 weeks'] },
@@ -10629,7 +10692,7 @@ const FS_BEN = {
   satfat: { body: ['Fewer heart attacks and strokes', 'Years'] },
   red: { body: ['Less bowel cancer risk', 'Years'] },
   protein: { fit: ['Muscle kept while the fat comes off', 'Weeks'] },
-  sleep: { looks: ['A healthier-looking face', 'Next day'], fit: ['Faster and more accurate', 'Weeks'] },
+  sleep: { looks: ['A healthier-looking face', 'Next day'], body: ['Less hunger, fewer cravings', 'Days'], fit: ['Faster and more accurate', 'Weeks'] },
   kcal: { looks: ['A smaller waist', 'Weeks'], body: ['The weight your plan is built for', 'Weeks'] },
   'h:vitd': { body: ['Vitamin D through the winter', 'Months'] }
 };
@@ -10658,13 +10721,20 @@ function fsArea(id, a) {
   }
   if (id === 'sugar') {
     const now = fsAvg('sugar'), was = fsWas('sugar'), d = fsDays(28, k => { const v = foodVal('sugar', k); return v === null || v === undefined ? null : v <= set.fsMax; });
-    if (a === 'looks') return R('Your teeth', 'Tooth decay was consistently higher when added sugar was above about 10% of calories, and lower below it. Your limit is about 5%, which may cut it further.', FS_REF.moynihan,
-      'From 55 studies, mostly in children and with no trials, so the evidence is rated moderate. The 5% is the authors\' cautious reading; the UK\'s 30g limit sits at about the same.',
+    if (a === 'looks') return R('Skin and teeth', 'In 602 people, those with higher blood sugar were judged older from photos of their faces: about five months older for each 1 mmol/L of blood sugar, and people with diabetes looked about a year and a half older than the lowest group. Added sugar also drives tooth decay, which was consistently higher when added sugar went over about 10% of calories.', `${FS_REF.noordam} · ${FS_REF.moynihan}`,
+      'The face study measured blood sugar, which added sugar pushes up, and it shows a link rather than proof. Skin: in a 12-week trial in 43 young men, a low-glycaemic-load diet (fewer refined carbs and sugars, more protein) cleared acne more than a normal one, though they lost weight too (Smith et al. 2007). Teeth: from 55 studies, mostly in children; your 30g limit is about 5% of calories, which may cut decay further.',
       now !== null ? `${fmtFS(now)} a day over the last month${d.of ? `, under your ${set.fsMax}g on ${d.yes} of ${d.of} days` : ''}.` : '');
     if (a === 'body') return R('lighter, on average', 'In trials where people cut down sugar without being told to eat less overall, they lost about 0.8 kg. When people ate more sugar, they gained about the same.', FS_REF.temorenga,
       'From 30 trials. Where sugar was swapped for other carbs at the same calories, weight didn\'t change, so it\'s the calories that come with sugar, not sugar itself.',
       now !== null && was !== null && was - now >= 2 ? `Down from ${fmtFS(was)} to ${fmtFS(now)} a day since ${fsMon(addDays(todayKey(), -182))}: about ${fmtN((was - now) * 4)} kcal a day, roughly ${((was - now) * 4 * 365 / KCAL_KG).toFixed(1)} kg a year if nothing else changes.` : now !== null ? `${fmtFS(now)} a day lately: every 10g less is about 40 kcal a day.` : '', { big: '0.8', bigs: 'kg' });
   }
+  if (id === 'sugar' && a === 'mind') { const now = fsAvg('sugar');
+    return R('Less risk of low mood', 'In over 5,000 men followed for five years, those eating more than 67g of sugar a day from sweet foods and drinks were 23% more likely to develop anxiety or depression than those eating under 40g.', FS_REF.knuppel,
+      'The researchers checked it wasn\'t the other way round, with low mood leading to more sugar, and found it wasn\'t. No link was found in women, and it\'s an observational study, so a link rather than proof.',
+      now !== null ? `${fmtFS(now)} a day over the last month.` : '', { big: '23%', bigs: 'more likely' }); }
+  if ((id === 'run' || id === 'lift') && a === 'sleep') { const sl = fsAvg('sleep');
+    return R('Sleep better', 'Across 66 studies, regular exercise gave moderately better sleep quality and helped people drop off a little faster, as well as sleep slightly longer.', FS_REF.kredlow,
+      'The effects were biggest for sleep quality. A single session helped a little; doing it regularly helped more.', sl !== null ? `${sl.toFixed(1)} hours a night over the last month.` : ''); }
   if (id === 'run') {
     const now = fsAvg('run'), was = fsWas('run'), you = now !== null ? `${oneDp(now)} runs a week lately${was !== null && Math.abs(now - was) >= 0.3 ? `, ${now > was ? 'up' : 'down'} from ${oneDp(was)} three to six months ago` : ''}.` : '';
     if (a === 'body') return R('lower risk of dying early', `${FX_RES.pedisic} Two short ones a week is the whole job.`, FX_SRC.pedisic, 'Pooled from studies of over 230,000 people followed for years. It shows a link; people who run may differ in other ways too.', you, { big: '27%' });
@@ -10697,6 +10767,8 @@ function fsArea(id, a) {
   if (id === 'protein' && a === 'fit') return Object.assign(one('protein', 'Enough, not more', 'Pooled from 49 trials of people lifting. Spread it across the day rather than one big meal.'), { p: FX_RES.morton, src: FX_SRC.morton });
   if (id === 'sleep') { const now = fsAvg('sleep'), you = now !== null ? `${now.toFixed(1)} hours a night lately, against your goal of ${set.sleepGoal}.` : '';
     if (a === 'looks') return R('Rested faces', 'Strangers rated people\'s faces as less healthy, less attractive and more tired after a sleepless night than after a normal one.', FS_REF.axelsson, `23 people, one night without sleep. Over longer stretches: ${FX_RES.oyetakin.charAt(0).toLowerCase() + FX_RES.oyetakin.slice(1)}`, you);
+    if (a === 'body') return R('Less hunger', 'After two short nights, young men\'s hunger rose by about a quarter, and their appetite for sweet, starchy, calorie-dense food by a third or more. The hormone that signals fullness fell and the one that drives hunger rose.', FS_REF.spiegel,
+      '12 men, two nights of four hours in bed against two nights of ten. Small and short, but it\'s why a short night makes the prep harder to stick to the next day.', you);
     if (a === 'fit') return R('faster and more accurate', 'When basketball players stretched their sleep for several weeks, they sprinted faster and shot about 9% better, and felt less tired.', FS_REF.mah, 'Eleven college players aiming for 10 hours a night. A small study.', you, { big: '9%' }); }
   if (id === 'kcal') { const w = WT(), u = w.unit, wt = waistTrend(), sl = wSlope(todayKey(), 28);
     if (a === 'looks') return wt && wt.wks ? R('A smaller waist', `Your waist is ${Math.abs(wt.d) < 0.01 ? 'unchanged' : `${wt.d < 0 ? 'down' : 'up'} ${+Math.abs(wt.d).toFixed(2)} in`} over ${wt.wks} week${wt.wks > 1 ? 's' : ''}. Weeks on budget are where it moves.`, 'From your own logs', 'The scale swings with water and food from day to day; your waist moves more slowly and steadily.', '') : null;
@@ -10705,13 +10777,16 @@ function fsArea(id, a) {
   return null;
 }
 const FS_WHAT = { alcohol: 'less booze', sugar: 'less sugar', run: 'running', lift: 'lifting', plants: 'more plants', colours: 'more colour', ferm: 'fermented food', fibre: 'more fibre', fish: 'oily fish', sodium: 'less salt', satfat: 'less sat fat', red: 'less red meat', protein: 'enough protein', sleep: 'more sleep', kcal: 'sticking to the prep', 'h:vitd': 'vitamin D' };
+// which level each area slide measures you against ('' for none)
+const FS_LV = { alcohol: 'alcohol', 'alcohol.fit': '', 'alcohol.sleep': 'sleep', 'alcohol.nose': '', sugar: 'sugar', 'sugar.body': '', 'sugar.mind': 'sugarmind', run: 'run', 'run.mind': '', 'run.fit': '', 'run.sleep': 'sleep', 'lift.fit': 'protein', 'lift.sleep': 'sleep',
+  plants: 'plants', 'plants.looks': 'colours', 'plants.mind': '', colours: 'colours', 'colours.mind': '', fibre: 'fibre', fish: 'fish', sodium: 'sodium', satfat: 'satfat', red: 'red', protein: 'protein', sleep: 'sleep' };
 function fsWhy(id) {
   const map = FS_BEN[id]; if (!map) return [];
   const areas = FS_AORD.map(a => (map[a] ? fsArea(id, a) : null)).filter(Boolean);
   if (!areas.length) return [];
   const tag = FS_SHORT[id] || fxName(id);
   return [{ t: 'map', k: id, id, tag: fsTag(id, 'what it does for you'), h: `What ${FS_WHAT[id] || lcFirst(fxName(id))} does for you`, map, has: areas.map(x => x.area) },
-    ...areas.map(x => Object.assign(x, { t: 'area', tag: `${tag} · ${FS_AREA[x.area][0]}`, k: id === 'kcal' ? 'weight' : { fit: 'lift', sleep: 'sleep', nose: 'nose' }[x.area] || FX_ICON[id] || 'check' }))];
+    ...areas.map(x => Object.assign(x, { t: 'area', lv: FS_LV[`${id}.${x.area}`] !== undefined ? FS_LV[`${id}.${x.area}`] : FS_LV[id] || '', tag: `${tag} · ${FS_AREA[x.area][0]}`, k: id === 'kcal' ? 'weight' : { fit: 'lift', sleep: 'sleep', nose: 'nose' }[x.area] || FX_ICON[id] || 'check' }))];
 }
 function fsSlides() {
   const cur = startOf(todayKey()), now = fxNow(cur); if (!now || !now.ids.length) return null;
@@ -10737,7 +10812,7 @@ function fsSlide(s) {
   if (s.t === 'area') {
     const [n, c] = FS_AREA[s.area];
     return `<div class="shslide"><span class="fsarea a-${c}">${fsAic(s.area)}${n}</span><div class="shart ${s.big ? 'xs' : 'sm'}">${idl(shArt(s.k, 170), 'go')}</div>${s.big ? `<div class="shfig"><b>${esc(s.big)}</b>${s.bigs ? `<small>${esc(s.bigs)}</small>` : ''}</div>` : ''}<h2 class="shname">${esc(s.h)}</h2>
-      <p class="shline">${esc(s.p)}</p>${s.you ? `<div class="fsyou a-${c}"><b>Your numbers</b><span>${esc(s.you)}</span></div>` : ''}${s.src ? `<p class="shdet fssrc">${esc(s.src)}</p>` : ''}
+      <p class="shline">${esc(s.p)}</p>${s.you || (s.lv && lvOf(s.lv)) ? `<div class="fsyou a-${c}"><b>Your numbers</b>${s.lv ? lvHtml(s.lv) : ''}${s.you ? `<span>${esc(s.you)}</span>` : ''}</div>` : ''}${s.src ? `<p class="shdet fssrc">${esc(s.src)}</p>` : ''}
       ${s.more ? `<details class="fsmore live"><summary>More detail</summary><p>${esc(s.more)}</p></details>` : ''}</div>`;
   }
   const stamp = s.st ? `<span class="fsst ${s.st}">${{ ok: 'On track', go: 'Needs a push', up: 'Early days' }[s.st]}</span>` : '';
@@ -11017,7 +11092,8 @@ function noseCard(k) {
       <div class="nlbl">Anything else yesterday?</div><div class="chips">${xShow.map(([id, t]) => `<button class="chip" data-a="nx" data-v="${id}" aria-pressed="${cx.includes(id)}">${esc(t)}</button>`).join('')}${UI.nXAll ? '' : '<button class="chip more" data-a="nxall">More…</button>'}</div>
       ${sy.length ? sy.map(id => noseAdvice(id, noseCond(k))).join('') : r >= 4 ? '<p class="small muted" style="margin:0">Logged. Good mornings show what to reproduce, so tap anything from yesterday that might explain it.</p>' : ''}`;
   }
-  return `<section class="wsum nosecard" aria-label="Nose"><div class="nshead">${idl(shArt('nose', 52))}<div><div class="eyebrow">Nose · ${fmtDay(k)}</div><b>How's your nose this morning?</b></div>${r ? '<button class="btn link sm" data-a="nclear">Clear</button>' : ''}</div>${scale}${more}</section>`;
+  // part of the check-in card, just above its Save button; each tap saves straight away
+  return `<div class="nosecard ckf" role="group" aria-label="Nose"><div class="nshead">${idl(shArt('nose', 44))}<div><div class="cklbl">Nose this morning</div><b>How's your nose?</b></div>${r ? '<button class="btn link sm" data-a="nclear">Clear</button>' : ''}</div>${scale}${more}</div>`;
 }
 function noseEntry(k) { let n = S.nose[k]; if (!n || n.imp) n = S.nose[k] = { r: 3, sy: [], cx: [] }; n.at = todayKey(); return n; }
 Object.assign(ACT, {
