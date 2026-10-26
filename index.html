@@ -1851,7 +1851,7 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.22.0';</script>
+<script>window.TP_VERSION = '3.22.1';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -4146,9 +4146,10 @@ function dayCalcCore(k, carry, fc) {
   // spread: the day's total includes its own drinks, less its share of the week's; on the night: drinks come out of the day's total
   // carry: food from earlier in the week that its own day couldn't absorb
   const B = d.t || st.target, T0 = Math.round(spread ? B - share + dK : B), T = T0 - Math.round(carry || 0);
-  const latte = st.latteOn ? st.latteK : 0, latteP = st.latteOn ? st.latteP : 0;
+  // a latte skipped for the day gives its kcal to the meals cooked that day; prepped boxes keep their size
+  const latteSet = st.latteOn ? st.latteK : 0, latteOn = st.latteOn && !d.noLatte, latte = latteOn ? st.latteK : 0, latteP = latteOn ? st.latteP : 0;
   // portions are sized on the day's own total, so prepped boxes don't change; meals cooked on the day absorb any carry
-  const sc = (T0 - latte - dK) / SLOTS.reduce((a, s) => a + st.bud[s], 0);
+  const sc = (T0 - latteSet - dK) / SLOTS.reduce((a, s) => a + st.bud[s], 0);
   const out = {}, flex = [];
   let fixed = latte + dK;
   // a day with meals ticked counts what was ticked: a meal left unticked once the day is over, or passed over for a
@@ -4201,7 +4202,7 @@ function dayCalcCore(k, carry, fc) {
   }
   let planK = (latteGone ? 0 : latte) + dK, planP = latteGone ? 0 : latteP, eatK = (d.done.latte ? latte : 0) + (night && night.done ? dK : 0), eatP = d.done.latte ? latteP : 0, fermPlan = false, fermEat = false, planF = 0, eatF = 0;
   // sodium: the meals, the latte's milk, and the LoSalt you season with (counted once the day has a plan)
-  const latteNa = st.latteOn ? st.latteMl * ING.milk.sa / 250 : 0, latteSF = st.latteOn ? st.latteMl * ING.milk.sf / 100 : 0, hasMeals = SLOTS.some(s => out[s].kind === 'recipe');
+  const latteNa = latteOn ? st.latteMl * ING.milk.sa / 250 : 0, latteSF = latteOn ? st.latteMl * ING.milk.sf / 100 : 0, hasMeals = SLOTS.some(s => out[s].kind === 'recipe');
   const loNa = hasMeals ? (+st.loSalt || 0) * TSP_SALT * LOSALT_NA / 100 : 0;
   let planNa = (latteGone ? 0 : latteNa) + loNa, eatNa = (d.done.latte ? latteNa : 0), planFS = 0, eatFS = 0, planSF = latteGone ? 0 : latteSF, eatSF = d.done.latte ? latteSF : 0;
   const plants = new Set(), plantsEaten = new Set(), colours = new Set(), fermSrc = []; let loG = 0;
@@ -4917,7 +4918,9 @@ function vToday() {
     ${UI.flag ? flagPanel(c, UI.flag) : ''}
     <button class="morebtn" data-a="heromore" aria-expanded="${UI.heroMore}">${UI.heroMore ? 'Less' : 'Day details'}${ic('down')}</button>${more}</section>`;
   const rows = [];
-  if (set.latteOn) rows.push(mealRow({ tick: 'latte', on: !!d.done.latte, done: !!d.done.latte, slot: 'Morning', nm: 'Latte', kc: `${set.latteK}<small>kcal</small>`, art: art({ type: 'latte', main: 'white' }, 42) }));
+  if (set.latteOn) rows.push(d.noLatte
+    ? mealRow({ tick: 'latte', disabled: true, slot: 'Morning · tap to bring back', nm: '<span class="muted">Latte skipped</span>', art: art({ type: 'latte', main: 'white' }, 42), open: `data-a="lskip" aria-label="Bring back the latte"` })
+    : mealRow({ tick: 'latte', on: !!d.done.latte, done: !!d.done.latte, slot: d.done.latte ? 'Morning' : 'Morning · tap to skip', nm: 'Latte', kc: `${set.latteK}<small>kcal</small>`, art: art({ type: 'latte', main: 'white' }, 42), open: d.done.latte ? '' : `data-a="lskip" aria-label="Skip the latte today"` }));
   for (const s of SLOTS) {
     const o = c.slots[s];
     if (o.kind === 'empty') rows.push(mealRow({ tick: s, disabled: true, slot: SLOTNAME[s], nm: `<span class="addslot">+ Add ${SLOTNAME[s].toLowerCase()}</span>`, art: art({ type: 'plate', main: 'white', cols: ['white'] }, 42), open: `data-a="pick" data-k="${k}" data-s="${s}"` }));
@@ -6623,7 +6626,7 @@ function shopTotals(st, trip) {
       const own = gotOf(S.days[k], s);
       o.r.items.forEach(it => { add(it.i, it.g * o.m, it.from); if (own && own[it.i]) { got[it.i] = (got[it.i] || 0) + it.g * o.m; (gotAt[it.i] = gotAt[it.i] || new Set()).add(`${DOW[dayIndex(k)]} ${SLOTNAME[s].toLowerCase()}`); } });
     }
-    const ls = setAt(k); if (ls.latteOn && !peekD(k).done.latte) { const t = weekMode(st) === 'two' ? (daysBetween(st, k) <= 2 ? 1 : 2) : 1; if (!trip || t === trip) add('milk', ls.latteMl); }
+    const ls = setAt(k); if (ls.latteOn && !peekD(k).done.latte && !peekD(k).noLatte) { const t = weekMode(st) === 'two' ? (daysBetween(st, k) <= 2 ? 1 : 2) : 1; if (!trip || t === trip) add('milk', ls.latteMl); }
   }
   return { tot, from, got, gotAt };
 }
@@ -7991,6 +7994,7 @@ const ACT = {
   flagopen(d) { UI.flag = UI.flag === d.v ? null : d.v; render(); },
   weekmore() { UI.weekMore = !UI.weekMore; render(); },
   dayacc(d) { if (UI.openDays.has(d.v)) UI.openDays.delete(d.v); else UI.openDays.add(d.v); render(); },
+  lskip() { const day = D(UI.day); if (day.noLatte) delete day.noLatte; else { day.noLatte = true; delete day.done.latte; } save(); render(); },
   tick(d) {
     const day = D(UI.day);
     if (d.s === 'latte') { if (day.done.latte) delete day.done.latte; else day.done.latte = true; }
