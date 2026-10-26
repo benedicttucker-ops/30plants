@@ -1851,7 +1851,7 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.21.0';</script>
+<script>window.TP_VERSION = '3.22.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -4151,19 +4151,26 @@ function dayCalcCore(k, carry, fc) {
   const sc = (T0 - latte - dK) / SLOTS.reduce((a, s) => a + st.bud[s], 0);
   const out = {}, flex = [];
   let fixed = latte + dK;
+  // a day with meals ticked counts what was ticked: a meal left unticked once the day is over, or passed over for a
+  // later one today, wasn't had. A day with nothing ticked keeps its plan
+  const tk = todayKey(), logged = SLOTS.some(s => d.done[s]) || !!d.done.latte;
+  const gone = s => logged && !d.done[s] && k <= tk && (k < tk || SLOTS.slice(SLOTS.indexOf(s) + 1).some(t => d.done[t]));
+  const latteGone = logged && k < tk && !d.done.latte;
   for (const s of SLOTS) {
     const v = d.sl[s];
     const o = { s, v, base: st.bud[s] * sc, done: !!d.done[s] };
+    if (v && v !== '@skip' && gone(s)) o.gone = true;
     if (!v) o.kind = 'empty';
     else if (v === '@skip') { o.kind = 'skip'; o.k = 0; o.p = 0; }
-    else if (v === '@c') { const c = d.cu[s] || { n: 'Something else', k: 0, p: 0 }; o.kind = 'custom'; o.c = c; o.k = +c.k || 0; o.p = +c.p || 0; o.f = +c.f || 0; o.na = +c.na || 0; o.fs = +c.fs || 0; o.sf = +c.sf || 0; fixed += o.k; }
+    else if (v === '@c') { const c = d.cu[s] || { n: 'Something else', k: 0, p: 0 }; o.kind = 'custom'; o.c = c; o.k = +c.k || 0; o.p = +c.p || 0; o.f = +c.f || 0; o.na = +c.na || 0; o.fs = +c.fs || 0; o.sf = +c.sf || 0; if (!o.gone) fixed += o.k; }
     else if (R[v]) {
       // eaten meals and packed boxes keep the recipe (swaps included) and portion they had at the time
       const dn = d.done[s], pk = d.pk && d.pk[s] && d.pk[s].r === v ? d.pk[s] : null, fz = !pk && d.fz && d.fz[s] && d.fz[s].r === v ? d.fz[s] : null;
       const own = !(dn && dn.sw) && !pk ? dayOmits(d, s) : null;
       const r = atEra(dn && dn.sw ? variant(R[v], dn.sw) : pk ? variant(R[v], pk.sw) : own ? variant(R[v], Object.assign({}, weekSw(startOf(k), v), own)) : eff(R[v], startOf(k)), k);
       o.kind = 'recipe'; o.r = r; o.prepped = prepped(k, s, r); o.packed = !!pk;
-      if (o.done && dn.m) { o.m = dn.m; fixed += r.k * o.m; }
+      if (o.gone) o.m = pk ? pk.m : r.shop ? 1 : portionM(r, o.base / r.k); // not had: shown at a plain portion, counted nowhere
+      else if (o.done && dn.m) { o.m = dn.m; fixed += r.k * o.m; }
       else if (pk) { o.m = pk.m; fixed += r.k * o.m; }
       else if (fz && o.prepped) { o.m = fz.m; o.kept = true; fixed += r.k * o.m; } // cooked before a change of portions
       else if (r.shop) { o.m = 1; o.fixedPack = true; fixed += r.k; } // shop-bought: a pot is a pot
@@ -4176,7 +4183,7 @@ function dayCalcCore(k, carry, fc) {
   if (flex.length) {
     // a fermented meal only keeps enough to count when it's the day's one fermented food: nothing eaten, packed, shop-bought
     // or logged already covers it. Of several, the cheapest to keep holds the floor
-    const fermDone = SLOTS.some(s => { const o = out[s]; return o.kind === 'recipe' && o.m !== undefined && isFerm(o.r, o.m); }) || d.x.some(x => x.fe);
+    const fermDone = SLOTS.some(s => { const o = out[s]; return o.kind === 'recipe' && !o.gone && o.m !== undefined && isFerm(o.r, o.m); }) || d.x.some(x => x.fe);
     const keep = fermDone ? null : flex.filter(o => o.r.fermMinM).sort((a, b) => a.r.fermMinM * a.r.k - b.r.fermMinM * b.r.k)[0];
     const lo = o => (o === keep ? Math.max(0.5, Math.min(1.8, o.r.fermMinM)) : 0.5);
     // what's left is shared by budget; a meal that hits its floor or ceiling stays there and the others share the rest,
@@ -4192,15 +4199,16 @@ function dayCalcCore(k, carry, fc) {
     }
     flex.forEach(o => { o.m = Math.min(1.8, Math.max(lo(o), isFinite(o.m) ? o.m : 1)); });
   }
-  let planK = latte + dK, planP = latteP, eatK = (d.done.latte ? latte : 0) + (night && night.done ? dK : 0), eatP = d.done.latte ? latteP : 0, fermPlan = false, fermEat = false, planF = 0, eatF = 0;
+  let planK = (latteGone ? 0 : latte) + dK, planP = latteGone ? 0 : latteP, eatK = (d.done.latte ? latte : 0) + (night && night.done ? dK : 0), eatP = d.done.latte ? latteP : 0, fermPlan = false, fermEat = false, planF = 0, eatF = 0;
   // sodium: the meals, the latte's milk, and the LoSalt you season with (counted once the day has a plan)
   const latteNa = st.latteOn ? st.latteMl * ING.milk.sa / 250 : 0, latteSF = st.latteOn ? st.latteMl * ING.milk.sf / 100 : 0, hasMeals = SLOTS.some(s => out[s].kind === 'recipe');
   const loNa = hasMeals ? (+st.loSalt || 0) * TSP_SALT * LOSALT_NA / 100 : 0;
-  let planNa = latteNa + loNa, eatNa = (d.done.latte ? latteNa : 0), planFS = 0, eatFS = 0, planSF = latteSF, eatSF = d.done.latte ? latteSF : 0;
+  let planNa = (latteGone ? 0 : latteNa) + loNa, eatNa = (d.done.latte ? latteNa : 0), planFS = 0, eatFS = 0, planSF = latteGone ? 0 : latteSF, eatSF = d.done.latte ? latteSF : 0;
   const plants = new Set(), plantsEaten = new Set(), colours = new Set(), fermSrc = []; let loG = 0;
   for (const s of SLOTS) {
     const o = out[s];
-    if (o.kind === 'recipe') { o.r.items.forEach(it => { if (it.i === 'losalt') loG += it.g * o.m; }); o.k = o.r.k * o.m; o.p = o.r.p * o.m; o.f = o.r.f * o.m; o.na = o.r.na * o.m; o.fs = o.r.fs * o.m; o.sf = o.r.sf * o.m; o.ferm = isFerm(o.r, o.m); }
+    if (o.kind === 'recipe') { if (!o.gone) o.r.items.forEach(it => { if (it.i === 'losalt') loG += it.g * o.m; }); o.k = o.r.k * o.m; o.p = o.r.p * o.m; o.f = o.r.f * o.m; o.na = o.r.na * o.m; o.fs = o.r.fs * o.m; o.sf = o.r.sf * o.m; o.ferm = isFerm(o.r, o.m); }
+    if (o.gone) continue;
     if (o.kind === 'recipe' || o.kind === 'custom') { planF += o.f; planNa += o.na; planFS += o.fs; planSF += o.sf; if (o.done) { eatF += o.f; eatNa += o.na; eatFS += o.fs; eatSF += o.sf; } }
     if (o.kind === 'recipe' || o.kind === 'custom') { planK += o.k; planP += o.p; if (o.done) { eatK += o.k; eatP += o.p; } }
     if (o.kind === 'recipe') {
@@ -4219,7 +4227,7 @@ function dayCalcCore(k, carry, fc) {
     if (x.fe) { fermPlan = true; fermEat = true; fermSrc.push(x.n); }
     (x.pl || []).forEach(p => { if (!PLANTS[p]) return; plants.add(p); plantsEaten.add(p); if (PLANTS[p][2]) colours.add(CG(PLANTS[p][2])); });
   }
-  return { loG, k, T, B, share, carry: carry || 0, carryFrom: fc && fc.src[k] ? fc.src[k] : [], carryOut: fc && fc.out[k] ? fc.out[k] : null, night, dK, custom: !!d.t, latte, latteP, slots: out, planK, planP, eatK, eatP, planF, eatF, planNa, eatNa, loNa, latteNa, planFS, eatFS, planSF, eatSF, fermPlan, fermEat, fermSrc, plants, plantsEaten, colours, hasPlan: SLOTS.some(s => out[s].kind !== 'empty') };
+  return { loG, k, T, B, share, carry: carry || 0, carryFrom: fc && fc.src[k] ? fc.src[k] : [], carryOut: fc && fc.out[k] ? fc.out[k] : null, night, dK, custom: !!d.t, latte, latteP, latteGone, slots: out, planK, planP, eatK, eatP, planF, eatF, planNa, eatNa, loNa, latteNa, planFS, eatFS, planSF, eatSF, fermPlan, fermEat, fermSrc, plants, plantsEaten, colours, hasPlan: SLOTS.some(s => out[s].kind !== 'empty') };
 }
 const ptsOf = set => [...set].reduce((a, x) => a + PLANTS[x][1], 0);
 function weekCalc(st) {
@@ -4227,7 +4235,7 @@ function weekCalc(st) {
   let fb = 0, na = 0, fs = 0, sf = 0, naOver = 0, fsOver = 0, sfOver = 0, oilyP = 0, oilyE = 0, redP = 0, redE = 0, fermDays = 0, fermEatDays = 0, k = 0, p = 0, n = 0;
   dc.forEach(c => {
     c.plants.forEach(x => plan.add(x)); c.plantsEaten.forEach(x => eat.add(x));
-    for (const s of SLOTS) { const o = c.slots[s]; if (o.kind !== 'recipe') continue; if (o.r.oily) { oilyP++; if (o.done) oilyE++; } if (o.r.red) { redP++; if (o.done) redE++; } }
+    for (const s of SLOTS) { const o = c.slots[s]; if (o.kind !== 'recipe' || o.gone) continue; if (o.r.oily) { oilyP++; if (o.done) oilyE++; } if (o.r.red) { redP++; if (o.done) redE++; } }
     if (c.fermPlan) fermDays++;
     if (c.fermEat) fermEatDays++;
     c.colours.forEach(x => cols.add(x));
@@ -5045,8 +5053,8 @@ function lastMonths(n) { const d = parse(todayKey()); return Array.from({ length
 const FOOD = {
   protein: c => c.planP, fibre: c => c.planF, sodium: c => c.planNa, sugar: c => c.planFS, satfat: c => c.planSF,
   ferm: c => (c.fermPlan ? 1 : 0),
-  fish: c => SLOTS.filter(s => c.slots[s].kind === 'recipe' && c.slots[s].r.oily).length,
-  red: c => SLOTS.filter(s => c.slots[s].kind === 'recipe' && c.slots[s].r.red).length
+  fish: c => SLOTS.filter(s => c.slots[s].kind === 'recipe' && !c.slots[s].gone && c.slots[s].r.oily).length,
+  red: c => SLOTS.filter(s => c.slots[s].kind === 'recipe' && !c.slots[s].gone && c.slots[s].r.red).length
 };
 // food is counted from the day tracking began (the check-in setting); weeks planned before it weren't followed
 const foodFrom = () => (S.wt && S.wt.from) || '0000';
@@ -5988,6 +5996,27 @@ function logDrinks(k, u) {
     if (o.logged && !(u > 0)) delete d.out; // a night only the check-in added, now none
     else { o.units = u; o.unitsFrom = tk; o.done = true; }
   } else d.out = { on: true, drinks: {}, units: u, unitsFrom: tk, dinner: 'home', dinnerK: S.set.dinnerOutK, skipPud: false, note: '', done: true, from: tk, logged: true };
+}
+// a night out marked as done is that day's drinks: the alcohol log follows it, so a night edited after the check-in,
+// or ticked off before the next morning's, still counts in full
+function alcSync(k, was) {
+  if (k > todayKey()) return;
+  const o = outOf(S.days[k]);
+  if (o && o.done) S.alc[k] = alcR(drinkU(o));
+  else if (was !== undefined && k in S.alc && Math.abs(+S.alc[k] - alcR(was)) < 0.05) delete S.alc[k]; // no longer done: what it set goes too
+}
+// once: nights done before the log followed them
+function alcRepair() {
+  if (S.fix && S.fix.alc1) return;
+  (S.fix = S.fix || {}).alc1 = 1;
+  const tk = todayKey();
+  Object.keys(S.days).forEach(k => {
+    const o = outOf(S.days[k]); if (!o || !o.done || k > tk) return;
+    const u = alcR(drinkU(o));
+    // missing, or the night's drinks were changed after the check-in logged it (which clears its units)
+    if (!(k in S.alc) || (o.units === undefined && drinkPlanU(o) > 0 && Math.abs(+S.alc[k] - u) >= 0.05)) S.alc[k] = u;
+  });
+  save();
 }
 function ckField(id, label, unit, step, val, ph, na) {
   const naBox = na !== undefined ? `<button class="wna" data-a="ckwna" data-v="0" aria-label="No weigh-in. Tap to enter a weight">n/a</button>` : '';
@@ -7965,7 +7994,7 @@ const ACT = {
   tick(d) {
     const day = D(UI.day);
     if (d.s === 'latte') { if (day.done.latte) delete day.done.latte; else day.done.latte = true; }
-    else if (d.s === 'out') { const o = outOf(day); if (o) o.done = !o.done; }
+    else if (d.s === 'out') { const o = outOf(day); if (o) { o.done = !o.done; alcSync(UI.day, drinkU(o)); } }
     else { const o = dayCalc(UI.day).slots[d.s]; if (day.done[d.s]) delete day.done[d.s]; else day.done[d.s] = o.kind === 'recipe' ? { m: +o.m.toFixed(3), sw: Object.assign({}, o.r.swapped || {}) } : { c: 1 }; }
     UI.pop = d.s; save(); render();
   },
@@ -7973,7 +8002,7 @@ const ACT = {
   night(d) { const o = outOf(peekD(d.k)); openSheet({ type: 'night', k: d.k, o: o ? JSON.parse(JSON.stringify(o)) : defaultNight() }); },
   outtoggle(d) {
     const k = d.k, day = D(k); holdPast(k);
-    if (outOf(day)) { delete day.out; applyOut(k); planWeek(startOf(k), false); toast(`Staying in on ${fmtDay(k)}`); render(); return; }
+    if (outOf(day)) { const o0 = outOf(day), wu = o0.done ? drinkU(o0) : undefined; delete day.out; alcSync(k, wu); applyOut(k); planWeek(startOf(k), false); toast(`Staying in on ${fmtDay(k)}`); render(); return; }
     day.out = defaultNight(); const moved = applyOut(k); render();
     if (moved) toast(`Oily fish moved to ${fmtDay(moved)}`);
     openSheet({ type: 'night', k, o: JSON.parse(JSON.stringify(day.out)) });
@@ -7985,10 +8014,11 @@ const ACT = {
     keepNightFields(); const k = SH.k, day = D(k), was = outOf(day); holdPast(k);
     day.out = Object.assign({}, SH.o, { on: true, done: was ? !!was.done : false });
     if (was && JSON.stringify(was.drinks || {}) !== JSON.stringify(SH.o.drinks || {})) { delete day.out.units; delete day.out.unitsFrom; delete day.out.logged; }
+    alcSync(k);
     const moved = applyOut(k); planWeek(startOf(k), false);
     closeSheet(); render(); toast(moved ? `Saved. Oily fish moved to ${fmtDay(moved)}` : 'Night out saved');
   },
-  nightoff() { const k = SH.k; holdPast(k); delete D(k).out; applyOut(k); planWeek(startOf(k), false); closeSheet(); render(); toast(`Staying in on ${fmtDay(k)}`); },
+  nightoff() { const k = SH.k, o = outOf(D(k)), wu = o && o.done ? drinkU(o) : undefined; holdPast(k); delete D(k).out; alcSync(k, wu); applyOut(k); planWeek(startOf(k), false); closeSheet(); render(); toast(`Staying in on ${fmtDay(k)}`); },
   outmode(d) { if (d.v !== 'spread' && d.v !== 'day') return; holdPast(); setFrom(todayKey(), Object.assign(datedOf(S.set), { drinkMode: d.v })); save(); render(); },
   open(d) { openSheet({ type: 'recipe', r: d.r, k: d.k, s: d.s, n: 1 }); },
   pick(d) { openSheet({ type: 'pick', k: d.k, s: d.s, q: '' }); },
@@ -8397,7 +8427,8 @@ function closeReview() {
 function rvFreezeDay(k) {
   const d = S.days[k]; if (!d) return;
   const c = dayCalc(k);
-  SLOTS.forEach(s => { if (d.done[s]) return; const o = c.slots[s]; if (o.kind === 'recipe') d.done[s] = { m: +o.m.toFixed(3), sw: Object.assign({}, o.r.swapped || {}) }; else if (o.kind === 'custom') d.done[s] = { c: 1 }; });
+  if (c.latte && !c.latteGone && !d.done.latte) d.done.latte = true;
+  SLOTS.forEach(s => { if (d.done[s]) return; const o = c.slots[s]; if (o.gone) return; if (o.kind === 'recipe') d.done[s] = { m: +o.m.toFixed(3), sw: Object.assign({}, o.r.swapped || {}) }; else if (o.kind === 'custom') d.done[s] = { c: 1 }; });
 }
 function rvFinish() {
   const st = RV.st, tk = todayKey(), from = RV.from, ends = addDays(st, 6) === tk;
@@ -8414,25 +8445,25 @@ const rvHead = (h, p) => `<div class="wz-head"><div><h2>${h}</h2>${p ? `<p>${p}<
 const rvDayBtn = (k, cls, act, inner, label, extra) => `<button class="${cls}" data-a="${act}" data-k="${k}" aria-label="${label}" ${extra || ''}>${inner}</button>`;
 
 function rvMeals() {
-  // one day at a time: every meal starts as had; tap any you didn't have
+  // one day at a time: on a day with ticks, what was left unticked starts as not had; otherwise every meal starts as had
   const days = weekDays(RV.st); if (!days.includes(RV.mday)) RV.mday = days[0];
   const k = RV.mday, i = days.indexOf(k), c = dayCalc(k), night = outOf(S.days[k]);
-  const offN = dd => SLOTS.filter(s => RV.was[dd + s]).length;
+  const offN = dd => { const cc = dd === k ? c : dayCalc(dd); return SLOTS.filter(s => RV.was[dd + s] || cc.slots[s].gone).length; };
   const tabs = `<div class="rv7 rvtabs" role="tablist">${days.map(dd => { const n = offN(dd); return `<button role="tab" aria-selected="${dd === k}" class="rvtab ${dd === k ? 'on' : ''}" data-a="rvmday" data-k="${dd}"><small>${DOW[dayIndex(dd)].slice(0, 2)}</small><b>${parse(dd).getDate()}</b><i>${n ? `−${n}` : ''}</i></button>`; }).join('')}</div>`;
   const rows = SLOTS.map(s => {
-    const o = c.slots[s], w = RV.was[k + s];
+    const o = c.slots[s], w = RV.was[k + s], off = !!w || !!o.gone;
     let n, kc;
     if (w) { n = w.n; kc = 0; }
     else if (o.kind === 'recipe') { n = o.r.n; kc = o.k; }
     else if (o.kind === 'custom') { n = o.c.n; kc = o.k; }
     else if (o.kind === 'skip') return `<div class="rvml skip"><span class="box"></span><span class="mt"><small>${SLOTNAME[s]}</small><b>Skipped</b></span></div>`;
     else return '';
-    return `<button class="rvml ${w ? 'off' : ''}" role="checkbox" aria-checked="${!w}" data-a="rvskip" data-k="${k}" data-s="${s}"><span class="box">${ic('check')}</span><span class="mt"><small>${SLOTNAME[s]}</small><b>${esc(n)}</b></span><span class="kc">${w ? "Didn't have" : `${fmtN(kc)} kcal`}</span></button>`;
+    return `<button class="rvml ${off ? 'off' : ''}" role="checkbox" aria-checked="${!off}" data-a="rvskip" data-k="${k}" data-s="${s}"><span class="box">${ic('check')}</span><span class="mt"><small>${SLOTNAME[s]}</small><b>${esc(n)}</b></span><span class="kc">${off ? "Didn't have" : `${fmtN(kc)} kcal`}</span></button>`;
   }).join('');
   const xs = peekD(k).x.map((x, j) => ({ x, j })).filter(({ x }) => !x.rv);
   const extra = xs.length ? `<div class="rvxs">${xs.map(({ x, j }) => `<div class="rvx"><span>${esc(x.n)}<small>${[x.k ? `${fmtN(x.k)} kcal` : '', (x.pl || []).length ? `${x.pl.length} plant${x.pl.length > 1 ? 's' : ''}` : ''].filter(Boolean).join(' · ')}</small></span><span class="xbtns"><button class="iconbtn" data-a="xedit" data-k="${k}" data-i="${j}" aria-label="Edit ${esc(x.n)}">${ic('edit')}</button><button class="iconbtn" data-a="rvxdel" data-k="${k}" data-i="${j}" aria-label="Remove ${esc(x.n)}">${ic('trash')}</button></span></div>`).join('')}</div>` : '';
   const nx = days[i + 1];
-  return `${rvHead('Meals', "Go through each day. Untick anything you didn't have; the rest counts as eaten when you finish.")}
+  return `${rvHead('Meals', "Go through each day. On days you ticked meals, anything left unticked starts as not had; on days you didn't, the plan counts as eaten. Tap any meal to change it.")}
     ${tabs}
     <section class="wsum rvdayc"><div class="rvdh"><b>${DOWL[dayIndex(k)]} ${parse(k).getDate()} ${MONS[parse(k).getMonth()]}</b>${night ? `<span class="small muted">Night out · ${esc(drinkSummary(night))}</span>` : ''}</div>
       <div class="rvmls">${rows || '<p class="small muted" style="margin:0">Nothing planned.</p>'}</div>
@@ -8562,7 +8593,9 @@ Object.assign(ACT, {
   rvmday(d) { RV.mday = d.k; renderRV(); $('rv-body').scrollTop = 0; },
   rvskip(d) {
     const k = d.k, s = d.s, key = k + s, day = D(k), w = RV.was[key];
+    const g = !w && dayCalc(k).slots[s];
     if (w) { day.sl[s] = w.v; if (w.cu) day.cu[s] = w.cu; if (w.done) day.done[s] = w.done; delete RV.was[key]; }
+    else if (g && g.gone) day.done[s] = g.kind === 'recipe' ? { m: +g.m.toFixed(3), sw: Object.assign({}, g.r.swapped || {}) } : { c: 1 }; // left unticked, but it was had
     else {
       rvFreezeDay(k);
       const o = dayCalc(k).slots[s];
@@ -11576,7 +11609,7 @@ function repairDrinks() {
 }
 (function init() {
   const st = startOf(todayKey());
-  const fixMsg = repairDrinks(), noseMsg = noseImport();
+  const fixMsg = repairDrinks(), noseMsg = noseImport(); alcRepair();
   if (!weekDays(st).some(k => S.days[k] && Object.keys(S.days[k].sl || {}).length)) planWeek(st, false);
   nudgeWeek(UI.tab);
   render();
