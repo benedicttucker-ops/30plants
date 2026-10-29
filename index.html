@@ -1197,7 +1197,7 @@ body.tvon .scrim { z-index: 80; }
 .tvrow.today { background: var(--surface-2); border-radius: 12px; padding: 9px 8px; margin: 2px -8px; width: calc(100% + 16px); border-top-color: transparent; }
 .tvlist li:has(> .tvrow.today) + li > .tvrow { border-top-color: transparent; }
 .tvxs { list-style: none; margin: 0 0 0 60px; padding: 0; display: grid; }
-.tvx { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 0; font-size: 14px; border-top: 1px dashed var(--line); }
+.tvx { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto auto; gap: 8px; align-items: center; padding: 6px 0; font-size: 14px; border-top: 1px dashed var(--line); }
 .tvx .bx { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--line); display: grid; place-items: center; color: #fff; }
 .tvx .bx svg { width: 13px; height: 13px; }
 .tvx.on .bx { background: var(--leaf); border-color: var(--leaf); }
@@ -1826,6 +1826,102 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 }
 @keyframes mrfall { 0% { transform: translate(0, -30px) rotate(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(-14px, 40px) rotate(160deg); opacity: 1; } }
 
+/* 3.23: nose, two scales and what works for you */
+.nshd { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: -4px; }
+.nshd b { font-size: 14.5px; } .nshd span { font-size: 12px; color: var(--muted); }
+.nyours { background: color-mix(in srgb, var(--fishblue) 10%, var(--surface)); border-radius: 12px; padding: 9px 10px; display: grid; gap: 5px; font-size: 13.5px; }
+.nyours .eyebrow { color: color-mix(in srgb, var(--fishblue) 70%, var(--ink)); }
+.nyours ol { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.nlist { display: grid; gap: 8px; }
+.nlr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; border-top: 1px solid var(--line); padding-top: 8px; }
+.nlr:first-child { border-top: 0; padding-top: 0; }
+.nlr b { font-size: 14px; }
+.nlr .eff { font-weight: 800; font-size: 13px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.nlr .eff.up { color: var(--leaf); } .nlr .eff.dn { color: var(--c-red); } .nlr .eff.flat { color: var(--muted); }
+.nlr small { grid-column: 1 / -1; color: var(--muted); font-size: 12.5px; line-height: 1.38; }
+.conf { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 6px; padding: 1px 6px; margin-right: 5px; vertical-align: 1px; }
+.conf.c { background: var(--leaf-soft); color: var(--leaf); } .conf.l { background: var(--warn-soft); color: var(--warn); } .conf.e { background: var(--surface-2); color: var(--muted); }
+.res { font-size: 11.5px; font-weight: 700; color: var(--muted); }
+.res.ag::before { content: "✓ "; color: var(--leaf); } .res.df::before { content: "≠ "; color: var(--warn); }
+.nlag { display: grid; gap: 4px; }
+.lagrow { display: grid; grid-template-columns: minmax(0, 1fr) repeat(3, 56px); gap: 4px; font-size: 12.5px; align-items: center; }
+.lagrow.h { color: var(--muted); font-weight: 700; font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; }
+.lagrow.h span { text-align: center; }
+.lagrow .c { text-align: center; border-radius: 7px; padding: 3px 0; font-weight: 800; font-variant-numeric: tabular-nums; }
+.lagrow .c.p2 { background: var(--leaf); color: var(--surface); } .lagrow .c.p1 { background: var(--leaf-soft); color: var(--leaf); } .lagrow .c.z { background: var(--surface-2); color: var(--muted); }
+.lagrow .c.n1 { background: color-mix(in srgb, var(--c-red) 18%, var(--surface)); color: var(--c-red); } .lagrow .c.n2 { background: var(--c-red); color: var(--surface); } .lagrow .c.q { color: var(--muted); font-weight: 400; }
+.nsum.good { background: var(--leaf-soft); } .nsum.good b { color: var(--leaf); }
+
+/* 3.23: training, not done */
+.tvnd { width: 32px; height: 30px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); display: grid; place-items: center; padding: 0; }
+.tvnd svg { width: 14px; height: 14px; }
+.tvnd.undo { width: auto; border-color: transparent; background: none; color: var(--accent); font-weight: 700; font-size: 12.5px; padding: 0 4px; }
+.tvx.nd { color: var(--muted); } .tvx.nd .nm { text-decoration: line-through; }
+.tvx.nd .bx { border-color: var(--c-red); color: var(--c-red); }
+.tvex.nd { opacity: .85; }
+.tvndn { display: flex; gap: 6px; align-items: center; margin: 6px 0 0; font-size: 13px; color: var(--c-red); font-weight: 700; }
+.tvndn svg { width: 14px; height: 14px; flex: none; }
+
+/* 3.23: monthly sugar, salt and fat */
+.mrlims { display: grid; gap: 12px; }
+.mrlim { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 10px; align-items: start; }
+.mrlim .mrpic, .mrlim > span { width: 46px; }
+.mrlim b { display: block; font-size: 15px; line-height: 1.3; }
+.mrlim p { margin: 4px 0 0; font-size: 14px; }
+.mrlim p.note { color: var(--muted); font-size: 13px; }
+
+/* 3.23: Prep ingredients, ticks, amounts and scanning */
+.pging { display: grid; gap: 8px; margin-top: 8px; }
+.pghead { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.pgtog { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; text-align: left; width: 100%; border: 0; background: var(--surface-2); border-radius: 12px; padding: 8px 10px; color: var(--ink); font: inherit; }
+.pgtog b { display: block; font-size: 13.5px; } .pgtog small { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.35; }
+.pgtog .switch { pointer-events: none; }
+.pgrows { display: grid; }
+.pgrow { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 7px 0; border-top: 1px solid var(--line); }
+.pgrow:first-child { border-top: 0; }
+.pgbox { border: 0; background: none; padding: 0; width: 32px; height: 32px; display: grid; place-items: center; }
+.pgbox .box { width: 22px; height: 22px; border: 2px solid var(--line); border-radius: 7px; display: grid; place-items: center; transition: background .2s, border-color .2s; }
+.pgbox .box svg { width: 14px; height: 14px; opacity: 0; color: var(--accent-ink); }
+.pgbox[aria-checked="true"] .box { background: var(--leaf); border-color: var(--leaf); } .pgbox[aria-checked="true"] .box svg { opacity: 1; color: var(--surface); }
+.pgbox:disabled { opacity: .5; }
+.pgn { font-size: 14px; line-height: 1.3; min-width: 0; }
+.pgn small { display: block; font-size: 12px; color: var(--muted); margin-top: 1px; }
+.pgrow.in .pgn { color: var(--muted); }
+.pgreset { border: 0; background: none; color: var(--accent); font: inherit; font-size: 12px; font-weight: 700; padding: 0 2px; }
+.pgg { display: flex; align-items: center; gap: 4px; }
+.pgg input { width: 66px; font: inherit; font-weight: 700; font-size: 14px; text-align: right; border: 1.5px solid var(--line); border-radius: 9px; padding: 5px 6px; background: var(--surface); color: var(--ink); }
+.pgg input:focus { border-color: var(--accent); outline: none; }
+.pgg span { font-size: 12.5px; color: var(--muted); width: 18px; }
+.scanbar { display: grid; gap: 2px; background: var(--surface-2); border-radius: 12px; padding: 8px 10px; font-size: 13.5px; }
+.scanbar.ok { background: var(--leaf-soft); } .scanbar.ok span { color: var(--leaf); font-weight: 700; }
+.scanbar svg { width: 14px; height: 14px; vertical-align: -2px; margin-right: 3px; }
+button.samt.tap { border: 0; font: inherit; font-size: 13px; cursor: pointer; background: var(--accent-soft); color: var(--accent); text-align: left; }
+button.samt.tap b { color: var(--accent); }
+button.samt.tap.in { background: var(--surface-2); color: var(--muted); text-decoration: line-through; }
+button.samt.tap.in b { color: var(--muted); }
+button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-align: -2px; }
+
+/* 3.23: make up the gap */
+.mkbar { margin: 10px 0 0; background: color-mix(in srgb, var(--accent) 8%, var(--surface)); border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--line)); border-radius: 14px; padding: 10px 12px; display: grid; gap: 8px; }
+.mkbar b { display: block; font-size: 14.5px; } .mkbar small { display: block; color: var(--muted); font-size: 12.5px; }
+.mkbar .btnrow { margin: 0; }
+.mkg { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; margin: 0 0 10px; }
+.mkg div { background: var(--surface-2); border-radius: 10px; padding: 6px 4px; display: grid; text-align: center; }
+.mkg b { font-family: var(--f-display); font-weight: 800; font-size: 19px; line-height: 1.05; }
+.mkg span { font-size: 10.5px; color: var(--muted); line-height: 1.2; }
+.mkg .short b { color: var(--warn); } .mkg .fine b { color: var(--leaf); }
+.mkopts { display: grid; gap: 8px; }
+.mkopt { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 10px; text-align: left; border: 1.5px solid var(--line); border-radius: 14px; padding: 9px; background: var(--surface); color: var(--ink); font: inherit; width: 100%; }
+.mkopt.best { border-color: var(--leaf); }
+.mkopt b { display: block; font-size: 14.5px; line-height: 1.25; }
+.mkopt .meta { display: block; font-size: 12.5px; color: var(--muted); }
+.mkopt .wins { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+.mkopt .wins i { font-style: normal; font-size: 11.5px; font-weight: 700; border-radius: 6px; padding: 1px 6px; background: var(--leaf-soft); color: var(--leaf); }
+.mkopt .wins i.shop { background: var(--warn-soft); color: var(--warn); } .mkopt .wins i.warn { background: color-mix(in srgb, var(--c-red) 15%, var(--surface)); color: var(--c-red); }
+.pgtog .switch { background: var(--line); }
+.pgtog[aria-checked="true"] .switch { background: var(--accent); box-shadow: none; }
+.pgtog[aria-checked="true"] .switch span { transform: translateX(18px); }
+
 </style>
 </head>
 <body>
@@ -1851,7 +1947,7 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.22.1';</script>
+<script>window.TP_VERSION = '3.23.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -3598,8 +3694,62 @@ function amtPlan(r, texts) {
   if (left.length && plan.length) { let at = -1; texts.forEach((t, i) => { if (/\b(serve|serving|top|scatter|sprinkle|garnish|finish|eat|pack)\b/i.test(t)) at = i; }); plan[at < 0 ? plan.length - 1 : at].push(...left); }
   return plan;
 }
-function amtChips(ids, gOf) {
-  const out = (ids || []).map(id => { const g = gOf(id); if (!(g > 0)) return ''; const q = fmtQ(id, g), w = /\d(k?g|ml)\b|litres/.test(q) ? '' : ` (${ING[id].ml ? fmtMl(g) : fmtG(g)})`; const nm = shortN(id), u = ING[id].u, same = u && nm.toLowerCase().replace(/s$/, '') === u.toLowerCase(); return `<span class="samt">${same ? `<b>${esc(q)}</b>${w}` : `<b>${esc(nm)}</b> ${esc(q)}${w}`}</span>`; }).join('');
+/* which form an ingredient goes in as: the juice or the zest, grated or sliced. Read from each recipe's method, with
+   these as the usual when the method doesn't say. An entry starting = is the whole label */
+const FORM = {
+  b_apricotoats: {"orange": "=Orange, zested, then the flesh chopped"},
+  b_mangochia: {"lime": "zest"},
+  b_masala: {"onion": "finely chopped"},
+  b_quarkpancakes: {"lemon": "zest"},
+  b_zaatar: {"lemon": "zest", "mint": "torn"},
+  d_biryani: {"onion": "sliced"},
+  d_carbonara: {"lemon": "zest"},
+  d_chaca: {"redonion": "thinly sliced"},
+  d_congee: {"ginger": "sliced"},
+  d_drunken: {"garlic": "finely chopped"},
+  d_gnocchitray: {"garlic": "grated"},
+  d_keema: {"redonion": "finely chopped"},
+  d_krapow: {"garlic": "chopped"},
+  d_mackerelfennel: {"orange": "slices"},
+  d_mackpenne: {"lemon": "zest and juice"},
+  d_moqueca: {"onion": "sliced", "lime": "zest and juice"},
+  d_salmonrisotto: {"lemon": "zest and juice"},
+  d_sardinepasta: {"lemon": "zest and juice"},
+  d_steak: {"parsley": "chopped"},
+  d_turkeyragu: {"onion": "finely chopped"},
+  l_bunprawn: {"chilli": "chopped", "garlic": "grated"},
+  l_caesarwrap: {"garlic": "grated"},
+  l_gadogado: {"chilli": "chopped", "garlic": "grated"},
+  l_greengoddess: {"basil": "finely chopped", "lemon": "zest and juice", "garlic": "grated"},
+  l_lemonorzo: {"lemon": "zest and juice"},
+  l_pastaceci: {"onion": "finely chopped"},
+  l_ricottabake: {"lemon": "zest"},
+  l_turkeyragu: {"onion": "finely chopped"},
+  p_cheesecake: {"lemon": "zest"},
+  p_chocorange: {"orange": "=Orange, zested, then peeled and sliced"},
+  p_clemskyr: {"ginger": "finely grated", "mint": "torn"},
+  p_lemonposset: {"lemon": "zest and juice"},
+  p_mangoskyr: {"lime": "zest"},
+  p_quarkcheesecake: {"lemon": "zest"},
+  p_rhubarbfool: {"orange": "zest and juice"},
+  s_beetdip: {"dill": "chopped", "garlic": "grated"},
+  s_devilled: {"chives": "chopped"},
+  s_quarkstraw: {"lemon": "zest and juice"}
+};
+const FORM_DEF = { lemon: 'juice', lime: 'juice', garlic: 'crushed', ginger: 'grated', chilli: 'finely chopped', onion: 'chopped', redonion: 'sliced', springonion: 'sliced',
+  basil: 'leaves, torn', parsley: 'leaves, chopped', coriander: 'leaves, chopped', mint: 'leaves, chopped', dill: 'chopped', chives: 'snipped', rosemary: 'leaves, finely chopped' };
+const FORM_CIT = { lemon: 'Lemon', lime: 'Lime', orange: 'Orange' }, FORM_LEAF = new Set(['basil', 'parsley', 'coriander', 'mint', 'rosemary']);
+const ingForm = (rid, id) => (rid && FORM[rid] && FORM[rid][id]) || FORM_DEF[id] || null;
+function formLabel(id, f, base) {
+  if (f[0] === '=') return f.slice(1);
+  if (FORM_CIT[id]) return `${FORM_CIT[id]} ${f}`;
+  if (FORM_LEAF.has(id) && !/^leaves/.test(f)) return `${base} leaves, ${f}`;
+  return /^leaves/.test(f) ? `${base} ${f}` : `${base}, ${f}`;
+}
+const ingLabel = (rid, id, base) => { const f = rid === false ? null : ingForm(rid, id); return f ? formLabel(id, f, base) : base; };
+// in the cooking view (add given), each amount is a button that greys out once it's in the pan
+function amtChips(ids, gOf, rid, add) {
+  const out = (ids || []).map(id => { const g = gOf(id); if (!(g > 0)) return ''; const q = fmtQ(id, g), w = /\d(k?g|ml)\b|litres/.test(q) ? '' : ` (${ING[id].ml ? fmtMl(g) : fmtG(g)})`; const f = rid === false ? null : ingForm(rid, id), nm = f ? formLabel(id, f, shortN(id)) : shortN(id), u = ING[id].u, same = !f && u && nm.toLowerCase().replace(/s$/, '') === u.toLowerCase(); const inner = same ? `<b>${esc(q)}</b>${w}` : `<b>${esc(nm)}</b> ${esc(q)}${w}`; if (!add) return `<span class="samt" data-i="${id}">${inner}</span>`; const on = !!add.on[add.pre + id]; return `<button class="samt tap ${on ? 'in' : ''}" data-a="samt" data-v="${add.pre + id}" aria-pressed="${on}" aria-label="${esc(nm)}: ${on ? 'in, tap to undo' : 'tap once it\'s in'}">${on ? ic('check') : ''}${inner}</button>`; }).join('');
   return out ? `<span class="stepamt">${out}</span>` : '';
 }
 const itemTotals = (r, mult) => { const t = {}; r.items.forEach(it => { t[it.i] = (t[it.i] || 0) + it.g * mult; }); return t; };
@@ -3761,6 +3911,8 @@ const CK_GROUPS = { rinse: 'Nasal rinse' };
 const isObj = x => !!x && typeof x === 'object' && !Array.isArray(x);
 const WPD_HIST = '2025-11-17|04222242222-24242422622224-22242-4242444-266444442624424422444624442262242642424222824222044424244222062446226446624244426422624224262-2442462222064-26-44226446242222242224422-64082842428464222624442404464444628464646343543272260422424246424444646244444234426242424212242244424444222002----2-2244-4-2a2224444422422642424444224222';
 const DAY_KEY = /^\d{4}-\d{2}-\d{2}$/;
+// an amount logged with a food: grams (or ml), kept so it comes back the same next time
+function amtOk(x) { if (x.g !== undefined && !(+x.g > 0 && +x.g < 10000)) delete x.g; else if (x.g !== undefined) x.g = Math.round(+x.g * 10) / 10; if (x.u !== undefined && x.u !== 'ml') delete x.u; if (x.g === undefined) delete x.u; }
 // a saved day with anything missing or the wrong shape is mended rather than crashing the app
 function mendDay(d) {
   if (!isObj(d)) return null;
@@ -3768,7 +3920,7 @@ function mendDay(d) {
   Object.keys(d.sl).forEach(s => { const v = d.sl[s]; if (typeof v !== 'string' || (v[0] !== '@' && !R[v])) delete d.sl[s]; });
   Object.keys(d.cu).forEach(s => { if (!isObj(d.cu[s])) delete d.cu[s]; });
   d.x = (Array.isArray(d.x) ? d.x : []).filter(isObj);
-  d.x.forEach(x => { x.n = typeof x.n === 'string' && x.n ? x.n : 'Extra'; ['k', 'p'].forEach(f => { x[f] = Number.isFinite(+x[f]) ? +x[f] : 0; }); x.pl = (Array.isArray(x.pl) ? x.pl : []).filter(p => PLANTS[p]); });
+  d.x.forEach(x => { x.n = typeof x.n === 'string' && x.n ? x.n : 'Extra'; ['k', 'p'].forEach(f => { x[f] = Number.isFinite(+x[f]) ? +x[f] : 0; }); x.pl = (Array.isArray(x.pl) ? x.pl : []).filter(p => PLANTS[p]); amtOk(x); });
   if (d.t !== null && d.t !== undefined && !(+d.t > 0)) d.t = null;
   if (d.out !== undefined && !isObj(d.out)) delete d.out;
   // drinks already taken off this day, by the night they came from, fixed once a later change could have moved them
@@ -3789,10 +3941,18 @@ function foodPut(st, x, day) {
   if (x.fe) e.fe = true;
   if (Array.isArray(x.pl) && x.pl.length) e.pl = x.pl.filter(q => PLANTS[q]);
   ['na', 'sa', 'fs', 'sf', 'f'].forEach(f => { if (x[f] !== undefined && x[f] !== null && Number.isFinite(+x[f])) e[f] = +x[f]; });
+  if (+x.g > 0) { e.g = +x.g; if (x.u === 'ml') e.u = 'ml'; }
   e.used = (prev.used || 0) + 1; e.last = day && (!prev.last || day >= prev.last) ? day : prev.last || day || todayKey();
   st.foods[key] = e;
 }
-const foodCopy = e => { const x = { n: e.n, k: e.k, p: e.p, pl: (e.pl || []).slice() }; if (e.fe) x.fe = true; ['na', 'sa', 'fs', 'sf', 'f'].forEach(f => { if (e[f] !== undefined) x[f] = e[f]; }); return x; };
+const foodCopy = e => { const x = { n: e.n, k: e.k, p: e.p, pl: (e.pl || []).slice() }; if (e.fe) x.fe = true; ['na', 'sa', 'fs', 'sf', 'f', 'g', 'u'].forEach(f => { if (e[f] !== undefined) x[f] = e[f]; }); return x; };
+// a saved food or logged entry with its amount, as a lookup the grams box can scale
+function amtItem(e) {
+  if (!(+e.g > 0)) return null;
+  const g = +e.g, sa = e.sa !== undefined ? e.sa : e.na !== undefined ? e.na * 2.5 : undefined, per = { k: (+e.k || 0) * 100 / g, p: (+e.p || 0) * 100 / g };
+  [['sa', sa], ['fs', e.fs], ['sf', e.sf], ['f', e.f]].forEach(([f, v]) => { if (v !== undefined && v !== null) per[f] = +v * 100 / g; });
+  return { n: e.n, per, g, serv: g, pl: (e.pl || []).slice(), fe: !!e.fe, ml: e.u === 'ml', src: 'saved' };
+}
 // saved recipe ideas: kept only when well formed, and registered as recipes before the days are checked, so a day
 // that uses one keeps it
 function cleanMyr(m) {
@@ -3877,7 +4037,7 @@ function normalise(s) {
   // weekly focus: week start -> { ids: up to three goal ids, from: the week it was picked from, at: when }
   s.mrep = isObj(s.mrep) ? s.mrep : {};
   s.nose = isObj(s.nose) ? s.nose : {};
-  Object.keys(s.nose).forEach(k => { const n = s.nose[k]; if (!DAY_KEY.test(k) || !isObj(n)) { delete s.nose[k]; return; } n.r = Number.isInteger(n.r) && n.r >= 1 && n.r <= 5 ? n.r : n.imp ? 0 : 3; ['sy', 'cx'].forEach(f => { n[f] = Array.isArray(n[f]) ? [...new Set(n[f].filter(x => typeof x === 'string' && /^[a-z][a-z0-9_]{1,20}$/.test(x)))].slice(0, f === 'sy' ? 3 : 25) : []; }); });
+  Object.keys(s.nose).forEach(k => { const n = s.nose[k]; if (!DAY_KEY.test(k) || !isObj(n)) { delete s.nose[k]; return; } n.sm = Number.isInteger(n.sm) && n.sm >= 1 && n.sm <= 5 ? n.sm : undefined; if (n.sm === undefined) delete n.sm; n.r = Number.isInteger(n.r) && n.r >= 1 && n.r <= 5 ? n.r : n.imp || n.sm ? 0 : 3; ['sy', 'cx'].forEach(f => { n[f] = Array.isArray(n[f]) ? [...new Set(n[f].filter(x => typeof x === 'string' && /^[a-z][a-z0-9_]{1,20}$/.test(x)))].slice(0, f === 'sy' ? 3 : 25) : []; }); });
   s.focus = isObj(s.focus) ? s.focus : {};
   Object.keys(s.focus).forEach(k => { const f = s.focus[k]; if (!DAY_KEY.test(k) || !isObj(f) || !Array.isArray(f.ids)) { delete s.focus[k]; return; } f.ids = [...new Set(f.ids.filter(x => typeof x === 'string' && /^(h:)?[a-z][a-z0-9_-]{1,30}$/.test(x)))].slice(0, 3); if (!DAY_KEY.test(f.from || '')) f.from = addDays(k, -7); });
   s.rev = s.rev && typeof s.rev === 'object' ? s.rev : {}; // weeks reviewed: week start -> the day it was done
@@ -3896,6 +4056,7 @@ function normalise(s) {
   });
   // saved foods; the first time, built from everything already logged
   s.foods = isObj(s.foods) ? s.foods : {};
+  Object.values(s.foods).forEach(e => { if (isObj(e)) amtOk(e); });
   Object.keys(s.foods).forEach(key => { const e = s.foods[key]; if (!isObj(e) || typeof e.n !== 'string' || !e.n.trim() || !Number.isFinite(+e.k)) { delete s.foods[key]; return; } e.k = +e.k; e.p = Number.isFinite(+e.p) ? +e.p : 0; if (e.pl !== undefined) e.pl = Array.isArray(e.pl) ? e.pl.filter(q => PLANTS[q]) : []; });
   if (!s.foodv) {
     Object.keys(s.days).sort().forEach(k => { const d = s.days[k]; (d.x || []).forEach(x => foodPut(s, x, k)); Object.values(d.cu || {}).forEach(c => foodPut(s, c, k)); });
@@ -3988,6 +4149,9 @@ const startOf = k => addDays(k, -((dayIndex(k) - S.set.weekStart + 7) % 7));
 const UI = { trends: false, topen: null, tbar: null, tlong: false, mode: 'meals', wrange: 28, wsel: null, ckDate: null, ckEdit: false, ckWaist: false, ckDraft: null, ckSkip: false, tab: 'today', day: todayKey(), week: null, rq: '', rslot: 'all', rtag: '', rplant: '', rfilt: false, trip: 1, wview: 'plan', hsel: null, heroMore: false, weekMore: false, openDays: new Set([todayKey()]), anim: 'enter', pop: null };
 UI.week = startOf(UI.day);
 try { const t = sessionStorage.getItem('tp.tab'); if (t) UI.tab = t; } catch (e) { /* ignore */ }
+try { if (localStorage.getItem('tp.pkeep') === '0') UI.pkKeep = false; } catch (e) { /* ignore */ }
+// which Prep ingredient lists are open, so ticking one doesn't fold it away
+document.addEventListener('toggle', e => { const k = e.target && e.target.dataset && e.target.dataset.pgo; if (!k) return; UI.pgOpen = UI.pgOpen || {}; if (e.target.open) UI.pgOpen[k] = 1; else delete UI.pgOpen[k]; }, true);
 try { const m = localStorage.getItem('tp.mode'); if (m === 'weight' || m === 'train') UI.mode = m; } catch (e) { /* ignore */ }
 // the day ring shows kcal left, or kcal eaten so far once tapped (remembered on this phone)
 try { UI.ringEat = localStorage.getItem('tp.ring') === 'eat'; } catch (e) { UI.ringEat = false; }
@@ -4175,7 +4339,7 @@ function dayCalcCore(k, carry, fc) {
       else if (pk) { o.m = pk.m; fixed += r.k * o.m; }
       else if (fz && o.prepped) { o.m = fz.m; o.kept = true; fixed += r.k * o.m; } // cooked before a change of portions
       else if (r.shop) { o.m = 1; o.fixedPack = true; fixed += r.k; } // shop-bought: a pot is a pot
-      else if (o.prepped || !st.adapt) { const rb = own && o.prepped ? atEra(eff(R[v], startOf(k)), k) : r; o.m = portionM(rb, o.base / rb.k); fixed += r.k * o.m; } // a box is sized as the batch is cooked
+      else if (o.prepped || !st.adapt) { const rb = sizeRec(own && o.prepped ? atEra(eff(R[v], startOf(k)), k) : r, k); o.m = portionM(rb, o.base / rb.k); fixed += r.k * o.m; } // a box is sized as the batch is cooked
       else flex.push(o);
     } else o.kind = 'empty';
     out[s] = o;
@@ -4229,6 +4393,14 @@ function dayCalcCore(k, carry, fc) {
     (x.pl || []).forEach(p => { if (!PLANTS[p]) return; plants.add(p); plantsEaten.add(p); if (PLANTS[p][2]) colours.add(CG(PLANTS[p][2])); });
   }
   return { loG, k, T, B, share, carry: carry || 0, carryFrom: fc && fc.src[k] ? fc.src[k] : [], carryOut: fc && fc.out[k] ? fc.out[k] : null, night, dK, custom: !!d.t, latte, latteP, latteGone, slots: out, planK, planP, eatK, eatP, planF, eatF, planNa, eatNa, loNa, latteNa, planFS, eatFS, planSF, eatSF, fermPlan, fermEat, fermSrc, plants, plantsEaten, colours, hasPlan: SLOTS.some(s => out[s].kind !== 'empty') };
+}
+// the recipe a box is sized on: an amount changed on Prep with "keep the calories" off ('@k:<ingredient>') adds its
+// calories rather than shrinking the portion, so sizing leaves that change out
+function sizeRec(rb, k) {
+  const sw = rb && rb.swapped; if (!sw || !R[rb.id]) return rb;
+  const ks = Object.keys(sw).filter(x => x.slice(0, 3) === '@k:'); if (!ks.length) return rb;
+  const s2 = Object.assign({}, sw); ks.forEach(x => { delete s2[x]; delete s2[AMT + x.slice(3)]; });
+  return atEra(variant(R[rb.id], s2), k);
 }
 const ptsOf = set => [...set].reduce((a, x) => a + PLANTS[x][1], 0);
 function weekCalc(st) {
@@ -4657,14 +4829,14 @@ function ingPanel(id, I = ING, era = null) {
 }
 /* ingredient lines with calories: kcal for the amount, and kcal per 100g (or 100ml) to check against the pack's label */
 const per100 = (id, I = ING) => `${fmtN(I[id].k)} kcal per 100${I[id].ml ? 'ml' : 'g'}`;
-function ingRows(list, totLabel, chk, I = ING, era = null, extra = '') {
+function ingRows(list, totLabel, chk, I = ING, era = null, extra = '', rid) {
   let tot = 0;
   const rows = list.map(([id, g, extra, after, tap]) => {
     const kc = I[id].k * g / 100, q = fmtQ(id, g), w = /\d(k?g|ml)\b|litres/.test(q) ? '' : `${ING[id].ml ? fmtMl(g) : fmtG(g)} · `; // spoons and counts get their weight too
     tot += kc;
     const own = !!S.ingOver[id], ok = own || !!S.ingChk[id];
     const btn = !chk ? '' : era ? `<button class="ichip" data-a="ingchk" data-i="${id}" aria-expanded="${SH && SH.chk === id}">That week</button>` : `<button class="ichip ${own ? 'own' : ok ? 'ok' : ''}" data-a="ingchk" data-i="${id}" aria-expanded="${SH && SH.chk === id}">${ok ? ic('check') : ''}${own ? 'Your pack' : ok ? 'Confirmed' : 'Check'}</button>`;
-    return `<li><span class="in">${tap ? `<button class="inbtn" data-a="ingtap" data-i="${esc(tap)}" aria-expanded="${!!(SH && SH.swi === tap)}">${esc(I[id].n)}</button>` : esc(I[id].n)}${extra || ''}<small>${per100(id, I)}${btn}</small></span><span class="q">${q}<small>${w}${fmtN(kc)} kcal</small></span></li>${chk && SH && SH.chk === id ? ingPanel(id, I, era) : ''}${after || ''}`;
+    return `<li><span class="in">${tap ? `<button class="inbtn" data-a="ingtap" data-i="${esc(tap)}" aria-expanded="${!!(SH && SH.swi === tap)}">${esc(ingLabel(rid, id, I[id].n))}</button>` : esc(ingLabel(rid, id, I[id].n))}${extra || ''}<small>${per100(id, I)}${btn}</small></span><span class="q">${q}<small>${w}${fmtN(kc)} kcal</small></span></li>${chk && SH && SH.chk === id ? ingPanel(id, I, era) : ''}${after || ''}`;
   }).join('');
   return `${rows}${extra}<li class="itot"><span>${totLabel || 'Total'}</span><span class="q">${fmtN(tot)} kcal</span></li>`;
 }
@@ -4934,7 +5106,72 @@ function vToday() {
   const tiles = `<div class="tiles"><button class="tile ${wc.ptsEat >= g ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${fmtPts(wc.ptsEat)}<small>/${g}</small></span><span class="l">Plants eaten</span></button>
     <button class="tile ${wc.oilyE >= set.oilyGoal ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${wc.oilyE}<small>/${set.oilyGoal}</small></span><span class="l">Oily fish</span></button>
     <button class="tile ${wc.fermEatDays === 7 ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${wc.fermEatDays}<small>/7</small></span><span class="l">Fermented days</span></button></div>`;
-  return `${weekNav(st)}<div class="strip">${strip}</div>${k === tk ? mrCard() : ''}${fxCard(k)}${hero}${k === tk ? todayPrompts() : ''}<div class="meals">${rows.join('')}</div><div class="extras">${extras}<button class="btn link" data-a="xadd">${ic('plus')}Log something else</button></div>${tiles}${wrap}`;
+  return `${weekNav(st)}<div class="strip">${strip}</div>${k === tk ? mrCard() : ''}${fxCard(k)}${hero}${k === tk ? todayPrompts() : ''}<div class="meals">${rows.join('')}</div>${mkupBar(k, c)}<div class="extras">${extras}<button class="btn link" data-a="xadd">${ic('plus')}Log something else</button></div>${tiles}${wrap}`;
+}
+/* making up the gap: from 4pm, a meal still to come can be swapped for one that fixes what today is short of
+   (fibre, fermented) without going over on sat fat, sugar or salt, within the calories left; new plants come next */
+const MK_HOUR = 16;
+function mkupSlots(k, c) {
+  if (k !== todayKey() || new Date().getHours() < MK_HOUR) return [];
+  return SLOTS.filter(s => { const o = c.slots[s]; return (o.kind === 'recipe' || o.kind === 'custom') && !o.done && !o.gone && !o.packed && !(o.kind === 'recipe' && (o.prepped || o.r.shop)); });
+}
+// the day without the meal being replaced: what's left of each budget for it
+function mkupGap(k, s) {
+  const c = dayCalc(k), o = c.slots[s], dg = dayGoals(k), less = f => (c[f] || 0) - (o[{ planK: 'k', planF: 'f', planSF: 'sf', planFS: 'fs', planNa: 'na', planP: 'p' }[f]] || 0);
+  const other = new Set(); SLOTS.forEach(x => { const q = c.slots[x]; if (x === s || q.gone) return; if (q.kind === 'recipe') q.r.plants.forEach(p => other.add(p)); if (q.kind === 'custom') (q.c.pl || []).forEach(p => other.add(p)); });
+  peekD(k).x.forEach(x => (x.pl || []).forEach(p => other.add(p)));
+  const fermOther = c.fermSrc.filter(n => !(o.kind === 'recipe' ? o.r.n === n : o.c && o.c.n === n)).length > 0;
+  return { c, o, kc: c.T - less('planK'), fibre: dg.fibre.g - less('planF'), sf: dg.satfat.g - less('planSF'), fs: dg.sugar.g - less('planFS'), na: dg.sodium.g - less('planNa'), prot: dg.protein.g - less('planP'), ferm: fermOther, other };
+}
+function mkupOpts(k, s, G) {
+  const st = startOf(k), w = S.weeks[st] || {}, shop = w.shop || {}, cur = G.o.kind === 'recipe' ? G.o.r : null;
+  const isIn = i => !!(S.stock[i] && !(w.low || {})[i]) || Object.keys(shop).some(key => shop[key] && key.split(':')[1] === i) || (cur && cur.items.some(it => it.i === i)) || ING[i].pantry;
+  const all = mkupAll(k, s, G, isIn, cur);
+  // a quick pick-up is a few things, not a whole shop: those first, the rest only to fill up
+  const near = all.filter(x => x.miss.length <= 5);
+  return near.concat(all.filter(x => x.miss.length > 5)).slice(0, 3);
+}
+function mkupAll(k, s, G, isIn, cur) {
+  return RL.filter(r => r.slots.includes(s) && !r.shop && !S.nope[r.id] && (!cur || r.id !== cur.id) && (r.t || 0) <= 45).map(r => {
+    const m = G.kc > 0 ? r.k ? G.kc / r.k : 1 : 0; if (m < 0.5) return null;
+    const mm = Math.min(1.8, Math.max(0.5, Math.max(m > 1.8 ? 1.8 : m, r.fermMinM || 0))), k0 = r.k * mm;
+    if (k0 > G.kc + 60) return null;
+    const f = r.f * mm, sf = r.sf * mm, fs = r.fs * mm, na = r.na * mm, p = r.p * mm, ferm = isFerm(r, mm);
+    const fresh = r.plants.filter(x => !G.other.has(x)), pts = ptsOf(new Set(fresh));
+    const miss = [...new Set(r.items.map(it => it.i))].filter(i => !isIn(i));
+    let sc = 0;
+    if (G.fibre > 1) sc += 3 * Math.min(1, f / G.fibre) + (f >= G.fibre - 0.5 ? 1 : 0); else sc += Math.min(1, f / 10) * 0.5;
+    if (!G.ferm && ferm) sc += 1.5;
+    sc -= 2 * Math.max(0, sf - Math.max(0, G.sf)) / 5 + 2 * Math.max(0, fs - Math.max(0, G.fs)) / 10 + 2 * Math.max(0, na - Math.max(0, G.na)) / 0.5;
+    sc += 0.12 * pts + (G.prot > 5 ? Math.min(1, p / G.prot) * 0.6 : 0) + (S.favs[r.id] ? 0.3 : 0) - Math.min(2.4, 0.3 * miss.length);
+    return { r, mm, k0, f, sf, fs, na, p, ferm, pts, nNew: fresh.length, miss, sc };
+  }).filter(Boolean).sort((a, b) => b.sc - a.sc);
+}
+function mkupBar(k, c) {
+  const sl = mkupSlots(k, c); if (!sl.length) return '';
+  const short = dayGoals(k).fibre.g - c.planF, need = [short > 1 ? `${fmtN(short)}g short on fibre` : '', !c.fermPlan ? 'without anything fermented' : ''].filter(Boolean);
+  return `<section class="mkbar"><div><b>${need.length ? `As planned, today ends ${esc(joinAnd(need))}` : 'Fibre and fermented are covered as planned'}</b><small>${need.length ? 'Swap a meal still to come for one that makes up the gap, within the calories left.' : 'A swap can still add new plants, within the calories left.'}</small></div>
+    <div class="btnrow">${sl.map(s => `<button class="btn sm" data-a="mkup" data-k="${k}" data-s="${s}">${ic('wand')}Swap ${SLOTNAME[s].toLowerCase()}</button>`).join('')}</div></section>`;
+}
+function shMkup() {
+  const k = SH.k, s = SH.s, G = mkupGap(k, s);
+  SH.title = 'Make up the gap';
+  if (!G.o || G.o.done) return `<div class="sheethead"><div><h2>Make up the gap</h2></div>${closeBtn}</div><p class="muted">That meal's already eaten.</p>`;
+  const dayShort = dayGoals(k).fibre.g - G.c.planF, short = G.fibre > 3;
+  const head = dayShort > 1 ? `As planned, the day ends ${fmtN(dayShort)}g short on fibre, so that's the one to fix.` : short ? `Fibre's fine as planned, but this meal is carrying ${fmtN(G.fibre)}g of it.` : !G.ferm ? 'Nothing fermented yet today.' : 'Fibre and fermented are covered; this is about the extras.';
+  const box = (v, l, cls) => `<div class="${cls}"><b>${v}</b><span>${l}</span></div>`;
+  const tiles = `<div class="mkg">${box(short ? `${fmtN(G.fibre)}g` : '✓', short ? `fibre needed from ${SLOTNAME[s].toLowerCase()}` : 'fibre covered', short ? 'short' : 'fine')}${box(G.sf > 0 ? `${fmtN(G.sf)}g` : 'Over', G.sf > 0 ? 'sat fat left' : 'on sat fat', G.sf > 3 ? 'fine' : 'short')}${box(G.ferm ? '✓' : 'No', G.ferm ? 'fermented in' : 'fermented yet', G.ferm ? 'fine' : 'short')}${box(G.na > 0 ? `${G.na.toFixed(1)}g` : 'Over', G.na > 0 ? 'sodium left' : 'on sodium', G.na > 0.4 ? 'fine' : 'short')}</div>`;
+  const O = mkupOpts(k, s, G);
+  const opt = (x, i) => {
+    const wins = [G.fibre > 3 && x.f >= G.fibre - 1 ? 'Fibre covered' : x.f >= 8 ? `${fmtN(x.f)}g fibre` : '', !G.ferm && x.ferm ? 'Fermented' : '', x.nNew ? `+${x.nNew} new plant${x.nNew === 1 ? '' : 's'}` : '', x.sf <= Math.max(1, G.sf) * 0.5 ? 'Low sat fat' : '', x.r.oily ? 'Oily fish' : ''].filter(Boolean);
+    const warn = [x.sf > G.sf + 1 ? 'over on sat fat' : '', x.fs > G.fs + 2 ? 'over on sugar' : '', x.na > G.na + 0.2 ? 'over on salt' : ''].filter(Boolean);
+    const shopTxt = x.miss.length ? `Pick up: ${joinAnd(x.miss.slice(0, 3).map(i => shortN(i).toLowerCase()))}${x.miss.length > 3 ? ` and ${x.miss.length - 3} more` : ''}` : 'All in';
+    return `<button class="mkopt ${i === 0 ? 'best' : ''}" data-a="mkgo" data-r="${x.r.id}">${art(x.r, 52)}<span><b>${esc(x.r.n)}</b><span class="meta">${fmtN(x.k0)} kcal · ${fmtN(x.f)}g fibre · ${fmtN(x.p)}g protein${x.r.t ? ` · ${tmin(x.r.t)}` : ''}</span>
+      <span class="wins">${wins.map(t => `<i>${esc(t)}</i>`).join('')}<i class="${x.miss.length ? 'shop' : ''}">${esc(shopTxt)}</i>${warn.map(t => `<i class="warn">${esc(capFirst(t))}</i>`).join('')}</span></span></button>`;
+  };
+  return `<div class="sheethead"><div><span class="eyebrow">${SLOTNAME[s]} · ${fmtDay(k)}</span><h2>Make up the gap</h2></div>${closeBtn}</div>
+    <p style="margin:0 0 8px"><b>${fmtN(Math.max(0, G.kc))} kcal for ${SLOTNAME[s].toLowerCase()}.</b> ${esc(head)}</p>${tiles}
+    ${O.length ? `<div class="mkopts">${O.map(opt).join('')}</div><p class="small muted" style="margin:8px 0 0">Picking one swaps it in for ${SLOTNAME[s].toLowerCase()}${G.o.kind === 'recipe' ? ` instead of ${esc(G.o.r.n)}` : ''}, at a portion that fits the calories left.</p>` : '<p class="muted">Nothing in the recipes fits the calories left for this one.</p>'}`;
 }
 // thumbs up = liked (planned more often), thumbs down = never planned automatically
 function thumbs(id, small) {
@@ -6169,6 +6406,39 @@ function prepGroups(se) {
   }
   return groups;
 }
+/* Prep: each batch's ingredients, ticked in and with amounts you can change before cooking. The amounts go on the
+   week's dish ('@g:'), so the boxes, the shopping list and the totals all follow */
+const pgEntries = (st, key, s, rid) => { const se = sessions(st, weekMode(st)).find(x => x.key === key); if (!se) return []; return sessDays(se, s).map(k => ({ k, o: dayCalc(k).slots[s] })).filter(x => x.o.kind === 'recipe' && x.o.r.id === rid && x.o.prepped && !x.o.done); };
+const pgTot = (E, i) => E.reduce((a, x) => a + x.o.r.items.filter(it => it.i === i).reduce((b, it) => b + it.g, 0) * x.o.m, 0);
+// sets the batch's total of one ingredient: with "keep the calories" on, the portions resize around it, so the
+// amount per portion is found in a few rounds; with it off, the portions stay as they were
+function pgSet(st, key, s, rid, i, G) {
+  let E = pgEntries(st, key, s, rid); if (!E.length) return;
+  setAmt({ st, rid, key: '@k:' + i }, G === null || UI.pkKeep !== false ? null : 1);
+  if (G === null) { setAmt({ st, rid, key: AMT + i }, null); return; }
+  let g0 = G / Math.max(0.01, E.reduce((a, x) => a + x.o.m, 0));
+  for (let n = 0; n < 6; n++) {
+    setAmt({ st, rid, key: AMT + i }, Math.max(0.1, Math.round(g0 * 10) / 10)); FOODC = {}; TC = null;
+    E = pgEntries(st, key, s, rid); const T = pgTot(E, i); if (!T || Math.abs(T - G) < 0.5) break; g0 *= G / T;
+  }
+}
+function prepIngs(st, key, gr, tot, from) {
+  const k0 = gr.entries.map(e => e.k).find(k => haveable(k, gr.s, dayCalc(k).slots[gr.s])), o0 = k0 ? dayCalc(k0).slots[gr.s] : null;
+  const have = o0 ? Object.fromEntries(mealHave(k0, gr.s, o0).map(x => [x.i, x.src])) : null;
+  const sw = weekSw(st, gr.r.id), keep = UI.pkKeep !== false, ids = Object.keys(tot).filter(i => i !== 'losalt' && tot[i] > 0);
+  const da = `data-st="${st}" data-key="${key}" data-s="${gr.s}" data-r="${gr.r.id}"`;
+  const rows = ids.map(i => {
+    const g = tot[i], src = have ? have[i] : undefined, own = (AMT + i) in sw, more = ('@k:' + i) in sw, unit = ING[i].ml ? 'ml' : 'g';
+    const box = have ? `<button class="pgbox" role="checkbox" aria-checked="${!!src}" ${src === 'left' ? 'disabled' : `data-a="pgot" data-k="${k0}" data-s="${gr.s}" data-i="${i}"`} aria-label="${esc(ING[i].n)}: got it in"><span class="box">${ic('check')}</span></button>` : '<span></span>';
+    const sub = [/\d(k?g|ml)\b|litres/.test(fmtQ(i, g)) ? '' : fmtQ(i, g), from[i] ? `for ${shortN(from[i])}` : '', HAVE_SRC[src] || '', own ? (more ? 'your amount, more calories' : 'your amount, calories kept') : ''].filter(Boolean);
+    return `<div class="pgrow ${src ? 'in' : ''}">${box}<span class="pgn">${esc(ingLabel(gr.r.id, i, ING[i].n))}${sub.length || own ? `<small>${esc(sub.join(' · '))}${own ? ` <button class="pgreset" data-a="pgreset" ${da} data-i="${i}">Reset</button>` : ''}</small>` : ''}</span><span class="pgg"><input type="number" inputmode="decimal" min="0" step="${g >= 100 ? 5 : 1}" value="${g >= 20 ? Math.round(g) : +g.toFixed(1)}" data-pg="${i}" ${da} aria-label="${esc(ING[i].n)} for the batch, in ${unit}"><span>${unit}</span></span></div>`;
+  }).join('');
+  const nIn = have ? ids.filter(i => have[i]).length : 0, kc = gr.entries.length ? Math.round(gr.entries.reduce((a, e) => a + dayCalc(e.k).slots[gr.s].k, 0) / gr.entries.length) : 0;
+  return `<div class="pging">
+    <div class="pghead"><span class="small">${have ? `<b>${nIn} of ${ids.length}</b> in` : 'Amounts for the batch'}${kc ? ` · about ${fmtN(kc)} kcal a portion` : ''}</span>${have ? `<button class="btn sm ghost" data-a="pscan" ${da} data-k="${k0}">${ic('scan')}Scan</button>` : ''}</div>
+    <button class="pgtog" role="switch" aria-checked="${keep}" data-a="pgkeep"><span><b>Keep the calories</b><small>${keep ? 'Change an amount and the portions resize so each box stays on its calories.' : 'Change an amount and the portions stay the same size; the calories go up or down with it.'}</small></span><span class="switch"><span></span></span></button>
+    <div class="pgrows">${rows}</div></div>`;
+}
 function vPrep() {
   const st = UI.week, w = S.weeks[st] || { mode: 'auto' }, sug = suggestMode(st), mode = weekMode(st), sess = sessions(st, mode);
   if (!weekCalc(st).planned) return `${weekNav(st)}${emptyBlock(`Nothing to prep for ${fmtRange(st)} yet.`)}`;
@@ -6188,8 +6458,8 @@ function vPrep() {
         <div class="labels">${boxLabels(gr)}</div>
         ${sw.length ? `<p class="swapin">${ic('swap')}<span>Swapped this week: ${esc(sw.map(x => x.text).join('; '))}.</span></p>` : ''}
         ${gr.r.rice ? '<div class="small muted">Cool the rice within an hour, keep it in the fridge no more than a day, and freeze the rest. Reheat once, until piping hot.</div>' : ''}
-        <details class="more"><summary>Ingredients for ${n} portion${n > 1 ? 's' : ''}${ic('chev')}</summary><ul class="ilist ik">${ingRows(Object.entries(tot).map(([id, g]) => [id, g, from[id] ? ` <span class="muted for">for ${esc(shortN(from[id]))}</span>` : '']), `Total for ${n} portion${n > 1 ? 's' : ''}`)}</ul></details>
-        <details class="more"><summary>${gr.s === 's' ? 'Packing' : 'Method'}${ic('chev')}</summary><ol class="steps">${(() => { const st2 = prepSteps(gr), plan = amtPlan(gr.r, st2); return st2.map((x, i) => `<li>${esc(x)}${amtChips(plan[i], id => tot[id])}${swapNotes(gr.r, x)}</li>`).join(''); })()}</ol>${gr.r.note && gr.s !== 's' ? `<p class="small muted">${esc(gr.r.note)}</p>` : ''}</details>
+        <details class="more" ${UI.pgOpen && UI.pgOpen[`${se.key}${gr.s}${gr.r.id}`] ? 'open' : ''} data-pgo="${se.key}${gr.s}${gr.r.id}"><summary>Ingredients for ${n} portion${n > 1 ? 's' : ''}${ic('chev')}</summary>${prepIngs(st, se.key, gr, tot, from)}</details>
+        <details class="more"><summary>${gr.s === 's' ? 'Packing' : 'Method'}${ic('chev')}</summary><ol class="steps">${(() => { const st2 = prepSteps(gr), plan = amtPlan(gr.r, st2); return st2.map((x, i) => `<li>${esc(x)}${amtChips(plan[i], id => tot[id], gr.r.id)}${swapNotes(gr.r, x)}</li>`).join(''); })()}</ol>${gr.r.note && gr.s !== 's' ? `<p class="small muted">${esc(gr.r.note)}</p>` : ''}</details>
         <div><button class="btn sm" data-a="bswap" data-key="${se.key}" data-s="${gr.s}" ${gr.s === 's' ? `data-ks="${gr.entries.map(e => e.k).join(',')}"` : ''}>${ic('edit')}Swap ${sl}</button></div></div>`;
     }).join('') : M.ps.fin ? `<div class="batch"><p class="muted" style="margin:0">Everything from this batch has been eaten.</p></div>`
       : `<div class="batch"><p class="muted" style="margin:0">Nothing to batch-cook in this session.</p><div class="btnrow"><button class="btn sm" data-a="bswap" data-key="${se.key}" data-s="l">Choose a lunch</button><button class="btn sm" data-a="bswap" data-key="${se.key}" data-s="b">Choose a breakfast</button></div></div>`;
@@ -6381,12 +6651,12 @@ function stepHtml(M, s, i, cur) {
     const tot = {}, from = {}; s.gr.entries.forEach(e => s.gr.r.items.forEach(it => { tot[it.i] = (tot[it.i] || 0) + it.g * e.m; if (it.from) from[it.i] = it.from; }));
     const sw = swapList(s.gr.r);
     title = 'Get the ingredients out';
-    body = `<p class="psub">${M.cook ? `${M.k === todayKey() ? "Today's" : `The ${fmtDay(M.k)}`} portion, ${fmtN(M.o.k)} kcal` : `For ${s.gr.n} portion${s.gr.n > 1 ? 's' : ''}`}</p>${sw.length ? `<p class="swapin">${ic('swap')}<span>Swapped this week: ${esc(sw.map(x => x.text).join('; '))}.</span></p>` : ''}<ul class="ilist ik pings">${ingRows(Object.entries(tot).map(([id, g]) => [id, g, from[id] ? ` <span class="muted for">for ${esc(shortN(from[id]))}</span>` : '']), M.cook ? 'Total' : `Total for ${s.gr.n} portion${s.gr.n > 1 ? 's' : ''}`)}</ul>`;
+    body = `<p class="psub">${M.cook ? `${M.k === todayKey() ? "Today's" : `The ${fmtDay(M.k)}`} portion, ${fmtN(M.o.k)} kcal` : `For ${s.gr.n} portion${s.gr.n > 1 ? 's' : ''}`}</p>${sw.length ? `<p class="swapin">${ic('swap')}<span>Swapped this week: ${esc(sw.map(x => x.text).join('; '))}.</span></p>` : ''}<ul class="ilist ik pings">${ingRows(Object.entries(tot).map(([id, g]) => [id, g, from[id] ? ` <span class="muted for">for ${esc(shortN(from[id]))}</span>` : '']), M.cook ? 'Total' : `Total for ${s.gr.n} portion${s.gr.n > 1 ? 's' : ''}`, false, ING, null, '', s.gr.r.id)}</ul>`;
   } else if (s.kind === 'do') {
     title = s.text;
     const mine = M.all.filter(x => x.kind === 'do' && x.gr === s.gr), plan = amtPlan(s.gr.r, mine.map(x => x.text)), tot = {};
     s.gr.entries.forEach(e => s.gr.r.items.forEach(it => { tot[it.i] = (tot[it.i] || 0) + it.g * e.m; }));
-    body = amtChips(plan[mine.indexOf(s)], id => tot[id]) + swapNotes(s.gr.r, s.text);
+    body = amtChips(plan[mine.indexOf(s)], id => tot[id], s.gr.r.id, { on: M.ps.add || {}, pre: `${s.gr.r.id}:` }) + swapNotes(s.gr.r, s.text);
     if (s.tm.length) body += `<div class="tbtns">${s.tm.map((_, j) => tbtnHtml(M, s, j)).join('')}</div>${isCur && M.left > 1 && s.tm.some((_, j) => !TM.some(t => t.id === `${M.st}|${M.key}|${s.id}|${j}`)) ? '<p class="psub">Start the timer and carry on. It keeps counting at the top.</p>' : ''}`;
   } else {
     const gr = s.gr, avg = gr.sumM / gr.n, big = gr.entries.filter(e => e.m > avg * 1.08).map(e => DOW[dayIndex(e.k)]), small = gr.entries.filter(e => e.m < avg * 0.92).map(e => DOW[dayIndex(e.k)]);
@@ -6710,6 +6980,64 @@ function haveChip(k, s, o) {
   const h = mealHave(k, s, o), n = h.filter(x => x.src).length, all = n === h.length;
   return `<button class="havebtn ${all ? 'all' : ''}" data-a="haveopen" data-k="${k}" data-s="${s}" aria-label="Ingredients for ${esc(o.r.n)}: ${all ? 'everything in' : `${n} of ${h.length} in`}">${ic('shop')}<span>${all ? ic('check') : `${n}/${h.length}`}</span></button>`;
 }
+// tick an ingredient in (or out) for a meal and the rest of its batch; null if it can't be changed
+function haveToggle(k, s, i, on) {
+  const o = dayCalc(k).slots[s]; if (!haveable(k, s, o)) return null;
+  const x = mealHave(k, s, o).find(y => y.i === i); if (!x || x.src === 'left') return null;
+  if (on === true && x.src) return '';
+  const st = startOf(k), grp = haveGroup(k, s, o), nm = shortN(i);
+  if (!x.src) { grp.forEach(k2 => setGot(k2, s, i, true)); return ''; }
+  if (x.src === 'meal') { grp.forEach(k2 => setGot(k2, s, i, false)); return ''; }
+  if (x.src === 'shop') { const w = W(st), t = mealTrip(st, k, s, o); delete w.shop[`${t}:${i}`]; clearGot(st, t, i); return `${nm} is back on the shopping list`; }
+  const w = W(st); w.low = w.low || {}; w.low[i] = 1; return `${nm}: running low, so it's back on the shopping list`;
+}
+/* scanning on Prep: a product's barcode ticks the ingredient it is, and its pack size becomes the usual one */
+const qtyG = q => { const m = /(\d+(?:[.,]\d+)?)\s*(kg|g|ml|cl|l)\b/i.exec(String(q || '')); if (!m) return null; const v = +m[1].replace(',', '.'), u = m[2].toLowerCase(); const g = u === 'kg' || u === 'l' ? v * 1000 : u === 'cl' ? v * 10 : v; return g >= 5 && g <= 10000 ? Math.round(g) : null; };
+const PG_STOP = new Set(['fresh', 'dried', 'tin', 'drained', 'frozen', 'ready', 'cooked', 'pouch', 'the', 'and', 'of', 'in', 'or', 'reduced', 'fat', 'light', 'plain', 'live', 'from', 'cube', 'pot', 'whole', 'not', 'vinegar', 'extra', 'virgin', 'with', 'a']);
+// names a pack can go by that aren't in the app's own name
+const PG_ALIAS = { parmesan: ['parmigiano', 'grana padano'], springonion: ['salad onions', 'salad onion'], coriander: ['cilantro'], fage0: ['greek yoghurt', 'greek style yoghurt'], choptom: ['chopped tomatoes'], chilli: ['chillies', 'chilli peppers'], prawns: ['king prawns'], wwpasta: ['wholewheat penne', 'wholewheat fusilli', 'wholewheat spaghetti'], brownrice: ['brown rice'], soy: ['soy sauce', 'soya sauce'] };
+function pgMatch(name, ids) {
+  const w = ' ' + String(name || '').toLowerCase().replace(/[^a-z ]/g, ' ').replace(/\s+/g, ' ') + ' ', has = t => w.includes(` ${t} `) || w.includes(` ${t}s `) || w.includes(` ${t.replace(/s$/, '')} `);
+  const sc = ids.map(i => { const ws = [...new Set(ING[i].n.toLowerCase().replace(/[^a-z ]/g, ' ').split(/\s+/).filter(t => t.length > 2 && !PG_STOP.has(t)))]; return { i, v: (PG_ALIAS[i] || []).some(a => w.includes(` ${a} `)) ? 1 : ws.length ? ws.filter(has).length / ws.length : 0 }; }).sort((a, b) => b.v - a.v);
+  return sc[0] && sc[0].v >= 0.5 && !(sc[1] && sc[1].v === sc[0].v) ? sc[0].i : null;
+}
+function pgScanIds() { const E = pgEntries(SH.st, SH.key, SH.s, SH.r), ids = new Set(); E.forEach(x => x.o.r.items.forEach(it => { if (it.i !== 'losalt') ids.add(it.i); })); return [...ids]; }
+async function pscanCode(code) {
+  code = String(code || '').replace(/\D/g, ''); if (code.length < 6) { toast('That barcode looks too short'); return; }
+  SH.busy = true; SH.res = null; renderSheet();
+  try {
+    const j = await offGet(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=${OFF_FIELDS}`);
+    if (!SH || SH.type !== 'pscan') return;
+    const p = j && j.status === 1 && j.product ? j.product : null, it = p ? offItem(Object.assign({ code }, p)) : null;
+    SH.res = p ? { code, n: it ? it.n : p.product_name || 'That product', g: qtyG(p.quantity) } : { code, none: true };
+    if (p) { SH.res.match = pgMatch(SH.res.n, pgScanIds()); if (SH.res.match) pgScanApply(SH.res.match); }
+  } catch (e) { if (SH && SH.type === 'pscan') SH.res = { code, err: true }; }
+  if (SH && SH.type === 'pscan') { SH.busy = false; renderSheet(); }
+}
+function pgScanApply(i) {
+  const r = SH.res; if (!r || !ING[i]) return;
+  haveToggle(SH.k, SH.s, i, true); r.match = i;
+  if (r.g) { S.packs = S.packs || {}; if (r.g === PACK_BASE[i]) delete S.packs[i]; else S.packs[i] = r.g; applyPacks(); r.pack = r.g; }
+  save(); render();
+}
+function shPScan() {
+  SH.title = 'Scan an ingredient';
+  const r = SH.res, ids = pgScanIds(), o0 = dayCalc(SH.k).slots[SH.s], have = haveable(SH.k, SH.s, o0) ? Object.fromEntries(mealHave(SH.k, SH.s, o0).map(x => [x.i, x.src])) : {};
+  const un = i => (ING[i].ml ? 'ml' : 'g');
+  let res = '';
+  if (SH.scan) res = `<div class="scanbox"><video id="scan-v" playsinline muted autoplay></video><p class="small muted">Point the camera at the barcode.</p><button class="btn sm ghost" data-a="scanstop2">Cancel</button></div>`;
+  else if (SH.busy) res = '<p class="small muted">Looking up the barcode…</p>';
+  else if (r && r.err) res = "<p class=\"small muted\">Couldn't reach Open Food Facts. Check the connection and try again, or tick it off by hand.</p>";
+  else if (r && r.none) res = `<p class="small muted">Barcode ${esc(r.code)} isn't on Open Food Facts. Tick it off by hand.</p>`;
+  else if (r && r.match) res = `<div class="scanbar ok"><b>${esc(r.n)}</b><span>${ic('check')}Ticked off: ${esc(ING[r.match].n)}${r.pack ? `. Packs of ${fmtN(r.pack)}${un(r.match)} from now on, for leftovers and the shopping list.` : '.'}</span></div><p class="small muted" style="margin:6px 0 0">Not right? Pick the one it is:</p>`;
+  else if (r) res = `<div class="scanbar"><b>${esc(r.n)}</b><span>Which ingredient is it?${r.g ? ` Its pack size, ${fmtN(r.g)}g, will be kept.` : ''}</span></div>`;
+  const pick = r && !r.err && !r.none && !SH.scan && !SH.busy ? `<div class="chips" style="margin-top:8px">${ids.filter(i => i !== r.match).map(i => `<button class="chip" data-a="pscanpick" data-i="${i}">${have[i] ? ic('check') : ''}${esc(ING[i].n)}</button>`).join('')}</div>` : '';
+  return `<div class="sheethead"><div><span class="eyebrow">${esc(R[SH.r] ? R[SH.r].n : 'Prep')}</span><h2>Scan an ingredient</h2></div>${closeBtn}</div>
+    <p class="small muted" style="margin:0 0 8px">Scan a pack and the app ticks off the ingredient it is, and keeps its pack size as the usual one.</p>
+    ${res}${pick}
+    ${SH.scan || SH.busy ? '' : `<div class="btnrow" style="margin-top:10px"><button class="btn primary" data-a="pscango">${ic('scan')}${r ? 'Scan another' : 'Scan'}</button></div>`}
+    ${SH.noscan ? `<div class="fieldrow" style="margin-top:8px"><div class="field"><label for="ps-code">This phone can't scan here; type the barcode</label><input id="ps-code" inputmode="numeric" placeholder="e.g. 5000169005019"></div><div class="field"><label>&nbsp;</label><button class="btn sm" data-a="pscancode">Look up</button></div></div>` : ''}`;
+}
 const HAVE_SRC = { stock: 'In your cupboard', shop: 'Ticked off in the shopping list', left: 'Left over from last week', meal: '' };
 function shHave() {
   const k = SH.k, s = SH.s, o = dayCalc(k).slots[s];
@@ -6928,7 +7256,7 @@ function renderSheet(fresh) {
   const root = $('sheet-root');
   if (!SH) { root.innerHTML = ''; return; }
   const old = root.querySelector('.sheet'), top = old && !fresh ? old.scrollTop : 0;
-  const html = ({ wgoal: shWGoal, ckitems: shCkItems, cupboard: shCupboard, recipe: shRecipe, pick: shPick, xadd: shAdd, custom: shCustom, target: shTarget, settings: shSettings, confirm: shConfirm, setwhen: shSetWhen, leftadd: shLeftAdd, pack: shPack, backup: shBackup, lift: shLift, trswap: shTrSwap, trset: shTrSet, tvpick: shTvPick, tvaddex: shTvAddEx, tradd: shTrAdd, have: shHave, trre: shTrRe, weekmenu: shWeekMenu, night: shNight, swap: shSwap, idea: shIdea, fx: shFx })[SH.type]();
+  const html = ({ wgoal: shWGoal, ckitems: shCkItems, cupboard: shCupboard, recipe: shRecipe, pick: shPick, xadd: shAdd, custom: shCustom, target: shTarget, settings: shSettings, confirm: shConfirm, setwhen: shSetWhen, leftadd: shLeftAdd, pack: shPack, backup: shBackup, lift: shLift, trswap: shTrSwap, trset: shTrSet, tvpick: shTvPick, tvaddex: shTvAddEx, tradd: shTrAdd, have: shHave, pscan: shPScan, mkup: shMkup, trre: shTrRe, weekmenu: shWeekMenu, night: shNight, swap: shSwap, idea: shIdea, fx: shFx })[SH.type]();
   root.innerHTML = `<div class="scrim" data-scrim="1"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(SH.title || 'Details')}"><div class="grab"></div>${html}</div></div>`;
   if (!fresh) root.querySelector('.scrim').style.animation = 'none';
   const sh = root.querySelector('.sheet'); if (!fresh) sh.style.animation = 'none';
@@ -7220,8 +7548,8 @@ function shRecipe() {
           const tail = (it.from ? ` <span class="muted for">for ${esc(shortN(it.from))}</span>` : '') + (it.own ? ' <span class="muted for">your amount</span>' : '');
           return [it.i, it.g * mm, tail, tap && SH.swi === orig ? ingTools(r, o, orig, scope, scopes, many, false) : '', tap];
         });
-      })(), n > 1 ? `Total for ${n} portions` : 'Total', true, era ? eraIng(era) : ING, era, era ? '' : outRows(r, o, omAll, scope, scopes, mm))}</ul></section>
-    <section><h4>Method</h4><ol class="steps">${(() => { const plan = amtPlan(r, r.steps), tot = itemTotals(r, mm); return r.steps.map((x, i) => `<li>${esc(x)}${amtChips(plan[i], id => tot[id])}${swapNotes(r, x)}</li>`).join(''); })()}</ol>${r.note ? `<p class="small muted">${esc(r.note)}</p>` : ''}</section>
+      })(), n > 1 ? `Total for ${n} portions` : 'Total', true, era ? eraIng(era) : ING, era, era ? '' : outRows(r, o, omAll, scope, scopes, mm), r.id)}</ul></section>
+    <section><h4>Method</h4><ol class="steps">${(() => { const plan = amtPlan(r, r.steps), tot = itemTotals(r, mm); return r.steps.map((x, i) => `<li>${esc(x)}${amtChips(plan[i], id => tot[id], r.id)}${swapNotes(r, x)}</li>`).join(''); })()}</ol>${r.note ? `<p class="small muted">${esc(r.note)}</p>` : ''}</section>
     <section><details class="more"><summary>Plants & storage${ic('chev')}</summary>${keeps.length ? `<p style="margin:8px 0">${keeps.join(' · ').replace(/^./, c => c.toUpperCase())}.</p>` : ''}<div class="plantgrid">${plants}</div></details></section>
     ${R[SH.r] && R[SH.r].mine ? `<p class="small muted" style="margin:12px 0 4px">One of your recipe ideas.</p><button class="btn sm ghost" data-a="ideadel" data-r="${esc(SH.r)}">${ic('trash')}Remove from your ideas</button>` : ''}`;
 }
@@ -7322,7 +7650,7 @@ function labelFields(px, o) {
   return `<div class="lblf"><div class="lblh">From the label, if you have it</div><div class="fieldrow four">${f('sa', 'Salt (g)', o.sa)}${f('fs', 'Sugar (g)', o.fs)}${f('sf', 'Sat fat (g)', o.sf)}${f('f', 'Fibre (g)', o.f)}</div><p class="small muted" style="margin:4px 0 0">Salt as printed on the pack; the app turns it into sodium. For sugar, count only added sugar.</p></div>`;
 }
 function readLabel(px) { const g = id => { const el = $(`${px}-${id}`), v = el ? el.value.trim() : ''; return v === '' ? undefined : Math.max(0, +v || 0); }; const sa = g('sa'); return { sa, fs: g('fs'), sf: g('sf'), f: g('f') }; }
-const X_FIELDS = ['n', 'k', 'p', 'fe', 'pl', 'na', 'sa', 'fs', 'sf', 'f']; // what the log sheet edits; anything else on an entry is kept
+const X_FIELDS = ['n', 'k', 'p', 'fe', 'pl', 'na', 'sa', 'fs', 'sf', 'f', 'g', 'u']; // what the log sheet edits; anything else on an entry is kept
 function foodRows(forMeal) {
   const q = foodKey(SH && SH.fq), all = Object.entries(S.foods || {}).sort((a, b) => (b[1].last || '').localeCompare(a[1].last || '') || (b[1].used || 0) - (a[1].used || 0));
   const hits = (q ? all.filter(([k]) => k.includes(q)) : all).slice(0, q ? 30 : 6);
@@ -7428,8 +7756,8 @@ function lkBox() {
   if (SH.scan) return `<div class="scanbox"><video id="scan-v" playsinline muted autoplay></video><p class="small muted">Point the camera at the barcode.</p><button class="btn sm ghost" data-a="scanstop">Cancel</button></div>`;
   if (SH.lk) {
     const it = SH.lk;
-    return `<div class="lkpick"><div><b>${esc(it.n)}</b><small>${fmtN(it.per.k)} kcal per 100${ING[it.id] && ING[it.id].ml ? 'ml' : 'g'}${it.src === 'off' ? ' · Open Food Facts' : ''}</small></div><button class="iconbtn" data-a="lkclear" aria-label="Look up something else">${ic('x')}</button></div>
-      <div class="fieldrow"><div class="field"><label for="lk-g">Amount (${ING[it.id] && ING[it.id].ml ? 'ml' : 'g'})</label><input id="lk-g" type="number" inputmode="decimal" value="${it.g || it.serv || 100}"></div>${it.serv ? `<div class="field"><label>&nbsp;</label><button class="btn sm ghost" data-a="lkserv">${esc(it.src === 'ing' ? it.servTxt : it.servTxt ? `1 serving (${it.servTxt})` : `1 serving, ${fmtN(it.serv)}g`)}</button></div>` : ''}</div>
+    return `<div class="lkpick"><div><b>${esc(it.n)}</b><small>${fmtN(it.per.k)} kcal per 100${it.ml || (ING[it.id] && ING[it.id].ml) ? 'ml' : 'g'}${it.src === 'off' ? ' · Open Food Facts' : it.src === 'saved' ? ` · last time ${fmtN(it.serv)}${it.ml ? 'ml' : 'g'}` : ''}</small></div><button class="iconbtn" data-a="lkclear" aria-label="Look up something else">${ic('x')}</button></div>
+      <div class="fieldrow"><div class="field"><label for="lk-g">Amount (${it.ml || (ING[it.id] && ING[it.id].ml) ? 'ml' : 'g'})</label><input id="lk-g" type="number" inputmode="decimal" value="${it.g || it.serv || 100}"></div>${it.serv ? `<div class="field"><label>&nbsp;</label><button class="btn sm ghost" data-a="lkserv">${esc(it.src === 'ing' ? it.servTxt : it.servTxt ? `1 serving (${it.servTxt})` : `1 serving, ${fmtN(it.serv)}g`)}</button></div>` : ''}</div>
       ${it.src === 'off' && it.per.fs === undefined && it.sugars ? `<p class="small muted" style="margin:0">The label has ${+(it.sugars * (it.g || 100) / 100).toFixed(1)}g sugars in that amount. Put the added part in Sugar if you know it.</p>` : ''}`;
   }
   const q = (SH.lq || '').trim(), ql = q.toLowerCase();
@@ -7449,15 +7777,16 @@ function lkBox() {
 }
 function stopScan() { const v = $('scan-v'); if (SCAN.stream) SCAN.stream.getTracks().forEach(t => t.stop()); SCAN.stream = null; clearTimeout(SCAN.t); if (v) v.srcObject = null; if (SH) SH.scan = false; }
 const SCAN = { stream: null, t: 0 };
-async function startScan() {
+async function startScan(onCode, show) {
+  onCode = onCode || offCode; show = show || lkRender;
   if (!('BarcodeDetector' in window) || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { SH.noscan = true; renderSheet(); return; }
   let det; try { det = new window.BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] }); } catch (e) { SH.noscan = true; renderSheet(); return; }
-  SH.scan = true; lkRender();
+  SH.scan = true; show();
   try { SCAN.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); } catch (e) { SH.scan = false; SH.noscan = true; renderSheet(); toast('No camera access'); return; }
   const v = $('scan-v'); if (!v || !SH || !SH.scan) { stopScan(); return; } v.srcObject = SCAN.stream;
   const tick = async () => {
     if (!SH || !SH.scan) return;
-    try { const r = await det.detect(v); if (r && r.length) { const code = r[0].rawValue; stopScan(); offCode(code); return; } } catch (e) { /* frame not ready */ }
+    try { const r = await det.detect(v); if (r && r.length) { const code = r[0].rawValue; stopScan(); onCode(code); return; } } catch (e) { /* frame not ready */ }
     SCAN.t = setTimeout(tick, 250);
   };
   tick();
@@ -7478,11 +7807,12 @@ function shAdd() {
   const ed = SH.ei !== undefined, dk = SH.dk || UI.day; if (!SH.xk0) { SH.xk0 = 1; XK0 = +SH.k || null; }
   SH.title = ed ? 'Edit' : 'Log something else'; SH.pl = SH.pl || [];
   return `<div class="sheethead"><div><span class="eyebrow">${fmtDay(dk)}</span><h2>${ed ? 'Edit what you logged' : 'Log something else'}</h2></div>${closeBtn}</div>
-    ${ed ? '' : `${pcBox()}${SH.pc ? '' : foodBox(false)}<section class="lookup" ${SH.pc ? 'hidden' : ''}><div class="field" style="margin:${Object.keys(S.foods || {}).length ? '14px' : '0'} 0 0"><label for="lq">Look it up</label><div class="lqrow"><input id="lq" type="search" placeholder="e.g. Fage 0%, oat milk, banana" value="${esc(SH.lq || '')}" autocomplete="off"><button class="btn sm" data-a="scanstart" aria-label="Scan a barcode">${ic('scan')}Scan</button></div></div>
+    ${ed ? (SH.lk ? `<div id="lk-box">${lkBox()}</div>` : '') : `${pcBox()}${SH.pc ? '' : foodBox(false)}<section class="lookup" ${SH.pc ? 'hidden' : ''}><div class="field" style="margin:${Object.keys(S.foods || {}).length ? '14px' : '0'} 0 0"><label for="lq">Look it up</label><div class="lqrow"><input id="lq" type="search" placeholder="e.g. Fage 0%, oat milk, banana" value="${esc(SH.lq || '')}" autocomplete="off"><button class="btn sm" data-a="scanstart" aria-label="Scan a barcode">${ic('scan')}Scan</button></div></div>
       ${SH.noscan ? `<div class="fieldrow"><div class="field"><label for="lq-code">This phone can't scan here; type the barcode</label><input id="lq-code" inputmode="numeric" placeholder="e.g. 5201054017364"></div><div class="field"><label>&nbsp;</label><button class="btn sm" data-a="offcode">Look up</button></div></div>` : ''}
       <div id="lk-box">${lkBox()}</div></section><div class="lblh" style="margin-top:14px">${SH.lk || SH.pc ? 'Check the figures' : 'Or type it in'}</div>`}
     <div class="field"><label for="x-n">What was it?</label><input id="x-n" ${Object.keys(S.foods || {}).length && !ed ? '' : 'autofocus'} value="${esc(SH.n || '')}" placeholder="e.g. Office cake"></div>
     <div class="fieldrow"><div class="field"><label for="x-k">Calories</label><input id="x-k" type="number" inputmode="numeric" value="${esc(SH.k || '')}"></div><div class="field"><label for="x-p">Protein (g)</label><input id="x-p" type="number" inputmode="numeric" value="${esc(SH.p || '')}"></div></div>
+    ${SH.lk ? '' : `<div class="field"><label for="x-g">How much, in grams <span class="muted">(optional: kept for next time)</span></label><input id="x-g" type="number" inputmode="decimal" value="${esc(SH.g || '')}" placeholder="e.g. 80"></div>`}
     <div class="xscale"><span class="small muted">Scale it all</span><div class="chips">${[0.5, 0.75, 1.25, 1.5, 2].map(f => `<button class="chip" data-a="xscale" data-v="${f}">${frac(f, 0.25)}×</button>`).join('')}</div></div>
     <div id="x-match"></div>
     ${labelFields('x', SH)}
@@ -8074,6 +8404,7 @@ const ACT = {
   xsave() {
     keepAddFields(); if (!SH.n && !SH.k) { toast('Add a name or calories'); return; }
     const xs = D(SH.dk || UI.day).x, nw = Object.assign({ n: SH.n || 'Extra', k: +SH.k || 0, p: +SH.p || 0, fe: !!SH.fe, pl: SH.pl.slice(), at: todayKey() }, labelOut(SH)), old = SH.ei !== undefined && xs[SH.ei];
+    const gAmt = SH.lk ? +SH.lk.g : +SH.g; if (gAmt > 0 && gAmt < 10000) { nw.g = Math.round(gAmt * 10) / 10; if (SH.lk && (SH.lk.ml || (ING[SH.lk.id] && ING[SH.lk.id].ml))) nw.u = 'ml'; }
     if (old) { const keep = {}; Object.keys(old).forEach(f => { if (!X_FIELDS.includes(f)) keep[f] = old[f]; }); xs[SH.ei] = Object.assign(keep, nw); toast('Updated'); }
     else xs.push(nw);
     if (!(old && old.rv)) foodPut(S, nw, SH.dk || UI.day);
@@ -8084,12 +8415,13 @@ const ACT = {
     const dk = SH.dk || UI.day, x = foodCopy(e); x.at = todayKey(); D(dk).x.push(x); foodPut(S, x, dk);
     save(); closeSheet(); render(); toast(`Added ${e.n}`);
   },
-  fedit(d) { const e = S.foods && S.foods[d.v]; if (!e) return; Object.assign(SH, { n: e.n, k: e.k || '', p: e.p || '', fe: !!e.fe, pl: (e.pl || []).slice(), sa: e.sa !== undefined ? e.sa : e.na !== undefined ? +(e.na * 2.5).toFixed(2) : undefined, fs: e.fs, sf: e.sf, f: e.f }); renderSheet(); },
+  fedit(d) { const e = S.foods && S.foods[d.v]; if (!e) return; const it = amtItem(e); if (it) { lkPick(it); return; } Object.assign(SH, { n: e.n, k: e.k || '', p: e.p || '', fe: !!e.fe, pl: (e.pl || []).slice(), sa: e.sa !== undefined ? e.sa : e.na !== undefined ? +(e.na * 2.5).toFixed(2) : undefined, fs: e.fs, sf: e.sf, f: e.f }); renderSheet(); },
   fuse(d) { const e = S.foods && S.foods[d.v]; if (!e) return; SH.pre = { n: e.n, k: e.k, p: e.p, sa: e.sa !== undefined ? e.sa : e.na !== undefined ? +(e.na * 2.5).toFixed(2) : undefined, fs: e.fs, sf: e.sf, f: e.f }; renderSheet(); },
   fforget(d) { const e = S.foods && S.foods[d.v]; if (!e) return; delete S.foods[d.v]; save(); renderSheet(); toast(`Forgot ${e.n}`); },
   xedit(d) {
     const dk = d.k || UI.day, x = peekD(dk).x[+d.i]; if (!x) return;
-    openSheet({ type: 'xadd', dk, ei: +d.i, n: x.n, k: x.k || '', p: x.p || '', fe: !!x.fe, pl: (x.pl || []).slice(), sa: x.sa !== undefined ? x.sa : x.na !== undefined ? +(x.na * 2.5).toFixed(2) : undefined, fs: x.fs, sf: x.sf, f: x.f });
+    openSheet({ type: 'xadd', dk, ei: +d.i, n: x.n, k: x.k || '', p: x.p || '', g: x.g || '', fe: !!x.fe, pl: (x.pl || []).slice(), sa: x.sa !== undefined ? x.sa : x.na !== undefined ? +(x.na * 2.5).toFixed(2) : undefined, fs: x.fs, sf: x.sf, f: x.f });
+    const it = amtItem(x); if (it) { SH.lk = it; renderSheet(); lkFill(it.g); }
   },
   xrm() { const xs = D(SH.dk || UI.day).x, x = xs[SH.ei]; if (x) { xs.splice(SH.ei, 1); toast(`Removed ${x.n}`); } save(); closeSheet(); render(); },
   xdel(d) { D(UI.day).x.splice(+d.i, 1); save(); render(); },
@@ -8129,16 +8461,21 @@ const ACT = {
     save(); render();
   },
   haveopen(d) { openSheet({ type: 'have', k: d.k, s: d.s }); },
+  // an amount in the cooking view: in the pan, or not yet
+  samt(d) { if (!PM) return; const ps = prepState(PM.st, PM.key); ps.add = ps.add || {}; if (ps.add[d.v]) delete ps.add[d.v]; else ps.add[d.v] = 1; save(); renderPrep(); },
+  mkup(d) { openSheet({ type: 'mkup', k: d.k, s: d.s }); },
+  mkgo(d) { if (!SH || SH.type !== 'mkup' || !R[d.r]) return; const k = SH.k, s = SH.s; setSlot(k, s, d.r); closeSheet(); render(); toast(`${SLOTNAME[s]}: ${R[d.r].n}`); },
+  pgot(d) { const msg = haveToggle(d.k, d.s, d.i); if (msg === null) return; save(); render(); if (msg) toast(msg); },
+  pgkeep() { UI.pkKeep = UI.pkKeep === false; try { localStorage.setItem('tp.pkeep', UI.pkKeep ? '1' : '0'); } catch (e) { /* ignore */ } render(); },
+  pgreset(d) { pgSet(d.st, d.key, d.s, d.r, d.i, null); save(); render(); toast(`${shortN(d.i)} back to the recipe's amount`); },
+  pscan(d) { openSheet({ type: 'pscan', st: d.st, key: d.key, s: d.s, r: d.r, k: d.k }); },
+  pscango() { if (!SH || SH.type !== 'pscan') return; SH.res = null; startScan(pscanCode, renderSheet); },
+  scanstop2() { stopScan(); renderSheet(); },
+  pscancode() { const el = $('ps-code'); if (el) pscanCode(el.value); },
+  pscanpick(d) { if (!SH || SH.type !== 'pscan' || !SH.res) return; pgScanApply(d.i); renderSheet(); toast(`Ticked off: ${shortN(d.i)}`); },
   havetog(d) {
     if (!SH || SH.type !== 'have' || !ING[d.i]) return;
-    const k = SH.k, s = SH.s, o = dayCalc(k).slots[s]; if (!haveable(k, s, o)) return;
-    const x = mealHave(k, s, o).find(y => y.i === d.i); if (!x) return;
-    const st = startOf(k), grp = haveGroup(k, s, o), nm = shortN(d.i);
-    let msg = '';
-    if (!x.src) grp.forEach(k2 => setGot(k2, s, d.i, true));
-    else if (x.src === 'meal') grp.forEach(k2 => setGot(k2, s, d.i, false));
-    else if (x.src === 'shop') { const w = W(st), t = mealTrip(st, k, s, o); delete w.shop[`${t}:${d.i}`]; clearGot(st, t, d.i); msg = `${nm} is back on the shopping list`; }
-    else if (x.src === 'stock') { const w = W(st); w.low = w.low || {}; w.low[d.i] = 1; msg = `${nm}: running low, so it's back on the shopping list`; }
+    const msg = haveToggle(SH.k, SH.s, d.i); if (msg === null) return;
     save(); render(); renderSheet(); if (msg) toast(msg);
   },
   haveall() {
@@ -8749,7 +9086,7 @@ document.addEventListener('input', e => {
   if (id !== 'x-k') XK0 = +(($('x-k') || {}).value) || null; // figures typed against this calorie figure
   xMatchBtn();
 });
-function keepAddFields() { if (!SH || SH.type !== 'xadd') return; SH.n = $('x-n').value.trim(); SH.k = $('x-k').value; SH.p = $('x-p').value; SH.fe = $('x-fe').checked; SH.plq = $('plq').value; Object.assign(SH, readLabel('x')); }
+function keepAddFields() { if (!SH || SH.type !== 'xadd') return; SH.n = $('x-n').value.trim(); SH.k = $('x-k').value; SH.p = $('x-p').value; SH.fe = $('x-fe').checked; SH.plq = $('plq').value; const ge = $('x-g'); if (ge) SH.g = ge.value; Object.assign(SH, readLabel('x')); }
 
 document.addEventListener('click', e => {
   if (e.target.dataset && e.target.dataset.scrim) { closeSheet(); return; }
@@ -8773,6 +9110,8 @@ document.addEventListener('input', e => {
   else if (SH && SH.type === 'settings' && (Object.values(BUD_IDS).includes(id) || id === 's-target' || id === 's-lk')) budNote();
 });
 document.addEventListener('change', e => {
+  const pg = e.target.dataset && e.target.dataset.pg;
+  if (pg && ING[pg]) { const v = +e.target.value, t = e.target.dataset; if (v > 0 && v < 20000) { pgSet(t.st, t.key, t.s, t.r, pg, v); save(); render(); toast(`${shortN(pg)}: ${fmtN(v)}${ING[pg].ml ? 'ml' : 'g'} for the batch${UI.pkKeep === false ? ', portions kept the same' : ', calories kept'}`); } return; }
   if (e.target.id === 'ck-w' && e.target.value !== '' && +e.target.value === 0) ACT.ckwna({ v: '1' });
   if (e.target.id === 'wz-date' && WZ && e.target.value) { WZ.start = e.target.value; renderWZ(); }
   if (e.target.id === 'ck-date' && e.target.value) { const v = e.target.value > todayKey() ? todayKey() : e.target.value; UI.ckDate = v; UI.ckEdit = !ckSaved(v); UI.ckWaist = false; ckReset(); render(); }
@@ -8832,7 +9171,7 @@ function trNormalise(s) {
     l.id = id;
     if (!SESS[l.sess]) l.rt = typeof l.rt === 'string' && l.rt ? l.rt : 'Session';
     l.ex = l.ex.filter(e => isObj(e) && e.ex && Array.isArray(e.sets));
-    l.ex.forEach(e => { if (e.n !== undefined && !(Math.round(+e.n) >= 1)) delete e.n; else if (e.n !== undefined) e.n = Math.min(10, Math.round(+e.n)); });
+    l.ex.forEach(e => { if (e.n !== undefined && !(Math.round(+e.n) >= 1)) delete e.n; else if (e.n !== undefined) e.n = Math.min(10, Math.round(+e.n)); if (e.nd !== undefined && e.nd !== 1) delete e.nd; });
     l.ex.forEach(e => { e.sets = e.sets.filter(isObj).map(x => ({ kg: x.kg == null ? '' : String(x.kg), reps: x.reps == null ? '' : String(x.reps), rir: x.rir == null ? '' : String(x.rir), done: !!x.done })); });
     if (!['cut', 'maint', 'bulk'].includes(l.phase)) l.phase = 'cut';
     if (l.dose !== 'min') l.dose = 'eff';
@@ -8998,6 +9337,14 @@ function trSaveSoon(l) { if (l) l.updated = Date.now(); TRW = null; clearTimeout
 // a set counts as done once it's ticked or has its reps filled in, everywhere: sessions, the week and the ledger
 const setDone = x => !!x.done || tnum(x.reps) > 0;
 const exDone = e => e.sets.filter(setDone).length;
+// how much of a session was done: each exercise is its share, a part-done one counts in proportion, and one marked
+// not done counts nothing (so one of four missed leaves 75%)
+function sesPct(l) {
+  const xs = l.ex.filter(e => exTgt(l, e) > 0 || e.sets.length); if (!xs.length) return 0;
+  return xs.reduce((a, e) => a + (e.nd ? 0 : Math.min(1, exDone(e) / Math.max(1, exTgt(l, e)))), 0) / xs.length;
+}
+// quarters, as on the monthly scorecard: 8¾
+const fmtQtr = v => { const q = Math.round(v * 4) / 4, w = Math.floor(q), f = q - w; return `${w || !f ? w : ''}${f === 0.25 ? '¼' : f === 0.5 ? '½' : f === 0.75 ? '¾' : ''}`; };
 const phaseTxt = phase => ({ cut: 'Cutting, so the weights stay heavy and the volume moderate: the job is to keep every bit of muscle while the fat comes off.', maint: 'Holding steady: heavy weights, moderate volume, and a rep or two added wherever it comes.', bulk: 'Bulking: more sets and a few more reps, adding weight as soon as the top of each range comes easily.' }[phase]);
 // a planned session's exercises and sets at a dose, before it's started
 function trSesEx(id, phase, dose) {
@@ -9015,10 +9362,15 @@ function trWeekRow(r, o) {
   const day = `<b class="d">${DOW[dayIndex(r.k)]} ${parse(r.k).getDate()}</b>`;
   let sub, chip, body;
   if (l) {
-    const did = tvDone(l), tgt = tvTarget(l), left = l.ex.filter(e => exTgt(l, e) > 0 && exDone(e) < exTgt(l, e)), all = !left.length;
-    sub = `${r.extra ? 'Extra · ' : ''}${did} of ${tgt} sets · ${all ? (l.fin ? 'finished' : 'every set in') : `${left.length} exercise${left.length === 1 ? '' : 's'} left`}`;
+    const did = tvDone(l), tgt = tvTarget(l), left = l.ex.filter(e => !e.nd && exTgt(l, e) > 0 && exDone(e) < exTgt(l, e)), all = !left.length, nd = l.ex.filter(e => e.nd).length, pc = Math.round(sesPct(l) * 100);
+    sub = `${r.extra ? 'Extra · ' : ''}${did} of ${tgt} sets · ${pc}%${nd ? ` · ${nd} not done` : ''} · ${all ? (l.fin ? 'finished' : 'every set in') : `${left.length} exercise${left.length === 1 ? '' : 's'} left`}`;
     chip = all && l.fin ? `<span class="wt wt-ok">${ic('check')}Done</span>` : !l.fin ? '<span class="wt wt-warn">Started</span>' : `<span class="wt wt-warn">${left.length} left</span>`;
-    const items = l.ex.filter(e => exTgt(l, e) > 0 || e.sets.length).map(e => { const d = exDone(e), n = Math.max(exTgt(l, e), 1), full = d >= n; return `<li class="tvx ${full ? 'on' : d ? 'part' : ''}"><span class="bx" aria-hidden="true">${full ? ic('check') : ''}</span><span>${esc(exName(e.ex))}</span><span class="v">${d}/${n}</span></li>`; }).join('');
+    const items = l.ex.map((e, i) => ({ e, i })).filter(({ e }) => exTgt(l, e) > 0 || e.sets.length).map(({ e, i }) => {
+      const d = exDone(e), n = Math.max(exTgt(l, e), 1), full = d >= n;
+      const btn = e.nd ? `<button class="tvnd undo" data-a="trnd" data-id="${l.id}" data-e="${i}" aria-label="Undo: ${esc(exName(e.ex))} not done">Undo</button>`
+        : full ? '<span></span>' : `<button class="tvnd" data-a="trnd" data-id="${l.id}" data-e="${i}" aria-label="Mark ${esc(exName(e.ex))} as not done">${ic('x')}</button>`;
+      return `<li class="tvx ${e.nd ? 'nd' : full ? 'on' : d ? 'part' : ''}"><span class="bx" aria-hidden="true">${e.nd ? ic('x') : full ? ic('check') : ''}</span><span class="nm">${esc(exName(e.ex))}</span><span class="v">${d}/${n}</span>${btn}</li>`;
+    }).join('');
     body = `<ul class="tvxs">${items}</ul><div class="btnrow tvxgo">${!l.fin || !all ? `<button class="btn sm primary" data-a="tvstart" data-s="${esc(l.sess)}" data-id="${l.id}">${ic('play')}Carry on</button>` : `<button class="btn sm" data-a="tvopen" data-id="${l.id}">Open the session</button>`}</div>`;
   } else {
     const se = trSesInfo(r.sess, phase, dose, null), list = trSesEx(r.sess, phase, dose);
@@ -9039,7 +9391,8 @@ function vTrain() {
   // how far through the week: sessions finished, and sets done against everything planned
   const ses = all.filter(r => r.sess || r.log), fin = ses.filter(r => r.log && r.log.fin).length;
   const setsIn = ses.reduce((a, r) => a + (r.log ? tvDone(r.log) : 0), 0), setsAll = ses.reduce((a, r) => a + (r.log ? tvTarget(r.log) : trSesEx(r.sess, phase, dose).reduce((x, e) => x + e.n, 0)), 0);
-  const sum = ses.length ? `<div class="trwsum"><span><b>${fin} of ${ses.length}</b> done</span><span class="trbar" aria-hidden="true"><i style="width:${setsAll ? Math.min(100, (setsIn / setsAll) * 100).toFixed(1) : 0}%"></i></span><span class="small muted">${setsIn} of ${setsAll} sets</span></div>` : '';
+  const wpc = ses.length ? ses.reduce((a, r) => a + (r.log ? sesPct(r.log) : 0), 0) / ses.length : 0;
+  const sum = ses.length ? `<div class="trwsum"><span><b>${fin} of ${ses.length}</b> done</span><span class="trbar" aria-hidden="true"><i style="width:${Math.min(100, wpc * 100).toFixed(1)}%"></i></span><span class="small muted">${Math.round(wpc * 100)}% · ${setsIn} of ${setsAll} sets</span></div>` : '';
   const hint = plan.re ? `Rearranged ${plan.re.at === tk ? 'today' : `on ${DOWL[dayIndex(plan.re.at)]}`}: ${RE_LAY[plan.re.lay].n.toLowerCase()}, ${DOSE_N[plan.re.dose].toLowerCase()} dose. Changing the days goes back to the usual plan.` : picked.length < 3 ? `Pick ${3 - picked.length} more day${3 - picked.length === 1 ? '' : 's'}.` : trPicked(st) ? '' : 'Suggested days: tap to change.';
   const doneAll = ses.length && !next ? '<p class="small muted" style="margin:0">Every session this week is logged. Nice work.</p>' : !ses.length ? '<p class="small muted" style="margin:0">Pick some days above.</p>' : '';
   const delNote = del ? `<div class="callout">${ic('info')}<div><b>Deload week.</b> Minimal dose at your usual weights, stopping 3 or 4 reps short. It lets the tiredness of the last few weeks clear so the next block starts fresh.<div class="btnrow"><button class="btn sm ghost" data-a="trdeload" data-v="0">Make it a normal week</button></div></div></div>`
@@ -9235,8 +9588,9 @@ function tvCard(l, e, i) {
     <input type="number" inputmode="numeric" min="0" data-tf="reps" data-e="${i}" data-s="${j}" value="${esc(s.reps)}" placeholder="${def ? slotReps(sl, ph).join('–') : 'reps'}" aria-label="Set ${j + 1} reps">
     <select data-tf="rir" data-e="${i}" data-s="${j}" aria-label="Set ${j + 1} reps in reserve"><option value="">–</option>${['0', '1', '2', '3', '4+'].map(v => `<option ${s.rir === v ? 'selected' : ''}>${v}</option>`).join('')}</select>
     <button class="stick" data-a="tvtick" data-e="${i}" data-s="${j}" aria-pressed="${!!s.done}" aria-label="Set ${j + 1} done">${ic('check')}</button>`).join('');
-  return `<article class="tvex" id="tvx-${i}">
+  return `<article class="tvex ${e.nd ? 'nd' : ''}" id="tvx-${i}">
     <div class="tvex-top">${sel}<span class="rx">${rx}</span></div>
+    ${e.nd ? `<p class="tvndn">${ic('x')}Marked not done on the week list. Log a set and it counts again.</p>` : ''}
     ${r ? `<p class="small muted" style="margin:2px 0 0">Stop ${slotRir(sl, l.deload)} short · rest ${mins(r.rest)}${x.bw ? ' · bodyweight' : ''}</p>` : ''}
     <p class="small" style="margin:4px 0 0">${last ? `Last time (${shortD(last.date)}): ${esc(setsTxt(last.sets, x.bw))}` : '<span class="muted">No earlier sets for this one.</span>'}</p>
     ${sg && last ? `<p class="tvhint ${sg.up ? 'up' : sg.down ? 'down' : ''}">${sg.kg !== null && !x.bw ? `<b>${sg.kg} kg</b> · ` : ''}${esc(sg.txt)}</p>` : sg ? `<p class="tvhint">${esc(sg.txt)}</p>` : ''}
@@ -9392,9 +9746,17 @@ Object.assign(ACT, {
   },
   tvready(d) { const l = tvLog(); if (!l) return; l.readiness = l.readiness === +d.v ? null : +d.v; trSave(l); document.querySelectorAll('.scale10 button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.v === l.readiness))); },
   tvdose(d) { const l = tvLog(); if (!l || l.dose === d.v) return; trApplyDose(l, d.v); trSave(l); renderTV(); },
+  // not done, from the week list: asked first, and it stays in the session so it can still be logged
+  trnd(d) {
+    const l = S.tr.logs[d.id], e = l && l.ex[+d.e]; if (!e) return;
+    if (e.nd) { delete e.nd; trSave(l); render(); toast(`${exName(e.ex)} back in ${trSN(l.sess, l)}`); return; }
+    const was = sesPct(l);
+    e.nd = 1; const after = sesPct(l); delete e.nd;
+    ask(`Mark ${exName(e.ex).toLowerCase()} as not done?`, `It stays in the workout, so you can still log it${l.date === todayKey() ? ' later today' : ''}. ${Math.round(after * 100) === Math.round(was * 100) ? `${trSN(l.sess, l)} stays at ${Math.round(was * 100)}%: nothing logged for it already counts as nothing, and this settles it as missed rather than still to do.` : `${trSN(l.sess, l)} would count as ${Math.round(after * 100)}% rather than ${Math.round(was * 100)}%.`}`, 'Not done', () => { e.nd = 1; trSave(l); render(); }, true);
+  },
   tvtick(d, el) {
     const l = tvLog(); if (!l) return;
-    const i = +d.e, j = +d.s, s = l.ex[i].sets[j]; s.done = !s.done; trSave(l);
+    const i = +d.e, j = +d.s, s = l.ex[i].sets[j]; s.done = !s.done; if (s.done && l.ex[i].nd) { delete l.ex[i].nd; trSave(l); renderTV(); return; } trSave(l);
     el.setAttribute('aria-pressed', String(s.done)); tvProg();
     if (s.done) { const sl = l.ex[i].slot; tvRestStart(SLOTDEF[sl] ? roleOf(sl).rest : 90, tvNextLbl(l, i, j)); }
   },
@@ -9617,7 +9979,7 @@ document.addEventListener('input', e => {
   const t = e.target, f = t.dataset && t.dataset.tf, l = f ? tvLog() : null; if (!l) return;
   if (f === 'note') l.note = t.value;
   else if (f === 'exnote') l.ex[+t.dataset.e].note = t.value;
-  else if (f === 'kg' || f === 'reps') l.ex[+t.dataset.e].sets[+t.dataset.s][f] = t.value;
+  else if (f === 'kg' || f === 'reps') { const ex = l.ex[+t.dataset.e]; ex.sets[+t.dataset.s][f] = t.value; if (f === 'reps' && tnum(t.value) > 0 && ex.nd) { delete ex.nd; const a = t.closest('.tvex'); if (a) { a.classList.remove('nd'); const n = a.querySelector('.tvndn'); if (n) n.remove(); } } }
   else return;
   trSaveSoon(l);
 });
@@ -9635,7 +9997,8 @@ document.addEventListener('change', e => {
 
 /* ── for Trends ── */
 // sessions by day (a session counts once it's finished or has a set ticked)
-function liftDays() { const m = {}; trLogsAll().forEach(l => { if (l.fin || tvDone(l)) m[l.date] = (m[l.date] || 0) + 1; }); return { m, first: Object.keys(m).sort()[0] || '9999' }; }
+// a session counts for what was done of it (see sesPct)
+function liftDays() { const m = {}; trLogsAll().forEach(l => { if (!(l.fin || tvDone(l))) return; const p = sesPct(l); if (p > 0) m[l.date] = (m[l.date] || 0) + p; }); return { m, first: Object.keys(m).sort()[0] || '9999' }; }
 function liftWeek() {
   const tk = todayKey(), st = startOf(tk), plan = trPlan(st), done = trLogsIn(st).filter(l => l.fin || tvDone(l)).length, days = trDays(st);
   return { done, planned: plan.planned, due: days.filter(k => k <= tk).length, next: plan.rows.find(r => !r.log && r.sess && r.k >= tk) };
@@ -10589,7 +10952,7 @@ function fxBenefits() {
 }
 
 /* ───────────── paste from Claude: a code made from a photo in a chat, read into the log sheet ─────────────
-   The code is "TP1:" and the details as base64 JSON: { v: 1, d: day, s: suggested slot, n: name, items: [{ n, k, p, f, sa, fs, sf,
+   The code is "TP1:" and the details as base64 JSON: { v: 1, d: day, s: suggested slot, n: name, items: [{ n, k, p, f, sa, fs, sf, g (grams, one item),
    pl: plant ids or names, fe }] }. Several items become one entry (summed, plants pooled), so the usual tools can tweak it.
    Where it goes is asked each time: on top of the plan, or instead of a meal still planned that day. */
 const PC_RE = /TP1:([A-Za-z0-9_\-+/=]+)/;
@@ -10614,7 +10977,7 @@ function pcDecode(txt) {
   o.items.slice(0, 12).forEach(it => {
     if (!isObj(it)) return;
     const pl = []; (Array.isArray(it.pl) ? it.pl : []).forEach(x => { const id = pcPlant(x); if (id) { if (!pl.includes(id)) pl.push(id); } else miss.push(String(x)); });
-    items.push({ n: String(it.n || 'Something').slice(0, 80), k: num(it.k, 5000) || 0, p: num(it.p, 400) || 0, f: num(it.f, 150), sa: num(it.sa, 40), fs: num(it.fs, 300), sf: num(it.sf, 200), pl, fe: !!it.fe });
+    items.push({ n: String(it.n || 'Something').slice(0, 80), k: num(it.k, 5000) || 0, p: num(it.p, 400) || 0, f: num(it.f, 150), sa: num(it.sa, 40), fs: num(it.fs, 300), sf: num(it.sf, 200), g: num(it.g, 5000) || undefined, pl, fe: !!it.fe });
   });
   if (!items.length) return { err: "That code didn't have any food in it." };
   const d = DAY_KEY.test(o.d || '') && o.d <= todayKey() ? o.d : null, s = SLOTS.includes(o.s) ? o.s : null;
@@ -10623,7 +10986,7 @@ function pcDecode(txt) {
 // several items as one entry: figures summed, plants pooled, fermented if any part is
 function pcOne(pc) {
   const its = pc.items, sum = f => { const v = its.map(x => x[f]).filter(x => x !== undefined); return v.length ? +v.reduce((a, b) => a + b, 0).toFixed(f === 'k' ? 0 : 1) : undefined; };
-  return { n: pc.n || joinAnd(its.map(x => x.n)), k: Math.round(sum('k') || 0), p: sum('p') || 0, f: sum('f'), sa: sum('sa'), fs: sum('fs'), sf: sum('sf'), pl: [...new Set(its.flatMap(x => x.pl))], fe: its.some(x => x.fe) };
+  return { n: pc.n || joinAnd(its.map(x => x.n)), k: Math.round(sum('k') || 0), p: sum('p') || 0, f: sum('f'), sa: sum('sa'), fs: sum('fs'), sf: sum('sf'), pl: [...new Set(its.flatMap(x => x.pl))], fe: its.some(x => x.fe), g: its.length === 1 ? its[0].g : undefined };
 }
 // the meals still to come on a day, any of which a pasted meal could stand in for
 function pcSlots(dk) {
@@ -10655,7 +11018,7 @@ function pcApply(raw) {
   if (r.err) { SH.pc = null; SH.pcErr = r.err; renderSheet(); return true; }
   const one = pcOne(r);
   SH.pc = r; SH.pcErr = null; SH.pcWhere = null; if (r.d) SH.dk = r.d;
-  Object.assign(SH, { n: one.n, k: one.k, p: one.p, sa: one.sa, fs: one.fs, sf: one.sf, f: one.f, pl: one.pl.slice(), fe: one.fe, lk: null, lq: '', off: null, xk0: 0 });
+  Object.assign(SH, { n: one.n, k: one.k, p: one.p, sa: one.sa, fs: one.fs, sf: one.sf, f: one.f, g: one.g || '', pl: one.pl.slice(), fe: one.fe, lk: null, lq: '', off: null, xk0: 0 });
   renderSheet(); XK0 = one.k || null; toast(r.items.length > 1 ? `Read ${r.items.length} items from the code` : 'Read the code');
   return true;
 }
@@ -10668,7 +11031,7 @@ Object.assign(ACT, {
     if (!SH.pcWhere || SH.pcWhere === 'x') return ACT.xsave();
     const s = SH.pcWhere, day = D(dk), was = R[day.sl[s]] ? R[day.sl[s]].n : day.cu[s] ? day.cu[s].n : '';
     const e = Object.assign({ n: SH.n || 'Something else', k: +SH.k || 0, p: +SH.p || 0, at: todayKey() }, labelOut(SH));
-    if (SH.pl.length) e.pl = SH.pl.slice(); if (SH.fe) e.fe = true;
+    if (SH.pl.length) e.pl = SH.pl.slice(); if (SH.fe) e.fe = true; if (+SH.g > 0 && +SH.g < 10000) e.g = Math.round(+SH.g * 10) / 10;
     setSlot(dk, s, '@c'); day.cu[s] = e; day.done[s] = { c: 1 };
     foodPut(S, e, dk); save(); closeSheet(); render();
     toast(`${SLOTNAME[s]} on ${DOW[dayIndex(dk)]}: ${e.n}${was ? `, instead of ${was}` : ''}`);
@@ -11179,10 +11542,11 @@ function noseAdvice(id, cond) {
     ${flags.map(f => `<div class="callout warn">${ic('info')}<div><b>Worth getting looked at.</b> ${esc(f)}</div></div>`).join('')}</div>`;
 }
 function noseCard(k) {
-  const n = S.nose[k] && !S.nose[k].imp ? S.nose[k] : null, r = n ? n.r : 0, kn = noseKnown(k), sy = n ? n.sy : [], cx = n ? n.cx : [];
-  const scale = `<div class="nscale" role="group" aria-label="How's your nose">${NOSE_R.map(([v, l, c]) => `<button data-a="nrate" data-v="${v}" aria-pressed="${r === v}"><i style="background:${c === 'leaf' ? 'var(--leaf)' : `var(--c-${c})`}"></i>${l}</button>`).join('')}</div>`;
+  const n = S.nose[k] && !S.nose[k].imp ? S.nose[k] : null, r = n ? n.r : 0, sm = n ? n.sm || 0 : 0, kn = noseKnown(k), sy = n ? n.sy : [], cx = n ? n.cx : [];
+  const sc = (L, v0, act, lab) => `<div class="nscale" role="group" aria-label="${lab}">${L.map(([v, l, c]) => `<button data-a="${act}" data-v="${v}" aria-pressed="${v0 === v}"><i style="background:${c === 'leaf' ? 'var(--leaf)' : `var(--c-${c})`}"></i>${l}</button>`).join('')}</div>`;
+  const scale = `<div class="nshd"><b>Condition</b><span>how clear it is</span></div>${sc(NOSE_R, r, 'nrate', 'Nose condition')}<div class="nshd"><b>Smell</b><span>coffee, toothpaste, soap</span></div>${sc(NOSE_SM, sm, 'nsm', 'Sense of smell')}`;
   let more = '';
-  if (r) {
+  if (r || sm) {
     const showAll = !!UI.nSyAll, common = NOSE_SY_COMMON.concat(sy.filter(x => !NOSE_SY_COMMON.includes(x)));
     const syChip = id => { const s = noseSym(id); return s ? `<button class="chip" data-a="nsym" data-v="${id}" aria-pressed="${sy.includes(id)}">${esc(s.t)}</button>` : ''; };
     const syHtml = showAll ? NOSE_SYM.map(g => `<div class="ngrp">${esc(capFirst(g.g.toLowerCase()))}</div><div class="chips">${g.items.map(i => syChip(i.id)).join('')}</div>`).join('') + `<button class="btn link sm" data-a="nsyall">Fewer</button>`
@@ -11191,13 +11555,15 @@ function noseCard(k) {
     more = `${r <= 3 || sy.length ? `<div class="nlbl">What's it like?</div>${syHtml}` : ''}
       ${kn.chips.length ? `<div class="nlbl">The app already knows</div><div class="chips">${kn.chips.map(([t, c]) => `<span class="chip known ${c}">${c === 'ok' ? ic('check') : ''}${esc(t)}</span>`).join('')}</div>` : ''}
       <div class="nlbl">Anything else yesterday?</div><div class="chips">${xShow.map(([id, t]) => `<button class="chip" data-a="nx" data-v="${id}" aria-pressed="${cx.includes(id)}">${esc(t)}</button>`).join('')}${UI.nXAll ? '' : '<button class="chip more" data-a="nxall">More…</button>'}</div>
+      ${noseYours(k)}
       ${sy.length ? sy.map(id => noseAdvice(id, noseCond(k))).join('') : r >= 4 ? '<p class="small muted" style="margin:0">Logged. Good mornings show what to reproduce, so tap anything from yesterday that might explain it.</p>' : ''}`;
   }
   // part of the check-in card, just above its Save button; each tap saves straight away
-  return `<div class="nosecard ckf" role="group" aria-label="Nose"><div class="nshead">${idl(shArt('nose', 44))}<div><div class="cklbl">Nose this morning</div><b>How's your nose?</b></div>${r ? '<button class="btn link sm" data-a="nclear">Clear</button>' : ''}</div>${scale}${more}</div>`;
+  return `<div class="nosecard ckf" role="group" aria-label="Nose"><div class="nshead">${idl(shArt('nose', 44))}<div><div class="cklbl">Nose this morning</div><b>How's your nose?</b></div>${r || sm ? '<button class="btn link sm" data-a="nclear">Clear</button>' : ''}</div>${scale}${more}</div>`;
 }
-function noseEntry(k) { let n = S.nose[k]; if (!n || n.imp) n = S.nose[k] = { r: 3, sy: [], cx: [] }; n.at = todayKey(); return n; }
+function noseEntry(k) { let n = S.nose[k]; if (!n || n.imp) n = S.nose[k] = { r: 0, sy: [], cx: [] }; n.at = todayKey(); return n; }
 Object.assign(ACT, {
+  nsm(d) { const k = ckK(), n = noseEntry(k); n.sm = n.sm === +d.v ? 0 : +d.v; if (!n.sm) delete n.sm; if (!n.r && !n.sm && !n.sy.length && !n.cx.length) delete S.nose[k]; save(); render(); },
   nrate(d) { const k = ckK(), n = noseEntry(k); n.r = +d.v; if (n.r >= 4) n.sy = n.sy.filter(x => x === 's_good'); save(); render(); },
   nsym(d) { const k = ckK(), n = noseEntry(k), i = n.sy.indexOf(d.v); if (i >= 0) n.sy.splice(i, 1); else { if (n.sy.length >= 3) { toast('Three at most: take one off first'); return; } n.sy.push(d.v); } save(); render(); },
   nx(d) { const k = ckK(), n = noseEntry(k), i = n.cx.indexOf(d.v); if (i >= 0) n.cx.splice(i, 1); else n.cx.push(d.v); save(); render(); },
@@ -11206,31 +11572,187 @@ Object.assign(ACT, {
   nclear() { const k = ckK(); delete S.nose[k]; save(); render(); }
 });
 
-/* Trends: your mornings against what happened the day before */
+/* Trends: what works for you. Everything comes from what's already logged: the morning nose (condition and
+   smell), sleep, the rinse and steroid checks, drinks, training and the chips. Each thing is set against the
+   next morning, the two mornings after that, and runs of fortnights, and a permutation test says how likely
+   the difference is to be chance. */
 const noseRated = () => Object.keys(S.nose).filter(k => S.nose[k].r && !S.nose[k].imp).sort();
-const noseHas = (k, ids) => (S.nose[k].cx || []).some(x => ids.includes(x));
-function noseRinse(k) { const c = (S.ck[k] || {}).c || {}; return 'rinse' in c || 'rinsepm' in c ? c.rinse === 1 || c.rinsepm === 1 : null; }
-const NOSE_F = [
-  ['alc6', '6+ units the night before', k => { const y = addDays(k, -1); return y in S.alc ? +S.alc[y] >= 6 : null; }],
-  ['alc2', '6+ units two nights before', k => { const y = addDays(k, -2); return y in S.alc ? +S.alc[y] >= 6 : null; }],
-  ['wine', 'Wine the night before', k => { const y = addDays(k, -1); return y in S.alc ? +S.alc[y] > 0 && noseDrinks(y).wine : null; }],
-  ['dry', 'Heating, aircon or dry air', k => noseHas(k, ['heating', 'aircon', 'dryair'])],
-  ['vape', 'Vape or smoke around', k => noseHas(k, ['vape'])],
-  ['late', 'Ate late or heavy', k => noseHas(k, ['latefood'])],
-  ['sleep', 'Short night', k => { const s = (S.ck[k] || {}).sl; return s ? s < setAt(k).sleepGoal - 1 : null; }],
-  ['rinse', 'No rinse', k => { const v = noseRinse(k); return v === null ? null : !v; }],
-  ['picked', 'Picked or blew hard', k => noseHas(k, ['picked'])],
-  ['trained', 'A run or lifting the day before', k => noseTrained(addDays(k, -1))]
+const noseHas = (k, ids) => (S.nose[k] && !S.nose[k].imp ? (S.nose[k].cx || []).some(x => ids.includes(x)) : null);
+const NOSE_SM = [[1, 'Gone', 'red'], [2, 'Faint', 'orange'], [3, 'Dulled', 'yellow'], [4, 'Normal', 'green'], [5, 'Sharp', 'leaf']];
+const NOSE_OUT = [['cond', 'Condition'], ['smell', 'Smell'], ['sleep', 'Sleep']];
+const NL_MIN = 6; // days each way before a comparison shows
+const nlCk = (m, id) => { const c = (S.ck[m] || {}).c; return c && id in c ? c[id] === 1 : null; };
+const nlAlc = n => (n in S.alc ? +S.alc[n] : null);
+// what's measured on a morning: condition and smell that morning, and the night's sleep that ended it
+const NL_Y = {
+  cond: m => (S.nose[m] && !S.nose[m].imp && S.nose[m].r ? S.nose[m].r : null),
+  smell: m => (S.nose[m] && !S.nose[m].imp && S.nose[m].sm ? S.nose[m].sm : null),
+  sleep: m => { const s = (S.ck[m] || {}).sl; return s > 0 ? s : null; }
+};
+// research, where a review or study covers it: the direction it expects and what it says
+const NL_RES = {
+  steroid: { cond: [1, 'steroid sprays ease a blocked nose, moderately, and help smell a little', 'chong_st'], smell: [1, 'steroid sprays help smell a little', 'chong_st'] },
+  rinsepm: { cond: [1, 'daily saline rinsing may help a little', 'chong_sal'] },
+  rinseam: { cond: [1, 'daily saline rinsing may help a little', 'chong_sal'] },
+  alc6: { cond: [-1, 'alcohol, wine most of all, can block the nose', 'nihlen'], sleep: [-1, 'heavier drinking breaks up the second half of the night', 'ebrahim'] },
+  wine: { cond: [-1, 'wine is the drink most often behind alcohol-triggered blocked noses', 'nihlen'] },
+  trained: { sleep: [1, 'regular exercise gives moderately better sleep', 'kredlow'] },
+  poornose: { sleep: [-1, 'a blocked nose is a risk factor for disturbed breathing in sleep', 'young'] }
+};
+const NL_SRC = { chong_st: 'Chong et al. 2016, Cochrane Database of Systematic Reviews (steroid sprays)', chong_sal: 'Chong et al. 2016, Cochrane Database of Systematic Reviews (saline irrigation)', nihlen: 'Nihlén et al. 2005, Respiratory Medicine', ebrahim: 'Ebrahim et al. 2013, Alcoholism: Clinical and Experimental Research', kredlow: 'Kredlow et al. 2015, Journal of Behavioral Medicine', young: 'Young et al. 1997, Journal of Allergy and Clinical Immunology' };
+// the things compared, each read for a morning m: true, false, or unknown. wk: how a fortnight is judged for the long run
+const NL_X = [
+  { id: 'steroid', n: 'Steroid the night before', sh: 'the steroid', helps: 1, out: ['cond', 'smell', 'sleep'], f: m => nlCk(m, 'steroid'), wk: { n: 'Steroid most nights for two weeks', f: m => nlCk(m, 'steroid') } },
+  { id: 'rinsepm', n: 'Evening rinse', sh: 'the evening rinse', helps: 1, out: ['cond', 'smell', 'sleep'], f: m => nlCk(m, 'rinsepm'), wk: { n: 'Evening rinse most nights for two weeks', f: m => nlCk(m, 'rinsepm') } },
+  { id: 'rinseam', n: 'Morning rinse the day before', sh: 'the morning rinse', helps: 1, out: ['cond', 'smell'], f: m => nlCk(addDays(m, -1), 'rinse'), wk: { n: 'Morning rinse most days for two weeks', f: m => nlCk(m, 'rinse') } },
+  { id: 'alc6', n: '6+ units the night before', sh: 'a heavy night', helps: -1, out: ['cond', 'smell', 'sleep'], f: m => { const u = nlAlc(addDays(m, -1)); return u === null ? null : u >= 6; } },
+  { id: 'alcany', n: 'Any drink the night before', sh: 'drinking', helps: -1, out: ['cond', 'sleep'], f: m => { const u = nlAlc(addDays(m, -1)); return u === null ? null : u > 0; }, wk: { n: 'Over 14 units a week for two weeks', units: true } },
+  { id: 'wine', n: 'Wine the night before', sh: 'wine', helps: -1, out: ['cond'], f: m => { const y = addDays(m, -1), u = nlAlc(y); return u === null ? null : u > 0 && noseDrinks(y).wine; } },
+  { id: 'short', n: 'A short night', sh: 'a short night', helps: -1, out: ['cond', 'smell'], f: m => { const s = (S.ck[m] || {}).sl; return s ? s < setAt(m).sleepGoal - 1 : null; } },
+  { id: 'trained', n: 'A run or lifting the day before', sh: 'training', helps: 1, out: ['cond', 'sleep'], f: m => noseTrained(addDays(m, -1)) },
+  { id: 'dry', n: 'Heating, aircon or dry air', sh: 'dry air', helps: -1, out: ['cond', 'smell', 'sleep'], f: m => noseHas(m, ['heating', 'aircon', 'dryair']) },
+  { id: 'vape', n: 'Vape or smoke around', sh: 'vape smoke', helps: -1, out: ['cond', 'smell'], f: m => noseHas(m, ['vape']) },
+  { id: 'late', n: 'Ate late or heavy', sh: 'eating late', helps: -1, out: ['cond', 'sleep'], f: m => noseHas(m, ['latefood']) },
+  { id: 'picked', n: 'Picked or blew hard', sh: 'picking', helps: -1, out: ['cond'], f: m => noseHas(m, ['picked']) },
+  { id: 'poornose', n: 'A rough nose that day', sh: 'a rough nose', helps: -1, out: ['sleep'], f: m => { const y = NL_Y.cond(addDays(m, -1)); return y === null ? null : y <= 2; } }
 ];
-function noseStats(days) {
-  days = days || noseRated().filter(k => k >= addDays(todayKey(), -180));
-  const av = a => a.reduce((x, y) => x + y, 0) / a.length, all = days.map(k => S.nose[k].r), out = [];
-  NOSE_F.forEach(([id, n, f]) => {
-    const yes = [], no = []; days.forEach(k => { const v = f(k); if (v === true) yes.push(S.nose[k].r); else if (v === false) no.push(S.nose[k].r); });
-    if (yes.length >= 3 && no.length >= 3) out.push({ id, n, a: av(yes), b: av(no), ny: yes.length, d: av(yes) - av(no) });
-  });
-  return { n: days.length, avg: all.length ? av(all) : null, f: out };
+// a seeded shuffle, so the same data always gives the same answer
+function nlRand(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function nlPerm(a, b) {
+  const av = x => x.reduce((p, q) => p + q, 0) / x.length, d0 = Math.abs(av(a) - av(b)), all = a.concat(b), na = a.length, rnd = nlRand(all.length * 7919 + Math.round(d0 * 1000));
+  let hit = 0; const N = 1000, tot = all.reduce((p, q) => p + q, 0), nb = all.length - na;
+  for (let i = 0; i < N; i++) {
+    if (i === 200 && hit > 60) return (hit + 1) / 201; // plainly not a real difference: no need to go on
+    // only the first na places need shuffling to draw a random group of na
+    let s = 0;
+    for (let j = 0; j < na; j++) { const r = j + Math.floor(rnd() * (all.length - j)), t = all[j]; all[j] = all[r]; all[r] = t; s += all[j]; }
+    if (Math.abs(s / na - (tot - s) / nb) >= d0 - 1e-9) hit++;
+  }
+  return (hit + 1) / (N + 1);
 }
+// the long run: fortnights, newest first, judged by how often the habit was kept and the average result across them
+function nlWeeks(x, out, days) {
+  const tk = todayKey(), first = days[0]; if (!first) return null;
+  const hi = [], lo = [];
+  for (let e = addDays(tk, -1); e >= first; e = addDays(e, -14)) {
+    const span = Array.from({ length: 14 }, (_, i) => addDays(e, -i)), ys = span.map(m => NL_Y[out](m)).filter(v => v !== null);
+    if (ys.length < 5) continue;
+    const yv = ys.reduce((p, q) => p + q, 0) / ys.length;
+    if (x.wk.units) { const known = span.filter(m => m in S.alc); if (known.length < 10) continue; const u = known.reduce((p, m) => p + +S.alc[m], 0) / known.length * 7; (u > 14 ? lo : u <= 7 ? hi : []).push(yv); continue; }
+    const kn = span.map(x.wk.f).filter(v => v !== null); if (kn.length < 7) continue;
+    const r = kn.filter(Boolean).length / kn.length; if (r >= 0.85) hi.push(yv); else if (r < 0.6) lo.push(yv);
+  }
+  if (hi.length < 3 || lo.length < 3) return { early: true, ny: hi.length, nn: lo.length };
+  const av = a => a.reduce((p, q) => p + q, 0) / a.length;
+  // for drinking, "yes" is the heavy fortnights, as with the nights
+  const a = x.wk.units ? lo : hi, b = x.wk.units ? hi : lo;
+  return { a: av(a), b: av(b), d: av(a) - av(b), ny: a.length, nn: b.length, p: nlPerm(a, b) };
+}
+const nlConf = r => (r.early ? 'early' : r.p < 0.05 ? 'c' : r.p < 0.2 ? 'l' : 'none');
+let NLC = null, NLN = -1;
+function noseLearn() {
+  if (NLC && NLN === SAVEN) return NLC;
+  const tk = todayKey(), days = Object.keys(S.ck).concat(Object.keys(S.nose)).filter(k => k <= tk).sort(), from = days[0] || tk;
+  const all = []; for (let m = from; m <= tk; m = addDays(m, 1)) all.push(m);
+  const res = [];
+  NL_X.forEach(x => x.out.forEach(out => {
+    const yes = [], no = [], yesL = [], noL = [], yk = [], nk = [];
+    all.forEach(m => {
+      const v = x.f(m); if (v === null || v === undefined) return;
+      const y = NL_Y[out](m); if (y !== null) { (v ? yes : no).push(y); (v ? yk : nk).push(m); }
+      const l = [NL_Y[out](addDays(m, 1)), NL_Y[out](addDays(m, 2))].filter(z => z !== null);
+      if (l.length) (v ? yesL : noL).push(l.reduce((p, q) => p + q, 0) / l.length);
+    });
+    const cmp = (a, b) => { if (a.length < NL_MIN || b.length < NL_MIN) return { early: true, ny: a.length, nn: b.length }; const av = z => z.reduce((p, q) => p + q, 0) / z.length; return { a: av(a), b: av(b), d: av(a) - av(b), ny: a.length, nn: b.length, p: nlPerm(a, b) }; };
+    const next = cmp(yes, no), later = cmp(yesL, noL), weeks = x.wk ? nlWeeks(x, out, all) : null;
+    // when most of the "yes" mornings also followed a heavy night, the drink may be doing the work
+    let mixed = false;
+    if (!x.id.startsWith('alc') && x.id !== 'wine' && yk.length >= NL_MIN) { const h = ks => ks.filter(m => { const u = nlAlc(addDays(m, -1)); return u !== null && u >= 6; }).length / ks.length; mixed = h(yk) - h(nk) >= 0.3; }
+    const rs = NL_RES[x.id] && NL_RES[x.id][out];
+    res.push({ x, id: x.id, out, next, later, weeks, mixed, res: rs ? { dir: rs[0], t: rs[1], s: NL_SRC[rs[2]] } : null });
+  }));
+  NLN = SAVEN; return (NLC = res);
+}
+// the effect in the outcome's own terms
+const nlFmt = (out, d) => (out === 'sleep' ? `${d >= 0 ? '+' : '−'}${Math.round(Math.abs(d) * 60)} min` : `${d >= 0 ? '+' : '−'}${Math.abs(d).toFixed(1)}`);
+const nlVal = (out, v) => (out === 'sleep' ? fmtH(v) : v.toFixed(1));
+const NL_CONF = { c: ['c', 'Clear'], l: ['l', 'Leaning'], none: ['e', 'No clear difference'], early: ['e', 'Too early'] };
+function nlRow(f) {
+  const r = f.next, c = nlConf(r), cls = c === 'c' || c === 'l' ? (r.d > 0 ? 'up' : 'dn') : 'flat';
+  const unit = f.out === 'sleep' ? 'nights' : 'mornings';
+  const res = f.res ? (c === 'c' || c === 'l' ? (Math.sign(r.d) === f.res.dir ? `<span class="res ag">Research agrees: ${esc(f.res.t)}</span>` : `<span class="res df">Research expects the opposite: ${esc(f.res.t)}</span>`) : `<span class="res">Research: ${esc(f.res.t)}</span>`) : '';
+  const txt = `${nlVal(f.out, r.a)} with it, ${nlVal(f.out, r.b)} without · ${r.ny} and ${r.nn} ${unit}.${c === 'l' ? ' Could still be chance.' : ''}${f.mixed ? ' Many of these followed a heavy night, so some of it may be the drink.' : ''}`;
+  return `<div class="nlr"><b>${esc(f.x.n)}</b><span class="eff ${cls}">${c === 'none' ? '±' + nlFmt(f.out, Math.abs(r.d)).slice(1) : nlFmt(f.out, r.d)}</span><small><span class="conf ${NL_CONF[c][0]}">${NL_CONF[c][1]}</span>${esc(txt)} ${res}</small></div>`;
+}
+function nlCell(f, k) {
+  const r = f[k]; if (!r) return '<span class="c q">—</span>';
+  if (r.early) return '<span class="c q">soon</span>';
+  const c = nlConf(r); if (c === 'none') return '<span class="c z">0</span>';
+  const big = f.out === 'sleep' ? Math.abs(r.d) >= 0.4 : Math.abs(r.d) >= 0.7;
+  return `<span class="c ${r.d > 0 ? (big ? 'p2' : 'p1') : big ? 'n2' : 'n1'}">${nlFmt(f.out, r.d)}</span>`;
+}
+// the wins, in words: practices that help and triggers that hurt, clear or leaning, biggest first
+function nlWins(out) {
+  const L = noseLearn().filter(f => f.out === out && !f.next.early && ['c', 'l'].includes(nlConf(f.next)));
+  const help = L.filter(f => f.x.helps > 0 && f.next.d > 0).sort((a, b) => b.next.d - a.next.d), hurt = L.filter(f => f.x.helps < 0 && f.next.d < 0).sort((a, b) => a.next.d - b.next.d);
+  return { help, hurt };
+}
+function noseTrends() {
+  const keys = Object.keys(S.nose); if (!keys.length && !Object.keys(S.ck).length) return '';
+  const tk = todayKey(), rated = noseRated(), imp = keys.filter(k => S.nose[k].imp);
+  const l14 = rated.filter(k => k > addDays(tk, -14)), good = l14.filter(k => S.nose[k].r >= 4).length;
+  const av = a => (a.length ? a.reduce((x, k) => x + S.nose[k].r, 0) / a.length : null);
+  const a4 = av(rated.filter(k => k > addDays(tk, -28))), b4 = av(rated.filter(k => k <= addDays(tk, -28) && k > addDays(tk, -56)));
+  const L = noseLearn(), shown = o => L.filter(f => f.out === o && !f.next.early);
+  const out = UI.nlOut || (shown('cond').length ? 'cond' : shown('sleep').length ? 'sleep' : 'cond');
+  const nC = L.filter(f => !f.next.early && nlConf(f.next) === 'c').length, nL = L.filter(f => !f.next.early && nlConf(f.next) === 'l').length, nE = L.filter(f => f.next.early).length;
+  const head = rated.length ? `${good} good morning${good === 1 ? '' : 's'} of the last ${l14.length} logged` : 'No mornings rated yet';
+  const sub = a4 !== null ? `Averaging ${a4.toFixed(1)} out of 5 over 4 weeks${b4 !== null && Math.abs(a4 - b4) >= 0.2 ? `, ${a4 > b4 ? 'up' : 'down'} from ${b4.toFixed(1)}` : ''}` : 'Rate it in the check-in each morning';
+  const tabs = `<div class="seg" role="group" aria-label="What to look at">${NOSE_OUT.map(([v, l]) => `<button data-a="nlout" data-v="${v}" aria-pressed="${out === v}">${l}</button>`).join('')}</div>`;
+  const rows = shown(out).sort((a, b) => { const o = { c: 0, l: 1, none: 2 }; return o[nlConf(a.next)] - o[nlConf(b.next)] || Math.abs(b.next.d) - Math.abs(a.next.d); });
+  const early = L.filter(f => f.out === out && f.next.early);
+  const lagF = L.filter(f => f.out === out && (!f.next.early || (f.later && !f.later.early) || (f.weeks && !f.weeks.early)));
+  const lag = lagF.length ? `<div class="eyebrow">How long the effects last</div><div class="nlag"><div class="lagrow h"><span></span><span>Next day</span><span>2–3 days</span><span>Weeks</span></div>${lagF.map(f => `<div class="lagrow"><span>${esc(capFirst(f.x.sh))}</span>${nlCell(f, 'next')}${nlCell(f, 'later')}${f.weeks ? nlCell(f, 'weeks') : '<span class="c q">—</span>'}</div>`).join('')}</div>` : '';
+  const wk = L.filter(f => f.out === out && f.weeks && !f.weeks.early && ['c', 'l'].includes(nlConf(f.weeks)));
+  const wkRows = wk.map(f => { const r = f.weeks, c = nlConf(r); return `<div class="nlr"><b>${esc(f.x.wk.n)}</b><span class="eff ${r.d > 0 ? 'up' : 'dn'}">${nlFmt(out, r.d)}</span><small><span class="conf ${NL_CONF[c][0]}">${NL_CONF[c][1]}</span>${esc(`Fortnights like this average ${nlVal(out, r.a)}; the others, ${nlVal(out, r.b)} · ${r.ny} and ${r.nn} fortnights.`)}</small></div>`; }).join('');
+  const W = nlWins(out), oname = out === 'cond' ? 'your nose' : out === 'smell' ? 'your smell' : 'your sleep';
+  const wins = W.help.length || W.hurt.length ? `<p class="nsum good"><b>On your data, for ${oname}:</b> ${esc([W.help.length ? `${joinAnd(W.help.slice(0, 2).map(f => f.x.sh))} help${W.help.length === 1 && !/s$/.test(W.help[0].x.sh) ? 's' : ''}` : '', W.hurt.length ? `${joinAnd(W.hurt.slice(0, 2).map(f => f.x.sh))} ${W.hurt.length === 1 ? 'costs' : 'cost'} you most` : ''].filter(Boolean).join('; '))}.</p>` : '';
+  const need = early.length ? `<p class="small muted" style="margin:0">Still too early for ${esc(joinAnd(early.slice(0, 4).map(f => f.x.sh)))}${early.length > 4 ? ` and ${early.length - 4} more` : ''}: each needs ${NL_MIN} ${out === 'sleep' ? 'nights' : 'mornings'} with it and ${NL_MIN} without${out !== 'sleep' && rated.length < 20 ? ', so keep rating your nose each morning' : ''}.</p>` : '';
+  const srcs = [...new Set(rows.concat(wk).filter(f => f.res).map(f => f.res.s))];
+  return `<section class="wsum nosetr" id="tr-nose"><div class="nshead">${idl(shArt('nose', 52))}<div><div class="eyebrow">Nose · what works for you</div><b>${head}</b><small>${esc(sub)}</small></div></div>
+    ${noseLine(rated)}
+    <p class="small" style="margin:0"><b>${nC} clear finding${nC === 1 ? '' : 's'}, ${nL} leaning</b>, ${nE} still too early. Checked against your nose and smell each morning and that night's sleep.</p>
+    ${tabs}
+    ${rows.length ? `<div class="nlist">${rows.map(nlRow).join('')}</div>` : `<p class="small muted" style="margin:0">Nothing to compare yet for ${out === 'smell' ? 'smell' : out === 'cond' ? 'condition' : 'sleep'}.</p>`}
+    ${wkRows ? `<div class="eyebrow">Over weeks</div><div class="nlist">${wkRows}</div>` : ''}
+    ${lag}${wins}${need}
+    ${imp.length ? `<p class="small muted" style="margin:0">Plus ${imp.length} day${imp.length === 1 ? '' : 's'} from the nose app's log, before mornings were rated, so they're left out of the averages.</p>` : ''}
+    ${srcs.length ? `<p class="small muted" style="margin:0;font-style:italic">${srcs.map(esc).join(' · ')}</p>` : ''}</section>`;
+}
+// kept for the slides and tips: next-morning condition, as before
+function noseStats() {
+  const f = noseLearn().filter(x => x.out === 'cond' && !x.next.early).map(x => ({ id: x.id === 'alc6' ? 'alc6' : x.id, n: x.x.n, a: x.next.a, b: x.next.b, ny: x.next.ny, d: x.next.d, p: x.next.p }));
+  const r = noseRated(); return { n: r.length, avg: r.length ? r.reduce((a, k) => a + S.nose[k].r, 0) / r.length : null, f };
+}
+// the check-in: what has worked for you before, given what the app knows about this morning
+function noseYours(k) {
+  const L = noseLearn(), g = (id, out) => L.find(f => f.id === id && f.out === out), ok = r => r && !r.early && ['c', 'l'].includes(nlConf(r));
+  const out = [], unit = r => `${r.ny} and ${r.nn} mornings`;
+  const st = g('steroid', 'cond'), sp = g('rinsepm', 'cond'), a6 = g('alc6', 'cond'), u = nlAlc(addDays(k, -1));
+  if (ok(st && st.next) && st.next.d > 0) out.push(`<b>${nlCk(k, 'steroid') === false ? 'Steroid tonight.' : 'Keep the steroid going.'}</b> Mornings after it average ${st.next.a.toFixed(1)} for condition; without, ${st.next.b.toFixed(1)} (${unit(st.next)}).`);
+  if (ok(sp && sp.next) && sp.next.d > 0) out.push(`<b>Evening rinse${out.length ? ' as well' : ''}.</b> On your logs it's worth ${sp.next.d >= 0.75 ? 'about a step' : sp.next.d >= 0.35 ? 'about half a step' : 'a little'} by morning.`);
+  if (u !== null && u >= 6 && a6) {
+    if (ok(a6.later) && a6.later.d < 0) out.push(`<b>Expect tomorrow to be rough too.</b> After 6+ units, the next two mornings average ${a6.later.a.toFixed(1)} against ${a6.later.b.toFixed(1)}.`);
+    else if (ok(a6.next) && a6.next.d < 0 && a6.later && !a6.later.early && nlConf(a6.later) === 'none') out.push(`<b>It should pass by tomorrow.</b> Mornings after 6+ units average ${a6.next.a.toFixed(1)}, but the ones after that are back to normal for you.`);
+  }
+  const pn = g('poornose', 'sleep'), n = S.nose[k];
+  if (n && n.r && n.r <= 2 && ok(pn && pn.next) && pn.next.d < 0) out.push(`<b>Rinse and gel before bed.</b> Rough nose days cost you about ${Math.round(Math.abs(pn.next.d) * 60)} minutes of sleep that night.`);
+  const W = nlWins('cond'); W.help.filter(f => !['steroid', 'rinsepm'].includes(f.id)).slice(0, 1).forEach(f => out.push(`<b>${esc(capFirst(f.x.sh))} helps you.</b> Mornings after it average ${f.next.a.toFixed(1)} against ${f.next.b.toFixed(1)}.`));
+  if (!out.length) return '';
+  return `<div class="nyours"><div class="eyebrow">What's worked for you before</div><ol>${out.slice(0, 3).map(x => `<li>${x}</li>`).join('')}</ol><span class="small muted">From your check-ins. Each line needs at least ${NL_MIN} days with and ${NL_MIN} without before it shows.</span></div>`;
+}
+Object.assign(ACT, { nlout(d) { UI.nlOut = d.v; render(); } });
+
 function noseLine(rated) {
   const tk = todayKey(), cur = startOf(tk), pts = [];
   for (let i = 25; i >= 0; i--) { const st = addDays(cur, -7 * i), v = rated.filter(k => k >= st && k <= addDays(st, 6)).map(k => S.nose[k].r); if (v.length >= 2) pts.push({ st, v: v.reduce((a, b) => a + b, 0) / v.length }); }
@@ -11241,29 +11763,6 @@ function noseLine(rated) {
   return `<svg class="nline" viewBox="0 0 ${W} ${H}" role="img" aria-label="Nose, weekly average, from ${shortD(pts[0].st)}: ${pts[0].v.toFixed(1)} then, ${pts[pts.length - 1].v.toFixed(1)} lately">${g}<path class="na" d="${d}L${x(pts.length - 1).toFixed(1)} ${y(1)}L${x(0).toFixed(1)} ${y(1)}Z"/><path class="nl" d="${d}"/><circle cx="${x(pts.length - 1).toFixed(1)}" cy="${y(pts[pts.length - 1].v).toFixed(1)}" r="4"/>
     <text x="${L}" y="${H - 3}">${shortD(pts[0].st)}</text><text x="${W - R}" y="${H - 3}" text-anchor="end">This week</text></svg>`;
 }
-function noseTrends() {
-  const keys = Object.keys(S.nose); if (!keys.length) return '';
-  const tk = todayKey(), rated = noseRated(), imp = keys.filter(k => S.nose[k].imp);
-  const l14 = rated.filter(k => k > addDays(tk, -14)), good = l14.filter(k => S.nose[k].r >= 4).length;
-  const av = a => (a.length ? a.reduce((x, k) => x + S.nose[k].r, 0) / a.length : null);
-  const a4 = av(rated.filter(k => k > addDays(tk, -28))), b4 = av(rated.filter(k => k <= addDays(tk, -28) && k > addDays(tk, -56)));
-  const st = noseStats(), sorted = st.f.slice().sort((p, q) => Math.abs(q.d) - Math.abs(p.d));
-  const worse = sorted.filter(f => f.d <= -0.4), better = sorted.filter(f => f.d >= 0.4), flat = sorted.filter(f => Math.abs(f.d) < 0.25);
-  const head = rated.length ? `${good} good morning${good === 1 ? '' : 's'} of the last ${l14.length} logged` : 'Nothing rated yet';
-  const sub = a4 !== null ? `Averaging ${a4.toFixed(1)} out of 5 over 4 weeks${b4 !== null && Math.abs(a4 - b4) >= 0.2 ? `, ${a4 > b4 ? 'up' : 'down'} from ${b4.toFixed(1)}` : ''}` : 'Rate it in the check-in each morning';
-  const bar = (v, cls) => `<div class="nbar"><i class="${cls}" style="width:${((v / 5) * 100).toFixed(1)}%"></i></div>`;
-  const rows = sorted.map(f => `<div class="ncr"><div class="t"><b>${esc(f.n)}</b><span>${f.a.toFixed(1)} · ${f.ny} morning${f.ny === 1 ? '' : 's'}</span></div>${bar(f.a, f.d <= -0.4 ? 'w' : f.d >= 0.4 ? 'b' : 'n')}${bar(f.b, 'u')}</div>`).join('');
-  const lst = a => joinAnd(a.slice(0, 3).map(f => (/^[A-Z][a-z ]/.test(f.n) ? f.n.charAt(0).toLowerCase() + f.n.slice(1) : f.n)));
-  const sum = st.f.length ? `${worse.length ? `<b>Worse after:</b> ${esc(lst(worse))}. ` : ''}${better.length ? `<b>Better after:</b> ${esc(lst(better))}. ` : ''}${flat.length ? `No clear difference from ${esc(lst(flat))} so far.` : ''}` : '';
-  const need = NOSE_F.length - st.f.length;
-  return `<section class="wsum nosetr" id="tr-nose"><div class="nshead">${idl(shArt('nose', 52))}<div><div class="eyebrow">Nose</div><b>${head}</b><small>${esc(sub)}</small></div></div>
-    ${noseLine(rated)}
-    ${st.f.length ? `<div class="eyebrow">Mornings after…</div><div class="nkey"><span><i class="w"></i>worse than usual</span><span><i class="b"></i>better</span><span><i class="u"></i>the other mornings</span></div><div class="ncmp">${rows}</div><p class="nsum">${sum}</p>` : ''}
-    ${need ? `<p class="small muted" style="margin:0">${st.f.length ? `${need} more thing${need === 1 ? '' : 's'} to compare` : 'The comparisons start'} once there are at least 3 mornings with ${need === 1 && st.f.length ? 'it' : 'each'} and 3 without.</p>` : ''}
-    ${imp.length ? `<p class="small muted" style="margin:0">Plus ${imp.length} day${imp.length === 1 ? '' : 's'} from the nose app's log, before mornings were rated, so they're left out of the averages.</p>` : ''}
-    ${st.f.some(f => f.id === 'wine') ? '<p class="small muted" style="margin:0;font-style:italic">Wine: Nihlén et al. 2005, Respiratory Medicine</p>' : ''}</section>`;
-}
-
 /* Today: a line at the top on mornings it has something to say */
 function noseTip(tk) {
   const n = S.nose[tk] && !S.nose[tk].imp ? S.nose[tk] : null, y = addDays(tk, -1), u = y in S.alc ? +S.alc[y] : 0, dk = noseDrinks(y);
@@ -11359,19 +11858,21 @@ function mrBase(ym, r) {
 // the nine numbers on the scorecard: value, how it sits against your goal, and which way it moved
 function mrTiles(s, base) {
   const set = s.set, w = WT(), u = w.unit, T = [];
-  const add = (id, v, txt, lab, st, d, good) => { if (v === null || v === undefined) return; const mv = d === null || d === undefined || Math.abs(d) < 0.05 ? 0 : d > 0 === good ? 1 : -1; T.push({ id, txt, lab, st, d, mv }); };
+  const add = (id, v, txt, lab, st, d, good) => { if (v === null || v === undefined) return; const mv = d === null || d === undefined || Math.abs(d) < (['fibre', 'sugar', 'satfat', 'protein'].includes(id) ? 0.5 : 0.05) ? 0 : d > 0 === good ? 1 : -1; T.push({ id, txt, lab, st, d, mv }); };
   const d = (k, sc) => (base[k] !== null && base[k] !== undefined && s[k] !== null && s[k] !== undefined ? (s[k] - base[k]) * (sc || 1) : null);
   add('plants', s.plants, fmtPts(Math.round(s.plants)), 'plant points a week', s.plants >= set.plantGoal ? 'ok' : s.plants >= set.plantGoal - 5 ? 'mid' : 'off', d('plants'), true);
   add('alcohol', s.unitsWk, fmtU(alcR(s.unitsWk || 0)), 'units a week', s.unitsWk <= ALC.week ? 'ok' : s.unitsWk <= ALC.week + 3 ? 'mid' : 'off', d('unitsWk'), false);
   add('run', s.runsWk, oneDp(s.runsWk || 0), 'runs a week', s.runsWk >= 2 ? 'ok' : s.runsWk >= 1 ? 'mid' : 'off', d('runsWk'), true);
   add('fibre', s.fibre, `${fmtN(s.fibre)}g`, 'fibre a day', s.fibre >= set.fibreGoal ? 'ok' : s.fibre >= 25 ? 'mid' : 'off', d('fibre'), true);
   add('sugar', s.sugar, `${fmtN(s.sugar)}g`, 'added sugar a day', s.sugar <= set.fsMax ? 'ok' : s.sugar <= 40 ? 'mid' : 'off', d('sugar'), false);
+  add('sodium', s.sodium, fmtNa(s.sodium || 0), 'sodium a day', s.sodium <= set.naMax ? 'ok' : s.sodium <= set.naMax * 1.15 ? 'mid' : 'off', d('sodium'), false);
+  add('satfat', s.satfat, `${fmtN(s.satfat)}g`, 'sat fat a day', s.satfat <= set.sfMax ? 'ok' : s.satfat <= set.sfMax * 1.2 ? 'mid' : 'off', d('satfat'), false);
   add('sleep', s.sleep, `${(s.sleep || 0).toFixed(1)}h`, 'sleep a night', s.sleep >= set.sleepGoal ? 'ok' : s.sleep >= set.sleepGoal - 0.5 ? 'mid' : 'off', d('sleep'), true);
   if (s.wDelta !== null) { const wk = Math.max(1, s.n / 7), rate = s.wDelta / wk, aim = w.goal === 'lose' ? -w.rate : w.goal === 'gain' ? w.rate : 0, ok = w.goal === 'maintain' ? Math.abs(rate) < 0.25 : w.goal === 'lose' ? rate <= aim * 0.6 : rate >= aim * 0.6;
     T.push({ id: 'weight', txt: `${s.wDelta > 0.05 ? '+' : s.wDelta < -0.05 ? '−' : ''}${Math.abs(toU(s.wDelta)).toFixed(1)}`, lab: `${u}, 7-day average`, st: ok ? 'ok' : (w.goal === 'lose' ? rate <= 0 : rate >= 0) ? 'mid' : 'off', mv: 0, tag: ok ? 'on pace' : '' }); }
-  if (s.liftPlan) T.push({ id: 'lift', txt: `${s.liftDone}/${s.liftPlan}`, lab: 'lifting sessions', st: s.liftDone >= s.liftPlan * 0.9 ? 'ok' : s.liftDone >= s.liftPlan * 0.7 ? 'mid' : 'off', mv: 0 });
+  if (s.liftPlan) T.push({ id: 'lift', txt: `${fmtQtr(s.liftDone)}/${s.liftPlan}`, lab: 'lifting sessions, by what was done', st: s.liftDone >= s.liftPlan * 0.9 ? 'ok' : s.liftDone >= s.liftPlan * 0.7 ? 'mid' : 'off', mv: 0 });
   add('nose', s.nose, (s.nose || 0).toFixed(1), 'nose, out of 5', s.nose >= 3.5 ? 'ok' : s.nose >= 2.8 ? 'mid' : 'off', d('nose'), true);
-  return T.slice(0, 9);
+  return T.slice(0, 12);
 }
 const MR_UP = { plants: 'the plants went up', alcohol: 'the booze came down', run: 'the runs picked up', fibre: 'the fibre went up', sugar: 'the sugar came down', sleep: 'the sleep got longer', nose: 'your nose had better mornings' };
 const MR_OK = { plants: s => `averaged ${fmtPts(Math.round(s.plants))} plant points a week`, alcohol: s => `kept drinking to ${fmtU(alcR(s.unitsWk))} units a week`, run: s => `ran ${oneDp(s.runsWk)} times a week`, fibre: s => `ate ${fmtN(s.fibre)}g of fibre a day`, sugar: s => `kept added sugar to ${fmtN(s.sugar)}g a day`, sleep: s => `slept ${s.sleep.toFixed(1)} hours a night`, nose: s => `had ${s.noseGood} good nose mornings out of ${s.noseN}` };
@@ -11399,6 +11900,40 @@ function mrStory(ym, s, base, tiles) {
 }
 
 /* the chapters */
+// sugar, salt and sat fat: advice where the month was over, and what it's doing for you where it wasn't
+const MR_LIM = [
+  { f: 'fs', id: 'sugar', n: 'Added sugar', lim: 'fsMax', fmt: v => `${fmtN(v)}g`, good: () => [`${FX_RES.knuppel} (${FX_SRC.knuppel})`, `${FX_RES.noordam} (${FX_SRC.noordam})`] },
+  { f: 'na', id: 'sodium', n: 'Sodium', lim: 'naMax', fmt: v => `${v.toFixed(1)}g`, good: () => [`${FX_RES.salt} (${FX_SRC.salt})`] },
+  { f: 'sf', id: 'satfat', n: 'Sat fat', lim: 'sfMax', fmt: v => `${fmtN(v)}g`, good: () => [`${FX_RES.hooper} (${FX_SRC.hooper})`] }
+];
+// where it came from: the planned meals, and the rest by name, as a daily average over the days counted
+function mrSrc(s, f) {
+  const per = {}, add = (n, v) => { if (!(v > 0)) return; const key = foodKey(String(n || '').replace(/\s*\([^)]*\)\s*$/, '')); if (!key) return; (per[key] = per[key] || { n: String(n).replace(/\s*\([^)]*\)\s*$/, '').trim(), v: 0 }).v += v; };
+  let plan = 0, added = 0, n = 0; const tot = { fs: 'planFS', na: 'planNa', sf: 'planSF' }[f];
+  s.days.forEach(k => {
+    const c = k >= foodFrom() ? dcc(k) : null; if (!c || !c.hasPlan) return; n++;
+    let a = 0;
+    SLOTS.forEach(sl => { const o = c.slots[sl]; if (o.gone || o.kind !== 'custom') return; add(o.c.n, o[f] || 0); a += o[f] || 0; });
+    (peekD(k).x || []).forEach(x => { add(x.n, +x[f] || 0); a += +x[f] || 0; });
+    added += a; plan += Math.max(0, c[tot] - a); // the planned meals, the latte and the seasoning
+  });
+  if (!n) return null;
+  const all = Object.values(per);
+  return { n, plan: plan / n, added: added / n, kinds: all.length, top: all.map(x => ({ n: x.n, v: x.v / n })).sort((a, b) => b.v - a.v).slice(0, 3) };
+}
+function mrLims(s) {
+  const out = MR_LIM.map(L => {
+    const v = s[L.id], g = s.set[L.lim]; if (v === null || v === undefined || !g) return '';
+    const src = mrSrc(s, L.f), pic = mrPic(shArt(L.id, 46)), over = v > g * 1.02;
+    if (!over) return `<div class="mrlim">${pic}<div><b>${L.n}: ${L.fmt(v)} a day, under the ${L.fmt(g)} line. Well done.</b>${L.good().map(t => `<p>${esc(t)}</p>`).join('')}</div></div>`;
+    const top = src && src.top.filter(x => x.v >= (L.f === 'na' ? 0.05 : 0.5));
+    const where = src ? `The plan came to ${L.fmt(src.plan)} a day and what you added on top to ${L.fmt(src.added)}${src.kinds > 1 ? `, across ${src.kinds} different foods` : ''}.${top.length ? ` The biggest: ${joinAnd(top.map(x => `${x.n} (${L.fmt(x.v)} a day)`))}.` : ''}` : '';
+    const t0 = top && top[0], half = t0 ? v - t0.v / 2 : null;
+    const aim = t0 && t0.v >= (v - g) * 0.8 && src && t0.v >= src.added * 0.15 ? `halving ${t0.n} alone would bring it to about ${L.fmt(half)} a day.` : src && src.plan > g ? 'the plan itself is over the line, so the swaps on the meals are the place to start.' : src && src.added > v - g ? `the extras are where it comes from: cutting them by ${Math.min(100, Math.ceil(((v - g) / src.added) * 10) * 10)}% gets you there.` : 'small cuts across the week are the way down.';
+    return `<div class="mrlim">${pic}<div><b>${L.n}: ${L.fmt(v)} a day, ${L.fmt(v - g)} over the ${L.fmt(g)} line</b><p>${esc(where)}</p><p class="note">Aim for next month: ${esc(aim)}</p></div></div>`;
+  }).filter(Boolean);
+  return out.length ? `<div class="mrlims">${out.join('')}</div>` : '';
+}
 function mrFood(s) {
   const all = new Set(), cnt = {}, brought = {};
   s.days.forEach(k => { const c = k >= foodFrom() ? dcc(k) : null; if (!c || !c.hasPlan) return; c.plants.forEach(x => all.add(x)); SLOTS.forEach(sl => { const o = c.slots[sl]; if (o.kind === 'recipe') { cnt[o.r.id] = (cnt[o.r.id] || 0) + 1; (brought[o.r.id] = brought[o.r.id] || new Set()); o.r.plants.forEach(x => brought[o.r.id].add(x)); } }); });
@@ -11438,7 +11973,7 @@ function mrDrink(s) {
 function mrMove(s) {
   const ser = typeof trLiftSeries === 'function' ? trLiftSeries('bench') : [], inR = ser.filter(x => x.date >= s.a && x.date <= s.b && x.e1), b0 = inR[0], b1 = inR[inR.length - 1];
   const parts = [];
-  if (s.liftPlan) parts.push(`${capFirst(nWord(s.liftDone, 'lifting session'))} done of ${s.liftPlan} planned${b0 && b1 && b0 !== b1 ? `, and your bench press estimate is ${b1.e1 >= b0.e1 ? 'up' : 'down'} ${Math.abs(Math.round(b1.e1 - b0.e1))} kg` : ''}.`);
+  if (s.liftPlan) parts.push(`${fmtQtr(s.liftDone)} lifting session${Math.abs(s.liftDone - 1) < 0.125 ? '' : 's'}' worth done of ${s.liftPlan} planned${b0 && b1 && b0 !== b1 ? `, and your bench press estimate is ${b1.e1 >= b0.e1 ? 'up' : 'down'} ${Math.abs(Math.round(b1.e1 - b0.e1))} kg` : ''}.`);
   if (s.runs || s.runsWk !== null) parts.push(`${s.runsWk !== null && s.runsWk >= 2 ? 'Runs were on target' : 'Runs were the weak spot'}: ${nWord(s.runs, 'run')} in ${s.n} days.`);
   return parts.length ? `<p>${parts.join(' ')}</p>` : '';
 }
@@ -11498,7 +12033,7 @@ function mrHtml(ym) {
   const A = mrAims(tiles), at = A.lv.filter(x => x.o.st === 'at').length;
   const showLv = [...A.lv.filter(x => x.o.st === 'at').slice(0, 2), ...A.lv.filter(x => x.o.st !== 'at').slice(0, 2)];
   const chap = (pic, eb, h, body) => (body ? `<section class="mrchap"><div class="mrch">${pic}<div><div class="eyebrow">${eb}</div><h3>${h}</h3></div></div>${body}</section>` : '');
-  const tl = tiles.map(t => `<div class="mrsc ${t.st}"><b>${esc(t.txt)}</b><span>${esc(t.lab)}</span><i class="${t.mv > 0 ? 'up' : t.mv < 0 ? 'dn' : ''}">${t.tag ? esc(t.tag) : t.mv ? `${(t.d > 0 ? '▲' : '▼')} ${esc(t.id === 'plants' ? fmtPts(Math.round(Math.abs(t.d))) : t.id === 'run' || t.id === 'alcohol' || t.id === 'sleep' || t.id === 'nose' ? Math.abs(t.d).toFixed(1) : `${fmtN(Math.abs(t.d))}g`)}` : 'same'}</i></div>`).join('');
+  const tl = tiles.map(t => `<div class="mrsc ${t.st}"><b>${esc(t.txt)}</b><span>${esc(t.lab)}</span><i class="${t.mv > 0 ? 'up' : t.mv < 0 ? 'dn' : ''}">${t.tag ? esc(t.tag) : t.mv ? `${(t.d > 0 ? '▲' : '▼')} ${esc(t.id === 'plants' ? fmtPts(Math.round(Math.abs(t.d))) : t.id === 'run' || t.id === 'alcohol' || t.id === 'sleep' || t.id === 'nose' || t.id === 'sodium' ? Math.abs(t.d).toFixed(1) : `${fmtN(Math.abs(t.d))}g`)}` : 'same'}</i></div>`).join('');
   const H = mrHigh(s);
   const aims = A.ids.map((id, i) => `<div class="mraim"><span class="n">${i + 1}</span><span><b>${esc(fxName(id))}</b><small>${esc(fxAim(id, {}))}${MR_WHY[id] ? ` It helps ${MR_WHY[id]}.` : ''}</small></span></div>`).join('');
   const could = A.lv.length ? at + A.ids.filter(id => A.lv.some(x => x.k === id && x.o.st !== 'at')).length : 0;
@@ -11509,10 +12044,8 @@ function mrHtml(ym) {
       <section class="mrstory"><p class="drop">${esc(st.p1)}</p><p>${esc(st.p2)}</p></section>
       <section class="mrchap"><div class="eyebrow">The month in numbers · ${esc(base.lab)}</div><div class="mrscore">${tl}</div>
         <p class="note">Green is on the goal, amber close, red off it. The arrows compare ${first ? `with your first week; from ${nx} they'll compare with the month before` : `with ${ymName(ymPrev(ym))}`}.</p></section>
-      ${chap(mrPic(MR_ART.basket()), 'Chapter one', 'What you ate', mrFood(s))}
-      ${chap(mrPic(shArt('alcohol', 76)), 'Chapter two', 'What you drank', mrDrink(s))}
-      ${chap(mrPic(shArt('run', 76)), 'Chapter three', 'How you moved', mrMove(s))}
-      ${chap(mrPic(shArt('sleep', 76)), 'Chapter four', 'Sleep, body and nose', mrBody(s))}
+      ${[[mrPic(MR_ART.basket()), 'What you ate', mrFood(s)], [mrPic(shArt('sugar', 76)), 'Sugar, salt and fat', mrLims(s)], [mrPic(shArt('alcohol', 76)), 'What you drank', mrDrink(s)],
+        [mrPic(shArt('run', 76)), 'How you moved', mrMove(s)], [mrPic(shArt('sleep', 76)), 'Sleep, body and nose', mrBody(s)]].filter(c => c[2]).map((c, i) => chap(c[0], `Chapter ${['one', 'two', 'three', 'four', 'five'][i]}`, c[1], c[2])).join('')}
       ${H.length ? chap(mrPic(MR_ART.rosette()), 'The best bits', 'Highlights', `<div class="mrhl">${H.map(([b, t]) => `<div><b>${esc(b)}</b>${esc(t)}</div>`).join('')}</div>`) : ''}
       ${A.lv.length ? chap(mrPic(shArt('score', 76)), 'Where you stand', `At the level for ${at} of ${A.lv.length}`, `<p>Against the amounts the research saw its benefits at, over your last four weeks. Green ones are already working for you; the others say how far there is to go.</p><div class="mrbox">${showLv.map(x => lvHtml(x.k)).join('')}</div><p class="note">The full list is in Trends, under What it's doing for you.</p>`) : ''}
       ${A.ids.length ? chap(mrPic(MR_ART.path()), nx, 'Three things to aim for'.replace('Three', ['', 'One', 'Two', 'Three'][A.ids.length]).replace('things', A.ids.length === 1 ? 'thing' : 'things'), `<div class="mraims">${aims}</div><button class="btn primary" data-a="mrfocus" data-v="${ym}" style="width:100%">Make ${A.ids.length === 1 ? 'it' : 'these'} next week's focus</button>`) : ''}
