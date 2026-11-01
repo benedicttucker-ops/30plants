@@ -1933,6 +1933,15 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 .sparerow .btnrow { margin-top: 6px; }
 /* 3.24.1 red meat and oily fish on your own meals */
 .mfchecks { display: flex; flex-wrap: wrap; gap: 0 22px; }
+/* 3.24.2 prep: swap from the ingredient name; whole things counted in steps */
+.pgname { all: unset; cursor: pointer; display: inline; font: inherit; color: inherit; }
+.pgname svg { width: 13px; height: 13px; margin-left: 5px; vertical-align: -1px; opacity: .55; }
+.pgname:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.pgg.pgc { gap: 0; }
+.pgg.pgc b { min-width: 34px; text-align: center; font-size: 14px; }
+.pgg.pgc span { width: auto; min-width: 44px; margin-left: 4px; }
+.pgst { width: 30px; height: 30px; border-radius: 9px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-weight: 700; font-size: 16px; line-height: 1; padding: 0; cursor: pointer; }
+.pgst:disabled { opacity: .35; cursor: default; }
 
 </style>
 </head>
@@ -1959,7 +1968,7 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.24.1';</script>
+<script>window.TP_VERSION = '3.24.2';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -6486,6 +6495,9 @@ function pgSet(st, key, s, rid, i, G) {
     E = pgEntries(st, key, s, rid); const T = pgTot(E, i); if (!T || Math.abs(T - G) < 0.5) break; g0 *= G / T;
   }
 }
+// a whole thing's step on Prep: one for small things like garlic cloves, a quarter for onions and lemons; 0 for grams
+// (only fresh veg and fruit, and eggs: meat, fish, tins and bread stay in grams)
+const pgCount = i => { const g = ING[i]; return g && g.u && g.uw >= 4 && !g.ml && (g.a === 'veg' || i === 'egg') ? (g.uw < 15 ? 1 : 0.25) : 0; };
 function prepIngs(st, key, gr, tot, from) {
   const k0 = gr.entries.map(e => e.k).find(k => haveable(k, gr.s, dayCalc(k).slots[gr.s])), o0 = k0 ? dayCalc(k0).slots[gr.s] : null;
   const have = o0 ? Object.fromEntries(mealHave(k0, gr.s, o0).map(x => [x.i, x.src])) : null;
@@ -6494,8 +6506,11 @@ function prepIngs(st, key, gr, tot, from) {
   const rows = ids.map(i => {
     const g = tot[i], src = have ? have[i] : undefined, own = (AMT + i) in sw, more = ('@k:' + i) in sw, unit = ING[i].ml ? 'ml' : 'g';
     const box = have ? `<button class="pgbox" role="checkbox" aria-checked="${!!src}" ${src === 'left' ? 'disabled' : `data-a="pgot" data-k="${k0}" data-s="${gr.s}" data-i="${i}"`} aria-label="${esc(ING[i].n)}: got it in"><span class="box">${ic('check')}</span></button>` : '<span></span>';
-    const sub = [/\d(k?g|ml)\b|litres/.test(fmtQ(i, g)) ? '' : fmtQ(i, g), from[i] ? `for ${shortN(from[i])}` : '', HAVE_SRC[src] || '', own ? (more ? 'your amount, more calories' : 'your amount, calories kept') : ''].filter(Boolean);
-    return `<div class="pgrow ${src ? 'in' : ''}">${box}<span class="pgn">${esc(ingLabel(gr.r.id, i, ING[i].n))}${sub.length || own ? `<small>${esc(sub.join(' · '))}${own ? ` <button class="pgreset" data-a="pgreset" ${da} data-i="${i}">Reset</button>` : ''}</small>` : ''}</span><span class="pgg"><input type="number" inputmode="decimal" min="0" step="${g >= 100 ? 5 : 1}" value="${g >= 20 ? Math.round(g) : +g.toFixed(1)}" data-pg="${i}" ${da} aria-label="${esc(ING[i].n)} for the batch, in ${unit}"><span>${unit}</span></span></div>`;
+    // things counted whole (onions, lemons, garlic) step in quarters or ones; everything else is grams
+    const ct = pgCount(i), sub = [ct ? (ING[i].uw >= 20 ? fmtG(g) : '') : /\d(k?g|ml)\b|litres/.test(fmtQ(i, g)) ? '' : fmtQ(i, g), from[i] ? `for ${shortN(from[i])}` : '', HAVE_SRC[src] || '', own ? (more ? 'your amount, more calories' : 'your amount, calories kept') : ''].filter(Boolean);
+    const amt = ct ? (() => { const c = Math.max(ct, Math.round(g / ING[i].uw / ct) * ct); return `<span class="pgg pgc"><button class="pgst" data-a="pgstep" data-d="-1" ${da} data-i="${i}" data-g="${g}" ${c <= ct ? 'disabled' : ''} aria-label="Less ${esc(ING[i].n)}">−</button><b>${frac(c, ct)}</b><button class="pgst" data-a="pgstep" data-d="1" ${da} data-i="${i}" data-g="${g}" aria-label="More ${esc(ING[i].n)}">+</button><span>${esc(plural(ING[i].u, c))}</span></span>`; })()
+      : `<span class="pgg"><input type="number" inputmode="decimal" min="0" step="${g >= 100 ? 5 : 1}" value="${g >= 20 ? Math.round(g) : +g.toFixed(1)}" data-pg="${i}" ${da} aria-label="${esc(ING[i].n)} for the batch, in ${unit}"><span>${unit}</span></span>`;
+    return `<div class="pgrow ${src ? 'in' : ''}">${box}<span class="pgn"><button class="pgname" data-a="pgswap" data-r="${gr.r.id}" data-k="${gr.entries[0].k}" data-s="${gr.s}" data-i="${i}" aria-label="Swap or leave out ${esc(ING[i].n)}">${esc(ingLabel(gr.r.id, i, ING[i].n))}${ic('swap')}</button>${sub.length || own ? `<small>${esc(sub.join(' · '))}${own ? ` <button class="pgreset" data-a="pgreset" ${da} data-i="${i}">Reset</button>` : ''}</small>` : ''}</span>${amt}</div>`;
   }).join('');
   const nIn = have ? ids.filter(i => have[i]).length : 0, kc = gr.entries.length ? Math.round(gr.entries.reduce((a, e) => a + dayCalc(e.k).slots[gr.s].k, 0) / gr.entries.length) : 0;
   return `<div class="pging">
@@ -8626,6 +8641,17 @@ const ACT = {
   },
   pgot(d) { const msg = haveToggle(d.k, d.s, d.i); if (msg === null) return; save(); render(); if (msg) toast(msg); },
   pgkeep() { UI.pkKeep = UI.pkKeep === false; try { localStorage.setItem('tp.pkeep', UI.pkKeep ? '1' : '0'); } catch (e) { /* ignore */ } render(); },
+  pgstep(d) {
+    const ing = ING[d.i], step = pgCount(d.i); if (!ing || !step) return;
+    const c = Math.max(step, Math.round(+d.g / ing.uw / step) * step), nv = +(c + +d.d * step).toFixed(2); if (nv < step) return;
+    pgSet(d.st, d.key, d.s, d.r, d.i, nv * ing.uw); save(); render();
+    toast(`${shortN(d.i)}: ${frac(nv, step)} ${plural(ing.u, nv)} for the batch${UI.pkKeep === false ? ', portions kept the same' : ', calories kept'}`);
+  },
+  // the dish's own ingredient panel, opened on this one: swap it or leave it out, for the whole batch by default
+  pgswap(d) {
+    ACT.open({ r: d.r, k: d.k, s: d.s }); if (!SH) return; SH.swi = d.i; renderSheet();
+    const el = document.querySelector('.ipanel.mswap'); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'center' });
+  },
   pgreset(d) { pgSet(d.st, d.key, d.s, d.r, d.i, null); save(); render(); toast(`${shortN(d.i)} back to the recipe's amount`); },
   pscan(d) { openSheet({ type: 'pscan', st: d.st, key: d.key, s: d.s, r: d.r, k: d.k }); },
   pscango() { if (!SH || SH.type !== 'pscan') return; SH.res = null; startScan(pscanCode, renderSheet); },
