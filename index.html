@@ -1931,6 +1931,8 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 .sparerow { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; align-items: start; }
 .sparerow b { display: block; font-size: 15px; margin-top: 1px; }
 .sparerow .btnrow { margin-top: 6px; }
+/* 3.24.1 red meat and oily fish on your own meals */
+.mfchecks { display: flex; flex-wrap: wrap; gap: 0 22px; }
 
 </style>
 </head>
@@ -1957,7 +1959,7 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.24.0';</script>
+<script>window.TP_VERSION = '3.24.1';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -3951,19 +3953,20 @@ function foodPut(st, x, day) {
   st.foods = st.foods || {};
   const prev = st.foods[key] || {}, e = { n: String(x.n).trim(), k: +x.k || 0, p: +x.p || 0 };
   if (x.fe) e.fe = true;
+  Object.assign(e, mfOut(x));
   if (Array.isArray(x.pl) && x.pl.length) e.pl = x.pl.filter(q => PLANTS[q]);
   ['na', 'sa', 'fs', 'sf', 'f'].forEach(f => { if (x[f] !== undefined && x[f] !== null && Number.isFinite(+x[f])) e[f] = +x[f]; });
   if (+x.g > 0) { e.g = +x.g; if (x.u === 'ml') e.u = 'ml'; }
   e.used = (prev.used || 0) + 1; e.last = day && (!prev.last || day >= prev.last) ? day : prev.last || day || todayKey();
   st.foods[key] = e;
 }
-const foodCopy = e => { const x = { n: e.n, k: e.k, p: e.p, pl: (e.pl || []).slice() }; if (e.fe) x.fe = true; ['na', 'sa', 'fs', 'sf', 'f', 'g', 'u'].forEach(f => { if (e[f] !== undefined) x[f] = e[f]; }); return x; };
+const foodCopy = e => { const x = Object.assign({ n: e.n, k: e.k, p: e.p, pl: (e.pl || []).slice() }, mfOut(e)); if (e.fe) x.fe = true; ['na', 'sa', 'fs', 'sf', 'f', 'g', 'u'].forEach(f => { if (e[f] !== undefined) x[f] = e[f]; }); return x; };
 // a saved food or logged entry with its amount, as a lookup the grams box can scale
 function amtItem(e) {
   if (!(+e.g > 0)) return null;
   const g = +e.g, sa = e.sa !== undefined ? e.sa : e.na !== undefined ? e.na * 2.5 : undefined, per = { k: (+e.k || 0) * 100 / g, p: (+e.p || 0) * 100 / g };
   [['sa', sa], ['fs', e.fs], ['sf', e.sf], ['f', e.f]].forEach(([f, v]) => { if (v !== undefined && v !== null) per[f] = +v * 100 / g; });
-  return { n: e.n, per, g, serv: g, pl: (e.pl || []).slice(), fe: !!e.fe, ml: e.u === 'ml', src: 'saved' };
+  return { n: e.n, per, g, serv: g, pl: (e.pl || []).slice(), fe: !!e.fe, rm: !!e.rm, oi: !!e.oi, ml: e.u === 'ml', src: 'saved' };
 }
 // saved recipe ideas: kept only when well formed, and registered as recipes before the days are checked, so a day
 // that uses one keeps it
@@ -4384,7 +4387,7 @@ function dayCalcCore(k, carry, fc) {
   const latteNa = latteOn ? st.latteMl * ING.milk.sa / 250 : 0, latteSF = latteOn ? st.latteMl * ING.milk.sf / 100 : 0, hasMeals = SLOTS.some(s => out[s].kind === 'recipe');
   const loNa = hasMeals ? (+st.loSalt || 0) * TSP_SALT * LOSALT_NA / 100 : 0;
   let planNa = (latteGone ? 0 : latteNa) + loNa, eatNa = (d.done.latte ? latteNa : 0), planFS = 0, eatFS = 0, planSF = latteGone ? 0 : latteSF, eatSF = d.done.latte ? latteSF : 0;
-  const plants = new Set(), plantsEaten = new Set(), colours = new Set(), fermSrc = []; let loG = 0;
+  const plants = new Set(), plantsEaten = new Set(), colours = new Set(), fermSrc = [], own = { red: [], oily: [] }; let loG = 0;
   for (const s of SLOTS) {
     const o = out[s];
     if (o.kind === 'recipe') { if (!o.gone) o.r.items.forEach(it => { if (it.i === 'losalt') loG += it.g * o.m; }); o.k = o.r.k * o.m; o.p = o.r.p * o.m; o.f = o.r.f * o.m; o.na = o.r.na * o.m; o.fs = o.r.fs * o.m; o.sf = o.r.sf * o.m; o.ferm = isFerm(o.r, o.m); }
@@ -4395,19 +4398,21 @@ function dayCalcCore(k, carry, fc) {
       if (o.ferm) { fermPlan = true; fermSrc.push(o.r.n); if (o.done) fermEat = true; }
       o.r.plants.forEach(x => { plants.add(x); if (o.done) plantsEaten.add(x); if (PLANTS[x][2]) colours.add(CG(PLANTS[x][2])); });
     }
-    if (o.kind === 'custom') { // a meal out or from a photo can carry its own plants and fermented flag
+    if (o.kind === 'custom') { // a meal out or from a photo can carry its own plants, fermented, red meat and oily fish
       if (o.c.fe) { fermPlan = true; fermSrc.push(o.c.n); if (o.done) fermEat = true; }
+      if (o.c.rm) own.red.push({ n: o.c.n, s, done: !!o.done }); if (o.c.oi) own.oily.push({ n: o.c.n, s, done: !!o.done });
       (Array.isArray(o.c.pl) ? o.c.pl : []).forEach(x => { if (!PLANTS[x]) return; plants.add(x); if (o.done) plantsEaten.add(x); if (PLANTS[x][2]) colours.add(CG(PLANTS[x][2])); });
     }
   }
-  for (const x of d.x) {
+  d.x.forEach((x, xi) => {
     planK += +x.k || 0; planP += +x.p || 0; eatK += +x.k || 0; eatP += +x.p || 0;
     const xf = +x.f || 0, xna = +x.na || 0, xfs = +x.fs || 0, xsf = +x.sf || 0;
     planF += xf; eatF += xf; planNa += xna; eatNa += xna; planFS += xfs; eatFS += xfs; planSF += xsf; eatSF += xsf;
     if (x.fe) { fermPlan = true; fermEat = true; fermSrc.push(x.n); }
+    if (x.rm) own.red.push({ n: x.n, i: xi, done: true }); if (x.oi) own.oily.push({ n: x.n, i: xi, done: true });
     (x.pl || []).forEach(p => { if (!PLANTS[p]) return; plants.add(p); plantsEaten.add(p); if (PLANTS[p][2]) colours.add(CG(PLANTS[p][2])); });
-  }
-  return { loG, k, T, B, share, carry: carry || 0, carryFrom: fc && fc.src[k] ? fc.src[k] : [], carryOut: fc && fc.out[k] ? fc.out[k] : null, night, dK, custom: !!d.t, latte, latteP, latteGone, slots: out, planK, planP, eatK, eatP, planF, eatF, planNa, eatNa, loNa, latteNa, planFS, eatFS, planSF, eatSF, fermPlan, fermEat, fermSrc, plants, plantsEaten, colours, hasPlan: SLOTS.some(s => out[s].kind !== 'empty') };
+  });
+  return { loG, k, T, B, share, carry: carry || 0, carryFrom: fc && fc.src[k] ? fc.src[k] : [], carryOut: fc && fc.out[k] ? fc.out[k] : null, night, dK, custom: !!d.t, latte, latteP, latteGone, slots: out, planK, planP, eatK, eatP, planF, eatF, planNa, eatNa, loNa, latteNa, planFS, eatFS, planSF, eatSF, fermPlan, fermEat, fermSrc, own, plants, plantsEaten, colours, hasPlan: SLOTS.some(s => out[s].kind !== 'empty') };
 }
 // the recipe a box is sized on: an amount changed on Prep with "keep the calories" off ('@k:<ingredient>') adds its
 // calories rather than shrinking the portion, so sizing leaves that change out
@@ -4424,6 +4429,7 @@ function weekCalc(st) {
   dc.forEach(c => {
     c.plants.forEach(x => plan.add(x)); c.plantsEaten.forEach(x => eat.add(x));
     for (const s of SLOTS) { const o = c.slots[s]; if (o.kind !== 'recipe' || o.gone) continue; if (o.r.oily) { oilyP++; if (o.done) oilyE++; } if (o.r.red) { redP++; if (o.done) redE++; } }
+    c.own.oily.forEach(x => { oilyP++; if (x.done) oilyE++; }); c.own.red.forEach(x => { redP++; if (x.done) redE++; });
     if (c.fermPlan) fermDays++;
     if (c.fermEat) fermEatDays++;
     c.colours.forEach(x => cols.add(x));
@@ -5116,7 +5122,7 @@ function vToday() {
     else { const bn = batchName(k, s, o.r) || (o.r.shop ? 'Shop' : ''); rows.push(mealRow({ tick: s, on: o.done, done: o.done, slot: `${SLOTNAME[s]}${bn ? ` <span class="tape">${bn}</span>` : ''}`, nm: esc(o.r.n), kc: `${fmtN(o.k)}<small>kcal</small>`, art: art(o.r, 42), open: `data-a="open" data-r="${o.r.id}" data-k="${k}" data-s="${s}"`, have: haveChip(k, s, o) })); }
   }
   if (c.night) rows.push(mealRow({ tick: 'out', on: !!c.night.done, done: !!c.night.done, slot: `Night out${c.night.note ? ` · ${esc(c.night.note)}` : ''}`, nm: esc(drinkSummary(c.night)), kc: `${fmtN(c.dK)}<small>kcal</small>`, art: nightArt(c.night, 42), open: `data-a="night" data-k="${k}"` }));
-  const extras = d.x.map((x, i) => `<div class="xrow"><button class="nm" data-a="xedit" data-i="${i}">${esc(x.n)}<span class="mt">${fmtN(x.k)} kcal · ${fmtN(x.p || 0)}g protein${(x.pl || []).length ? ` · ${x.pl.length} plant${x.pl.length > 1 ? 's' : ''}` : ''}${x.fe ? ' · fermented' : ''}</span></button><button class="iconbtn" data-a="xedit" data-i="${i}" aria-label="Edit ${esc(x.n)}">${ic('edit')}</button><button class="iconbtn" data-a="xdel" data-i="${i}" aria-label="Remove ${esc(x.n)}">${ic('trash')}</button></div>`).join('');
+  const extras = d.x.map((x, i) => `<div class="xrow"><button class="nm" data-a="xedit" data-i="${i}">${esc(x.n)}<span class="mt">${fmtN(x.k)} kcal · ${fmtN(x.p || 0)}g protein${(x.pl || []).length ? ` · ${x.pl.length} plant${x.pl.length > 1 ? 's' : ''}` : ''}${x.fe ? ' · fermented' : ''}${mfTags(x)}</span></button><button class="iconbtn" data-a="xedit" data-i="${i}" aria-label="Edit ${esc(x.n)}">${ic('edit')}</button><button class="iconbtn" data-a="xdel" data-i="${i}" aria-label="Remove ${esc(x.n)}">${ic('trash')}</button></div>`).join('');
   const g = set.plantGoal;
   const tiles = `<div class="tiles"><button class="tile ${wc.ptsEat >= g ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${fmtPts(wc.ptsEat)}<small>/${g}</small></span><span class="l">Plants eaten</span></button>
     <button class="tile ${wc.oilyE >= set.oilyGoal ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${wc.oilyE}<small>/${set.oilyGoal}</small></span><span class="l">Oily fish</span></button>
@@ -5327,8 +5333,8 @@ function lastMonths(n) { const d = parse(todayKey()); return Array.from({ length
 const FOOD = {
   protein: c => c.planP, fibre: c => c.planF, sodium: c => c.planNa, sugar: c => c.planFS, satfat: c => c.planSF,
   ferm: c => (c.fermPlan ? 1 : 0),
-  fish: c => SLOTS.filter(s => c.slots[s].kind === 'recipe' && !c.slots[s].gone && c.slots[s].r.oily).length,
-  red: c => SLOTS.filter(s => c.slots[s].kind === 'recipe' && !c.slots[s].gone && c.slots[s].r.red).length
+  fish: c => SLOTS.filter(s => c.slots[s].kind === 'recipe' && !c.slots[s].gone && c.slots[s].r.oily).length + c.own.oily.length,
+  red: c => SLOTS.filter(s => c.slots[s].kind === 'recipe' && !c.slots[s].gone && c.slots[s].r.red).length + c.own.red.length
 };
 // food is counted from the day tracking began (the check-in setting); weeks planned before it weren't followed
 const foodFrom = () => (S.wt && S.wt.from) || '0000';
@@ -5778,9 +5784,15 @@ function trWeekList(m) {
   }
   // oily fish and red meat: the meals themselves, each one opening its recipe
   const flag = m.id === 'fish' ? 'oily' : 'red', meals = [];
-  wc.days.forEach((k, i) => SLOTS.forEach(s => { const o = wc.dc[i].slots[s]; if (o.kind === 'recipe' && o.r[flag]) meals.push({ k, s, o }); }));
-  const eaten = meals.filter(x => x.o.done).length;
-  const rows = meals.map(({ k, s, o }) => `<li><button class="trwk-row" data-a="open" data-r="${o.r.id}" data-k="${k}" data-s="${s}"><b class="d">${dayLab(k)}</b><span>${esc(o.r.n)} <small class="nw">· ${SLOTNAME[s].toLowerCase()}</small></span>${when(o.done, k)}</button></li>`).join('');
+  wc.days.forEach((k, i) => {
+    SLOTS.forEach(s => { const o = wc.dc[i].slots[s]; if (o.kind === 'recipe' && !o.gone && o.r[flag]) meals.push({ k, s, o }); });
+    wc.dc[i].own[flag].forEach(x => meals.push({ k, x })); // your own meals and food you logged, marked by you
+  });
+  meals.sort((a, b) => (a.k < b.k ? -1 : a.k > b.k ? 1 : 0));
+  const eaten = meals.filter(m => (m.x || m.o).done).length;
+  const rows = meals.map(({ k, s, o, x }) => x
+    ? `<li><button class="trwk-row" ${x.s ? `data-a="custom" data-k="${k}" data-s="${x.s}"` : `data-a="xedit" data-k="${k}" data-i="${x.i}"`}><b class="d">${dayLab(k)}</b><span>${esc(x.n)} <small class="nw">· ${x.s ? SLOTNAME[x.s].toLowerCase() : 'logged'}</small></span>${when(x.done, k)}</button></li>`
+    : `<li><button class="trwk-row" data-a="open" data-r="${o.r.id}" data-k="${k}" data-s="${s}"><b class="d">${dayLab(k)}</b><span>${esc(o.r.n)} <small class="nw">· ${SLOTNAME[s].toLowerCase()}</small></span>${when(o.done, k)}</button></li>`).join('');
   const lead = m.id === 'fish'
     ? (meals.length ? `${meals.length} oily fish meal${meals.length === 1 ? '' : 's'} planned against your ${set.oilyGoal}${eaten ? `, ${eaten} eaten so far` : ''}.` : `No oily fish in the plan this week, against your ${set.oilyGoal}.`)
     : (meals.length ? `${meals.length} red meat meal${meals.length === 1 ? '' : 's'} planned against your limit of ${set.redMax}${eaten ? `, ${eaten} eaten so far` : ''}.` : 'No red meat in the plan this week.');
@@ -6280,6 +6292,24 @@ function alcSync(k, was) {
   else if (was !== undefined && k in S.alc && Math.abs(+S.alc[k] - alcR(was)) < 0.05) delete S.alc[k]; // no longer done: what it set goes too
 }
 // once: nights done before the log followed them
+// 3.24.1: food you'd logged before red meat and oily fish could be marked, picked out by name once
+const MF_RED = /\b(ham|beef|steak|lamb|pork|bacon|chorizo|salami|pepperoni|prosciutto|pancetta|n'?duja|rag[uù]|bolognese|birria|italian deli|veal|venison)\b/i;
+const MF_OILY = /\b(salmon|mackerel|sardines?|trout|herring|kippers?|anchov(y|ies)|pilchards?)\b/i;
+const MF_NOT = /\b(veg(gie|an|etarian)?|plant[- ]based|meat[- ]free|quorn|no meat)\b/i;
+function mfFix() {
+  if (S.fix && S.fix.mf1) return ''; (S.fix = S.fix || {}).mf1 = 1;
+  const red = new Set(), oily = new Set();
+  const mark = e => {
+    if (!isObj(e) || e.auto || typeof e.n !== 'string' || MF_NOT.test(e.n)) return;
+    if (!e.rm && MF_RED.test(e.n)) { e.rm = true; red.add(e.n); }
+    if (!e.oi && MF_OILY.test(e.n)) { e.oi = true; oily.add(e.n); }
+  };
+  Object.values(S.days).forEach(d => { (d.x || []).forEach(mark); Object.values(d.cu || {}).forEach(mark); });
+  Object.values(S.foods || {}).forEach(mark);
+  save();
+  const bits = [red.size ? `${red.size} as red meat` : '', oily.size ? `${oily.size} as oily fish` : ''].filter(Boolean);
+  return bits.length ? `Marked ${joinAnd(bits)} from logged names. Untick any that are wrong.` : '';
+}
 function alcRepair() {
   if (S.fix && S.fix.alc1) return;
   (S.fix = S.fix || {}).alc1 = 1;
@@ -7728,15 +7758,20 @@ function labelFields(px, o) {
   return `<div class="lblf"><div class="lblh">From the label, if you have it</div><div class="fieldrow four">${f('sa', 'Salt (g)', o.sa)}${f('fs', 'Sugar (g)', o.fs)}${f('sf', 'Sat fat (g)', o.sf)}${f('f', 'Fibre (g)', o.f)}</div><p class="small muted" style="margin:4px 0 0">Salt as printed on the pack; the app turns it into sodium. For sugar, count only added sugar.</p></div>`;
 }
 function readLabel(px) { const g = id => { const el = $(`${px}-${id}`), v = el ? el.value.trim() : ''; return v === '' ? undefined : Math.max(0, +v || 0); }; const sa = g('sa'); return { sa, fs: g('fs'), sf: g('sf'), f: g('f') }; }
-const X_FIELDS = ['n', 'k', 'p', 'fe', 'pl', 'na', 'sa', 'fs', 'sf', 'f', 'g', 'u']; // what the log sheet edits; anything else on an entry is kept
+const X_FIELDS = ['n', 'k', 'p', 'fe', 'rm', 'oi', 'pl', 'na', 'sa', 'fs', 'sf', 'f', 'g', 'u']; // what the log sheet edits; anything else on an entry is kept
 function foodRows(forMeal) {
   const q = foodKey(SH && SH.fq), all = Object.entries(S.foods || {}).sort((a, b) => (b[1].last || '').localeCompare(a[1].last || '') || (b[1].used || 0) - (a[1].used || 0));
   const hits = (q ? all.filter(([k]) => k.includes(q)) : all).slice(0, q ? 30 : 6);
   if (!all.length) return '<p class="small muted" style="margin:6px 0 0">Anything you log is saved here, so next time it\'s one tap.</p>';
   if (!hits.length) return '<p class="small muted" style="margin:6px 0 0">Nothing saved by that name.</p>';
-  return `<div class="foodlist">${hits.map(([key, e]) => `<div class="frow"><button class="nm" data-a="${forMeal ? 'fuse' : 'fadd'}" data-v="${esc(key)}">${esc(e.n)}<span class="mt">${fmtN(e.k)} kcal · ${fmtN(e.p || 0)}g protein${(e.pl || []).length ? ` · ${e.pl.length} plant${e.pl.length > 1 ? 's' : ''}` : ''}${e.fe ? ' · fermented' : ''}</span></button>${forMeal ? '' : `<button class="iconbtn" data-a="fedit" data-v="${esc(key)}" aria-label="Change ${esc(e.n)} before adding">${ic('edit')}</button>`}<button class="iconbtn" data-a="fforget" data-v="${esc(key)}" aria-label="Forget ${esc(e.n)}">${ic('x')}</button></div>`).join('')}</div>${!q && all.length > hits.length ? `<p class="small muted" style="margin:4px 0 0">${all.length} saved in all. Search to find the rest.</p>` : ''}`;
+  return `<div class="foodlist">${hits.map(([key, e]) => `<div class="frow"><button class="nm" data-a="${forMeal ? 'fuse' : 'fadd'}" data-v="${esc(key)}">${esc(e.n)}<span class="mt">${fmtN(e.k)} kcal · ${fmtN(e.p || 0)}g protein${(e.pl || []).length ? ` · ${e.pl.length} plant${e.pl.length > 1 ? 's' : ''}` : ''}${e.fe ? ' · fermented' : ''}${mfTags(e)}</span></button>${forMeal ? '' : `<button class="iconbtn" data-a="fedit" data-v="${esc(key)}" aria-label="Change ${esc(e.n)} before adding">${ic('edit')}</button>`}<button class="iconbtn" data-a="fforget" data-v="${esc(key)}" aria-label="Forget ${esc(e.n)}">${ic('x')}</button></div>`).join('')}</div>${!q && all.length > hits.length ? `<p class="small muted" style="margin:4px 0 0">${all.length} saved in all. Search to find the rest.</p>` : ''}`;
 }
 const foodBox = forMeal => (Object.keys(S.foods || {}).length ? `<section class="foodbox"><div class="field" style="margin:0"><label for="fq">${forMeal ? 'Something you\'ve had before?' : 'Saved foods'}</label><input id="fq" type="search" placeholder="Search what you've logged before" value="${esc(SH.fq || '')}"></div><div id="fq-list">${foodRows(forMeal)}</div></section>` : '');
+// red meat and oily fish on a meal of your own or something logged: two switches, kept on the entry as rm and oi
+function meatFish(px, o) { return `<div class="mfchecks"><label class="check"><input type="checkbox" id="${px}-rm" ${o && o.rm ? 'checked' : ''}> Red meat</label><label class="check"><input type="checkbox" id="${px}-oi" ${o && o.oi ? 'checked' : ''}> Oily fish</label></div>`; }
+function readMF(px) { const a = $(`${px}-rm`), b = $(`${px}-oi`); return { rm: !!(a && a.checked), oi: !!(b && b.checked) }; }
+function mfOut(o) { const x = {}; if (o && o.rm) x.rm = true; if (o && o.oi) x.oi = true; return x; }
+function mfTags(o) { return `${o.rm ? ' · red meat' : ''}${o.oi ? ' · oily fish' : ''}`; }
 function labelOut(l) { const o = {}; if (l.sa !== undefined) { o.na = +(l.sa / 2.5).toFixed(3); o.sa = l.sa; } ['fs', 'sf', 'f'].forEach(k => { if (l[k] !== undefined) o[k] = l[k]; }); return o; }
 /* looking a food up: the app's own ingredients (per 100g, offline), Open Food Facts by name (UK products) or by barcode.
    A pick fills the form for an amount you set; nothing is saved until Add */
@@ -7752,7 +7787,7 @@ function offItem(p) {
   return { src: 'off', code: p.code, n: nm, per: { k, p: num(n.proteins_100g) || 0, f: num(n.fiber_100g), sa: num(n.salt_100g) !== undefined ? num(n.salt_100g) : num(n.sodium_100g) !== undefined ? num(n.sodium_100g) * 2.5 : undefined, fs: num(n['added-sugars_100g']), sf: num(n['saturated-fat_100g']) },
     sugars: num(n.sugars_100g), serv: num(p.serving_quantity) > 0 && num(p.serving_quantity) < 2000 ? num(p.serving_quantity) : null, servTxt: p.serving_size || '', pl: [], fe: false };
 }
-const ingItem = id => { const g = ING[id]; return { src: 'ing', id, n: g.n, per: { k: g.k, p: g.p || 0, f: g.f, sa: g.sa, fs: g.fs, sf: g.sf }, serv: g.u && g.uw >= 4 ? g.uw : null, servTxt: g.u && g.uw >= 4 ? `1 ${g.u}, ${fmtN(g.uw)}${g.ml ? 'ml' : 'g'}` : '', pl: (g.pl || []).filter(x => PLANTS[x]), fe: !!g.fe, feMin: g.fe ? g.fe * 0.9 : 0 }; };
+const ingItem = id => { const g = ING[id]; return { src: 'ing', id, n: g.n, per: { k: g.k, p: g.p || 0, f: g.f, sa: g.sa, fs: g.fs, sf: g.sf }, serv: g.u && g.uw >= 4 ? g.uw : null, servTxt: g.u && g.uw >= 4 ? `1 ${g.u}, ${fmtN(g.uw)}${g.ml ? 'ml' : 'g'}` : '', pl: (g.pl || []).filter(x => PLANTS[x]), fe: !!g.fe, feMin: g.fe ? g.fe * 0.9 : 0, rm: RED.has(id), oi: OILY.has(id) }; };
 async function offGet(url, ms = 12000) {
   const ac = typeof AbortController !== 'undefined' ? new AbortController() : null, t = ac ? setTimeout(() => ac.abort(), ms) : null;
   try { const r = await fetch(url, ac ? { signal: ac.signal } : {}); if (!r.ok) throw new Error(`HTTP ${r.status}`); return await r.json(); } finally { if (t) clearTimeout(t); }
@@ -7822,9 +7857,10 @@ function lkFill(g) {
   const it = SH.lk; if (!it) return; it.g = g;
   const per = it.per, x = v => (v === undefined ? undefined : +(v * g / 100).toFixed(1));
   SH.n = it.n; SH.k = Math.round(per.k * g / 100); SH.p = +(per.p * g / 100).toFixed(1); SH.sa = x(per.sa); SH.fs = x(per.fs); SH.sf = x(per.sf); SH.f = x(per.f);
-  SH.pl = it.pl.slice(); SH.fe = it.fe && g >= (it.feMin || 0);
+  SH.pl = it.pl.slice(); SH.fe = it.fe && g >= (it.feMin || 0); SH.rm = !!it.rm; SH.oi = !!it.oi;
   [['x-n', SH.n], ['x-k', SH.k], ['x-p', SH.p], ['x-sa', SH.sa], ['x-fs', SH.fs], ['x-sf', SH.sf], ['x-f', SH.f]].forEach(([id, v]) => { const el = $(id); if (el) el.value = v === undefined ? '' : v; });
   const fe = $('x-fe'); if (fe) fe.checked = !!SH.fe;
+  [['x-rm', SH.rm], ['x-oi', SH.oi]].forEach(([id, v]) => { const el = $(id); if (el) el.checked = !!v; });
   const pg = $('pl-grid'); if (pg) pg.innerHTML = plantGrid();
   XK0 = SH.k || null; xMatchBtn();
 }
@@ -7895,6 +7931,7 @@ function shAdd() {
     <div id="x-match"></div>
     ${labelFields('x', SH)}
     <label class="check"><input type="checkbox" id="x-fe" ${SH.fe ? 'checked' : ''}> Counts as a fermented portion</label>
+    ${meatFish('x', SH)}
     <div class="field"><label for="plq">Plants in it (optional)</label><input id="plq" type="search" placeholder="Type to find a plant" value="${esc(SH.plq || '')}"></div>
     <div class="plantgrid" id="pl-grid">${plantGrid()}</div>
     ${ed ? `<div class="btnrow" style="margin-top:16px"><button class="btn primary" data-a="xsave">Save changes</button><button class="btn ghost" data-a="xrm">${ic('trash')}Remove</button></div>`
@@ -7936,6 +7973,7 @@ function shCustom() {
   <div class="field"><label for="c-n">What</label><input id="c-n" autofocus value="${esc(c.n || '')}" placeholder="e.g. Dinner out"></div>
   <div class="fieldrow"><div class="field"><label for="c-k">Calories (estimate)</label><input id="c-k" type="number" inputmode="numeric" value="${esc(c.k || '')}"></div><div class="field"><label for="c-p">Protein (g)</label><input id="c-p" type="number" inputmode="numeric" value="${esc(c.p || '')}"></div></div>
   ${labelFields('c', c)}
+  ${meatFish('c', c)}
   <div class="btnrow" style="margin-top:14px"><button class="btn primary" data-a="csave">Save</button><button class="btn ghost" data-a="pick" data-k="${SH.k}" data-s="${SH.s}">Pick a recipe instead</button></div>`;
 }
 function shTarget() {
@@ -8470,7 +8508,9 @@ const ACT = {
   custom(d) { openSheet({ type: 'custom', k: d.k, s: d.s }); },
   csave() {
     const n = $('c-n').value.trim() || 'Something else', k = +$('c-k').value || 0, p = +$('c-p').value || 0, day = D(SH.k), was = day.done[SH.s];
-    day.sl[SH.s] = '@c'; day.cu[SH.s] = Object.assign({ n, k, p, at: todayKey() }, labelOut(readLabel('c'))); if (!was || !was.c) delete day.done[SH.s];
+    // plants and fermented aren't on this sheet: kept from the meal being changed, or the saved food picked
+    const prev = SH.pre || (day.sl[SH.s] === '@c' && day.cu[SH.s]) || {}, keep = {}; if ((prev.pl || []).length) keep.pl = prev.pl.slice(); if (prev.fe) keep.fe = true;
+    day.sl[SH.s] = '@c'; day.cu[SH.s] = Object.assign(keep, { n, k, p, at: todayKey() }, labelOut(readLabel('c')), mfOut(readMF('c'))); if (!was || !was.c) delete day.done[SH.s];
     foodPut(S, day.cu[SH.s], SH.k);
     save(); closeSheet(); render();
   },
@@ -8483,7 +8523,7 @@ const ACT = {
   xpl(d) { keepAddFields(); const i = SH.pl.indexOf(d.v); if (i >= 0) SH.pl.splice(i, 1); else SH.pl.push(d.v); renderSheet(); },
   xsave() {
     keepAddFields(); if (!SH.n && !SH.k) { toast('Add a name or calories'); return; }
-    const xs = D(SH.dk || UI.day).x, nw = Object.assign({ n: SH.n || 'Extra', k: +SH.k || 0, p: +SH.p || 0, fe: !!SH.fe, pl: SH.pl.slice(), at: todayKey() }, labelOut(SH)), old = SH.ei !== undefined && xs[SH.ei];
+    const xs = D(SH.dk || UI.day).x, nw = Object.assign({ n: SH.n || 'Extra', k: +SH.k || 0, p: +SH.p || 0, fe: !!SH.fe, pl: SH.pl.slice(), at: todayKey() }, labelOut(SH), mfOut(SH)), old = SH.ei !== undefined && xs[SH.ei];
     const gAmt = SH.lk ? +SH.lk.g : +SH.g; if (gAmt > 0 && gAmt < 10000) { nw.g = Math.round(gAmt * 10) / 10; if (SH.lk && (SH.lk.ml || (ING[SH.lk.id] && ING[SH.lk.id].ml))) nw.u = 'ml'; }
     if (old) { const keep = {}; Object.keys(old).forEach(f => { if (!X_FIELDS.includes(f)) keep[f] = old[f]; }); xs[SH.ei] = Object.assign(keep, nw); toast('Updated'); }
     else xs.push(nw);
@@ -8495,12 +8535,12 @@ const ACT = {
     const dk = SH.dk || UI.day, x = foodCopy(e); x.at = todayKey(); D(dk).x.push(x); foodPut(S, x, dk);
     save(); closeSheet(); render(); toast(`Added ${e.n}`);
   },
-  fedit(d) { const e = S.foods && S.foods[d.v]; if (!e) return; const it = amtItem(e); if (it) { lkPick(it); return; } Object.assign(SH, { n: e.n, k: e.k || '', p: e.p || '', fe: !!e.fe, pl: (e.pl || []).slice(), sa: e.sa !== undefined ? e.sa : e.na !== undefined ? +(e.na * 2.5).toFixed(2) : undefined, fs: e.fs, sf: e.sf, f: e.f }); renderSheet(); },
-  fuse(d) { const e = S.foods && S.foods[d.v]; if (!e) return; SH.pre = { n: e.n, k: e.k, p: e.p, sa: e.sa !== undefined ? e.sa : e.na !== undefined ? +(e.na * 2.5).toFixed(2) : undefined, fs: e.fs, sf: e.sf, f: e.f }; renderSheet(); },
+  fedit(d) { const e = S.foods && S.foods[d.v]; if (!e) return; const it = amtItem(e); if (it) { lkPick(it); return; } Object.assign(SH, { n: e.n, k: e.k || '', p: e.p || '', fe: !!e.fe, rm: !!e.rm, oi: !!e.oi, pl: (e.pl || []).slice(), sa: e.sa !== undefined ? e.sa : e.na !== undefined ? +(e.na * 2.5).toFixed(2) : undefined, fs: e.fs, sf: e.sf, f: e.f }); renderSheet(); },
+  fuse(d) { const e = S.foods && S.foods[d.v]; if (!e) return; SH.pre = { n: e.n, k: e.k, p: e.p, rm: e.rm, oi: e.oi, fe: e.fe, pl: (e.pl || []).slice(), sa: e.sa !== undefined ? e.sa : e.na !== undefined ? +(e.na * 2.5).toFixed(2) : undefined, fs: e.fs, sf: e.sf, f: e.f }; renderSheet(); },
   fforget(d) { const e = S.foods && S.foods[d.v]; if (!e) return; delete S.foods[d.v]; save(); renderSheet(); toast(`Forgot ${e.n}`); },
   xedit(d) {
     const dk = d.k || UI.day, x = peekD(dk).x[+d.i]; if (!x) return;
-    openSheet({ type: 'xadd', dk, ei: +d.i, n: x.n, k: x.k || '', p: x.p || '', g: x.g || '', fe: !!x.fe, pl: (x.pl || []).slice(), sa: x.sa !== undefined ? x.sa : x.na !== undefined ? +(x.na * 2.5).toFixed(2) : undefined, fs: x.fs, sf: x.sf, f: x.f });
+    openSheet({ type: 'xadd', dk, ei: +d.i, n: x.n, k: x.k || '', p: x.p || '', g: x.g || '', fe: !!x.fe, rm: !!x.rm, oi: !!x.oi, pl: (x.pl || []).slice(), sa: x.sa !== undefined ? x.sa : x.na !== undefined ? +(x.na * 2.5).toFixed(2) : undefined, fs: x.fs, sf: x.sf, f: x.f });
     const it = amtItem(x); if (it) { SH.lk = it; renderSheet(); lkFill(it.g); }
   },
   xrm() { const xs = D(SH.dk || UI.day).x, x = xs[SH.ei]; if (x) { xs.splice(SH.ei, 1); toast(`Removed ${x.n}`); } save(); closeSheet(); render(); },
@@ -9206,7 +9246,7 @@ document.addEventListener('input', e => {
   if (id !== 'x-k') XK0 = +(($('x-k') || {}).value) || null; // figures typed against this calorie figure
   xMatchBtn();
 });
-function keepAddFields() { if (!SH || SH.type !== 'xadd') return; SH.n = $('x-n').value.trim(); SH.k = $('x-k').value; SH.p = $('x-p').value; SH.fe = $('x-fe').checked; SH.plq = $('plq').value; const ge = $('x-g'); if (ge) SH.g = ge.value; Object.assign(SH, readLabel('x')); }
+function keepAddFields() { if (!SH || SH.type !== 'xadd') return; SH.n = $('x-n').value.trim(); SH.k = $('x-k').value; SH.p = $('x-p').value; SH.fe = $('x-fe').checked; Object.assign(SH, readMF('x')); SH.plq = $('plq').value; const ge = $('x-g'); if (ge) SH.g = ge.value; Object.assign(SH, readLabel('x')); }
 
 document.addEventListener('click', e => {
   if (e.target.dataset && e.target.dataset.scrim) { closeSheet(); return; }
@@ -11074,7 +11114,7 @@ function fxBenefits() {
 
 /* ───────────── paste from Claude: a code made from a photo in a chat, read into the log sheet ─────────────
    The code is "TP1:" and the details as base64 JSON: { v: 1, d: day, s: suggested slot, n: name, items: [{ n, k, p, f, sa, fs, sf, g (grams, one item),
-   pl: plant ids or names, fe }] }. Several items become one entry (summed, plants pooled), so the usual tools can tweak it.
+   pl: plant ids or names, fe, rm (red meat), oi (oily fish) }] }. Several items become one entry (summed, plants pooled), so the usual tools can tweak it.
    Where it goes is asked each time: on top of the plan, or instead of a meal still planned that day. */
 const PC_RE = /TP1:([A-Za-z0-9_\-+/=]+)/;
 // a plant from its id, its name, or near enough
@@ -11098,16 +11138,16 @@ function pcDecode(txt) {
   o.items.slice(0, 12).forEach(it => {
     if (!isObj(it)) return;
     const pl = []; (Array.isArray(it.pl) ? it.pl : []).forEach(x => { const id = pcPlant(x); if (id) { if (!pl.includes(id)) pl.push(id); } else miss.push(String(x)); });
-    items.push({ n: String(it.n || 'Something').slice(0, 80), k: num(it.k, 5000) || 0, p: num(it.p, 400) || 0, f: num(it.f, 150), sa: num(it.sa, 40), fs: num(it.fs, 300), sf: num(it.sf, 200), g: num(it.g, 5000) || undefined, pl, fe: !!it.fe });
+    items.push({ n: String(it.n || 'Something').slice(0, 80), k: num(it.k, 5000) || 0, p: num(it.p, 400) || 0, f: num(it.f, 150), sa: num(it.sa, 40), fs: num(it.fs, 300), sf: num(it.sf, 200), g: num(it.g, 5000) || undefined, pl, fe: !!it.fe, rm: !!it.rm, oi: !!it.oi });
   });
   if (!items.length) return { err: "That code didn't have any food in it." };
   const d = DAY_KEY.test(o.d || '') && o.d <= todayKey() ? o.d : null, s = SLOTS.includes(o.s) ? o.s : null;
   return { d, s, n: typeof o.n === 'string' && o.n.trim() ? o.n.trim().slice(0, 80) : null, items, miss: [...new Set(miss)].slice(0, 8) };
 }
-// several items as one entry: figures summed, plants pooled, fermented if any part is
+// several items as one entry: figures summed, plants pooled, fermented, red meat or oily fish if any part is
 function pcOne(pc) {
   const its = pc.items, sum = f => { const v = its.map(x => x[f]).filter(x => x !== undefined); return v.length ? +v.reduce((a, b) => a + b, 0).toFixed(f === 'k' ? 0 : 1) : undefined; };
-  return { n: pc.n || joinAnd(its.map(x => x.n)), k: Math.round(sum('k') || 0), p: sum('p') || 0, f: sum('f'), sa: sum('sa'), fs: sum('fs'), sf: sum('sf'), pl: [...new Set(its.flatMap(x => x.pl))], fe: its.some(x => x.fe), g: its.length === 1 ? its[0].g : undefined };
+  return { n: pc.n || joinAnd(its.map(x => x.n)), k: Math.round(sum('k') || 0), p: sum('p') || 0, f: sum('f'), sa: sum('sa'), fs: sum('fs'), sf: sum('sf'), pl: [...new Set(its.flatMap(x => x.pl))], fe: its.some(x => x.fe), rm: its.some(x => x.rm), oi: its.some(x => x.oi), g: its.length === 1 ? its[0].g : undefined };
 }
 // the meals still to come on a day, any of which a pasted meal could stand in for
 function pcSlots(dk) {
@@ -11120,7 +11160,7 @@ function pcBox() {
   const head = `<section class="pcbox"><div class="field" style="margin:0"><label for="pc-in">Paste from Claude</label><input id="pc-in" placeholder="The code from a photo in a chat, starting TP1:" autocomplete="off" value=""></div>`;
   if (!pc) return `${head}${SH.pcErr ? `<p class="small" style="margin:6px 0 0;color:var(--warn)">${esc(SH.pcErr)}</p>` : ''}</section>`;
   const dk = SH.dk || UI.day, one = pcOne(pc);
-  return `${head}<div class="pcread"><b>${esc(one.n)}</b><small>${pc.items.length > 1 ? `${pc.items.length} items · ` : ''}${fmtN(one.k)} kcal · ${fmtN(one.p)}g protein${one.pl.length ? ` · ${one.pl.length} plant${one.pl.length === 1 ? '' : 's'}` : ''}${one.fe ? ' · fermented' : ''} · for ${fmtDay(dk)}</small>
+  return `${head}<div class="pcread"><b>${esc(one.n)}</b><small>${pc.items.length > 1 ? `${pc.items.length} items · ` : ''}${fmtN(one.k)} kcal · ${fmtN(one.p)}g protein${one.pl.length ? ` · ${one.pl.length} plant${one.pl.length === 1 ? '' : 's'}` : ''}${one.fe ? ' · fermented' : ''}${mfTags(one)} · for ${fmtDay(dk)}</small>
     ${pc.items.length > 1 ? `<ul class="pclist">${pc.items.map(x => `<li><span>${esc(x.n)}</span><span>${fmtN(x.k)} kcal · ${fmtN(x.p)}g</span></li>`).join('')}</ul>` : ''}
     ${pc.miss.length ? `<p class="small muted" style="margin:4px 0 0">Not matched to a plant in the app: ${esc(pc.miss.join(', '))}. Add them below if they count.</p>` : ''}
     <p class="small muted" style="margin:4px 0 0">Filled in below: check the figures, scale them if the portion was different, then say where it goes.</p></div></section>`;
@@ -11139,7 +11179,7 @@ function pcApply(raw) {
   if (r.err) { SH.pc = null; SH.pcErr = r.err; renderSheet(); return true; }
   const one = pcOne(r);
   SH.pc = r; SH.pcErr = null; SH.pcWhere = null; if (r.d) SH.dk = r.d;
-  Object.assign(SH, { n: one.n, k: one.k, p: one.p, sa: one.sa, fs: one.fs, sf: one.sf, f: one.f, g: one.g || '', pl: one.pl.slice(), fe: one.fe, lk: null, lq: '', off: null, xk0: 0 });
+  Object.assign(SH, { n: one.n, k: one.k, p: one.p, sa: one.sa, fs: one.fs, sf: one.sf, f: one.f, g: one.g || '', pl: one.pl.slice(), fe: one.fe, rm: one.rm, oi: one.oi, lk: null, lq: '', off: null, xk0: 0 });
   renderSheet(); XK0 = one.k || null; toast(r.items.length > 1 ? `Read ${r.items.length} items from the code` : 'Read the code');
   return true;
 }
@@ -11152,7 +11192,7 @@ Object.assign(ACT, {
     if (!SH.pcWhere || SH.pcWhere === 'x') return ACT.xsave();
     const s = SH.pcWhere, day = D(dk), was = R[day.sl[s]] ? R[day.sl[s]].n : day.cu[s] ? day.cu[s].n : '';
     const e = Object.assign({ n: SH.n || 'Something else', k: +SH.k || 0, p: +SH.p || 0, at: todayKey() }, labelOut(SH));
-    if (SH.pl.length) e.pl = SH.pl.slice(); if (SH.fe) e.fe = true; if (+SH.g > 0 && +SH.g < 10000) e.g = Math.round(+SH.g * 10) / 10;
+    if (SH.pl.length) e.pl = SH.pl.slice(); if (SH.fe) e.fe = true; Object.assign(e, mfOut(SH)); if (+SH.g > 0 && +SH.g < 10000) e.g = Math.round(+SH.g * 10) / 10;
     setSlot(dk, s, '@c'); day.cu[s] = e; day.done[s] = { c: 1 };
     foodPut(S, e, dk); save(); closeSheet(); render();
     toast(`${SLOTNAME[s]} on ${DOW[dayIndex(dk)]}: ${e.n}${was ? `, instead of ${was}` : ''}`);
@@ -12280,11 +12320,11 @@ function repairDrinks() {
 }
 (function init() {
   const st = startOf(todayKey());
-  const fixMsg = repairDrinks(), noseMsg = noseImport(); alcRepair(); noseSudFix();
+  const fixMsg = repairDrinks(), noseMsg = noseImport(); alcRepair(); noseSudFix(); const mfMsg = mfFix();
   if (!weekDays(st).some(k => S.days[k] && Object.keys(S.days[k].sl || {}).length)) planWeek(st, false);
   nudgeWeek(UI.tab);
   render();
-  if (fixMsg) toast(fixMsg, 9000); else if (noseMsg) toast(noseMsg, 7000);
+  if (fixMsg) toast(fixMsg, 9000); else if (noseMsg) toast(noseMsg, 7000); else if (mfMsg) toast(mfMsg, 10000);
   tloop();
 })();
 
