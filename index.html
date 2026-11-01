@@ -1921,6 +1921,16 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 .pgtog .switch { background: var(--line); }
 .pgtog[aria-checked="true"] .switch { background: var(--accent); box-shadow: none; }
 .pgtog[aria-checked="true"] .switch span { transform: translateX(18px); }
+.tile.mid .v { color: var(--warn); }
+.aipick { display: flex; justify-content: space-between; align-items: center; background: var(--surface-2); border-radius: 12px; padding: 8px 10px; margin-bottom: 8px; }
+
+/* 3.24: leftovers */
+.spareq { margin-top: 8px; background: var(--surface-2); border-radius: 12px; padding: 9px 10px; display: grid; gap: 6px; }
+.spareq b { font-size: 14.5px; }
+.sparecard { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 10px 12px; display: grid; gap: 10px; margin: 10px 0 0; }
+.sparerow { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; align-items: start; }
+.sparerow b { display: block; font-size: 15px; margin-top: 1px; }
+.sparerow .btnrow { margin-top: 6px; }
 
 </style>
 </head>
@@ -1947,7 +1957,7 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.23.0';</script>
+<script>window.TP_VERSION = '3.24.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -2804,7 +2814,7 @@ const SUBS_SRC = {
   chives: [['springonion'], ['dill'], ['omit', 'Leave them out']],
   rosemary: [['thyme*0.3', 'Dried thyme'], ['omit', 'Leave it out']],
   mixednuts: [['almonds'], ['walnuts'], ['cashews'], ['peanuts']],
-  seedmix: [['sesame'], ['almonds', 'Chopped'], ['walnuts', 'Chopped']],
+  seedmix: [['mixednuts', 'Chopped'], ['sesame'], ['almonds', 'Chopped'], ['walnuts', 'Chopped']],
   groundalm: [['oats*1.2'], ['almonds', 'Finely chopped']],
   almonds: [['walnuts'], ['cashews'], ['mixednuts']],
   walnuts: [['almonds'], ['pistachios'], ['mixednuts']],
@@ -3766,6 +3776,8 @@ function buildVariant(base, sw) {
   });
   // your own amounts, kept with the week's swaps as '@g:<ingredient>': grams for one portion before the day's scaling
   Object.entries(sw).forEach(([k, g]) => { if (k.slice(0, 3) !== AMT) return; const m0 = merged.get(k.slice(3)); if (!m0) return; if (+g > 0) { m0.g = +g; m0.own = 1; } else merged.delete(m0.i); });
+  // ingredients you've added to the dish, '@a:<ingredient>': grams for one portion, on top of anything already in it
+  Object.entries(sw).forEach(([k, g]) => { if (k.slice(0, 3) !== '@a:' || !ING[k.slice(3)] || !(+g > 0)) return; const id = k.slice(3), m0 = merged.get(id); if (m0) { m0.g += +g; m0.add = 1; } else merged.set(id, { i: id, g: +g, add: 1 }); });
   return finish(Object.assign({}, base, { items: [...merged.values()], swapped: Object.assign({}, sw) }));
 }
 const VAR = {};
@@ -4036,8 +4048,10 @@ function normalise(s) {
   if (!s.lsv) { if (s.set.loSalt === 0.25) s.set.loSalt = 0; s.stock = s.stock || {}; s.stock.losalt = true; s.lsv = 1; } // v1.19: LoSalt moved into the recipes; it's always in the cupboard
   // weekly focus: week start -> { ids: up to three goal ids, from: the week it was picked from, at: when }
   s.mrep = isObj(s.mrep) ? s.mrep : {};
+  // spare portions cooked on the day, kept to be offered on the days after: [{ id, r, m, sw, made, s, n }]
+  s.spare = (Array.isArray(s.spare) ? s.spare : []).filter(x => isObj(x) && R[x.r] && DAY_KEY.test(x.made || '') && +x.n >= 1 && +x.m > 0).map(x => Object.assign(x, { n: Math.min(6, Math.round(+x.n)), sw: isObj(x.sw) ? x.sw : {} }));
   s.nose = isObj(s.nose) ? s.nose : {};
-  Object.keys(s.nose).forEach(k => { const n = s.nose[k]; if (!DAY_KEY.test(k) || !isObj(n)) { delete s.nose[k]; return; } n.sm = Number.isInteger(n.sm) && n.sm >= 1 && n.sm <= 5 ? n.sm : undefined; if (n.sm === undefined) delete n.sm; n.r = Number.isInteger(n.r) && n.r >= 1 && n.r <= 5 ? n.r : n.imp || n.sm ? 0 : 3; ['sy', 'cx'].forEach(f => { n[f] = Array.isArray(n[f]) ? [...new Set(n[f].filter(x => typeof x === 'string' && /^[a-z][a-z0-9_]{1,20}$/.test(x)))].slice(0, f === 'sy' ? 3 : 25) : []; }); });
+  Object.keys(s.nose).forEach(k => { const n = s.nose[k]; if (!DAY_KEY.test(k) || !isObj(n)) { delete s.nose[k]; return; } n.sm = Number.isInteger(n.sm) && n.sm >= 1 && n.sm <= 5 ? n.sm : undefined; if (n.sm === undefined) delete n.sm; n.r = Number.isInteger(n.r) && n.r >= 0 && n.r <= 5 ? n.r : n.imp || n.sm ? 0 : 3; ['sy', 'cx'].forEach(f => { n[f] = Array.isArray(n[f]) ? [...new Set(n[f].filter(x => typeof x === 'string' && /^[a-z][a-z0-9_]{1,20}$/.test(x)))].slice(0, f === 'sy' ? 3 : 25) : []; }); });
   s.focus = isObj(s.focus) ? s.focus : {};
   Object.keys(s.focus).forEach(k => { const f = s.focus[k]; if (!DAY_KEY.test(k) || !isObj(f) || !Array.isArray(f.ids)) { delete s.focus[k]; return; } f.ids = [...new Set(f.ids.filter(x => typeof x === 'string' && /^(h:)?[a-z][a-z0-9_-]{1,30}$/.test(x)))].slice(0, 3); if (!DAY_KEY.test(f.from || '')) f.from = addDays(k, -7); });
   s.rev = s.rev && typeof s.rev === 'object' ? s.rev : {}; // weeks reviewed: week start -> the day it was done
@@ -4086,7 +4100,7 @@ function normalise(s) {
     Object.keys(w.swaps).forEach(rid => {
       const m = w.swaps[rid];
       if (!R[rid] || !m) { delete w.swaps[rid]; return; }
-      Object.keys(m).forEach(o => { if (o.slice(0, 3) === '@g:' ? !(ING[o.slice(3)] && Number.isFinite(+m[o]) && +m[o] >= 0) : !ING[o]) delete m[o]; });
+      Object.keys(m).forEach(o => { const p = o.slice(0, 3), i = o.slice(3); if (p === '@g:' || p === '@a:' ? !(ING[i] && Number.isFinite(+m[o]) && +m[o] >= 0) : p === '@k:' ? !(ING[i] && m[o] === 1) : !ING[o]) delete m[o]; });
       if (!Object.keys(m).length) delete w.swaps[rid];
     });
   });
@@ -4334,6 +4348,7 @@ function dayCalcCore(k, carry, fc) {
       const own = !(dn && dn.sw) && !pk ? dayOmits(d, s) : null;
       const r = atEra(dn && dn.sw ? variant(R[v], dn.sw) : pk ? variant(R[v], pk.sw) : own ? variant(R[v], Object.assign({}, weekSw(startOf(k), v), own)) : eff(R[v], startOf(k)), k);
       o.kind = 'recipe'; o.r = r; o.prepped = prepped(k, s, r); o.packed = !!pk;
+      if (pk && pk.lo) { o.prepped = false; o.lo = true; } // a leftover from another day: cooked already, no part of any batch
       if (o.gone) o.m = pk ? pk.m : r.shop ? 1 : portionM(r, o.base / r.k); // not had: shown at a plain portion, counted nowhere
       else if (o.done && dn.m) { o.m = dn.m; fixed += r.k * o.m; }
       else if (pk) { o.m = pk.m; fixed += r.k * o.m; }
@@ -4399,7 +4414,7 @@ function dayCalcCore(k, carry, fc) {
 function sizeRec(rb, k) {
   const sw = rb && rb.swapped; if (!sw || !R[rb.id]) return rb;
   const ks = Object.keys(sw).filter(x => x.slice(0, 3) === '@k:'); if (!ks.length) return rb;
-  const s2 = Object.assign({}, sw); ks.forEach(x => { delete s2[x]; delete s2[AMT + x.slice(3)]; });
+  const s2 = Object.assign({}, sw); ks.forEach(x => { delete s2[x]; delete s2[AMT + x.slice(3)]; delete s2['@a:' + x.slice(3)]; });
   return atEra(variant(R[rb.id], s2), k);
 }
 const ptsOf = set => [...set].reduce((a, x) => a + PLANTS[x][1], 0);
@@ -5105,8 +5120,8 @@ function vToday() {
   const g = set.plantGoal;
   const tiles = `<div class="tiles"><button class="tile ${wc.ptsEat >= g ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${fmtPts(wc.ptsEat)}<small>/${g}</small></span><span class="l">Plants eaten</span></button>
     <button class="tile ${wc.oilyE >= set.oilyGoal ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${wc.oilyE}<small>/${set.oilyGoal}</small></span><span class="l">Oily fish</span></button>
-    <button class="tile ${wc.fermEatDays === 7 ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${wc.fermEatDays}<small>/7</small></span><span class="l">Fermented days</span></button></div>`;
-  return `${weekNav(st)}<div class="strip">${strip}</div>${k === tk ? mrCard() : ''}${fxCard(k)}${hero}${k === tk ? todayPrompts() : ''}<div class="meals">${rows.join('')}</div>${mkupBar(k, c)}<div class="extras">${extras}<button class="btn link" data-a="xadd">${ic('plus')}Log something else</button></div>${tiles}${wrap}`;
+    <button class="tile ${wc.fermEatDays >= 6 ? 'good' : wc.fermEatDays >= 4 ? 'mid' : ''}" data-a="tab" data-v="week"><span class="v">${wc.fermEatDays}<small>/7</small></span><span class="l">Fermented days</span></button></div>`;
+  return `${weekNav(st)}<div class="strip">${strip}</div>${k === tk ? mrCard() : ''}${fxCard(k)}${spareCard(k)}${hero}${k === tk ? todayPrompts() : ''}<div class="meals">${rows.join('')}</div>${mkupBar(k, c)}<div class="extras">${extras}<button class="btn link" data-a="xadd">${ic('plus')}Log something else</button></div>${tiles}${wrap}`;
 }
 /* making up the gap: from 4pm, a meal still to come can be swapped for one that fixes what today is short of
    (fibre, fermented) without going over on sat fat, sugar or salt, within the calories left; new plants come next */
@@ -5128,8 +5143,8 @@ function mkupOpts(k, s, G) {
   const isIn = i => !!(S.stock[i] && !(w.low || {})[i]) || Object.keys(shop).some(key => shop[key] && key.split(':')[1] === i) || (cur && cur.items.some(it => it.i === i)) || ING[i].pantry;
   const all = mkupAll(k, s, G, isIn, cur);
   // a quick pick-up is a few things, not a whole shop: those first, the rest only to fill up
-  const near = all.filter(x => x.miss.length <= 5);
-  return near.concat(all.filter(x => x.miss.length > 5)).slice(0, 3);
+  const near = all.filter(x => x.miss.length <= 5 && nutOk({ sf: x.sf, na: x.na, f: x.f }));
+  return near.concat(all.filter(x => x.miss.length > 5 && nutOk({ sf: x.sf, na: x.na, f: x.f }))).slice(0, 3);
 }
 function mkupAll(k, s, G, isIn, cur) {
   return RL.filter(r => r.slots.includes(s) && !r.shop && !S.nope[r.id] && (!cur || r.id !== cur.id) && (r.t || 0) <= 45).map(r => {
@@ -5170,8 +5185,27 @@ function shMkup() {
       <span class="wins">${wins.map(t => `<i>${esc(t)}</i>`).join('')}<i class="${x.miss.length ? 'shop' : ''}">${esc(shopTxt)}</i>${warn.map(t => `<i class="warn">${esc(capFirst(t))}</i>`).join('')}</span></span></button>`;
   };
   return `<div class="sheethead"><div><span class="eyebrow">${SLOTNAME[s]} · ${fmtDay(k)}</span><h2>Make up the gap</h2></div>${closeBtn}</div>
-    <p style="margin:0 0 8px"><b>${fmtN(Math.max(0, G.kc))} kcal for ${SLOTNAME[s].toLowerCase()}.</b> ${esc(head)}</p>${tiles}
-    ${O.length ? `<div class="mkopts">${O.map(opt).join('')}</div><p class="small muted" style="margin:8px 0 0">Picking one swaps it in for ${SLOTNAME[s].toLowerCase()}${G.o.kind === 'recipe' ? ` instead of ${esc(G.o.r.n)}` : ''}, at a portion that fits the calories left.</p>` : '<p class="muted">Nothing in the recipes fits the calories left for this one.</p>'}`;
+    <p style="margin:0 0 8px"><b>${fmtN(Math.max(0, G.kc))} kcal for ${SLOTNAME[s].toLowerCase()}.</b> ${esc(head)}</p>${tiles}<div class="chips" style="margin:0 0 8px">${nutChips()}</div>
+    ${O.length ? `<div class="mkopts">${O.map(opt).join('')}</div><p class="small muted" style="margin:8px 0 0">Picking one swaps it in for ${SLOTNAME[s].toLowerCase()}${G.o.kind === 'recipe' ? ` instead of ${esc(G.o.r.n)}` : ''}, at a portion that fits the calories left.</p>` : `<p class="muted">Nothing in the recipes fits the calories left for this one${SH.nut ? ' with those filters' : ''}.</p>`}`;
+}
+/* leftovers: a meal cooked on the day with portions to spare. They're kept for as long as the dish keeps in the
+   fridge and offered on the days after (into the next week too), to take for a lunch or dinner or let go */
+const spareUntil = x => addDays(x.made, Math.max(1, +fridgeLife(R[x.r]) || 0)); // even a dish best eaten fresh does for the next day
+function spareBox(k, s, o) {
+  if (!o.done || o.prepped || o.packed || o.r.shop || k < addDays(todayKey(), -2)) return '';
+  const x = (S.spare || []).find(y => y.made === k && y.s === s && y.r === o.r.id);
+  if (x) return `<div class="callout" style="margin-top:8px">${ic('leaf')}<div><b>${nWord(x.n, 'spare portion')} kept</b>, good till ${DOWL[dayIndex(spareUntil(x))]}${R[x.r].fz ? ' (or freeze it)' : ''}. It'll be offered on Today.<div class="btnrow"><button class="btn sm ghost" data-a="sparerm" data-id="${x.id}">Undo</button></div></div></div>`;
+  return `<div class="spareq"><b>Made extra?</b><span class="small muted">Keep the spare portions and they'll be offered over the next few days.</span><div class="chips">${[1, 2, 3].map(n => `<button class="chip" data-a="spareadd" data-k="${k}" data-s="${s}" data-v="${n}">${nWord(n, 'portion')}</button>`).join('')}</div></div>`;
+}
+// what's on offer for a day: kept portions made before it and still good
+const spareOffers = k => (S.spare || []).filter(x => x.made < k && spareUntil(x) >= k && x.n > 0 && x.skip !== k);
+function spareCard(k) {
+  if (k !== todayKey()) return '';
+  const L = spareOffers(k); if (!L.length) return '';
+  const c = dayCalc(k), open = ['l', 'd'].filter(s => { const o = c.slots[s]; return !o.done && !(o.kind === 'recipe' && (o.packed || o.prepped)); });
+  return `<section class="sparecard">${L.map(x => { const r = R[x.r], last = spareUntil(x) === k;
+    return `<div class="sparerow">${art(r, 44)}<div><span class="eyebrow">Leftover from ${DOWL[dayIndex(x.made)]}${x.n > 1 ? ` · ${x.n} portions` : ''}${last ? ' · last day' : ''}</span><b>${esc(r.n)}</b>
+      <div class="btnrow">${open.map(s => `<button class="btn sm" data-a="spareuse" data-id="${x.id}" data-s="${s}">Have it for ${SLOTNAME[s].toLowerCase()}</button>`).join('')}<button class="btn sm ghost" data-a="sparedrop" data-id="${x.id}">${last ? 'Not having it' : 'Not today'}</button></div></div></div>`; }).join('')}</section>`;
 }
 // thumbs up = liked (planned more often), thumbs down = never planned automatically
 function thumbs(id, small) {
@@ -5415,7 +5449,7 @@ function metrics() {
   L.push({ id: 'plants', n: 'Plant points', grp: 'Food', kind: 'week', end: 'week', wval: weekPlants, first: () => minKey(trackedDays(), S.hist.w), fmt: v => fmtPts(Math.round(v * 4) / 4), unit: 'a week', goal: set.plantGoal, goalTxt: `${set.plantGoal} a week`,
     light() { const v = weekPlants(cur); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; return { st: v >= set.plantGoal ? 'ok' : v >= set.plantGoal - 5 ? 'mid' : 'off', txt: `${fmtPts(v)} in this week's plan` }; } });
   L.push(food('fish', 'Oily fish', 'rate', v => oneDp(v), `${set.oilyGoal} a week`, function () { const v = wkRate(this); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; const r = Math.round(v); return { st: r >= set.oilyGoal ? 'ok' : r >= set.oilyGoal - 1 ? 'mid' : 'off', txt: `${r} in this week's plan` }; }, { unit: 'a week', goal: set.oilyGoal }));
-  L.push(food('ferm', 'Fermented days', 'rate', v => oneDp(v), 'every day', function () { const v = wkRate(this); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; const r = Math.round(v); return { st: r >= 7 ? 'ok' : r >= 5 ? 'mid' : 'off', txt: `${r} of 7 days in this week's plan` }; }, { unit: 'days a week', goal: 7, cap: 7 }));
+  L.push(food('ferm', 'Fermented days', 'rate', v => oneDp(v), 'every day', function () { const v = wkRate(this); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; const r = Math.round(v); return { st: r >= 6 ? 'ok' : r >= 4 ? 'mid' : 'off', txt: `${r} of 7 days in this week's plan` }; }, { unit: 'days a week', goal: 7, cap: 7 }));
   L.push(food('red', 'Red meat', 'rate', v => oneDp(v), `${set.redMax} a week at most`, function () { const v = wkRate(this); if (v === null) return { st: 'none', txt: 'Nothing planned this week' }; const r = Math.round(v); return { st: r <= set.redMax ? 'ok' : r <= set.redMax + 1 ? 'mid' : 'off', txt: `${r} in this week's plan` }; }, { unit: 'a week', goal: set.redMax, lo: true }));
   L.push(food('protein', 'Protein', 'avg', v => `${fmtN(v)}g`, `${set.protGoal}g a day`, missLight('protein'), { unit: 'a day', goal: set.protGoal }));
   L.push(food('fibre', 'Fibre', 'avg', v => `${fmtN(v)}g`, `${set.fibreGoal}g a day`, missLight('fibre'), { unit: 'a day', goal: set.fibreGoal }));
@@ -5853,7 +5887,7 @@ function trJudge(m, v) {
   if (v === null || v === undefined) return 'none';
   if (m.id === 'plants') return v >= g ? 'ok' : v >= g - 5 ? 'mid' : 'off';
   if (m.id === 'fish' || m.id === 'colours') return v >= g - 0.05 ? 'ok' : v >= g - 1 ? 'mid' : 'off';
-  if (m.id === 'ferm') return v >= 6.5 ? 'ok' : v >= 5 ? 'mid' : 'off';
+  if (m.id === 'ferm') return v >= 5.5 ? 'ok' : v >= 3.5 ? 'mid' : 'off'; // 6 or 7 days green, 4 or 5 amber
   if (m.id === 'red') return v <= g + 0.05 ? 'ok' : v <= g + 1 ? 'mid' : 'off';
   if (m.id === 'alcohol') return v < ALC.week ? 'ok' : v <= ALC.week * 1.5 ? 'mid' : 'off';
   if (m.id === 'run') return v >= 2 ? 'ok' : v >= 1 ? 'mid' : 'off';
@@ -6890,7 +6924,7 @@ function shopTotals(st, trip) {
     const c = dayCalc(k);
     for (const s of SLOTS) {
       const o = c.slots[s];
-      if (o.kind !== 'recipe' || o.done || o.r.shop) continue; // shop-bought snacks go on their own list
+      if (o.kind !== 'recipe' || o.done || o.r.shop || o.lo) continue; // shop-bought snacks go on their own list; leftovers are cooked
       const t = mealTrip(st, k, s, o, sess) || 1;
       if (trip && t !== trip) continue;
       const own = gotOf(S.days[k], s);
@@ -7037,6 +7071,30 @@ function shPScan() {
     ${res}${pick}
     ${SH.scan || SH.busy ? '' : `<div class="btnrow" style="margin-top:10px"><button class="btn primary" data-a="pscango">${ic('scan')}${r ? 'Scan another' : 'Scan'}</button></div>`}
     ${SH.noscan ? `<div class="fieldrow" style="margin-top:8px"><div class="field"><label for="ps-code">This phone can't scan here; type the barcode</label><input id="ps-code" inputmode="numeric" placeholder="e.g. 5000169005019"></div><div class="field"><label>&nbsp;</label><button class="btn sm" data-a="pscancode">Look up</button></div></div>` : ''}`;
+}
+/* adding an ingredient to a dish: grams per portion, for this meal or the batch, calories kept or added */
+function aiDefG(i) { const g = ING[i]; if (g.u && g.uw >= 4 && g.uw <= 120) return g.uw; return { spices: 1, oils: 5, nuts: 15, world: 10, baking: 10 }[g.a] || 40; }
+function shAddI() {
+  const k = SH.k, s = SH.s, o = dayCalc(k).slots[s];
+  if (o.kind !== 'recipe' || o.done) return `<div class="sheethead"><div><h2>Add an ingredient</h2></div>${closeBtn}</div><p class="muted">This meal can't be changed now.</p>`;
+  SH.title = `Add to ${o.r.n}`;
+  const scopes = omitScopes(k, s, o), scope = SH.osc && scopes.includes(SH.osc) ? SH.osc : scopes.includes('batch') ? 'batch' : 'meal', keep = UI.pkKeep !== false;
+  const added = Object.keys(o.r.swapped || {}).filter(x => x.slice(0, 3) === '@a:' && ING[x.slice(3)]).map(x => x.slice(3));
+  const q = (SH.aq || '').trim().toLowerCase(), have = new Set(o.r.items.map(it => it.i));
+  const hits = q.length >= 2 ? Object.values(ING).filter(g => g.n.toLowerCase().includes(q) && g.id !== 'losalt').sort((a, b) => a.n.toLowerCase().indexOf(q) - b.n.toLowerCase().indexOf(q) || a.n.length - b.n.length).slice(0, 8) : [];
+  const pick = SH.ai && ING[SH.ai] ? ING[SH.ai] : null, un = pick && pick.ml ? 'ml' : 'g';
+  const seg = scopes.length > 1 ? `<div class="seg osc" role="group" aria-label="Where it goes">${[['meal', 'This meal'], ['batch', 'Whole batch']].map(([v, l]) => `<button data-a="oscope" data-v="${v}" aria-pressed="${scope === v}">${l}</button>`).join('')}</div>` : '';
+  return `<div class="sheethead"><div><span class="eyebrow">${SLOTNAME[s]} · ${fmtDay(k)}</span><h2>Add an ingredient</h2></div>${closeBtn}</div>
+    <p class="small" style="margin:0 0 8px"><b>${esc(o.r.n)}</b></p>
+    ${added.length ? `<div class="eyebrow">Added by you</div><div class="chips" style="margin:4px 0 10px">${added.map(i => `<button class="chip" data-a="airm" data-i="${i}">${esc(shortN(i))} ${ic('x')}</button>`).join('')}</div>` : ''}
+    ${pick ? `<div class="aipick"><b>${esc(pick.n)}</b><button class="iconbtn" data-a="aiclear" aria-label="Pick something else">${ic('x')}</button></div>
+      <div class="field"><label for="ai-g">How much in one portion (${un})</label><input id="ai-g" type="number" inputmode="decimal" min="0" value="${SH.ag || aiDefG(pick.id)}"></div>
+      ${seg}
+      <button class="pgtog" role="switch" aria-checked="${keep}" data-a="pgkeep"><span><b>Keep the calories</b><small>${keep ? 'The portion resizes so it stays on its calories.' : "The portion stays the same; this adds its calories."}</small></span><span class="switch"><span></span></span></button>
+      ${have.has(pick.id) ? `<p class="small muted" style="margin:6px 0 0">It's already in the dish; this goes on top.</p>` : ''}
+      <button class="btn primary" style="width:100%;margin-top:12px" data-a="aigo">${ic('plus')}Add to ${scope === 'batch' ? 'the batch' : 'this meal'}</button>`
+    : `<input class="search" id="ai-q" type="search" placeholder="Search ingredients" value="${esc(SH.aq || '')}" aria-label="Search ingredients">
+      <div class="lklist" id="ai-list">${hits.map(g => `<button class="lkrow" data-a="aipick" data-i="${g.id}">${esc(g.n)}<small>${fmtN(g.k)} kcal per 100${g.ml ? 'ml' : 'g'}${have.has(g.id) ? ' · already in it' : ''}</small></button>`).join('') || (q.length >= 2 ? '<p class="small muted">No ingredient by that name.</p>' : '<p class="small muted">Type at least two letters.</p>')}</div>`}`;
 }
 const HAVE_SRC = { stock: 'In your cupboard', shop: 'Ticked off in the shopping list', left: 'Left over from last week', meal: '' };
 function shHave() {
@@ -7256,7 +7314,7 @@ function renderSheet(fresh) {
   const root = $('sheet-root');
   if (!SH) { root.innerHTML = ''; return; }
   const old = root.querySelector('.sheet'), top = old && !fresh ? old.scrollTop : 0;
-  const html = ({ wgoal: shWGoal, ckitems: shCkItems, cupboard: shCupboard, recipe: shRecipe, pick: shPick, xadd: shAdd, custom: shCustom, target: shTarget, settings: shSettings, confirm: shConfirm, setwhen: shSetWhen, leftadd: shLeftAdd, pack: shPack, backup: shBackup, lift: shLift, trswap: shTrSwap, trset: shTrSet, tvpick: shTvPick, tvaddex: shTvAddEx, tradd: shTrAdd, have: shHave, pscan: shPScan, mkup: shMkup, trre: shTrRe, weekmenu: shWeekMenu, night: shNight, swap: shSwap, idea: shIdea, fx: shFx })[SH.type]();
+  const html = ({ wgoal: shWGoal, ckitems: shCkItems, cupboard: shCupboard, recipe: shRecipe, pick: shPick, xadd: shAdd, custom: shCustom, target: shTarget, settings: shSettings, confirm: shConfirm, setwhen: shSetWhen, leftadd: shLeftAdd, pack: shPack, backup: shBackup, lift: shLift, trswap: shTrSwap, trset: shTrSet, tvpick: shTvPick, tvaddex: shTvAddEx, tradd: shTrAdd, have: shHave, addi: shAddI, pscan: shPScan, mkup: shMkup, trre: shTrRe, weekmenu: shWeekMenu, night: shNight, swap: shSwap, idea: shIdea, fx: shFx })[SH.type]();
   root.innerHTML = `<div class="scrim" data-scrim="1"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(SH.title || 'Details')}"><div class="grab"></div>${html}</div></div>`;
   if (!fresh) root.querySelector('.scrim').style.animation = 'none';
   const sh = root.querySelector('.sheet'); if (!fresh) sh.style.animation = 'none';
@@ -7303,7 +7361,13 @@ const descBox = (r, id, on) => { const note = descNote(r); return `<div class="r
 // had), or the whole batch while it's still to cook. This meal is the default
 function omitScopes(k, s, o) {
   if (!o || o.kind !== 'recipe') return [];
-  return o.prepped && !o.done && !o.packed && !o.kept && !batchCooked(k, s) ? ['meal', 'batch'] : ['meal'];
+  return o.prepped && !o.done ? ['batch', 'meal'] : ['meal']; // a batch meal's changes go to the whole batch unless you pick this meal
+}
+// the meals of a batch still to eat, this one included: once it's cooked, a batch change goes into each of them
+function batchDays(k, s) {
+  const bc = batchContext(k, s), rid = peekD(k).sl[s]; if (!bc) return [k];
+  const ks = sessDays(bc.se, s).filter(k2 => { const d = peekD(k2); return d.sl[s] === rid && !d.done[s]; });
+  return ks.includes(k) ? ks : [k].concat(ks);
 }
 function omitScope(k, s, o) { const a = omitScopes(k, s, o); return !a.length ? null : SH && SH.osc && a.includes(SH.osc) ? SH.osc : a[0]; }
 // a portion that's already set (eaten, boxed, cooked, a shop pot): a change comes off its calories rather than resizing it
@@ -7312,6 +7376,7 @@ const fixedPortion = o => !!(o && (o.done || o.packed || o.kept || o.fixedPack |
 // an eaten meal's record, a packed box, or the day's own list. 'batch' changes the week's recipe instead
 function putChange(k, s, orig, key, scope) {
   const st = startOf(k), d = D(k), rid = d.sl[s];
+  if (scope === 'batch' && batchCooked(k, s)) { batchDays(k, s).forEach(k2 => putChange(k2, s, orig, key, 'meal')); return; }
   if (scope === 'batch') { const w = W(st); w.swaps = w.swaps || {}; const z = swPut(weekSw(st, rid), orig, key); if (Object.keys(z).length) w.swaps[rid] = z; else delete w.swaps[rid]; return; }
   const dn = d.done[s], pk = d.pk && d.pk[s] && d.pk[s].r === rid ? d.pk[s] : null;
   if (dn && dn.sw) { dn.sw = swPut(dn.sw, orig, key); return; }
@@ -7321,8 +7386,11 @@ function putChange(k, s, orig, key, scope) {
   if (!Object.keys(d.sw).length) delete d.sw;
 }
 // how much of an ingredient one meal (or the batch) has: grams for a portion before the day's sizing; null = the recipe's
-function putAmt(k, s, id, g, scope) {
-  const st = startOf(k), d = D(k), rid = d.sl[s], key = AMT + id, set = z => { if (g === null) delete z[key]; else z[key] = g; return z; };
+function putAmt(k, s, id, g, scope) { putSw(k, s, AMT + id, g, scope); }
+// one key on a meal's (or the batch's) changes: an amount, an added ingredient, a sizing mark
+function putSw(k, s, key, g, scope) {
+  const st = startOf(k), d = D(k), rid = d.sl[s], set = z => { if (g === null) delete z[key]; else z[key] = g; return z; };
+  if (scope === 'batch' && batchCooked(k, s)) { batchDays(k, s).forEach(k2 => putSw(k2, s, key, g, 'meal')); return; }
   if (scope === 'batch') { const w = W(st); w.swaps = w.swaps || {}; const z = set(Object.assign({}, w.swaps[rid] || {})); if (Object.keys(z).length) w.swaps[rid] = z; else delete w.swaps[rid]; return; }
   const dn = d.done[s], pk = d.pk && d.pk[s] && d.pk[s].r === rid ? d.pk[s] : null;
   if (dn && dn.sw) { set(dn.sw); return; }
@@ -7399,7 +7467,7 @@ function mealTry(k, s, orig, key, scope) {
   return withChange(k, s, orig, key, scope, () => { const fc = foodCarry(startOf(k)); return dayCalcCore(k, fc.share[k] || 0, fc).slots[s]; });
 }
 // how many of the week's portions a change touches: one meal, or every day of a batch still to come
-const swapReach = (k, s, rid, scope) => (scope === 'batch' ? weekDays(startOf(k)).filter(k2 => { const d = peekD(k2); return d.sl[s] === rid && !d.done[s] && !(d.pk && d.pk[s]); }).length : 1);
+const swapReach = (k, s, rid, scope) => (scope === 'batch' && batchCooked(k, s) ? batchDays(k, s).length : scope === 'batch' ? weekDays(startOf(k)).filter(k2 => { const d = peekD(k2); return d.sl[s] === rid && !d.done[s] && !(d.pk && d.pk[s]); }).length : 1);
 function mealFx(o, o2, orig, key, scope) {
   const out = [], dk = o2.k - o.k, dp = o2.p - o.p, df = o2.f - o.f, k = SH.k, wst = startOf(k), wc0 = weekCalc(wst), c0 = dayCalc(k);
   out.push(Math.abs(dk) < 15 ? ['good', `Still ${fmtN(o2.k)} kcal`] : ['', `${fmtN(o2.k)} kcal (${dk > 0 ? '+' : '−'}${fmtN(Math.abs(dk))})`]);
@@ -7437,7 +7505,7 @@ const curId = (r, orig) => { const it = r.items.find(x => (x.from || x.i) === or
 function ingTools(r, o, orig, scope, scopes, many, isOut) {
   const nm = shortN(orig).toLowerCase();
   const seg = scopes.length > 1 ? `<div class="seg osc" role="group" aria-label="Where the change goes">${[['meal', 'This meal'], ['batch', 'Whole batch']].map(([v, l]) => `<button data-a="oscope" data-v="${v}" aria-pressed="${scope === v}">${l}</button>`).join('')}</div>` : '';
-  const how = scope === 'batch' ? "Goes into every portion of this week's batch, and portions resize to keep their calories." : fixedPortion(o) ? 'Just this meal. The portion is already set, so its calories change.' : 'Just this meal. The portion resizes to keep its calories.';
+  const how = scope === 'batch' ? (SH && SH.k && batchCooked(SH.k, SH.s) ? `Goes into every box left from this batch (${batchDays(SH.k, SH.s).length}). They're already cooked, so their calories change.` : "Goes into every portion of this week's batch, and portions resize to keep their calories.") : fixedPortion(o) ? 'Just this meal. The portion is already set, so its calories change.' : 'Just this meal. The portion resizes to keep its calories.';
   if (isOut) return `<li class="ipanel mswap"><span class="eyebrow">The ${esc(nm)}</span>${seg}<p class="small muted" style="margin:0">${how}</p><div class="btnrow"><button class="btn sm primary" data-a="ingback" data-i="${esc(orig)}">${ic('plus')}Put it back</button><button class="btn sm ghost" data-a="ingtap" data-i="${esc(orig)}">Cancel</button></div></li>`;
   const opts = mealOpts(r, orig), all = many ? opts.concat([{ key: 'omit', label: 'Leave it out', note: '' }]) : opts;
   const c = amtCtx(curId(r, orig)), cur = c && c.def > 0 ? c.g / c.def : 1;
@@ -7519,9 +7587,10 @@ function shRecipe() {
   let ctx;
   if (o) {
     const bn = batchName(SH.k, SH.s, r), bc = o.prepped && batchContext(SH.k, SH.s);
-    const go = r.shop ? grabNote(r) : bc ? `<button class="btn primary" style="width:100%;margin-top:10px" data-a="pmopen" data-st="${bc.st}" data-key="${bc.se.key}">${ic('play')}Open ${sessName(bc.se)} prep</button>`
+    const go = r.shop || o.lo ? (r.shop ? grabNote(r) : '') : bc ? `<button class="btn primary" style="width:100%;margin-top:10px" data-a="pmopen" data-st="${bc.st}" data-key="${bc.se.key}">${ic('play')}Open ${sessName(bc.se)} prep</button>`
       : `<button class="btn primary" style="width:100%;margin-top:10px" data-a="cookopen" data-k="${SH.k}" data-s="${SH.s}">${ic('play')}Cook it step by step</button>`;
-    ctx = `${go}<div class="callout">${ic('info')}<div>${SLOTNAME[SH.s]} on ${fmtDay(SH.k)}${bn ? ` (${bn})` : ''}. ${o.packed ? `Packed at <b>${fmtN(o.k)} kcal</b>.` : o.kept ? `Already cooked at <b>${fmtN(o.k)} kcal</b>, so it keeps that size.` : o.fixedPack ? `<b>${fmtN(o.k)} kcal</b> as it comes; the rest of the day fits around it.` : `Scaled to <b>${fmtN(o.k)} kcal</b>, ${m.toFixed(2)}× the base recipe, to fit the day.${m >= 1.795 ? " That's as far as it scales, so the rest of the day makes up the difference." : ''}`}</div></div>
+    ctx = `${go}<div class="callout">${ic('info')}<div>${SLOTNAME[SH.s]} on ${fmtDay(SH.k)}${bn ? ` (${bn})` : ''}. ${o.lo ? `The leftover${(() => { const p = peekD(SH.k).pk; return p && p[SH.s] && DAY_KEY.test(p[SH.s].from || '') ? ` from ${DOWL[dayIndex(p[SH.s].from)]}` : ''; })()}: <b>${fmtN(o.k)} kcal</b>, already cooked.` : o.packed ? `Packed at <b>${fmtN(o.k)} kcal</b>.` : o.kept ? `Already cooked at <b>${fmtN(o.k)} kcal</b>, so it keeps that size.` : o.fixedPack ? `<b>${fmtN(o.k)} kcal</b> as it comes; the rest of the day fits around it.` : `Scaled to <b>${fmtN(o.k)} kcal</b>, ${m.toFixed(2)}× the base recipe, to fit the day.${m >= 1.795 ? " That's as far as it scales, so the rest of the day makes up the difference." : ''}`}</div></div>
+      ${spareBox(SH.k, SH.s, o)}
       ${(() => { if (o.done) return ''; const lo = leftoversOn(SH.k), lu = usesUp(r, lo).filter(i => lo[i].last); return lu.length ? `<div class="callout" style="margin-top:8px">${ic('leaf')}<div>Uses last week's ${esc(joinAnd(lu.map(i => `${shortN(i).toLowerCase()}${lo[i].until ? ` (good till ${DOW[dayIndex(lo[i].until)]})` : FREEZE.has(i) ? ' from the freezer' : ''}`)))}.</div></div>` : ''; })()}
       <div class="btnrow" style="margin-top:10px"><button class="btn sm" data-a="pick" data-k="${SH.k}" data-s="${SH.s}">${ic('edit')}Change meal</button><button class="btn sm" data-a="custom" data-k="${SH.k}" data-s="${SH.s}">Eat something else</button><button class="btn sm ghost" data-a="skip" data-k="${SH.k}" data-s="${SH.s}">Skip</button></div>`;
   } else {
@@ -7545,10 +7614,10 @@ function shRecipe() {
         return r.items.map(it => {
           const orig = it.from || it.i, first = !seen.has(orig); seen.add(orig);
           const tap = scope && !era && first && it.i !== 'losalt' ? orig : null;
-          const tail = (it.from ? ` <span class="muted for">for ${esc(shortN(it.from))}</span>` : '') + (it.own ? ' <span class="muted for">your amount</span>' : '');
+          const tail = (it.from ? ` <span class="muted for">for ${esc(shortN(it.from))}</span>` : '') + (it.add ? ' <span class="muted for">added by you</span>' : it.own ? ' <span class="muted for">your amount</span>' : '');
           return [it.i, it.g * mm, tail, tap && SH.swi === orig ? ingTools(r, o, orig, scope, scopes, many, false) : '', tap];
         });
-      })(), n > 1 ? `Total for ${n} portions` : 'Total', true, era ? eraIng(era) : ING, era, era ? '' : outRows(r, o, omAll, scope, scopes, mm), r.id)}</ul></section>
+      })(), n > 1 ? `Total for ${n} portions` : 'Total', true, era ? eraIng(era) : ING, era, era ? '' : outRows(r, o, omAll, scope, scopes, mm), r.id)}</ul>${scope && !era && !(o && o.done) ? `<button class="btn sm ghost" data-a="addiopen" style="margin-top:6px">${ic('plus')}Add an ingredient</button>` : ''}</section>
     <section><h4>Method</h4><ol class="steps">${(() => { const plan = amtPlan(r, r.steps), tot = itemTotals(r, mm); return r.steps.map((x, i) => `<li>${esc(x)}${amtChips(plan[i], id => tot[id], r.id)}${swapNotes(r, x)}</li>`).join(''); })()}</ol>${r.note ? `<p class="small muted">${esc(r.note)}</p>` : ''}</section>
     <section><details class="more"><summary>Plants & storage${ic('chev')}</summary>${keeps.length ? `<p style="margin:8px 0">${keeps.join(' · ').replace(/^./, c => c.toUpperCase())}.</p>` : ''}<div class="plantgrid">${plants}</div></details></section>
     ${R[SH.r] && R[SH.r].mine ? `<p class="small muted" style="margin:12px 0 4px">One of your recipe ideas.</p><button class="btn sm ghost" data-a="ideadel" data-r="${esc(SH.r)}">${ic('trash')}Remove from your ideas</button>` : ''}`;
@@ -7632,16 +7701,25 @@ function pickPlants(k) {
   const pf = SH.pf || [], shown = [...new Set([...pf, ...loPl])];
   const all = Object.keys(PLANTS).filter(x => !shown.includes(x) && RL.some(r => r.slots.includes(SH.s) && r.plants.includes(x))).sort((a, b) => PLANTS[a][0].localeCompare(PLANTS[b][0]));
   return `<div class="pfilt"><span class="eyebrow">Find meals with</span><div class="chips">${shown.map(x => `<button class="chip" data-a="pfilt" data-v="${x}" aria-pressed="${pf.includes(x)}">${esc(PLANTS[x][0])}${loPl.includes(x) ? '<small> · left over</small>' : ''}</button>`).join('')}
-    <select class="chip pfadd" id="pf-add" aria-label="Add a plant to find meals with"><option value="">+ A plant</option>${all.map(x => `<option value="${x}">${esc(PLANTS[x][0])}</option>`).join('')}</select>${pf.length ? '<button class="chip" data-a="pfclear">Clear</button>' : ''}</div></div>`;
+    ${nutChips()}<select class="chip pfadd" id="pf-add" aria-label="Add a plant to find meals with"><option value="">+ A plant</option>${all.map(x => `<option value="${x}">${esc(PLANTS[x][0])}</option>`).join('')}</select>${pf.length ? '<button class="chip" data-a="pfclear">Clear</button>' : ''}</div></div>`;
+}
+/* per-portion filters, on the meal picker and Make up the gap: low sat fat, low salt, high fibre */
+const NUT_F = [['lowsf', 'Low sat fat', x => x.sf <= 3], ['lowna', 'Low salt', x => x.na <= 0.6], ['hifib', 'High fibre', x => x.f >= 8]];
+const nutChips = () => NUT_F.map(([id, l]) => `<button class="chip" data-a="nutf" data-v="${id}" aria-pressed="${!!(SH.nut || {})[id]}">${l}</button>`).join('');
+const nutOk = x => NUT_F.every(([id, , f]) => !(SH.nut || {})[id] || f(x));
+// a recipe at the portion it would get in this slot on the day, for the filters
+function pickPortion(r, k, s) {
+  const st = setAt(k || todayKey()), lat = st.latteOn ? st.latteK : 0, sc = (st.target - lat) / SLOTS.reduce((a, x) => a + st.bud[x], 0), m = portionM(r, (st.bud[s] * sc) / r.k);
+  return { m, k: r.k * m, sf: r.sf * m, na: r.na * m, f: r.f * m };
 }
 // the recipe list alone, so typing in the search box doesn't rebuild the input
 function pickList() {
   const { k, s } = SH, st = SH.st || startOf(k), wc = weekCalc(st), q = (SH.q || '').toLowerCase(), cur = k ? peekD(k).sl[s] : null;
   const lo = k ? leftoversOn(k) : {};
   const pf = SH.pf || [], hits = r => pf.filter(x => r.plants.includes(x));
-  const opts = RL.filter(r => r.slots.includes(s) && textMatch(r, q) && (!pf.length || hits(r).length)).map(r => ({ r, h: hits(r), g: r.plants.reduce((a, x) => a + (wc.plan.has(x) ? 0 : PLANTS[x][1]), 0), lu: r.id === cur ? [] : usesUp(r, lo) }))
+  const opts = RL.filter(r => r.slots.includes(s) && textMatch(r, q) && (!pf.length || hits(r).length) && (!SH.nut || nutOk(pickPortion(r, k, s)))).map(r => ({ r, h: hits(r), g: r.plants.reduce((a, x) => a + (wc.plan.has(x) ? 0 : PLANTS[x][1]), 0), lu: r.id === cur ? [] : usesUp(r, lo) }))
     .sort((a, b) => (b.h.length - a.h.length) || (b.r.id === cur) - (a.r.id === cur) || (!!S.nope[a.r.id] - !!S.nope[b.r.id]) || (!!S.favs[b.r.id] - !!S.favs[a.r.id]) || (b.lu.length - a.lu.length) || (b.g - a.g) || a.r.n.localeCompare(b.r.n));
-  if (!opts.length) return `<p class="small muted">No ${SLOTNAME[s].toLowerCase()}s use ${pf.length > 1 ? 'any of those plants' : 'that plant'}${q ? ' and match the search' : ''}.</p>`;
+  if (!opts.length) return `<p class="small muted">No ${SLOTNAME[s].toLowerCase()}s ${pf.length ? `use ${pf.length > 1 ? 'any of those plants' : 'that plant'}` : 'fit'}${SH.nut && Object.keys(SH.nut).length ? ' with those filters' : ''}${q ? ' and match the search' : ''}.</p>`;
   return opts.map(({ r, g, lu, h }) => `<button class="pick ${r.id === cur ? 'cur' : ''}" data-a="choose" data-r="${r.id}">${art(r, 44)}<span>${pf.length > 1 ? `<span class="mt pfhit">Uses ${esc(joinAnd(h.map(x => PLANTS[x][0].toLowerCase())))}</span>` : ''}<span class="nm">${S.favs[r.id] ? ic('thup', false, 'inl lk') : S.nope[r.id] ? ic('thdown', false, 'inl nk') : ''}${esc(r.n)}</span><span class="mt">${fmtN(r.k)} kcal · ${fmtN(r.p)}g protein${g ? ` · <span class="gain">+${fmtPts(g)} new plant${g === 1 ? '' : 's'}</span>` : ''}${r.oily ? ' · oily fish' : ''}${r.fermBase ? ' · fermented' : ''}${r.mine ? ' · your idea' : ''}${s === 's' && S.set.prepSnacks && packable(r) ? ' · packs for work' : ''}${r.shop ? ' · shop-bought' : ''}${lu.length ? ` · <span class="gain">uses up ${esc(joinAnd(lu.slice(0, 2).map(i => shortN(i).toLowerCase())))}${lu.length > 2 ? ' and more' : ''}</span>` : ''}</span></span></button>`).join('') || '<div class="empty">No matches.</div>';
 }
 // optional figures from a food label; salt is entered as on the pack and kept as sodium
@@ -8329,8 +8407,9 @@ const ACT = {
     const day = D(UI.day);
     if (d.s === 'latte') { if (day.done.latte) delete day.done.latte; else day.done.latte = true; }
     else if (d.s === 'out') { const o = outOf(day); if (o) { o.done = !o.done; alcSync(UI.day, drinkU(o)); } }
-    else { const o = dayCalc(UI.day).slots[d.s]; if (day.done[d.s]) delete day.done[d.s]; else day.done[d.s] = o.kind === 'recipe' ? { m: +o.m.toFixed(3), sw: Object.assign({}, o.r.swapped || {}) } : { c: 1 }; }
+    else { const o = dayCalc(UI.day).slots[d.s]; if (day.done[d.s]) delete day.done[d.s]; else { day.done[d.s] = o.kind === 'recipe' ? { m: +o.m.toFixed(3), sw: Object.assign({}, o.r.swapped || {}) } : { c: 1 }; if (o.kind === 'recipe' && !o.prepped && !o.packed && !o.r.shop && (d.s === 'l' || d.s === 'd')) UI.spareHint = `${UI.day}${d.s}`; } }
     UI.pop = d.s; save(); render();
+    if (UI.spareHint === `${UI.day}${d.s}`) { UI.spareHint = null; toast('Made extra? Open the meal to keep the leftovers for the next few days.', 5000); }
   },
 
   night(d) { const o = outOf(peekD(d.k)); openSheet({ type: 'night', k: d.k, o: o ? JSON.parse(JSON.stringify(o)) : defaultNight() }); },
@@ -8357,6 +8436,7 @@ const ACT = {
   open(d) { openSheet({ type: 'recipe', r: d.r, k: d.k, s: d.s, n: 1 }); },
   pick(d) { openSheet({ type: 'pick', k: d.k, s: d.s, q: '' }); },
   pfilt(d) { if (!SH) return; const pf = SH.pf || []; SH.pf = pf.includes(d.v) ? pf.filter(x => x !== d.v) : [...pf, d.v]; renderSheet(); },
+  nutf(d) { if (!SH) return; SH.nut = SH.nut || {}; if (SH.nut[d.v]) delete SH.nut[d.v]; else SH.nut[d.v] = 1; if (!Object.keys(SH.nut).length) SH.nut = null; renderSheet(); },
   pfclear() { if (!SH) return; SH.pf = []; renderSheet(); },
   xscale(d) {
     const f = +d.v; if (!(f > 0)) return;
@@ -8462,9 +8542,48 @@ const ACT = {
   },
   haveopen(d) { openSheet({ type: 'have', k: d.k, s: d.s }); },
   // an amount in the cooking view: in the pan, or not yet
-  samt(d) { if (!PM) return; const ps = prepState(PM.st, PM.key); ps.add = ps.add || {}; if (ps.add[d.v]) delete ps.add[d.v]; else ps.add[d.v] = 1; save(); renderPrep(); },
+  samt(d) { if (!PM) return; const ps = PM.key[0] === 'c' ? cookState(PM.st, PM.key.slice(1)) : prepState(PM.st, PM.key); ps.add = ps.add || {}; if (ps.add[d.v]) delete ps.add[d.v]; else ps.add[d.v] = 1; save(); renderPrep(); },
   mkup(d) { openSheet({ type: 'mkup', k: d.k, s: d.s }); },
   mkgo(d) { if (!SH || SH.type !== 'mkup' || !R[d.r]) return; const k = SH.k, s = SH.s; setSlot(k, s, d.r); closeSheet(); render(); toast(`${SLOTNAME[s]}: ${R[d.r].n}`); },
+  addiopen() { if (!SH || !SH.k || !SH.s) return; openSheet({ type: 'addi', k: SH.k, s: SH.s, r: SH.r, back: { type: 'recipe', r: SH.r, k: SH.k, s: SH.s, n: SH.n || 1 } }); },
+  aipick(d) { if (!SH || SH.type !== 'addi' || !ING[d.i]) return; SH.ai = d.i; SH.ag = null; renderSheet(); },
+  aiclear() { if (!SH) return; SH.ai = null; renderSheet(); },
+  aigo() {
+    if (!SH || SH.type !== 'addi' || !ING[SH.ai]) return;
+    const k = SH.k, s = SH.s, o = dayCalc(k).slots[s]; if (o.kind !== 'recipe' || o.done) return;
+    const g = +(($('ai-g') || {}).value), i = SH.ai; if (!(g > 0 && g < 2000)) { toast('Add an amount'); return; }
+    const scopes = omitScopes(k, s, o), scope = SH.osc && scopes.includes(SH.osc) ? SH.osc : scopes.includes('batch') ? 'batch' : 'meal', k0 = Math.round(o.k);
+    if (scope === 'batch') freezeEaten(startOf(k));
+    putSw(k, s, '@a:' + i, Math.round(g * 10) / 10, scope); putSw(k, s, '@k:' + i, UI.pkKeep === false ? 1 : null, scope);
+    save(); render(); const o2 = dayCalc(k).slots[s], back = SH.back; openSheet(back);
+    toast(`Added ${shortN(i).toLowerCase()}${o2.kind === 'recipe' ? (Math.abs(o2.k - k0) < 15 ? `; still ${fmtN(o2.k)} kcal` : `; now ${fmtN(o2.k)} kcal`) : ''}`);
+  },
+  airm(d) {
+    if (!SH || SH.type !== 'addi' || !ING[d.i]) return;
+    const k = SH.k, s = SH.s, o = dayCalc(k).slots[s]; if (o.kind !== 'recipe' || o.done) return;
+    const scs = omitScopes(k, s, o); if (scs.includes('batch')) freezeEaten(startOf(k));
+    scs.forEach(sc => { putSw(k, s, '@a:' + d.i, null, sc); putSw(k, s, '@k:' + d.i, null, sc); });
+    save(); render(); renderSheet(); toast(`Took out the ${shortN(d.i).toLowerCase()}`);
+  },
+  spareadd(d) {
+    const k = d.k, s = d.s, o = dayCalc(k).slots[s]; if (o.kind !== 'recipe' || !o.done) return;
+    S.spare = (S.spare || []).filter(y => !(y.made === k && y.s === s));
+    S.spare.push({ id: 'sp' + Date.now().toString(36), r: o.r.id, m: +o.m.toFixed(3), sw: Object.assign({}, o.r.swapped || {}), made: k, s, n: +d.v });
+    save(); render(); if (SH) renderSheet(); toast(`${nWord(+d.v, 'spare portion')} kept for the next few days`);
+  },
+  sparerm(d) { S.spare = (S.spare || []).filter(y => y.id !== d.id); save(); render(); if (SH) renderSheet(); },
+  // a leftover goes in as a ready-made box: its portion and recipe as cooked, and nothing to buy
+  spareuse(d) {
+    const x = (S.spare || []).find(y => y.id === d.id), k = todayKey(), s = d.s; if (!x || !R[x.r]) return;
+    holdPast(k); setSlot(k, s, x.r); const day = D(k); day.pk = day.pk || {}; day.pk[s] = { r: x.r, m: x.m, sw: Object.assign({}, x.sw), lo: 1, from: x.made };
+    x.n -= 1; if (x.n <= 0) S.spare = S.spare.filter(y => y !== x);
+    save(); render(); toast(`${SLOTNAME[s]}: ${R[x.r].n}, the leftover from ${DOWL[dayIndex(x.made)]}`);
+  },
+  sparedrop(d) {
+    const x = (S.spare || []).find(y => y.id === d.id); if (!x) return; const k = todayKey();
+    if (spareUntil(x) <= k) S.spare = S.spare.filter(y => y !== x); else x.skip = k;
+    save(); render();
+  },
   pgot(d) { const msg = haveToggle(d.k, d.s, d.i); if (msg === null) return; save(); render(); if (msg) toast(msg); },
   pgkeep() { UI.pkKeep = UI.pkKeep === false; try { localStorage.setItem('tp.pkeep', UI.pkKeep ? '1' : '0'); } catch (e) { /* ignore */ } render(); },
   pgreset(d) { pgSet(d.st, d.key, d.s, d.r, d.i, null); save(); render(); toast(`${shortN(d.i)} back to the recipe's amount`); },
@@ -8997,7 +9116,8 @@ Object.assign(ACT, {
     if (!SH || !SH.k || !SH.s || !ING[d.i]) return;
     const k = SH.k, s = SH.s, o = dayCalc(k).slots[s]; if (!omitScope(k, s, o)) return;
     const st = startOf(k), own = mealOwn(k, s), w = S.weeks[st], scope = outScope(omitScopes(k, s, o), own, d.i);
-    if (own[d.i] === 'omit') clearOwn(k, s, d.i);
+    if (scope === 'batch' && batchCooked(k, s) && batchDays(k, s).some(k2 => mealOwn(k2, s)[d.i] === 'omit')) batchDays(k, s).forEach(k2 => { if (mealOwn(k2, s)[d.i] === 'omit') clearOwn(k2, s, d.i); });
+    else if (own[d.i] === 'omit') clearOwn(k, s, d.i);
     else if (scope === 'batch' && w && w.swaps && w.swaps[SH.r] && w.swaps[SH.r][d.i] === 'omit') { freezeEaten(st); delete w.swaps[SH.r][d.i]; if (!Object.keys(w.swaps[SH.r]).length) delete w.swaps[SH.r]; }
     else putChange(k, s, d.i, '@orig', 'meal');
     SH.swi = null; save(); render(); renderSheet(); toast(`The ${shortN(d.i).toLowerCase()} is back in`);
@@ -9100,6 +9220,7 @@ document.addEventListener('input', e => {
   if (RV && rvInput(e)) return;
   if (id === 'rq') { UI.rq = e.target.value; $('rlist').innerHTML = rListHtml(); }
   else if (id === 'pq' && SH && $('pk-list')) { SH.q = e.target.value; $('pk-list').innerHTML = pickList(); }
+  else if (id === 'ai-q' && SH && SH.type === 'addi') { SH.aq = e.target.value; renderSheet(); const el = $('ai-q'); if (el) { el.focus(); const n = el.value.length; try { el.setSelectionRange(n, n); } catch (x) { /* search inputs */ } } }
   else if (id === 'iq' && SH && SH.type === 'idea' && $('iq-list')) { SH.iq = e.target.value; $('iq-list').innerHTML = ideaFind(); }
   else if (id === 'lq' && SH && $('lk-box')) { SH.lq = e.target.value; if (SH.off && SH.off.q !== SH.lq.trim()) SH.off = null; lkRender(); }
   else if (id === 'lk-g' && SH && SH.lk) { const g = +e.target.value; if (g > 0 && g < 5000) lkFill(g); }
@@ -10084,9 +10205,9 @@ function wkScore(st) {
   }
   const fe = fv('ferm');
   if (fe.length) {
-    const n = fe.filter(x => x.v > 0).length, miss = fe.filter(x => !(x.v > 0)).map(x => x.k), r = Math.round(n / fe.length * 7), s = r >= 7 ? 'ok' : r >= 5 ? 'mid' : 'off';
+    const n = fe.filter(x => x.v > 0).length, miss = fe.filter(x => !(x.v > 0)).map(x => x.k), r = Math.round(n / fe.length * 7), s = r >= 6 ? 'ok' : r >= 4 ? 'mid' : 'off';
     add({ id: 'ferm', grp: 'Food', n: 'Fermented', art: 'ferm', st: s, fig: String(n), unit: `/ ${fe.length} days`, txt: `${n} of ${fe.length} days`,
-      line: s === 'ok' ? 'Something fermented every single day.' : s === 'mid' ? `${n} of ${fe.length} days. ${dayNames(miss)} went without.` : `Only ${n} of ${fe.length} days had something fermented.`,
+      line: s === 'ok' ? (miss.length ? `${n} of ${fe.length} days: ${dayNames(miss)} the only one without.` : 'Something fermented every single day.') : s === 'mid' ? `${n} of ${fe.length} days. ${dayNames(miss)} went without.` : `Only ${n} of ${fe.length} days had something fermented.`,
       short: `${nWord(miss.length, 'day')} without`, tip: `Kefir, live yoghurt, kimchi or sauerkraut once a day.${miss.length && miss.length <= 3 ? ` The gaps were ${dayNames(miss)}.` : ''}`, gap: miss.length / fe.length });
   }
   const rd = fv('red');
@@ -10396,9 +10517,9 @@ const IDEA_TPL = {
   scramble: { slots: 'b', tags: ['quick'], n: 'scrambled eggs', carb: 'rye', prot: 'egg', veg: ['spinach'], aroma: [], kit: ['oil'], fr: 0,
     fit: ['egg', 'spinach', 'mushroom', 'tomato', 'cherrytom', 'rye', 'sourdough', 'avocado', 'chives', 'feta', 'smokedmack', 'kimchi'] },
   oats: { slots: 'b', tags: [], n: 'overnight oats', carb: 'oats', prot: 'fage0', veg: [], aroma: [], kit: ['milk', 'chia', 'cinnamon'], fr: 3, fruit: 'berrymix',
-    fit: ['oats', 'chia', 'kefir', 'milk', 'oatmilk', 'fage0', 'skyr', 'banana', 'apple', 'berrymix', 'blueberries', 'raspberries', 'strawberries', 'cinnamon', 'pb', 'walnuts', 'seedmix'] },
+    fit: ['oats', 'chia', 'kefir', 'milk', 'oatmilk', 'fage0', 'skyr', 'banana', 'apple', 'berrymix', 'blueberries', 'raspberries', 'strawberries', 'cinnamon', 'pb', 'walnuts', 'seedmix', 'mixednuts', 'almonds', 'pistachios', 'cashews'] },
   pot: { slots: 'sp', tags: [], n: 'pot', carb: null, prot: 'fage0', veg: [], aroma: [], kit: ['seedmix'], fr: 2, fruit: 'berrymix',
-    fit: ['fage0', 'skyr', 'liveyog', 'quark', 'cottage', 'kefir', 'berrymix', 'blueberries', 'raspberries', 'strawberries', 'banana', 'apple', 'pear', 'kiwi', 'mango', 'frozmango', 'frozcherry', 'cinnamon', 'walnuts', 'almonds', 'seedmix', 'pistachios', 'darkchoc', 'cocoa', 'dates', 'pb'] }
+    fit: ['fage0', 'skyr', 'liveyog', 'quark', 'cottage', 'kefir', 'berrymix', 'blueberries', 'raspberries', 'strawberries', 'banana', 'apple', 'pear', 'kiwi', 'mango', 'frozmango', 'frozcherry', 'cinnamon', 'walnuts', 'almonds', 'seedmix', 'mixednuts', 'cashews', 'pistachios', 'darkchoc', 'cocoa', 'dates', 'pb'] }
 };
 // the dish types that suit a slot and what you've got, best first
 function ideaTpls(have, s) {
@@ -10439,7 +10560,7 @@ function ideaBuild(have, s, tplId, need) {
     by('fruit').filter(id => ['pomegranate', 'apple', 'pear', 'mango', 'orange'].includes(id)).slice(0, 1).forEach(id => add(id, ideaG(id, tplId), true));
   }
   if (!sweet) { const ar = by('aroma'); ar.forEach(id => add(id, ideaG(id, tplId), true)); T.aroma.forEach(id => add(id, ideaG(id, tplId), have.includes(id))); }
-  const ex = by('extra'), alt = { curry: ['thaipaste', 'greenpaste', 'garam', 'curry'], choptom: ['coconutmilk', 'passata', 'choptom'], milk: ['kefir', 'oatmilk', 'milk'], tahini: ['hummus', 'tahini', 'pesto'] };
+  const ex = by('extra'), alt = { curry: ['thaipaste', 'greenpaste', 'garam', 'curry'], choptom: ['coconutmilk', 'passata', 'choptom'], milk: ['kefir', 'oatmilk', 'milk'], tahini: ['hummus', 'tahini', 'pesto'], seedmix: ['seedmix', 'mixednuts', 'walnuts', 'almonds', 'pistachios', 'cashews', 'peanuts'] }; // the nuts you've got stand in for the seed topping
   ex.filter(id => (sweet ? T.fit.includes(id) : !['darkchoc', 'cocoa', 'dates', 'apricots'].includes(id))).forEach(id => add(id, ideaG(id, tplId), true));
   T.kit.forEach(id => { const grp = alt[id]; if (grp && have.some(h => grp.includes(h))) return; add(id, ideaG(id, tplId), have.includes(id)); });
   by('herb').filter(id => !sweet || id === 'mint').forEach(id => add(id, ideaG(id, tplId), true));
@@ -11492,9 +11613,9 @@ Why the same two pints sometimes costs you a day and sometimes doesn't: when hum
    S.nose[day] = { r: 1–5, sy: [what it's like], cx: [anything else from yesterday], at }. What the app already
    knows (drinks and which, sleep, training, rinse and spray) is read from its own records, never asked. */
 const NOSE_R = [[1, 'Blocked', 'red'], [2, 'Poor', 'orange'], [3, 'OK', 'yellow'], [4, 'Good', 'green'], [5, 'Great', 'leaf']];
-const NOSE_X = [['vape', 'Vape or smoke around'], ['heating', 'Heating on'], ['aircon', 'Aircon overnight'], ['dryair', 'Hygrometer under 35%'], ['city', 'City traffic'], ['latefood', 'Ate late or heavy'], ['picked', 'Picked or blew hard'], ['nogel', 'No gel last night'], ['ill', 'Fighting something off'],
+const NOSE_X = [['vape', 'Vape or smoke around'], ['heating', 'Heating on'], ['aircon', 'Aircon overnight'], ['dryair', 'Hygrometer under 35%'], ['city', 'City traffic'], ['latefood', 'Ate late or heavy'], ['picked', 'Picked or blew hard'], ['nogel', 'No gel last night'], ['sudafed', 'Sudafed spray'], ['ill', 'Fighting something off'],
   ['dusty', 'Dust, pollen or chalk'], ['fragrance', 'Strong fragrance or cleaning stuff'], ['cold', 'Out in cold air'], ['humid', 'Humid or tropical air'], ['flight', 'Flown in the last day or two'], ['nic_late', 'Late nicotine lozenge'], ['dairy', 'Lots of dairy'], ['spicy', 'Spicy food'], ['nsaid', 'Ibuprofen or aspirin'], ['massage', 'Massage or a long hot bath'], ['weather', 'Big weather change'], ['chlorine', 'Swimming pool']];
-const NOSE_X_SHOWN = 9;
+const NOSE_X_SHOWN = 10;
 const NOSE_SY_COMMON = ['c_swell', 'c_mucus', 'd_crust', 's_flat', 'c_drip', 'd_tight'];
 const NOSE_SYM_ALL = NOSE_SYM.flatMap(g => g.items.map(i => Object.assign({ g: g.g }, i)));
 const noseSym = id => NOSE_SYM_ALL.find(x => x.id === id);
@@ -11546,7 +11667,7 @@ function noseCard(k) {
   const sc = (L, v0, act, lab) => `<div class="nscale" role="group" aria-label="${lab}">${L.map(([v, l, c]) => `<button data-a="${act}" data-v="${v}" aria-pressed="${v0 === v}"><i style="background:${c === 'leaf' ? 'var(--leaf)' : `var(--c-${c})`}"></i>${l}</button>`).join('')}</div>`;
   const scale = `<div class="nshd"><b>Condition</b><span>how clear it is</span></div>${sc(NOSE_R, r, 'nrate', 'Nose condition')}<div class="nshd"><b>Smell</b><span>coffee, toothpaste, soap</span></div>${sc(NOSE_SM, sm, 'nsm', 'Sense of smell')}`;
   let more = '';
-  if (r || sm) {
+  if (r || sm || cx.length || sy.length) {
     const showAll = !!UI.nSyAll, common = NOSE_SY_COMMON.concat(sy.filter(x => !NOSE_SY_COMMON.includes(x)));
     const syChip = id => { const s = noseSym(id); return s ? `<button class="chip" data-a="nsym" data-v="${id}" aria-pressed="${sy.includes(id)}">${esc(s.t)}</button>` : ''; };
     const syHtml = showAll ? NOSE_SYM.map(g => `<div class="ngrp">${esc(capFirst(g.g.toLowerCase()))}</div><div class="chips">${g.items.map(i => syChip(i.id)).join('')}</div>`).join('') + `<button class="btn link sm" data-a="nsyall">Fewer</button>`
@@ -11555,11 +11676,16 @@ function noseCard(k) {
     more = `${r <= 3 || sy.length ? `<div class="nlbl">What's it like?</div>${syHtml}` : ''}
       ${kn.chips.length ? `<div class="nlbl">The app already knows</div><div class="chips">${kn.chips.map(([t, c]) => `<span class="chip known ${c}">${c === 'ok' ? ic('check') : ''}${esc(t)}</span>`).join('')}</div>` : ''}
       <div class="nlbl">Anything else yesterday?</div><div class="chips">${xShow.map(([id, t]) => `<button class="chip" data-a="nx" data-v="${id}" aria-pressed="${cx.includes(id)}">${esc(t)}</button>`).join('')}${UI.nXAll ? '' : '<button class="chip more" data-a="nxall">More…</button>'}</div>
-      ${noseYours(k)}
+      ${noseSudafed(k)}${noseYours(k)}
       ${sy.length ? sy.map(id => noseAdvice(id, noseCond(k))).join('') : r >= 4 ? '<p class="small muted" style="margin:0">Logged. Good mornings show what to reproduce, so tap anything from yesterday that might explain it.</p>' : ''}`;
   }
   // part of the check-in card, just above its Save button; each tap saves straight away
-  return `<div class="nosecard ckf" role="group" aria-label="Nose"><div class="nshead">${idl(shArt('nose', 44))}<div><div class="cklbl">Nose this morning</div><b>How's your nose?</b></div>${r || sm ? '<button class="btn link sm" data-a="nclear">Clear</button>' : ''}</div>${scale}${more}</div>`;
+  return `<div class="nosecard ckf" role="group" aria-label="Nose"><div class="nshead">${idl(shArt('nose', 44))}<div><div class="cklbl">Nose this morning</div><b>How's your nose?</b></div>${r || sm || cx.length ? '<button class="btn link sm" data-a="nclear">Clear</button>' : ''}</div>${scale}${more}</div>`;
+}
+// decongestant sprays: the MHRA's advice (April 2026) is no more than five days in a row, or the nose can rebound
+function noseSudafed(k) {
+  let n = 0; for (let d = k; n < 14; d = addDays(d, -1)) { const e = S.nose[d]; if (e && !e.imp && (e.cx || []).includes('sudafed')) n++; else break; }
+  return n >= 4 ? `<div class="callout warn">${ic('info')}<div><b>${n} days running on the Sudafed spray.</b> The MHRA's advice is no more than five days in a row: used for longer, decongestant sprays can leave the nose more blocked once you stop (rebound congestion).</div></div>` : '';
 }
 function noseEntry(k) { let n = S.nose[k]; if (!n || n.imp) n = S.nose[k] = { r: 0, sy: [], cx: [] }; n.at = todayKey(); return n; }
 Object.assign(ACT, {
@@ -11613,6 +11739,7 @@ const NL_X = [
   { id: 'dry', n: 'Heating, aircon or dry air', sh: 'dry air', helps: -1, out: ['cond', 'smell', 'sleep'], f: m => noseHas(m, ['heating', 'aircon', 'dryair']) },
   { id: 'vape', n: 'Vape or smoke around', sh: 'vape smoke', helps: -1, out: ['cond', 'smell'], f: m => noseHas(m, ['vape']) },
   { id: 'late', n: 'Ate late or heavy', sh: 'eating late', helps: -1, out: ['cond', 'sleep'], f: m => noseHas(m, ['latefood']) },
+  { id: 'sudafed', n: 'Sudafed spray the day before', sh: 'the Sudafed spray', helps: 0, out: ['cond', 'smell', 'sleep'], f: m => noseHas(m, ['sudafed']) },
   { id: 'picked', n: 'Picked or blew hard', sh: 'picking', helps: -1, out: ['cond'], f: m => noseHas(m, ['picked']) },
   { id: 'poornose', n: 'A rough nose that day', sh: 'a rough nose', helps: -1, out: ['sleep'], f: m => { const y = NL_Y.cond(addDays(m, -1)); return y === null ? null : y <= 2; } }
 ];
@@ -11785,6 +11912,13 @@ function noseTip(tk) {
 
 /* the nose app's own log, if it was kept on this phone under the same address: brought in once */
 const NOSE_TAGS = { aircon: 'aircon', 'dry air': 'dryair', vape: 'vape', city: 'city', 'late food': 'latefood', 'late nicotine': 'nic_late', dairy: 'dairy', spicy: 'spicy', picking: 'picked', 'no gel': 'nogel', 'cold air': 'cold', ill: 'ill', dust: 'dusty', humid: 'humid', massage: 'massage' };
+// once: the Sudafed spray on 30 October, logged in the 31 October check-in
+function noseSudFix() {
+  if (S.fix && S.fix.sud1) return; (S.fix = S.fix || {}).sud1 = 1;
+  const k = '2026-10-31', e = S.nose[k] && !S.nose[k].imp ? S.nose[k] : (S.nose[k] = { r: 0, sy: [], cx: [], at: todayKey() });
+  if (!e.cx.includes('sudafed')) e.cx.push('sudafed');
+  save();
+}
 function noseImport() {
   if (S.fix && S.fix.nose1) return '';
   let log = null; try { log = JSON.parse(localStorage.getItem('noselog') || 'null'); } catch (e) { log = null; }
@@ -12146,7 +12280,7 @@ function repairDrinks() {
 }
 (function init() {
   const st = startOf(todayKey());
-  const fixMsg = repairDrinks(), noseMsg = noseImport(); alcRepair();
+  const fixMsg = repairDrinks(), noseMsg = noseImport(); alcRepair(); noseSudFix();
   if (!weekDays(st).some(k => S.days[k] && Object.keys(S.days[k].sl || {}).length)) planWeek(st, false);
   nudgeWeek(UI.tab);
   render();
