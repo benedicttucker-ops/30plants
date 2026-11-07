@@ -1942,6 +1942,35 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 .pgg.pgc span { width: auto; min-width: 44px; margin-left: 4px; }
 .pgst { width: 30px; height: 30px; border-radius: 9px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-weight: 700; font-size: 16px; line-height: 1; padding: 0; cursor: pointer; }
 .pgst:disabled { opacity: .35; cursor: default; }
+/* 3.25 wrap-up against last week */
+.shbetter { display: inline-flex; align-items: center; gap: 5px; margin: 8px auto 0; padding: 4px 11px; border-radius: 999px; background: color-mix(in srgb, var(--c-green) 22%, var(--surface)); color: var(--ink); font-weight: 800; font-size: 13px; letter-spacing: .02em; }
+.shbetter svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.6; }
+.shline.shcmp { font-weight: 700; margin-bottom: 4px; }
+.rvsr .shtr { width: 14px; flex: none; text-align: center; font-style: normal; font-size: 11px; margin-left: 4px; }
+.rvsr .shtr.up { color: var(--c-green); }
+.rvsr .shtr.dn { color: var(--muted); }
+.fxup { font-weight: 700; }
+.shcard .rvsr { grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.25fr) 14px; }
+.rvsr .shtr { margin-left: 0; }
+/* 3.25 nose */
+.nhint { font-weight: 500; font-size: 12px; color: var(--muted); margin-left: 6px; text-transform: none; letter-spacing: 0; }
+.nlouts { margin: 2px 0; }
+.callout.nnight ul { margin: 4px 0 0; padding-left: 18px; }
+.callout.nnight li { margin: 2px 0; }
+.ilist .iout .in small .link { opacity: 1; font-weight: 700; padding: 0; }
+.ilist .iout:has(.link) { opacity: .75; }
+.pgout { margin: 6px 0 0; }
+/* 3.25 monthly why-cards */
+.mrwhy { border: 1.5px solid var(--line); border-radius: 14px; padding: 12px 14px; margin: 10px 0; background: var(--surface); }
+.mrwhy > b { display: block; font-size: 15px; }
+.mrwhy .note { margin: 6px 0 8px; }
+.mrwhy .chips { gap: 6px; }
+.mrlikely { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--accent-ink, var(--ink)); background: color-mix(in srgb, var(--accent) 22%, transparent); border-radius: 6px; padding: 1px 5px; margin-left: 4px; }
+.mrtips { margin-top: 8px; }
+.mrtips p { margin: 4px 0 0; font-size: 14px; }
+/* 3.25: toasts size to their text instead of half the screen, and keep a pill shape when they wrap */
+.toast { width: max-content; max-width: min(520px, calc(100% - 32px)); border-radius: 20px; text-align: center; text-wrap: balance; }
+@media (prefers-reduced-motion: no-preference) { .shbetter { animation: shup .45s .62s both var(--ease); } }
 
 </style>
 </head>
@@ -1968,7 +1997,7 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.24.2';</script>
+<script>window.TP_VERSION = '3.25.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -6516,7 +6545,7 @@ function prepIngs(st, key, gr, tot, from) {
   return `<div class="pging">
     <div class="pghead"><span class="small">${have ? `<b>${nIn} of ${ids.length}</b> in` : 'Amounts for the batch'}${kc ? ` · about ${fmtN(kc)} kcal a portion` : ''}</span>${have ? `<button class="btn sm ghost" data-a="pscan" ${da} data-k="${k0}">${ic('scan')}Scan</button>` : ''}</div>
     <button class="pgtog" role="switch" aria-checked="${keep}" data-a="pgkeep"><span><b>Keep the calories</b><small>${keep ? 'Change an amount and the portions resize so each box stays on its calories.' : 'Change an amount and the portions stay the same size; the calories go up or down with it.'}</small></span><span class="switch"><span></span></span></button>
-    <div class="pgrows">${rows}</div></div>`;
+    <div class="pgrows">${rows}</div>${(() => { const lo = outLeft(gr.r, gr.entries[0].k, gr.s, gr.sumM || gr.entries.reduce((x, e) => x + e.m, 0)); return lo ? `<ul class="ilist pgout">${lo}</ul>` : ''; })()}</div>`;
 }
 function vPrep() {
   const st = UI.week, w = S.weeks[st] || { mode: 'auto' }, sug = suggestMode(st), mode = weekMode(st), sess = sessions(st, mode);
@@ -6730,7 +6759,7 @@ function stepHtml(M, s, i, cur) {
     const tot = {}, from = {}; s.gr.entries.forEach(e => s.gr.r.items.forEach(it => { tot[it.i] = (tot[it.i] || 0) + it.g * e.m; if (it.from) from[it.i] = it.from; }));
     const sw = swapList(s.gr.r);
     title = 'Get the ingredients out';
-    body = `<p class="psub">${M.cook ? `${M.k === todayKey() ? "Today's" : `The ${fmtDay(M.k)}`} portion, ${fmtN(M.o.k)} kcal` : `For ${s.gr.n} portion${s.gr.n > 1 ? 's' : ''}`}</p>${sw.length ? `<p class="swapin">${ic('swap')}<span>Swapped this week: ${esc(sw.map(x => x.text).join('; '))}.</span></p>` : ''}<ul class="ilist ik pings">${ingRows(Object.entries(tot).map(([id, g]) => [id, g, from[id] ? ` <span class="muted for">for ${esc(shortN(from[id]))}</span>` : '']), M.cook ? 'Total' : `Total for ${s.gr.n} portion${s.gr.n > 1 ? 's' : ''}`, false, ING, null, '', s.gr.r.id)}</ul>`;
+    body = `<p class="psub">${M.cook ? `${M.k === todayKey() ? "Today's" : `The ${fmtDay(M.k)}`} portion, ${fmtN(M.o.k)} kcal` : `For ${s.gr.n} portion${s.gr.n > 1 ? 's' : ''}`}</p>${sw.length ? `<p class="swapin">${ic('swap')}<span>Swapped this week: ${esc(sw.map(x => x.text).join('; '))}.</span></p>` : ''}<ul class="ilist ik pings">${ingRows(Object.entries(tot).map(([id, g]) => [id, g, from[id] ? ` <span class="muted for">for ${esc(shortN(from[id]))}</span>` : '']), M.cook ? 'Total' : `Total for ${s.gr.n} portion${s.gr.n > 1 ? 's' : ''}`, false, ING, null, outLeft(s.gr.r, s.gr.entries[0].k, s.gr.s, s.gr.sumM), s.gr.r.id)}</ul>`;
   } else if (s.kind === 'do') {
     title = s.text;
     const mine = M.all.filter(x => x.kind === 'do' && x.gr === s.gr), plan = amtPlan(s.gr.r, mine.map(x => x.text)), tot = {};
@@ -7454,6 +7483,23 @@ function clearOwn(k, s, orig) {
   delete z.sw[orig]; if (!Object.keys(z.sw).length) delete d.sw[s]; if (!Object.keys(d.sw).length) delete d.sw;
 }
 // this meal's own changes, against the week's recipe
+// put a left-out ingredient back in, at the level it was left out: this meal, the batch or the week
+function putBack(k, s, rid, i) {
+  const o = dayCalc(k).slots[s]; if (!o || o.kind !== 'recipe' || !omitScope(k, s, o)) return false;
+  const st = startOf(k), own = mealOwn(k, s), w = S.weeks[st], scope = outScope(omitScopes(k, s, o), own, i);
+  if (scope === 'batch' && batchCooked(k, s) && batchDays(k, s).some(k2 => mealOwn(k2, s)[i] === 'omit')) batchDays(k, s).forEach(k2 => { if (mealOwn(k2, s)[i] === 'omit') clearOwn(k2, s, i); });
+  else if (own[i] === 'omit') clearOwn(k, s, i);
+  else if (scope === 'batch' && w && w.swaps && w.swaps[rid] && w.swaps[rid][i] === 'omit') { freezeEaten(st); delete w.swaps[rid][i]; if (!Object.keys(w.swaps[rid]).length) delete w.swaps[rid]; }
+  else putChange(k, s, i, '@orig', 'meal');
+  return true;
+}
+// left-out ingredients of a dish as cooked: struck through rows with a tap to put each back
+function outLeft(r, k, s, m) {
+  const base = R[r.id]; if (!base || !k || !s) return '';
+  const om = Object.entries(r.swapped || {}).filter(([orig, key]) => key === 'omit' && ING[orig] && !r.items.some(it => it.i === orig)).map(([orig]) => orig);
+  return om.map(orig => { const g0 = base.items.filter(it => it.i === orig).reduce((a, it) => a + it.g, 0) * m;
+    return `<li class="iout"><span class="in"><s>${esc(ING[orig].n)}</s><small>Left out · <button class="link" data-a="outback" data-k="${k}" data-s="${s}" data-r="${r.id}" data-i="${esc(orig)}">Put back</button></small></span><span class="q"><s>${g0 > 0 ? esc(fmtQ(orig, g0)) : ''}</s></span></li>`; }).join('');
+}
 function mealOwn(k, s) {
   const d = peekD(k), rid = d.sl[s], dn = d.done[s], pk = d.pk && d.pk[s] && d.pk[s].r === rid ? d.pk[s] : null;
   const base = dn && dn.sw ? dn.sw : pk ? pk.sw || {} : null;
@@ -9180,13 +9226,13 @@ Object.assign(ACT, {
   },
   ingback(d) {
     if (!SH || !SH.k || !SH.s || !ING[d.i]) return;
-    const k = SH.k, s = SH.s, o = dayCalc(k).slots[s]; if (!omitScope(k, s, o)) return;
-    const st = startOf(k), own = mealOwn(k, s), w = S.weeks[st], scope = outScope(omitScopes(k, s, o), own, d.i);
-    if (scope === 'batch' && batchCooked(k, s) && batchDays(k, s).some(k2 => mealOwn(k2, s)[d.i] === 'omit')) batchDays(k, s).forEach(k2 => { if (mealOwn(k2, s)[d.i] === 'omit') clearOwn(k2, s, d.i); });
-    else if (own[d.i] === 'omit') clearOwn(k, s, d.i);
-    else if (scope === 'batch' && w && w.swaps && w.swaps[SH.r] && w.swaps[SH.r][d.i] === 'omit') { freezeEaten(st); delete w.swaps[SH.r][d.i]; if (!Object.keys(w.swaps[SH.r]).length) delete w.swaps[SH.r]; }
-    else putChange(k, s, d.i, '@orig', 'meal');
+    if (!putBack(SH.k, SH.s, SH.r, d.i)) return;
     SH.swi = null; save(); render(); renderSheet(); toast(`The ${shortN(d.i).toLowerCase()} is back in`);
+  },
+  // the same from step-by-step or Prep, where a left-out ingredient stays greyed out with a tap to put it back
+  outback(d) {
+    if (!ING[d.i] || !putBack(d.k, d.s, d.r, d.i)) return;
+    save(); if (PM) renderPrep(); render(); toast(`The ${shortN(d.i).toLowerCase()} is back in`);
   },
   mswapgo() {
     if (!SH || !SH.k || !SH.s || !SH.swi || !SH.swk) return;
@@ -10238,19 +10284,19 @@ function wkScore(st) {
     const budget = pd.reduce((a, c) => a + c.B, 0), eaten = pd.reduce((a, c) => a + c.planK, 0), diff = eaten - budget, p = diff / budget, per = Math.abs(diff) / pd.length;
     const s = goal === 'gain' ? (p >= -0.01 ? 'ok' : p >= -0.05 ? 'mid' : 'off') : goal === 'maintain' ? (Math.abs(p) <= 0.03 ? 'ok' : Math.abs(p) <= 0.07 ? 'mid' : 'off') : (p <= 0.01 ? 'ok' : p <= 0.05 ? 'mid' : 'off');
     const over = diff > 0, side = over ? 'over' : 'under';
-    add({ id: 'kcal', grp: 'Food', n: 'Calories', art: 'kcal', st: s, lim: goal !== 'gain' && over, fig: fmtN(eaten), unit: `/ ${fmtN(budget)} kcal`, txt: `${fmtN(eaten)} of ${fmtN(budget)} kcal`,
+    add({ id: 'kcal', cv: per, better: 'lo', thr: 40, side, grp: 'Food', n: 'Calories', art: 'kcal', st: s, lim: goal !== 'gain' && over, fig: fmtN(eaten), unit: `/ ${fmtN(budget)} kcal`, txt: `${fmtN(eaten)} of ${fmtN(budget)} kcal`,
       vw: goal === 'gain' ? null : { mid: over ? 'A bit over' : 'A bit under', off: over ? 'Over budget' : 'Well under' },
       line: s === 'ok' ? (per < 15 ? 'Right on budget across the week.' : `About ${fmtN(per)} kcal a day ${side} budget${goal === 'lose' && !over ? ', which only helps the cut' : ''}.`)
         : `About ${fmtN(per)} kcal a day ${side} budget: ${fmtN(Math.abs(diff))} across the week.`,
       detail: `${pd.length} days counted · goal: ${goal === 'lose' ? 'losing' : goal === 'gain' ? 'gaining' : 'holding steady'}`,
       short: `${fmtN(Math.abs(diff))} kcal ${side}`,
-      tip: over ? 'Log extras when they happen: going over then comes off the days after, so the week can still land on budget.' : 'Eat the full portions on the plan; breakfast is the easiest place to add a little more.',
+      tip: over ? `Log extras when they happen: going over then comes off the days after, so the week can still land on budget.${s !== 'ok' && whyTip('food') ? ` ${whyTip('food')}` : ''}` : 'Eat the full portions on the plan; breakfast is the easiest place to add a little more.',
       gap: Math.abs(p) * 4 });
   }
   const pl = weekPlants(st);
   if (pl !== null) {
     const g = set.plantGoal, s = pl >= g ? 'ok' : pl >= g - 5 ? 'mid' : 'off', nP = wc.planned >= 4 ? wc.plan.size : 0;
-    add({ id: 'plants', grp: 'Food', n: 'Plant points', art: 'plants', st: s, fig: fmtPts(pl), unit: `/ ${g}`, txt: `${fmtPts(pl)} of ${g}`,
+    add({ id: 'plants', cv: pl, better: 'hi', thr: 1, grp: 'Food', n: 'Plant points', art: 'plants', st: s, fig: fmtPts(pl), unit: `/ ${g}`, txt: `${fmtPts(pl)} of ${g}`,
       line: s === 'ok' ? `${pl - g >= 0.25 ? `${fmtPts(pl - g)} points over the line.` : 'Exactly on the line.'}${nP ? ` ${nP} different plants made it into the week.` : ''}`
         : s === 'mid' ? `${fmtPts(g - pl)} short. One more handful of something new would have tipped it over.` : `${fmtPts(g - pl)} short of ${g}. The same few plants did most of the work.`,
       short: `${fmtPts(g - pl)} points short`, tip: 'A spoonful of the four-seed mix on breakfast is four points at once; a dinner built on beans or lentils adds a few more.', gap: (g - pl) / g });
@@ -10258,28 +10304,28 @@ function wkScore(st) {
   const co = weekColours(st);
   if (co !== null) {
     const g = set.colourGoal, s = co >= g ? 'ok' : co >= g - 1 ? 'mid' : 'off', miss = wc.planned >= 4 ? GROUPS.filter(x => !wc.cols.has(x)) : [];
-    add({ id: 'colours', grp: 'Food', n: 'Colour groups', art: 'colours', st: s, fig: String(co), unit: `/ ${g}`, txt: `${co} of ${g}`,
+    add({ id: 'colours', cv: co, better: 'hi', thr: 1, grp: 'Food', n: 'Colour groups', art: 'colours', st: s, fig: String(co), unit: `/ ${g}`, txt: `${co} of ${g}`,
       line: s === 'ok' ? 'Every colour group made an appearance: the full rainbow.' : `${co} of ${g}.${miss.length ? ` No ${miss.map(x => GROUPNAME[x]).join(' or ')} this week.` : ''}${s === 'off' ? ' A fairly beige week.' : ''}`,
       short: `${nWord(g - co, 'group')} missing`, tip: miss.length ? `Add ${joinAnd(miss.map(x => `something ${GROUPNAME[x]} (${COL_IDEAS[x]})`))}.` : `Aim for all ${g} colour groups.`, gap: (g - co) / g });
   }
   const fi = fv('fish');
   if (fi.length) {
     const n = sum(fi), g = set.oilyGoal, s = n >= g ? 'ok' : n >= g - 1 ? 'mid' : 'off';
-    add({ id: 'fish', grp: 'Food', n: 'Oily fish', art: 'fish', st: s, fig: String(n), unit: `/ ${g}`, txt: `${n} of ${g}`,
+    add({ id: 'fish', cv: n, better: 'hi', thr: 1, grp: 'Food', n: 'Oily fish', art: 'fish', st: s, fig: String(n), unit: `/ ${g}`, txt: `${n} of ${g}`,
       line: s === 'ok' ? (n > g ? `${n} oily fish meals, ${nWord(n - g, 'more')} than the goal.` : `${n} oily fish meals. Omega-3s sorted.`) : s === 'mid' ? `${n} of ${g}: one fish meal short.` : `${n} of ${g}. The fish had the week off.`,
       short: `${nWord(g - n, 'meal')} short`, tip: 'Salmon, mackerel, sardines or trout twice a week. A thumbs up on a fish dish makes the planner pick it more often.', gap: (g - n) / g });
   }
   const fe = fv('ferm');
   if (fe.length) {
     const n = fe.filter(x => x.v > 0).length, miss = fe.filter(x => !(x.v > 0)).map(x => x.k), r = Math.round(n / fe.length * 7), s = r >= 6 ? 'ok' : r >= 4 ? 'mid' : 'off';
-    add({ id: 'ferm', grp: 'Food', n: 'Fermented', art: 'ferm', st: s, fig: String(n), unit: `/ ${fe.length} days`, txt: `${n} of ${fe.length} days`,
+    add({ id: 'ferm', cv: r, better: 'hi', thr: 1, grp: 'Food', n: 'Fermented', art: 'ferm', st: s, fig: String(n), unit: `/ ${fe.length} days`, txt: `${n} of ${fe.length} days`,
       line: s === 'ok' ? (miss.length ? `${n} of ${fe.length} days: ${dayNames(miss)} the only one without.` : 'Something fermented every single day.') : s === 'mid' ? `${n} of ${fe.length} days. ${dayNames(miss)} went without.` : `Only ${n} of ${fe.length} days had something fermented.`,
       short: `${nWord(miss.length, 'day')} without`, tip: `Kefir, live yoghurt, kimchi or sauerkraut once a day.${miss.length && miss.length <= 3 ? ` The gaps were ${dayNames(miss)}.` : ''}`, gap: miss.length / fe.length });
   }
   const rd = fv('red');
   if (rd.length) {
     const n = sum(rd), g = set.redMax, s = n <= g ? 'ok' : n <= g + 1 ? 'mid' : 'off';
-    add({ id: 'red', grp: 'Food', n: 'Red meat', art: 'red', st: s, lim: true, fig: String(n), unit: `/ ${g} at most`, txt: `${n} · limit ${g}`,
+    add({ id: 'red', cv: n, better: 'lo', thr: 1, grp: 'Food', n: 'Red meat', art: 'red', st: s, lim: true, fig: String(n), unit: `/ ${g} at most`, txt: `${n} · limit ${g}`,
       line: s === 'ok' ? (n < g ? `${n === 0 ? 'None at all' : nWord(n, 'red-meat meal')}, under the limit of ${g}.` : `${n}, right on the limit.`) : `${n} against a limit of ${g}.${s === 'mid' ? ' Just the one over.' : ''}`,
       short: `${n - g} over`, tip: 'Swap one red-meat dinner for chicken, fish or beans; the recipe swaps can do it without changing the meal.', gap: (n - g) / Math.max(1, g) });
   }
@@ -10291,7 +10337,7 @@ function wkScore(st) {
     const vs = fv(id); if (!vs.length) return;
     const avg = sum(vs) / vs.length, a = ledgerR(id, avg), sh = vs.filter(x => Math.round(x.v) < setAt(x.k)[gk]).map(x => x.k), g = wkGoal(vs, gk, id), s = ledgerSt({ id, goal: g, lo: false, so: null, wk: avg });
     const few = sh.length && sh.length <= 3 ? ` ${dayNames(sh)} came in under` : '';
-    add({ id, grp: 'Food', n, art, st: s, fig: `${fmtN(avg)}g`, unit: `/ ${g}g a day`, txt: `${fmtN(avg)}g a day on average · ${!sh.length ? 'on target every day' : `${nWord(sh.length, 'day')} under`}`,
+    add({ id, cv: avg, better: 'hi', thr: id === 'protein' ? 3 : 1.5, grp: 'Food', n, art, st: s, fig: `${fmtN(avg)}g`, unit: `/ ${g}g a day`, txt: `${fmtN(avg)}g a day on average · ${!sh.length ? 'on target every day' : `${nWord(sh.length, 'day')} under`}`,
       line: s === 'ok' ? (!sh.length ? `${g}g or more on every one of ${vs.length} days.` : `${fmtN(avg)}g a day on average, ${fmtN(a - g)}g clear of ${g}g.${few ? `${few}, and the other days made up for it.` : ` ${nWord(sh.length, 'day')} came in under, and the rest made up for it.`}`)
         : `${fmtN(avg)}g a day on average, ${fmtN(g - a)}g short of ${g}g.${few ? `${few}.` : sh.length ? ` Under on ${sh.length} of ${vs.length} days.` : ''}`,
       short: `${fmtN(g - a)}g a day short`, tip, gap: Math.max(0, (g - a) / g) });
@@ -10303,21 +10349,21 @@ function wkScore(st) {
     const avg = sum(vs) / vs.length, a = ledgerR(id, avg), over = vs.filter(x => ledgerR(id, x.v) > setAt(x.k)[gk]), g = wkGoal(vs, gk, id), s = ledgerSt({ id, goal: g, lo: true, so: null, wk: avg });
     const worst = over.slice().sort((x, y) => y.v - x.v)[0], src = s !== 'ok' ? topSource(st, f) : null;
     const hi = !worst ? '' : over.length === 1 ? ` ${DOWL[dayIndex(worst.k)]} ran over at ${fm(worst.v)}` : ` ${capF(nWord(over.length, 'day'))} ran over, ${DOWL[dayIndex(worst.k)]} highest at ${fm(worst.v)}`;
-    add({ id, grp: 'Food', n, art: id, st: s, lim: true, fig: fm(avg), unit: `/ under ${g}g a day`, txt: `${fm(avg)} a day on average · ${!over.length ? 'under every day' : `${nWord(over.length, 'day')} over`}`,
+    add({ id, cv: avg, better: 'lo', thr: { sodium: 0.15, sugar: 2, satfat: 1.5 }[id], grp: 'Food', n, art: id, st: s, lim: true, fig: fm(avg), unit: `/ under ${g}g a day`, txt: `${fm(avg)} a day on average · ${!over.length ? 'under every day' : `${nWord(over.length, 'day')} over`}`,
       line: s === 'ok' ? (!over.length ? `Under ${g}g every day, ${fm(avg)} on average.` : `${fm(avg)} a day on average, under ${g}g.${hi}, and the rest of the week balanced it out.`)
         : `${fm(avg)} a day on average, ${s === 'mid' ? 'a little' : 'well'} over ${g}g.${hi ? `${hi}.` : ''}`,
       detail: src ? `Biggest source: ${src.n}, ${fm(src.v)} over the week` : '',
-      short: `${fm(a - g)} a day over`, tip: src ? `${tip} The biggest source was ${src.n} (${fm(src.v)} over the week).` : tip, gap: Math.max(0, (a - g) / g) });
+      short: `${fm(a - g)} a day over`, tip: `${src ? `${tip} The biggest source was ${src.n} (${fm(src.v)} over the week).` : tip}${id === 'sugar' && s !== 'ok' && whyTip('food') ? ` ${whyTip('food')}` : ''}`, gap: Math.max(0, (a - g) / g) });
   });
   // drink
   const ak = days.filter(k => k in S.alc);
   if (ak.length) {
     const tot = ak.reduce((a, k) => a + +S.alc[k], 0), big = ak.slice().sort((a, b) => S.alc[b] - S.alc[a])[0], hi = ak.filter(k => +S.alc[k] > ALC.binge).length, unk = 7 - ak.length;
     const s = tot < ALC.week ? 'ok' : tot <= ALC.week * 1.5 ? 'mid' : 'off';
-    add({ id: 'alcohol', grp: 'Drink', n: 'Alcohol', art: 'alcohol', st: s, lim: true, fig: fmtU(tot), unit: `/ under ${ALC.week} units`, txt: [`${fmtU(tot)} units`, hi ? `${hi} day${hi > 1 ? 's' : ''} over ${ALC.binge}` : '', unk ? `${unk} not logged` : ''].filter(Boolean).join(' · '),
+    add({ id: 'alcohol', cv: tot, better: 'lo', thr: 1, grp: 'Drink', n: 'Alcohol', art: 'alcohol', st: s, lim: true, fig: fmtU(tot), unit: `/ under ${ALC.week} units`, txt: [`${fmtU(tot)} units`, hi ? `${hi} day${hi > 1 ? 's' : ''} over ${ALC.binge}` : '', unk ? `${unk} not logged` : ''].filter(Boolean).join(' · '),
       line: s === 'ok' ? (tot === 0 ? 'A dry week.' : `${fmtU(tot)} units, under ${ALC.week}${tot <= ALC.week / 2 ? ' with room to spare' : ''}.`) : `${fmtU(tot)} units${s === 'mid' ? `: over ${ALC.week}, but not by much` : `, well past ${ALC.week}`}.${+S.alc[big] > ALC.binge ? ` ${DOWL[dayIndex(big)]} alone was ${fmtU(+S.alc[big])}.` : ''}`,
       detail: unk ? `${nWord(unk, 'day')} not logged` : '', short: `${fmtU(tot)} units, goal under ${ALC.week}`,
-      tip: `${+S.alc[big] > ALC.binge ? `The big one was ${DOWL[dayIndex(big)]} at ${fmtU(+S.alc[big])} units. ` : ''}Alternating with soft drinks on a night out halves what goes down.`, gap: (tot - ALC.week) / ALC.week });
+      tip: `${+S.alc[big] > ALC.binge ? `The big one was ${DOWL[dayIndex(big)]} at ${fmtU(+S.alc[big])} units. ` : ''}Alternating with soft drinks on a night out halves what goes down.${s !== 'ok' && whyTip('drink') ? ` ${whyTip('drink')}` : ''}`, gap: (tot - ALC.week) / ALC.week });
   } else add({ id: 'alcohol', grp: 'Drink', n: 'Alcohol', art: 'alcohol', st: 'none', txt: 'Not logged' });
   // activity: lifting, if you've started logging it
   const trOn = Object.values(S.tr.logs).some(l => l.date <= last) || Object.values(S.tr.adds).some(a => a.date <= last);
@@ -10325,7 +10371,7 @@ function wkScore(st) {
     const L = trLedger(st), p = L.dose === 'min' ? L.min : L.eff, T = L.dose === 'min' ? L.tMin : L.tEff, done = trLogsIn(st).filter(l => l.fin || tvDone(l)).length, planned = trPlan(st).planned;
     const behind = Object.keys(MUSC).filter(m => T[m] - L.done[m] >= 1).sort((a, b) => (T[b] - L.done[b]) / T[b] - (T[a] - L.done[a]) / T[a]).slice(0, 2).map(m => MUSC[m].toLowerCase());
     const s = p >= 90 ? 'ok' : p >= 65 ? 'mid' : 'off', dn = DOSE_N[L.dose].toLowerCase();
-    add({ id: 'lift', grp: 'Activity', n: 'Training', art: 'lift', st: s, fig: `${p}%`, unit: `of the ${dn} dose`, txt: `${p}% of the ${dn} dose · ${done} session${done === 1 ? '' : 's'}`,
+    add({ id: 'lift', cv: p, better: 'hi', thr: 5, grp: 'Activity', n: 'Training', art: 'lift', st: s, fig: `${p}%`, unit: `of the ${dn} dose`, txt: `${p}% of the ${dn} dose · ${done} session${done === 1 ? '' : 's'}`,
       line: s === 'ok' ? `${nWord(done, 'session')}, and ${p >= 100 ? 'every muscle got its sets' : 'near enough every muscle got its sets'}.` : done ? `${nWord(done, 'session')} reached ${p}% of the dose.${behind.length ? ` ${capF(joinAnd(behind))} fell furthest behind.` : ''}` : 'No lifting logged this week.',
       detail: planned ? `${done} of ${planned} planned sessions` : '', short: `${p}% of the dose`,
       tip: `${behind.length ? `${capF(joinAnd(behind))} were furthest behind. ` : ''}If a session slips, Rearrange the rest of the week on the Train page fills the gaps from what's left.`, gap: (100 - p) / 100 });
@@ -10336,7 +10382,7 @@ function wkScore(st) {
     // next week's days without lifting, two of them spaced apart
     let free = '';
     if (trOn) { const nx = addDays(st, 7), lift = trDays(nx), fr = weekDays(nx).filter(k => !lift.includes(k)), a = fr[0], b = a && fr.find(k => daysBetween(a, k) >= 2); if (a && b) free = ` ${DOWL[dayIndex(a)]} and ${DOWL[dayIndex(b)]} are free of lifting next week.`; }
-    add({ id: 'run', grp: 'Activity', n: 'Cardio and running', art: 'run', st: s, fig: String(n), unit: '/ 2', txt: `${n} · goal 2`,
+    add({ id: 'run', cv: n, better: 'hi', thr: 1, grp: 'Activity', n: 'Cardio and running', art: 'run', st: s, fig: String(n), unit: '/ 2', txt: `${n} · goal 2`,
       line: s === 'ok' ? (n > 2 ? `${n} sessions, ${nWord(n - 2, 'more')} than the goal.` : 'Two sessions. Job done.') : s === 'mid' ? 'One session, one short of two.' : 'No cardio this week.',
       short: `${nWord(2 - n, 'session')} short`, tip: `Two a week; short ones count.${free}`, gap: (2 - n) / 2 });
   } else add({ id: 'run', grp: 'Activity', n: 'Cardio and running', art: 'run', st: 'none', txt: 'Not logged' });
@@ -10345,7 +10391,7 @@ function wkScore(st) {
   if (sl.length) {
     const a = Math.round(sum(sl) / sl.length * 10) / 10, g = set.sleepGoal, s = a >= g ? 'ok' : a >= g - 0.5 ? 'mid' : 'off', low = sl.filter(x => x.v < g - 0.25), best = sl.slice().sort((x, y) => y.v - x.v)[0];
     const need = low.length ? ((g - a) * sl.length) / low.length : 0;
-    add({ id: 'sleep', grp: 'Sleep and checks', n: 'Sleep', art: 'sleep', st: s, fig: a.toFixed(1), unit: `/ ${g} h a night`, txt: `${a.toFixed(1)} h a night${sl.length < 7 ? ` · ${sl.length} nights logged` : ''}`,
+    add({ id: 'sleep', cv: a, better: 'hi', thr: 0.2, grp: 'Sleep and checks', n: 'Sleep', art: 'sleep', st: s, fig: a.toFixed(1), unit: `/ ${g} h a night`, txt: `${a.toFixed(1)} h a night${sl.length < 7 ? ` · ${sl.length} nights logged` : ''}`,
       line: s === 'ok' ? `${a.toFixed(1)} hours a night. The best was ${nightOf(best.k)} at ${fmtHM(best.v)}.` : `${a.toFixed(1)} hours a night against ${g}.${low.length ? ` The short ones: ${joinAnd(low.map(x => nightOf(x.k)))}.` : ''}`,
       detail: sl.length < 7 ? `${sl.length} nights logged` : '', short: `${fmtHM(g - a)} a night short`,
       tip: low.length ? `The short nights were ${joinAnd(low.map(x => nightOf(x.k)))}; about ${fmtHM(need)} more on nights like those gets the average to ${g} h.` : `Aim for ${g} h a night; the same lights-out time every night makes it easier.`, gap: (g - a) / g });
@@ -10353,7 +10399,7 @@ function wkScore(st) {
   habits().forEach(h => {
     const vs = days.map(k => ({ k, v: habitVal(h, k) })).filter(x => x.v !== null); if (!vs.length) return;
     const y = vs.filter(x => x.v === 1).length, miss = vs.filter(x => x.v !== 1).map(x => x.k), r = y / vs.length, s = ckSt(h, r);
-    add({ id: 'h:' + h.id, grp: 'Sleep and checks', n: h.n, art: 'check', st: s, vw: h.lvl === 'most' ? { ok: r >= CK_BAND.most.top - 1e-9 ? 'Fantastic' : 'Good', mid: 'Patchy', off: 'Missed it' } : null, fig: String(y), unit: `/ ${vs.length} days`, txt: `${y} of ${vs.length} days`,
+    add({ id: 'h:' + h.id, cv: r * 7, better: 'hi', thr: 1, grp: 'Sleep and checks', n: h.n, art: 'check', st: s, vw: h.lvl === 'most' ? { ok: r >= CK_BAND.most.top - 1e-9 ? 'Fantastic' : 'Good', mid: 'Patchy', off: 'Missed it' } : null, fig: String(y), unit: `/ ${vs.length} days`, txt: `${y} of ${vs.length} days`,
       line: s === 'ok' ? (miss.length ? `${y} of ${vs.length} days; only ${DOWL[dayIndex(miss[0])]} slipped.` : 'Every day logged, every day done.') : s === 'mid' ? `${y} of ${vs.length} days. Missed ${dayNames(miss)}.` : `Only ${y} of ${vs.length} days.`,
       short: `${nWord(miss.length, 'day')} missed`, tip: `Missed on ${dayNames(miss)}. Tying it to something you already do every day makes it stick.`, gap: 1 - r });
   });
@@ -10376,17 +10422,38 @@ function wkScore(st) {
   }
   return out;
 }
+// against the week before: better or worse on each goal with a figure both weeks. Under a limit, a rise doesn't
+// count against you; a miss that's better than last week is said first; a clear miss that's worse is said plainly
+const SH_PW = { plants: ' points', colours: ' groups', fish: ' meals', ferm: ' days', red: ' meals', alcohol: ' units', run: ' sessions', sleep: ' h', lift: '' };
+function shTrend(ms, st) {
+  let pv; try { pv = wkScore(addDays(st, -7)); } catch (e) { pv = []; }
+  const by = Object.fromEntries(pv.filter(p => p.st !== 'none' && typeof p.cv === 'number').map(p => [p.id, p]));
+  ms.forEach(m => {
+    const p = by[m.id]; if (!p || typeof m.cv !== 'number' || m.st === 'none') return;
+    const d = m.cv - p.cv, good = m.better === 'hi' ? d > 0 : d < 0;
+    m.pv = p; m.tr = Math.abs(d) < m.thr ? 0 : good ? 1 : -1;
+    const was = m.id === 'kcal' ? (p.cv < 15 ? 'right on budget' : `about ${fmtN(p.cv)} kcal a day ${p.side} budget`) : m.id.startsWith('h:') ? `${p.fig} days` : `${p.fig}${SH_PW[m.id] !== undefined ? SH_PW[m.id] : ' a day'}`;
+    if (m.tr === 0) m.cmp = m.st === 'ok' ? '' : `About the same as last week (${was}).`;
+    else if (m.id === 'kcal') m.cmp = `${m.tr > 0 ? 'Closer to budget than' : 'Further from budget than'} last week, which was ${was}.`;
+    else m.cmp = `${d > 0 ? 'Up' : 'Down'} from ${was} last week.`;
+    // under a limit, going up isn't worth a mention; on target and slipping a little isn't either
+    if (m.st === 'ok' && m.tr < 0) m.cmp = '';
+    m.better2 = m.tr > 0 && m.st !== 'ok'; // missed, but better: said first
+  });
+  return ms;
+}
 const shVerdict = m => (m.info ? 'For the record' : (m.vw && m.vw[m.st]) || (m.lim ? VERD_LIM : VERD)[m.st]);
 // the slides: a title card, every goal with data, the scorecard, and next week
 function shSlides(st) {
-  const ms = wkScore(st), shown = ms.filter(m => m.st !== 'none' || m.info), scored = ms.filter(m => m.st !== 'none');
+  const ms = shTrend(wkScore(st), st), shown = ms.filter(m => m.st !== 'none' || m.info), scored = ms.filter(m => m.st !== 'none');
+  const up = scored.filter(m => m.tr > 0).length;
   const cnt = s => scored.filter(m => m.st === s).length, ok = cnt('ok'), mid = cnt('mid'), off = cnt('off');
   const focus = scored.filter(m => m.st === 'mid' || m.st === 'off').sort((a, b) => RANK[b.st] - RANK[a.st] || b.gap - a.gap).slice(0, 3);
   const best = scored.filter(m => m.st === 'ok').sort((a, b) => a.gap - b.gap).slice(0, 3);
   const head = !scored.length ? 'A quiet week' : ok === scored.length ? 'A clean sweep' : !off ? 'A strong week' : ok >= scored.length * 0.6 ? 'A good week' : ok >= scored.length * 0.35 ? 'A mixed week' : 'A tough week';
   return [{ type: 'intro', st: 'intro', n: shown.length }]
     .concat(shown.map((m, i) => Object.assign({ type: 'metric', idx: i + 1, of: shown.length }, m)))
-    .concat([{ type: 'score', st: 'score', head, ok, mid, off, all: ms, best }, { type: 'focus', st: 'focus', focus }, { type: 'why', st: 'focus' }]);
+    .concat([{ type: 'score', st: 'score', head, ok, mid, off, all: ms, best, up }, { type: 'focus', st: 'focus', focus }, { type: 'why', st: 'focus' }]);
 }
 
 /* ── the drawings: one per goal, in the same inked style as the dishes ── */
@@ -10477,16 +10544,17 @@ function shSlide(sl, i, n) {
     <div class="shart">${shArt('intro', 210)}</div><p class="shline">${sl.n ? `${nWord(sl.n, 'goal')} to go through, one at a time.` : 'Nothing logged for this week yet.'}</p><p class="shdet">Tap the right of the screen for the next one, the left to go back.</p></div>`;
   if (sl.type === 'metric') {
     return `<div class="shslide"><div class="eyebrow shgrp">${esc(sl.grp)} · ${sl.idx} of ${sl.of}</div><h2 class="shname">${esc(sl.n)}</h2>
-      <div class="shart">${shArt(sl.art, 200)}</div><div class="shstamp" aria-label="Verdict">${shVerdict(sl)}</div>
-      <div class="shfig"><b>${esc(sl.fig)}</b><small>${esc(sl.unit)}</small></div><p class="shline">${esc(sl.line)}</p>${sl.detail ? `<p class="shdet">${esc(sl.detail)}</p>` : ''}</div>`;
+      <div class="shart">${shArt(sl.art, 200)}</div><div class="shstamp" aria-label="Verdict">${shVerdict(sl)}</div>${sl.better2 ? `<div class="shbetter">${ic('up')}Better than last week</div>` : ''}
+      <div class="shfig"><b>${esc(sl.fig)}</b><small>${esc(sl.unit)}</small></div>${sl.better2 ? `<p class="shline shcmp">${esc(sl.cmp)}</p>` : ''}<p class="shline">${esc(sl.line)}</p>${!sl.better2 && sl.cmp ? `<p class="shdet">${esc(sl.cmp)}</p>` : ''}${sl.detail ? `<p class="shdet">${esc(sl.detail)}</p>` : ''}</div>`;
   }
   if (sl.type === 'score') {
-    const rows = SH_GRP.map(g => { const ms = sl.all.filter(m => m.grp === g); return ms.length ? `<div class="shsg"><div class="eyebrow">${g}</div>${ms.map(m => `<div class="rvsr ${m.st === 'none' && !m.info ? 'nil' : ''}">${stDot(m.st)}<span>${esc(m.n)}<span class="sr-only">: ${m.info ? 'for the record' : TR_ST[m.st]}</span></span><b>${esc(m.txt)}</b></div>`).join('')}</div>` : ''; }).join('');
+    const rows = SH_GRP.map(g => { const ms = sl.all.filter(m => m.grp === g); return ms.length ? `<div class="shsg"><div class="eyebrow">${g}</div>${ms.map(m => `<div class="rvsr ${m.st === 'none' && !m.info ? 'nil' : ''}">${stDot(m.st)}<span>${esc(m.n)}<span class="sr-only">: ${m.info ? 'for the record' : TR_ST[m.st]}</span></span><b>${esc(m.txt)}</b>${m.tr > 0 ? '<i class="shtr up" title="Better than last week">▲<span class="sr-only">, better than last week</span></i>' : m.tr < 0 && m.cmp ? '<i class="shtr dn" title="Worse than last week">▼<span class="sr-only">, worse than last week</span></i>' : '<i class="shtr"></i>'}</div>`).join('')}</div>` : ''; }).join('');
     const tot = sl.ok + sl.mid + sl.off;
     return `<div class="shslide"><div class="eyebrow shgrp">The scorecard</div><h2 class="shname big">${sl.head}</h2>
       <div class="shart sm">${shArt('score', 150)}</div>
       <div class="shcounts"><div class="s-ok"><b>${sl.ok}</b><span>nailed</span></div><div class="s-mid"><b>${sl.mid}</b><span>close</span></div><div class="s-off"><b>${sl.off}</b><span>missed</span></div></div>
       ${tot && sl.best.length ? `<p class="shline">Best of the week: ${esc(joinAnd(sl.best.map(m => m.n.toLowerCase())))}.</p>` : ''}
+      ${sl.up ? `<p class="shdet">Better than last week on ${nWord(sl.up, 'goal')}${(() => { const b = sl.all.filter(m => m.better2).map(m => m.n.toLowerCase()); return b.length ? `, including ${joinAnd(b.slice(0, 3))}, which missed but moved the right way` : ''; })()}.</p>` : ''}
       <div class="shcard live">${rows}</div></div>`;
   }
   if (sl.type === 'why') return fxWhySlide();
@@ -10882,7 +10950,7 @@ function fxPrepLed(st) { if (!st) return false; const f = fxKcal(st); return f.o
 
 // next week's picks from a week's wrap-up: what slipped furthest, as the wrap-up has always chosen them
 let FXW = {}, FXN = -1;
-function fxWeek(st) { if (FXN !== SAVEN) { FXW = {}; FXN = SAVEN; } if (!FXW[st]) FXW[st] = wkScore(st); return FXW[st]; }
+function fxWeek(st) { if (FXN !== SAVEN) { FXW = {}; FXN = SAVEN; } if (!FXW[st]) FXW[st] = shTrend(wkScore(st), st); return FXW[st]; }
 function fxDefault(st) {
   return fxWeek(st).filter(m => (m.st === 'mid' || m.st === 'off') && !m.info).sort((a, b) => RANK[b.st] - RANK[a.st] || b.gap - a.gap).slice(0, 3).map(m => m.id);
 }
@@ -10943,7 +11011,7 @@ function fxSlide(sl) {
   const ids = S.focus[nx].ids, byId = Object.fromEntries(all.map(m => [m.id, m])), sw = RV.fxsw;
   const nW = ['Nothing to fix', 'One thing to work on', 'Two things to work on', 'Three things to work on'][ids.length];
   const card = (id, i) => { const m = byId[id] || {}; return `<div class="fxc s-${m.st || 'none'}">${fxArt(id, 52)}<div><div class="fxt"><b>${esc(fxName(id, RV.st))}</b><button class="link" data-a="fxswap" data-v="${i}">${sw === i ? 'Keep it' : 'Swap'}</button></div>
-    ${m.line ? `<p class="why">${esc(m.line)}</p>` : ''}<p class="aim"><b>Aim:</b> ${esc(fxAim(id, Object.assign({ st0: RV.st }, m)))}</p>
+    ${m.line ? `<p class="why">${m.better2 ? `<b class="fxup">${esc(m.cmp)}</b> ` : ''}${esc(m.line)}</p>` : ''}<p class="aim"><b>Aim:</b> ${esc(fxAim(id, Object.assign({ st0: RV.st }, m)))}</p>
     ${sw === i ? `<div class="fxalt">${all.filter(x => !ids.includes(x.id)).sort((a, b) => RANK[b.st] - RANK[a.st] || b.gap - a.gap).map(x => `<button class="chip" data-a="fxpick" data-i="${i}" data-v="${esc(x.id)}">${stDot(x.st)}${esc(fxName(x.id, RV.st))}</button>`).join('')}</div>` : ''}</div></div>`; };
   const spare = all.filter(x => !ids.includes(x.id)).sort((a, b) => RANK[b.st] - RANK[a.st] || b.gap - a.gap);
   return `<div class="shslide"><div class="eyebrow shgrp">Next week</div><h2 class="shname big">${nW}</h2>
@@ -11678,7 +11746,8 @@ Why the same two pints sometimes costs you a day and sometimes doesn't: when hum
 /* ───────────── the nose: a morning check in the check-in, tips on Today, patterns in Trends ─────────────
    S.nose[day] = { r: 1–5, sy: [what it's like], cx: [anything else from yesterday], at }. What the app already
    knows (drinks and which, sleep, training, rinse and spray) is read from its own records, never asked. */
-const NOSE_R = [[1, 'Blocked', 'red'], [2, 'Poor', 'orange'], [3, 'OK', 'yellow'], [4, 'Good', 'green'], [5, 'Great', 'leaf']];
+// from 3.25 the lights rate blockage alone; smell has its own row. Earlier ratings carry on in the same series
+const NOSE_R = [[1, 'Blocked', 'red'], [2, 'Stuffy', 'orange'], [3, 'Partly', 'yellow'], [4, 'Mostly clear', 'green'], [5, 'Clear', 'leaf']];
 const NOSE_X = [['vape', 'Vape or smoke around'], ['heating', 'Heating on'], ['aircon', 'Aircon overnight'], ['dryair', 'Hygrometer under 35%'], ['city', 'City traffic'], ['latefood', 'Ate late or heavy'], ['picked', 'Picked or blew hard'], ['nogel', 'No gel last night'], ['sudafed', 'Sudafed spray'], ['ill', 'Fighting something off'],
   ['dusty', 'Dust, pollen or chalk'], ['fragrance', 'Strong fragrance or cleaning stuff'], ['cold', 'Out in cold air'], ['humid', 'Humid or tropical air'], ['flight', 'Flown in the last day or two'], ['nic_late', 'Late nicotine lozenge'], ['dairy', 'Lots of dairy'], ['spicy', 'Spicy food'], ['nsaid', 'Ibuprofen or aspirin'], ['massage', 'Massage or a long hot bath'], ['weather', 'Big weather change'], ['chlorine', 'Swimming pool']];
 const NOSE_X_SHOWN = 10;
@@ -11731,7 +11800,7 @@ function noseAdvice(id, cond) {
 function noseCard(k) {
   const n = S.nose[k] && !S.nose[k].imp ? S.nose[k] : null, r = n ? n.r : 0, sm = n ? n.sm || 0 : 0, kn = noseKnown(k), sy = n ? n.sy : [], cx = n ? n.cx : [];
   const sc = (L, v0, act, lab) => `<div class="nscale" role="group" aria-label="${lab}">${L.map(([v, l, c]) => `<button data-a="${act}" data-v="${v}" aria-pressed="${v0 === v}"><i style="background:${c === 'leaf' ? 'var(--leaf)' : `var(--c-${c})`}"></i>${l}</button>`).join('')}</div>`;
-  const scale = `<div class="nshd"><b>Condition</b><span>how clear it is</span></div>${sc(NOSE_R, r, 'nrate', 'Nose condition')}<div class="nshd"><b>Smell</b><span>coffee, toothpaste, soap</span></div>${sc(NOSE_SM, sm, 'nsm', 'Sense of smell')}`;
+  const scale = `<div class="nshd"><b>Blockage</b><span>how freely it breathes</span></div>${sc(NOSE_R, r, 'nrate', 'Nose blockage')}<div class="nshd"><b>Smell</b><span>coffee, toothpaste, soap</span></div>${sc(NOSE_SM, sm, 'nsm', 'Sense of smell')}`;
   let more = '';
   if (r || sm || cx.length || sy.length) {
     const showAll = !!UI.nSyAll, common = NOSE_SY_COMMON.concat(sy.filter(x => !NOSE_SY_COMMON.includes(x)));
@@ -11739,7 +11808,9 @@ function noseCard(k) {
     const syHtml = showAll ? NOSE_SYM.map(g => `<div class="ngrp">${esc(capFirst(g.g.toLowerCase()))}</div><div class="chips">${g.items.map(i => syChip(i.id)).join('')}</div>`).join('') + `<button class="btn link sm" data-a="nsyall">Fewer</button>`
       : `<div class="chips">${common.map(syChip).join('')}<button class="chip more" data-a="nsyall">More…</button></div>`;
     const xShow = UI.nXAll ? NOSE_X : NOSE_X.slice(0, NOSE_X_SHOWN).concat(NOSE_X.slice(NOSE_X_SHOWN).filter(([id]) => cx.includes(id)));
-    more = `${r <= 3 || sy.length ? `<div class="nlbl">What's it like?</div>${syHtml}` : ''}
+    // symptoms are asked every morning now: a clear nose can still be dry or draining. With blockage rated, nothing
+    // ticked counts as none; without it, the morning is left out of the symptom trends
+    more = `<div class="nlbl">Anything going on? <span class="nhint">${r ? 'Nothing ticked counts as none' : 'Rate blockage too, or a blank here is left out'}</span></div>${syHtml}
       ${kn.chips.length ? `<div class="nlbl">The app already knows</div><div class="chips">${kn.chips.map(([t, c]) => `<span class="chip known ${c}">${c === 'ok' ? ic('check') : ''}${esc(t)}</span>`).join('')}</div>` : ''}
       <div class="nlbl">Anything else yesterday?</div><div class="chips">${xShow.map(([id, t]) => `<button class="chip" data-a="nx" data-v="${id}" aria-pressed="${cx.includes(id)}">${esc(t)}</button>`).join('')}${UI.nXAll ? '' : '<button class="chip more" data-a="nxall">More…</button>'}</div>
       ${noseSudafed(k)}${noseYours(k)}
@@ -11756,7 +11827,7 @@ function noseSudafed(k) {
 function noseEntry(k) { let n = S.nose[k]; if (!n || n.imp) n = S.nose[k] = { r: 0, sy: [], cx: [] }; n.at = todayKey(); return n; }
 Object.assign(ACT, {
   nsm(d) { const k = ckK(), n = noseEntry(k); n.sm = n.sm === +d.v ? 0 : +d.v; if (!n.sm) delete n.sm; if (!n.r && !n.sm && !n.sy.length && !n.cx.length) delete S.nose[k]; save(); render(); },
-  nrate(d) { const k = ckK(), n = noseEntry(k); n.r = +d.v; if (n.r >= 4) n.sy = n.sy.filter(x => x === 's_good'); save(); render(); },
+  nrate(d) { const k = ckK(), n = noseEntry(k); n.r = +d.v; save(); render(); },
   nsym(d) { const k = ckK(), n = noseEntry(k), i = n.sy.indexOf(d.v); if (i >= 0) n.sy.splice(i, 1); else { if (n.sy.length >= 3) { toast('Three at most: take one off first'); return; } n.sy.push(d.v); } save(); render(); },
   nx(d) { const k = ckK(), n = noseEntry(k), i = n.cx.indexOf(d.v); if (i >= 0) n.cx.splice(i, 1); else n.cx.push(d.v); save(); render(); },
   nsyall() { UI.nSyAll = !UI.nSyAll; render(); },
@@ -11771,7 +11842,12 @@ Object.assign(ACT, {
 const noseRated = () => Object.keys(S.nose).filter(k => S.nose[k].r && !S.nose[k].imp).sort();
 const noseHas = (k, ids) => (S.nose[k] && !S.nose[k].imp ? (S.nose[k].cx || []).some(x => ids.includes(x)) : null);
 const NOSE_SM = [[1, 'Gone', 'red'], [2, 'Faint', 'orange'], [3, 'Dulled', 'yellow'], [4, 'Normal', 'green'], [5, 'Sharp', 'leaf']];
-const NOSE_OUT = [['cond', 'Condition'], ['smell', 'Smell'], ['sleep', 'Sleep']];
+const NOSE_OUT = [['cond', 'Blockage'], ['smell', 'Smell'], ['dry', 'Dryness'], ['crust', 'Crusting'], ['drain', 'Draining'], ['sleep', 'Sleep']];
+// symptoms ticked in the morning: dryness, crusting, draining. They describe the night just gone and waking up.
+// A morning counts only with blockage rated (then nothing ticked is none); otherwise it's left out
+const NL_SYM = { dry: ['d_crust', 'd_tight', 'd_burn', 'd_blood', 'd_wake'], crust: ['d_crust', 'd_blood'], drain: ['c_drip'] };
+const NL_BAD = { dry: 1, crust: 1, drain: 1 }; // for these, lower is better
+const nlSym = (m, ids) => { const e = S.nose[m]; if (!e || e.imp) return null; if ((e.sy || []).some(x => ids.includes(x))) return 1; return e.r ? 0 : null; };
 const NL_MIN = 6; // days each way before a comparison shows
 const nlCk = (m, id) => { const c = (S.ck[m] || {}).c; return c && id in c ? c[id] === 1 : null; };
 const nlAlc = n => (n in S.alc ? +S.alc[n] : null);
@@ -11779,7 +11855,8 @@ const nlAlc = n => (n in S.alc ? +S.alc[n] : null);
 const NL_Y = {
   cond: m => (S.nose[m] && !S.nose[m].imp && S.nose[m].r ? S.nose[m].r : null),
   smell: m => (S.nose[m] && !S.nose[m].imp && S.nose[m].sm ? S.nose[m].sm : null),
-  sleep: m => { const s = (S.ck[m] || {}).sl; return s > 0 ? s : null; }
+  sleep: m => { const s = (S.ck[m] || {}).sl; return s > 0 ? s : null; },
+  dry: m => nlSym(m, NL_SYM.dry), crust: m => nlSym(m, NL_SYM.crust), drain: m => nlSym(m, NL_SYM.drain)
 };
 // research, where a review or study covers it: the direction it expects and what it says
 const NL_RES = {
@@ -11794,19 +11871,19 @@ const NL_RES = {
 const NL_SRC = { chong_st: 'Chong et al. 2016, Cochrane Database of Systematic Reviews (steroid sprays)', chong_sal: 'Chong et al. 2016, Cochrane Database of Systematic Reviews (saline irrigation)', nihlen: 'Nihlén et al. 2005, Respiratory Medicine', ebrahim: 'Ebrahim et al. 2013, Alcoholism: Clinical and Experimental Research', kredlow: 'Kredlow et al. 2015, Journal of Behavioral Medicine', young: 'Young et al. 1997, Journal of Allergy and Clinical Immunology' };
 // the things compared, each read for a morning m: true, false, or unknown. wk: how a fortnight is judged for the long run
 const NL_X = [
-  { id: 'steroid', n: 'Steroid the night before', sh: 'the steroid', helps: 1, out: ['cond', 'smell', 'sleep'], f: m => nlCk(m, 'steroid'), wk: { n: 'Steroid most nights for two weeks', f: m => nlCk(m, 'steroid') } },
-  { id: 'rinsepm', n: 'Evening rinse', sh: 'the evening rinse', helps: 1, out: ['cond', 'smell', 'sleep'], f: m => nlCk(m, 'rinsepm'), wk: { n: 'Evening rinse most nights for two weeks', f: m => nlCk(m, 'rinsepm') } },
-  { id: 'rinseam', n: 'Morning rinse the day before', sh: 'the morning rinse', helps: 1, out: ['cond', 'smell'], f: m => nlCk(addDays(m, -1), 'rinse'), wk: { n: 'Morning rinse most days for two weeks', f: m => nlCk(m, 'rinse') } },
-  { id: 'alc6', n: '6+ units the night before', sh: 'a heavy night', helps: -1, out: ['cond', 'smell', 'sleep'], f: m => { const u = nlAlc(addDays(m, -1)); return u === null ? null : u >= 6; } },
-  { id: 'alcany', n: 'Any drink the night before', sh: 'drinking', helps: -1, out: ['cond', 'sleep'], f: m => { const u = nlAlc(addDays(m, -1)); return u === null ? null : u > 0; }, wk: { n: 'Over 14 units a week for two weeks', units: true } },
+  { id: 'steroid', n: 'Steroid the night before', sh: 'the steroid', helps: 1, out: ['cond', 'smell', 'sleep', 'dry', 'crust', 'drain'], f: m => nlCk(m, 'steroid'), wk: { n: 'Steroid most nights for two weeks', f: m => nlCk(m, 'steroid') } },
+  { id: 'rinsepm', n: 'Evening rinse', sh: 'the evening rinse', helps: 1, out: ['cond', 'smell', 'sleep', 'dry', 'crust', 'drain'], f: m => nlCk(m, 'rinsepm'), wk: { n: 'Evening rinse most nights for two weeks', f: m => nlCk(m, 'rinsepm') } },
+  { id: 'rinseam', n: 'Morning rinse the day before', sh: 'the morning rinse', helps: 1, out: ['cond', 'smell', 'dry', 'crust', 'drain'], f: m => nlCk(addDays(m, -1), 'rinse'), wk: { n: 'Morning rinse most days for two weeks', f: m => nlCk(m, 'rinse') } },
+  { id: 'alc6', n: '6+ units the night before', sh: 'a heavy night', helps: -1, out: ['cond', 'smell', 'sleep', 'dry', 'crust', 'drain'], f: m => { const u = nlAlc(addDays(m, -1)); return u === null ? null : u >= 6; } },
+  { id: 'alcany', n: 'Any drink the night before', sh: 'drinking', helps: -1, out: ['cond', 'sleep', 'dry', 'crust', 'drain'], f: m => { const u = nlAlc(addDays(m, -1)); return u === null ? null : u > 0; }, wk: { n: 'Over 14 units a week for two weeks', units: true } },
   { id: 'wine', n: 'Wine the night before', sh: 'wine', helps: -1, out: ['cond'], f: m => { const y = addDays(m, -1), u = nlAlc(y); return u === null ? null : u > 0 && noseDrinks(y).wine; } },
-  { id: 'short', n: 'A short night', sh: 'a short night', helps: -1, out: ['cond', 'smell'], f: m => { const s = (S.ck[m] || {}).sl; return s ? s < setAt(m).sleepGoal - 1 : null; } },
+  { id: 'short', n: 'A short night', sh: 'a short night', helps: -1, out: ['cond', 'smell', 'dry', 'crust', 'drain'], f: m => { const s = (S.ck[m] || {}).sl; return s ? s < setAt(m).sleepGoal - 1 : null; } },
   { id: 'trained', n: 'A run or lifting the day before', sh: 'training', helps: 1, out: ['cond', 'sleep'], f: m => noseTrained(addDays(m, -1)) },
-  { id: 'dry', n: 'Heating, aircon or dry air', sh: 'dry air', helps: -1, out: ['cond', 'smell', 'sleep'], f: m => noseHas(m, ['heating', 'aircon', 'dryair']) },
-  { id: 'vape', n: 'Vape or smoke around', sh: 'vape smoke', helps: -1, out: ['cond', 'smell'], f: m => noseHas(m, ['vape']) },
-  { id: 'late', n: 'Ate late or heavy', sh: 'eating late', helps: -1, out: ['cond', 'sleep'], f: m => noseHas(m, ['latefood']) },
-  { id: 'sudafed', n: 'Sudafed spray the day before', sh: 'the Sudafed spray', helps: 0, out: ['cond', 'smell', 'sleep'], f: m => noseHas(m, ['sudafed']) },
-  { id: 'picked', n: 'Picked or blew hard', sh: 'picking', helps: -1, out: ['cond'], f: m => noseHas(m, ['picked']) },
+  { id: 'dry', n: 'Heating, aircon or dry air', sh: 'dry air', helps: -1, out: ['cond', 'smell', 'sleep', 'dry', 'crust', 'drain'], f: m => noseHas(m, ['heating', 'aircon', 'dryair']) },
+  { id: 'vape', n: 'Vape or smoke around', sh: 'vape smoke', helps: -1, out: ['cond', 'smell', 'dry', 'crust', 'drain'], f: m => noseHas(m, ['vape']) },
+  { id: 'late', n: 'Ate late or heavy', sh: 'eating late', helps: -1, out: ['cond', 'sleep', 'dry', 'crust', 'drain'], f: m => noseHas(m, ['latefood']) },
+  { id: 'sudafed', n: 'Sudafed spray the day before', sh: 'the Sudafed spray', helps: 0, out: ['cond', 'smell', 'sleep', 'dry', 'crust', 'drain'], f: m => noseHas(m, ['sudafed']) },
+  { id: 'picked', n: 'Picked or blew hard', sh: 'picking', helps: -1, out: ['cond', 'dry', 'crust', 'drain'], f: m => noseHas(m, ['picked']) },
   { id: 'poornose', n: 'A rough nose that day', sh: 'a rough nose', helps: -1, out: ['sleep'], f: m => { const y = NL_Y.cond(addDays(m, -1)); return y === null ? null : y <= 2; } }
 ];
 // a seeded shuffle, so the same data always gives the same answer
@@ -11867,11 +11944,12 @@ function noseLearn() {
   NLN = SAVEN; return (NLC = res);
 }
 // the effect in the outcome's own terms
-const nlFmt = (out, d) => (out === 'sleep' ? `${d >= 0 ? '+' : '−'}${Math.round(Math.abs(d) * 60)} min` : `${d >= 0 ? '+' : '−'}${Math.abs(d).toFixed(1)}`);
-const nlVal = (out, v) => (out === 'sleep' ? fmtH(v) : v.toFixed(1));
+const nlFmt = (out, d) => (out === 'sleep' ? `${d >= 0 ? '+' : '−'}${Math.round(Math.abs(d) * 60)} min` : NL_BAD[out] ? `${d >= 0 ? '+' : '−'}${Math.round(Math.abs(d) * 100)}%` : `${d >= 0 ? '+' : '−'}${Math.abs(d).toFixed(1)}`);
+const nlVal = (out, v) => (out === 'sleep' ? fmtH(v) : NL_BAD[out] ? `${Math.round(v * 100)}% of mornings` : v.toFixed(1));
+const nlGood = (out, d) => (NL_BAD[out] ? d < 0 : d > 0); // which way is better for this outcome
 const NL_CONF = { c: ['c', 'Clear'], l: ['l', 'Leaning'], none: ['e', 'No clear difference'], early: ['e', 'Too early'] };
 function nlRow(f) {
-  const r = f.next, c = nlConf(r), cls = c === 'c' || c === 'l' ? (r.d > 0 ? 'up' : 'dn') : 'flat';
+  const r = f.next, c = nlConf(r), cls = c === 'c' || c === 'l' ? (nlGood(f.out, r.d) ? 'up' : 'dn') : 'flat';
   const unit = f.out === 'sleep' ? 'nights' : 'mornings';
   const res = f.res ? (c === 'c' || c === 'l' ? (Math.sign(r.d) === f.res.dir ? `<span class="res ag">Research agrees: ${esc(f.res.t)}</span>` : `<span class="res df">Research expects the opposite: ${esc(f.res.t)}</span>`) : `<span class="res">Research: ${esc(f.res.t)}</span>`) : '';
   const txt = `${nlVal(f.out, r.a)} with it, ${nlVal(f.out, r.b)} without · ${r.ny} and ${r.nn} ${unit}.${c === 'l' ? ' Could still be chance.' : ''}${f.mixed ? ' Many of these followed a heavy night, so some of it may be the drink.' : ''}`;
@@ -11881,13 +11959,14 @@ function nlCell(f, k) {
   const r = f[k]; if (!r) return '<span class="c q">—</span>';
   if (r.early) return '<span class="c q">soon</span>';
   const c = nlConf(r); if (c === 'none') return '<span class="c z">0</span>';
-  const big = f.out === 'sleep' ? Math.abs(r.d) >= 0.4 : Math.abs(r.d) >= 0.7;
-  return `<span class="c ${r.d > 0 ? (big ? 'p2' : 'p1') : big ? 'n2' : 'n1'}">${nlFmt(f.out, r.d)}</span>`;
+  const big = f.out === 'sleep' ? Math.abs(r.d) >= 0.4 : NL_BAD[f.out] ? Math.abs(r.d) >= 0.25 : Math.abs(r.d) >= 0.7;
+  return `<span class="c ${nlGood(f.out, r.d) ? (big ? 'p2' : 'p1') : big ? 'n2' : 'n1'}">${nlFmt(f.out, r.d)}</span>`;
 }
 // the wins, in words: practices that help and triggers that hurt, clear or leaning, biggest first
 function nlWins(out) {
   const L = noseLearn().filter(f => f.out === out && !f.next.early && ['c', 'l'].includes(nlConf(f.next)));
-  const help = L.filter(f => f.x.helps > 0 && f.next.d > 0).sort((a, b) => b.next.d - a.next.d), hurt = L.filter(f => f.x.helps < 0 && f.next.d < 0).sort((a, b) => a.next.d - b.next.d);
+  const g = f => (NL_BAD[out] ? -f.next.d : f.next.d);
+  const help = L.filter(f => f.x.helps > 0 && g(f) > 0).sort((a, b) => g(b) - g(a)), hurt = L.filter(f => f.x.helps < 0 && g(f) < 0).sort((a, b) => g(a) - g(b));
   return { help, hurt };
 }
 function noseTrends() {
@@ -11899,28 +11978,74 @@ function noseTrends() {
   const L = noseLearn(), shown = o => L.filter(f => f.out === o && !f.next.early);
   const out = UI.nlOut || (shown('cond').length ? 'cond' : shown('sleep').length ? 'sleep' : 'cond');
   const nC = L.filter(f => !f.next.early && nlConf(f.next) === 'c').length, nL = L.filter(f => !f.next.early && nlConf(f.next) === 'l').length, nE = L.filter(f => f.next.early).length;
-  const head = rated.length ? `${good} good morning${good === 1 ? '' : 's'} of the last ${l14.length} logged` : 'No mornings rated yet';
+  const head = rated.length ? `${good} clear morning${good === 1 ? '' : 's'} of the last ${l14.length} logged` : 'No mornings rated yet';
   const sub = a4 !== null ? `Averaging ${a4.toFixed(1)} out of 5 over 4 weeks${b4 !== null && Math.abs(a4 - b4) >= 0.2 ? `, ${a4 > b4 ? 'up' : 'down'} from ${b4.toFixed(1)}` : ''}` : 'Rate it in the check-in each morning';
-  const tabs = `<div class="seg" role="group" aria-label="What to look at">${NOSE_OUT.map(([v, l]) => `<button data-a="nlout" data-v="${v}" aria-pressed="${out === v}">${l}</button>`).join('')}</div>`;
+  const tabs = `<div class="chips nlouts" role="group" aria-label="What to look at">${NOSE_OUT.map(([v, l]) => `<button class="chip" data-a="nlout" data-v="${v}" aria-pressed="${out === v}">${l}</button>`).join('')}</div>`;
   const rows = shown(out).sort((a, b) => { const o = { c: 0, l: 1, none: 2 }; return o[nlConf(a.next)] - o[nlConf(b.next)] || Math.abs(b.next.d) - Math.abs(a.next.d); });
   const early = L.filter(f => f.out === out && f.next.early);
   const lagF = L.filter(f => f.out === out && (!f.next.early || (f.later && !f.later.early) || (f.weeks && !f.weeks.early)));
   const lag = lagF.length ? `<div class="eyebrow">How long the effects last</div><div class="nlag"><div class="lagrow h"><span></span><span>Next day</span><span>2–3 days</span><span>Weeks</span></div>${lagF.map(f => `<div class="lagrow"><span>${esc(capFirst(f.x.sh))}</span>${nlCell(f, 'next')}${nlCell(f, 'later')}${f.weeks ? nlCell(f, 'weeks') : '<span class="c q">—</span>'}</div>`).join('')}</div>` : '';
   const wk = L.filter(f => f.out === out && f.weeks && !f.weeks.early && ['c', 'l'].includes(nlConf(f.weeks)));
-  const wkRows = wk.map(f => { const r = f.weeks, c = nlConf(r); return `<div class="nlr"><b>${esc(f.x.wk.n)}</b><span class="eff ${r.d > 0 ? 'up' : 'dn'}">${nlFmt(out, r.d)}</span><small><span class="conf ${NL_CONF[c][0]}">${NL_CONF[c][1]}</span>${esc(`Fortnights like this average ${nlVal(out, r.a)}; the others, ${nlVal(out, r.b)} · ${r.ny} and ${r.nn} fortnights.`)}</small></div>`; }).join('');
-  const W = nlWins(out), oname = out === 'cond' ? 'your nose' : out === 'smell' ? 'your smell' : 'your sleep';
+  const wkRows = wk.map(f => { const r = f.weeks, c = nlConf(r); return `<div class="nlr"><b>${esc(f.x.wk.n)}</b><span class="eff ${nlGood(out, r.d) ? 'up' : 'dn'}">${nlFmt(out, r.d)}</span><small><span class="conf ${NL_CONF[c][0]}">${NL_CONF[c][1]}</span>${esc(`Fortnights like this average ${nlVal(out, r.a)}; the others, ${nlVal(out, r.b)} · ${r.ny} and ${r.nn} fortnights.`)}</small></div>`; }).join('');
+  const W = nlWins(out), oname = { cond: 'blockage', smell: 'your smell', sleep: 'your sleep', dry: 'dryness', crust: 'crusting', drain: 'draining' }[out];
   const wins = W.help.length || W.hurt.length ? `<p class="nsum good"><b>On your data, for ${oname}:</b> ${esc([W.help.length ? `${joinAnd(W.help.slice(0, 2).map(f => f.x.sh))} help${W.help.length === 1 && !/s$/.test(W.help[0].x.sh) ? 's' : ''}` : '', W.hurt.length ? `${joinAnd(W.hurt.slice(0, 2).map(f => f.x.sh))} ${W.hurt.length === 1 ? 'costs' : 'cost'} you most` : ''].filter(Boolean).join('; '))}.</p>` : '';
   const need = early.length ? `<p class="small muted" style="margin:0">Still too early for ${esc(joinAnd(early.slice(0, 4).map(f => f.x.sh)))}${early.length > 4 ? ` and ${early.length - 4} more` : ''}: each needs ${NL_MIN} ${out === 'sleep' ? 'nights' : 'mornings'} with it and ${NL_MIN} without${out !== 'sleep' && rated.length < 20 ? ', so keep rating your nose each morning' : ''}.</p>` : '';
   const srcs = [...new Set(rows.concat(wk).filter(f => f.res).map(f => f.res.s))];
   return `<section class="wsum nosetr" id="tr-nose"><div class="nshead">${idl(shArt('nose', 52))}<div><div class="eyebrow">Nose · what works for you</div><b>${head}</b><small>${esc(sub)}</small></div></div>
     ${noseLine(rated)}
-    <p class="small" style="margin:0"><b>${nC} clear finding${nC === 1 ? '' : 's'}, ${nL} leaning</b>, ${nE} still too early. Checked against your nose and smell each morning and that night's sleep.</p>
+    <p class="small" style="margin:0"><b>${nC} clear finding${nC === 1 ? '' : 's'}, ${nL} leaning</b>, ${nE} still too early. Checked against blockage, smell, dryness, crusting and draining each morning, and the night's sleep.</p>
     ${tabs}
-    ${rows.length ? `<div class="nlist">${rows.map(nlRow).join('')}</div>` : `<p class="small muted" style="margin:0">Nothing to compare yet for ${out === 'smell' ? 'smell' : out === 'cond' ? 'condition' : 'sleep'}.</p>`}
+    ${rows.length ? `<div class="nlist">${rows.map(nlRow).join('')}</div>` : `<p class="small muted" style="margin:0">Nothing to compare yet for ${(NOSE_OUT.find(o => o[0] === out) || [0, ''])[1].toLowerCase()}}.</p>`}
     ${wkRows ? `<div class="eyebrow">Over weeks</div><div class="nlist">${wkRows}</div>` : ''}
     ${lag}${wins}${need}
+    ${noseRinse()}${noseNight()}${noseAlign()}
     ${imp.length ? `<p class="small muted" style="margin:0">Plus ${imp.length} day${imp.length === 1 ? '' : 's'} from the nose app's log, before mornings were rated, so they're left out of the averages.</p>` : ''}
     ${srcs.length ? `<p class="small muted" style="margin:0;font-style:italic">${srcs.map(esc).join(' · ')}</p>` : ''}</section>`;
+}
+// morning against evening rinse, outcome by outcome, next morning only
+function noseRinse() {
+  const L = noseLearn(), g = (id, o) => L.find(f => f.id === id && f.out === o);
+  const outs = NOSE_OUT.filter(([o]) => o !== 'sleep' && [g('rinseam', o), g('rinsepm', o)].some(f => f && !f.next.early));
+  if (!outs.length) return '';
+  const rows = outs.map(([o, l]) => `<div class="lagrow"><span>${esc(l)}</span>${nlCell(g('rinseam', o), 'next')}${nlCell(g('rinsepm', o), 'next')}</div>`).join('');
+  // a sentence where one rinse clearly does more for something
+  const said = outs.map(([o, l]) => {
+    const a = g('rinseam', o), p = g('rinsepm', o), ok = f => f && !f.next.early && ['c', 'l'].includes(nlConf(f.next)) && nlGood(o, f.next.d);
+    const ga = ok(a) ? Math.abs(a.next.d) : 0, gp = ok(p) ? Math.abs(p.next.d) : 0;
+    if (!ga && !gp) return '';
+    return gp > ga ? `the evening rinse does more for ${l.toLowerCase()}` : `the morning rinse does more for ${l.toLowerCase()}`;
+  }).filter(Boolean);
+  return `<div class="eyebrow">Morning or evening rinse</div><div class="nlag"><div class="lagrow h"><span></span><span>Morning</span><span>Evening</span></div>${rows}</div>
+    ${said.length ? `<p class="small" style="margin:0"><b>On your logs,</b> ${esc(joinAnd(said.slice(0, 3)))}.</p>` : '<p class="small muted" style="margin:0">Each cell is the next morning with that rinse against without it. Nothing clear between them yet.</p>'}`;
+}
+// dryness that keeps coming back overnight: what to do before bed, and what your own logs point at
+function noseNight() {
+  const tk = todayKey(), span = Array.from({ length: 28 }, (_, i) => addDays(tk, -i)), kn = span.filter(m => NL_Y.dry(m) !== null), dry = kn.filter(m => NL_Y.dry(m) === 1);
+  if (kn.length < 8 || dry.length / kn.length < 0.4) return '';
+  const crust = kn.filter(m => NL_Y.crust(m) === 1).length, W = nlWins('dry');
+  const noticed = W.hurt.slice(0, 2).map(f => `${capFirst(f.x.sh)}: dry on ${Math.round(f.next.a * 100)}% of mornings after, ${Math.round(f.next.b * 100)}% otherwise.`)
+    .concat(W.help.slice(0, 2).map(f => `${capFirst(f.x.sh)}: dry on ${Math.round(f.next.a * 100)}% of mornings after, against ${Math.round(f.next.b * 100)}% without.`));
+  const tips = ['Gel last thing before bed, every night rather than when it flares.', 'Get the bedroom to 40–50% humidity overnight; the hygrometer chip lets Trends check what it does for you.', 'If you rinse in the evening, gel after it, not before.', 'Heating off or turned down overnight if you can.'];
+  return `<div class="callout nnight">${ic('info')}<div><b>Dry or crusty on ${dry.length} of your last ${kn.length} logged mornings${crust ? `, crusting on ${crust}` : ''}.</b>
+    <p class="small" style="margin:4px 0 0">You log it in the morning and it's at its worst overnight, so the fixes that count happen before bed:</p><ul class="small">${tips.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
+    ${noticed.length ? `<p class="small" style="margin:4px 0 0"><b>What your logs show:</b></p><ul class="small">${noticed.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '<p class="small muted" style="margin:4px 0 0">Nothing in your logs stands out for dryness yet. Ticking the chips (heating, aircon, no gel) on the mornings it happens is what lets it show.</p>'}</div></div>`;
+}
+// blockage and smell, morning by morning: how closely they move together, and whether one follows the other
+const nlCorr = (xs, ys) => { const n = xs.length, mx = xs.reduce((a, b) => a + b, 0) / n, my = ys.reduce((a, b) => a + b, 0) / n; let sxy = 0, sxx = 0, syy = 0; for (let i = 0; i < n; i++) { sxy += (xs[i] - mx) * (ys[i] - my); sxx += (xs[i] - mx) ** 2; syy += (ys[i] - my) ** 2; } return sxx && syy ? sxy / Math.sqrt(sxx * syy) : null; };
+function noseAlign() {
+  const ks = Object.keys(S.nose).filter(k => !S.nose[k].imp && S.nose[k].r && S.nose[k].sm).sort();
+  if (!ks.length) return '';
+  if (ks.length < 10) return `<div class="eyebrow">Blockage and smell</div><p class="small muted" style="margin:0">${ks.length} morning${ks.length === 1 ? '' : 's'} with both rated so far. At 10 this shows how closely they move together.</p>`;
+  const r0 = nlCorr(ks.map(k => S.nose[k].r), ks.map(k => S.nose[k].sm));
+  const pr = (a, b) => { const p = ks.filter(k => S.nose[addDays(k, 1)] && S.nose[addDays(k, 1)][b] && !S.nose[addDays(k, 1)].imp); return p.length >= 8 ? nlCorr(p.map(k => S.nose[k][a]), p.map(k => S.nose[addDays(k, 1)][b])) : null; };
+  const lagS = pr('r', 'sm'), lagB = pr('sm', 'r');
+  const av = f => { const v = ks.filter(f).map(k => S.nose[k].sm); return v.length >= 3 ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+  const blk = av(k => S.nose[k].r <= 2), clr = av(k => S.nose[k].r >= 4);
+  const how = r0 === null ? 'not enough spread to tell' : r0 >= 0.6 ? 'closely' : r0 >= 0.35 ? 'somewhat' : r0 >= 0.15 ? 'a little' : 'hardly at all';
+  const sm = v => (NOSE_SM.find(x => x[0] === Math.round(v)) || [0, ''])[1].toLowerCase();
+  const lagLine = lagS !== null && r0 !== null && lagS - r0 >= 0.15 ? " Smell lines up better with the day before's blockage than the same day's, so it tends to lag a day behind." : lagB !== null && r0 !== null && lagB - r0 >= 0.15 ? " Blockage lines up better with the day before's smell, so changes in smell tend to show first." : '';
+  return `<div class="eyebrow">Blockage and smell</div><p class="small" style="margin:0"><b>Over ${ks.length} mornings, they move together ${how}${r0 !== null ? ` (r = ${r0.toFixed(2)})` : ''}.</b>${blk !== null && clr !== null ? ` On blocked mornings smell averages ${blk.toFixed(1)} (${sm(blk)}); on clear ones, ${clr.toFixed(1)} (${sm(clr)}).` : ''}${lagLine}</p>
+    <p class="small muted" style="margin:0">${r0 !== null && r0 < 0.35 ? 'A weak link means smell is being affected by something besides airflow, which is worth knowing on its own.' : 'r runs from 0 (no link) to 1 (they always move together).'}</p>`;
 }
 // kept for the slides and tips: next-morning condition, as before
 function noseStats() {
@@ -11932,7 +12057,7 @@ function noseYours(k) {
   const L = noseLearn(), g = (id, out) => L.find(f => f.id === id && f.out === out), ok = r => r && !r.early && ['c', 'l'].includes(nlConf(r));
   const out = [], unit = r => `${r.ny} and ${r.nn} mornings`;
   const st = g('steroid', 'cond'), sp = g('rinsepm', 'cond'), a6 = g('alc6', 'cond'), u = nlAlc(addDays(k, -1));
-  if (ok(st && st.next) && st.next.d > 0) out.push(`<b>${nlCk(k, 'steroid') === false ? 'Steroid tonight.' : 'Keep the steroid going.'}</b> Mornings after it average ${st.next.a.toFixed(1)} for condition; without, ${st.next.b.toFixed(1)} (${unit(st.next)}).`);
+  if (ok(st && st.next) && st.next.d > 0) out.push(`<b>${nlCk(k, 'steroid') === false ? 'Steroid tonight.' : 'Keep the steroid going.'}</b> Mornings after it average ${st.next.a.toFixed(1)} for blockage; without, ${st.next.b.toFixed(1)} (${unit(st.next)}).`);
   if (ok(sp && sp.next) && sp.next.d > 0) out.push(`<b>Evening rinse${out.length ? ' as well' : ''}.</b> On your logs it's worth ${sp.next.d >= 0.75 ? 'about a step' : sp.next.d >= 0.35 ? 'about half a step' : 'a little'} by morning.`);
   if (u !== null && u >= 6 && a6) {
     if (ok(a6.later) && a6.later.d < 0) out.push(`<b>Expect tomorrow to be rough too.</b> After 6+ units, the next two mornings average ${a6.later.a.toFixed(1)} against ${a6.later.b.toFixed(1)}.`);
@@ -11941,6 +12066,12 @@ function noseYours(k) {
   const pn = g('poornose', 'sleep'), n = S.nose[k];
   if (n && n.r && n.r <= 2 && ok(pn && pn.next) && pn.next.d < 0) out.push(`<b>Rinse and gel before bed.</b> Rough nose days cost you about ${Math.round(Math.abs(pn.next.d) * 60)} minutes of sleep that night.`);
   const W = nlWins('cond'); W.help.filter(f => !['steroid', 'rinsepm'].includes(f.id)).slice(0, 1).forEach(f => out.push(`<b>${esc(capFirst(f.x.sh))} helps you.</b> Mornings after it average ${f.next.a.toFixed(1)} against ${f.next.b.toFixed(1)}.`));
+  // ticked dryness, crusting or draining this morning: the best-supported thing for it on your logs
+  [['crust', 'crusting'], ['dry', 'dryness'], ['drain', 'draining']].some(([o, nm]) => {
+    if (!n || !(n.sy || []).some(x => NL_SYM[o].includes(x))) return false;
+    const h = nlWins(o).help[0]; if (!h) return false;
+    out.unshift(`<b>${esc(capFirst(h.x.sh))} for the ${nm}.</b> On your logs, ${Math.round(h.next.a * 100)}% of mornings after it have it, against ${Math.round(h.next.b * 100)}% without.`); return true;
+  });
   if (!out.length) return '';
   return `<div class="nyours"><div class="eyebrow">What's worked for you before</div><ol>${out.slice(0, 3).map(x => `<li>${x}</li>`).join('')}</ol><span class="small muted">From your check-ins. Each line needs at least ${NL_MIN} days with and ${NL_MIN} without before it shows.</span></div>`;
 }
@@ -11952,7 +12083,7 @@ function noseLine(rated) {
   if (pts.length < 3) return '';
   const W = 300, H = 96, L = 44, R = 10, T = 8, B = 18, x = i => L + ((W - L - R) * i) / (pts.length - 1), y = v => T + (H - T - B) * (1 - (v - 1) / 4);
   const d = pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(p.v).toFixed(1)}`).join('');
-  const g = [[5, 'Great'], [3, 'OK'], [1, 'Blocked']].map(([v, l]) => `<path class="ng" d="M${L} ${y(v)}H${W - R}"/><text x="${L - 6}" y="${y(v) + 3.5}" text-anchor="end">${l}</text>`).join('');
+  const g = [[5, 'Clear'], [3, 'Partly'], [1, 'Blocked']].map(([v, l]) => `<path class="ng" d="M${L} ${y(v)}H${W - R}"/><text x="${L - 6}" y="${y(v) + 3.5}" text-anchor="end">${l}</text>`).join('');
   return `<svg class="nline" viewBox="0 0 ${W} ${H}" role="img" aria-label="Nose, weekly average, from ${shortD(pts[0].st)}: ${pts[0].v.toFixed(1)} then, ${pts[pts.length - 1].v.toFixed(1)} lately">${g}<path class="na" d="${d}L${x(pts.length - 1).toFixed(1)} ${y(1)}L${x(0).toFixed(1)} ${y(1)}Z"/><path class="nl" d="${d}"/><circle cx="${x(pts.length - 1).toFixed(1)}" cy="${y(pts[pts.length - 1].v).toFixed(1)}" r="4"/>
     <text x="${L}" y="${H - 3}">${shortD(pts[0].st)}</text><text x="${W - R}" y="${H - 3}" text-anchor="end">This week</text></svg>`;
 }
@@ -12224,6 +12355,106 @@ const MR_ART = {
 };
 const mrPic = (svg, cls) => idl(svg, `go ${cls || ''}`);
 
+/* what set it off: the month's biggest drinking and eating stretches, with the app's best guess at why and every
+   other reason to pick from. Picks are kept with the month (S.mrep[ym].why) and shape the tips that follow */
+const MR_WHYS = {
+  drink: [
+    ['start', 'A big night that kept going', "Plan the day after a big night as a dry one before the night starts: that's where the run took hold."],
+    ['plans', 'A run of plans and nights out', 'With plans close together, decide in advance which are drinking nights, and alternate with soft drinks at the rest.'],
+    ['weekend', 'The weekend spread out', 'Give the weekend an end point: a set last drink on Saturday, and Sunday dry.'],
+    ['hair', 'Drinking to feel better the next day', 'The morning after: water, food and a walk before anything else. The urge usually passes by the afternoon.'],
+    ['home', 'Drinks at home out of habit', 'Keep less in the house, and swap the first drink at home for something else you like.'],
+    ['tired', 'Tired or short on sleep', 'An early night before a plan makes the extra drinks easier to turn down.'],
+    ['stress', 'A stressful stretch', "Have something else lined up for the evenings after a hard day: a run, a call, a film."],
+    ['celebrate', 'Celebrating something', 'Fair enough. Book the day after as a dry one.'],
+    ['other', 'Something else', '']],
+  food: [
+    ['snowball', 'One treat day snowballed', "The day after a treat day, the plan exactly as written: one day over doesn't need to become three."],
+    ['under', 'Under-ate earlier, then caught up', "Eat the full planned portions on busy days, so the hunger doesn't build up for later."],
+    ['drink', 'Drinking led to eating', 'A proper meal before a night out, and the morning after planned before you go.'],
+    ['treats', 'Treats in the house', 'Buy treats in single portions rather than packs to share.'],
+    ['routine', 'Out of routine: plans, travel or no prep', "On days away from the plan, a couple of checked go-tos (a meal deal you've looked up, a protein shake) keep it close."],
+    ['tired', 'Tired or short on sleep', 'After a short night, a filling high-protein breakfast and the planned lunch ready to go.'],
+    ['stress', 'A stressful stretch', 'Keep something easy and filling to hand for the hard days.'],
+    ['celebrate', 'Celebrating something', 'Fair enough. Back on the plan the day after.'],
+    ['other', 'Something else', '']]
+};
+const mrDay = k => `${DOW[dayIndex(k)]} ${parse(k).getDate()}`;
+const mrSpan = ks => (ks.length === 1 ? `${DOWL[dayIndex(ks[0])]} ${dayOrd(ks[0])}` : `${mrDay(ks[0])} to ${mrDay(ks[ks.length - 1])} ${MONS[parse(ks[ks.length - 1]).getMonth()]}`);
+// runs of days, joined when consecutive, kept if big enough
+function mrRuns(days, on) { const out = []; let cur = []; days.forEach(k => { if (on(k)) { if (cur.length && addDays(cur[cur.length - 1], 1) !== k) { out.push(cur); cur = []; } cur.push(k); } else if (cur.length) { out.push(cur); cur = []; } }); if (cur.length) out.push(cur); return out; }
+function mrStretches(s) {
+  const set = s.set, out = [], sleepShort = ks => ks.filter(k => { const v = (S.ck[k] || {}).sl; return v > 0 && v < set.sleepGoal - 1; }).length;
+  // drinking: consecutive drinking days, big in total or with one very big night in a run
+  mrRuns(s.days, k => +S.alc[k] > 0).forEach(ks => {
+    const u = ks.map(k => +S.alc[k]), tot = u.reduce((a, b) => a + b, 0), mx = Math.max(...u), top = ks[u.indexOf(mx)];
+    if (!(tot >= 15 || (mx >= ALC.binge && ks.length >= 2) || mx >= 12)) return;
+    const outs = ks.filter(k => outOf(S.days[k])).length, home = ks.length - outs, wk = ks.filter(k => dayIndex(k) >= 4).length, after = ks.filter(k => k > top);
+    const ev = {
+      start: u[0] >= ALC.binge && ks.length >= 2 ? `${DOWL[dayIndex(ks[0])]} was ${fmtU(u[0])} units, and you drank on the ${nWord(ks.length - 1, 'day')} after.` : '',
+      plans: outs >= 2 ? `${capFirst(nWord(outs, 'night'))} out are logged in it.` : '',
+      weekend: wk >= 2 && wk >= ks.length * 0.6 ? 'Most of it fell from Friday on.' : '',
+      hair: after.length && after.some(k => +S.alc[k] < mx / 2) ? `The day after the biggest night still had ${fmtU(+S.alc[after[0]])} units.` : '',
+      home: home >= 2 ? `${nWord(home, 'day')} of it had no night out logged.` : '',
+      tired: sleepShort(ks) >= 1 ? `${capFirst(nWord(sleepShort(ks), 'short night'))} in it.` : ''
+    };
+    out.push({ id: `drink:${ks[0]}`, kind: 'drink', ks, size: tot, head: `${mrSpan(ks)}: ${fmtU(tot)} units${ks.length > 1 ? ` over ${ks.length} days` : ''}`, ev });
+  });
+  // eating: days well over budget, or heavy on added sugar, run together
+  const over = k => { const c = k >= foodFrom() ? dcc(k) : null; return c && c.hasPlan ? c.planK - c.B : null; }, fs = k => foodVal('sugar', k);
+  mrRuns(s.days, k => { const o = over(k), c = dcc(k); return o !== null && c && (o > c.B * 0.1 || (fs(k) || 0) > set.fsMax * 1.5); }).forEach(ks => {
+    const xs = ks.map(k => Math.max(0, over(k))), tot = xs.reduce((a, b) => a + b, 0);
+    if (!(tot >= 800 || Math.max(...xs) >= 1000)) return;
+    const pre = [addDays(ks[0], -1), addDays(ks[0], -2)].map(over).filter(v => v !== null), under = pre.reduce((a, v) => a + Math.min(0, v), 0);
+    const drank = ks.filter(k => +S.alc[k] >= 3 || +S.alc[addDays(k, -1)] >= 3).length;
+    const names = {}; ks.forEach(k => (peekD(k).x || []).forEach(x => { const n = String(x.n || '').trim(); if (n) (names[n] = names[n] || new Set()).add(k); }));
+    const rep = Object.entries(names).filter(([, d]) => d.size >= 2).sort((a, b) => b[1].size - a[1].size)[0];
+    const away = ks.reduce((a, k) => { const c = dcc(k); return a + SLOTS.filter(sl => c.slots[sl].kind === 'custom' || c.slots[sl].gone).length; }, 0);
+    const f0 = fs(ks[0]) || 0;
+    const ev = {
+      snowball: ks.length >= 2 && (xs[0] >= Math.max(...xs) * 0.8 || f0 > set.fsMax * 1.5) ? `It started on ${DOWL[dayIndex(ks[0])]}${f0 > set.fsMax ? ` with ${fmtN(f0)}g of added sugar` : ` at ${fmtN(xs[0])} kcal over`}, and the days after followed.` : '',
+      under: under <= -300 ? `The ${pre.length === 1 ? 'day' : 'two days'} before came in ${fmtN(-under)} kcal under budget.` : '',
+      drink: drank ? `Drinking on ${nWord(drank, 'day')} of it, or the night before.` : '',
+      treats: rep ? `${rep[0]} on ${rep[1].size} of the days.` : '',
+      routine: away >= 2 ? `${capFirst(nWord(away, 'meal'))} away from the plan.` : '',
+      tired: sleepShort(ks) >= 1 ? `${capFirst(nWord(sleepShort(ks), 'short night'))} in it.` : ''
+    };
+    out.push({ id: `food:${ks[0]}`, kind: 'food', ks, size: tot / 100, head: `${mrSpan(ks)}: ${fmtN(tot)} kcal over budget${ks.length > 1 ? ` across ${ks.length} days` : ''}`, ev });
+  });
+  // the two biggest of each kind
+  return ['drink', 'food'].flatMap(kd => out.filter(e => e.kind === kd).sort((a, b) => b.size - a.size).slice(0, 2));
+}
+const mrPicks = (ym, id) => { const w = S.mrep[ym] && isObj(S.mrep[ym].why) ? S.mrep[ym].why : {}; return Array.isArray(w[id]) ? w[id].filter(x => typeof x === 'string') : []; };
+function mrWhy(ym, s) {
+  const E = mrStretches(s);
+  if (!E.length) {
+    const last = whyLast(ymPrev(ym));
+    return last.length ? `<p>No big drinking or eating stretches this month. Last month you put ${last.length === 1 ? 'one' : 'them'} down to ${esc(joinAnd(last.map(x => x.n.toLowerCase())))}.</p>` : '';
+  }
+  const cards = E.map(e => {
+    const L = MR_WHYS[e.kind], picked = mrPicks(ym, e.id), guess = L.filter(([id]) => e.ev[id]), rest = L.filter(([id]) => !e.ev[id]), top = guess[0];
+    const chip = ([id, t]) => `<button class="chip" data-a="mrwhy" data-ym="${ym}" data-e="${esc(e.id)}" data-v="${id}" aria-pressed="${picked.includes(id)}">${esc(t)}${e.ev[id] ? ' <span class="mrlikely">likely</span>' : ''}</button>`;
+    const tips = L.filter(([id, , tip]) => picked.includes(id) && tip).slice(0, 2);
+    return `<div class="mrwhy"><b>${esc(e.head)}</b>
+      ${top ? `<p class="note">The app's best guess: <b>${esc(top[1].toLowerCase())}</b>. ${esc(e.ev[top[0]])}${guess.length > 1 ? ` ${esc(guess.slice(1, 3).map(([id]) => e.ev[id]).join(' '))}` : ''}</p>` : '<p class="note">Nothing in the logs points one way. Pick whatever fits.</p>'}
+      <div class="chips">${guess.concat(rest).map(chip).join('')}</div>
+      ${tips.length ? `<div class="mrtips">${tips.map(([, t, tip]) => `<p><b>Next time:</b> ${esc(tip)}</p>`).join('')}</div>` : ''}</div>`;
+  }).join('');
+  return `<p>The month's biggest stretches, and what the logs suggest set them off. Pick what fits, as many as you like: the tips that follow use what you pick.</p>${cards}`;
+}
+// the reasons picked for the most recent month that has any: for the tips
+function whyLast(ym) {
+  const w = S.mrep[ym] && isObj(S.mrep[ym].why) ? S.mrep[ym].why : null; if (!w) return [];
+  const out = [];
+  Object.entries(w).forEach(([eid, ids]) => { const kind = eid.split(':')[0], L = MR_WHYS[kind]; if (!L || !Array.isArray(ids)) return; ids.forEach(id => { const r = L.find(x => x[0] === id); if (r && id !== 'other' && !out.some(o => o.kind === kind && o.id === id)) out.push({ kind, id, n: r[1], tip: r[2] }); }); });
+  return out;
+}
+function whyTip(kind) {
+  const tk = todayKey(); let ym = ymPrev(ymOf(tk));
+  for (let i = 0; i < 3; i++, ym = ymPrev(ym)) { const w = whyLast(ym).filter(x => x.kind === kind && x.tip); if (w.length) return `In ${ymName(ym)}'s wrap-up you put a big stretch down to ${w[0].n.toLowerCase()}: ${lcFirst(w[0].tip)}`; }
+  return '';
+}
+
 /* the report */
 function mrHtml(ym) {
   const r = mrRange(ym); if (!r) return '';
@@ -12244,8 +12475,8 @@ function mrHtml(ym) {
       <section class="mrstory"><p class="drop">${esc(st.p1)}</p><p>${esc(st.p2)}</p></section>
       <section class="mrchap"><div class="eyebrow">The month in numbers · ${esc(base.lab)}</div><div class="mrscore">${tl}</div>
         <p class="note">Green is on the goal, amber close, red off it. The arrows compare ${first ? `with your first week; from ${nx} they'll compare with the month before` : `with ${ymName(ymPrev(ym))}`}.</p></section>
-      ${[[mrPic(MR_ART.basket()), 'What you ate', mrFood(s)], [mrPic(shArt('sugar', 76)), 'Sugar, salt and fat', mrLims(s)], [mrPic(shArt('alcohol', 76)), 'What you drank', mrDrink(s)],
-        [mrPic(shArt('run', 76)), 'How you moved', mrMove(s)], [mrPic(shArt('sleep', 76)), 'Sleep, body and nose', mrBody(s)]].filter(c => c[2]).map((c, i) => chap(c[0], `Chapter ${['one', 'two', 'three', 'four', 'five'][i]}`, c[1], c[2])).join('')}
+      ${[[mrPic(MR_ART.basket()), 'What you ate', mrFood(s)], [mrPic(shArt('sugar', 76)), 'Sugar, salt and fat', mrLims(s)], [mrPic(shArt('alcohol', 76)), 'What you drank', mrDrink(s)], [mrPic(shArt('focus', 76)), 'What set it off', mrWhy(ym, s)],
+        [mrPic(shArt('run', 76)), 'How you moved', mrMove(s)], [mrPic(shArt('sleep', 76)), 'Sleep, body and nose', mrBody(s)]].filter(c => c[2]).map((c, i) => chap(c[0], `Chapter ${['one', 'two', 'three', 'four', 'five', 'six'][i]}`, c[1], c[2])).join('')}
       ${H.length ? chap(mrPic(MR_ART.rosette()), 'The best bits', 'Highlights', `<div class="mrhl">${H.map(([b, t]) => `<div><b>${esc(b)}</b>${esc(t)}</div>`).join('')}</div>`) : ''}
       ${A.lv.length ? chap(mrPic(shArt('score', 76)), 'Where you stand', `At the level for ${at} of ${A.lv.length}`, `<p>Against the amounts the research saw its benefits at, over your last four weeks. Green ones are already working for you; the others say how far there is to go.</p><div class="mrbox">${showLv.map(x => lvHtml(x.k)).join('')}</div><p class="note">The full list is in Trends, under What it's doing for you.</p>`) : ''}
       ${A.ids.length ? chap(mrPic(MR_ART.path()), nx, 'Three things to aim for'.replace('Three', ['', 'One', 'Two', 'Three'][A.ids.length]).replace('things', A.ids.length === 1 ? 'thing' : 'things'), `<div class="mraims">${aims}</div><button class="btn primary" data-a="mrfocus" data-v="${ym}" style="width:100%">Make ${A.ids.length === 1 ? 'it' : 'these'} next week's focus</button>`) : ''}
@@ -12278,6 +12509,12 @@ function mrList() {
 Object.assign(ACT, {
   mropen(d) { const ym = d.v; if (!mrRange(ym)) return; closeSheet(); MR = { ym }; S.mrep[ym] = Object.assign(S.mrep[ym] || {}, { read: todayKey() }); save(); mrRender(); syncHistory(); },
   mrclose() { mrClose(); render(); },
+  mrwhy(d) {
+    const ym = d.ym, e = d.e, v = d.v; if (!ym || !e || !v) return;
+    const m = S.mrep[ym] = isObj(S.mrep[ym]) ? S.mrep[ym] : {}; m.why = isObj(m.why) ? m.why : {};
+    const a = Array.isArray(m.why[e]) ? m.why[e] : (m.why[e] = []), i = a.indexOf(v); if (i >= 0) a.splice(i, 1); else a.push(v); if (!a.length) delete m.why[e];
+    const sc = $('mr-body'), y = sc ? sc.scrollTop : 0; save(); mrRender(); const sc2 = $('mr-body'); if (sc2) sc2.scrollTop = y;
+  },
   mrfocus(d) { const r = mrRange(d.v), s = mrStats(r[0], r[1]), A = mrAims(mrTiles(s, mrBase(d.v, r).s)), tk = todayKey(), nx = dayIndex(tk) === 0 ? tk : addDays(startOf(tk), 7); if (!A.ids.length) return; fxSet(nx, A.ids, addDays(nx, -7)); toast(`${A.ids.length === 1 ? 'It\'s' : 'They\'re'} the focus for the week of ${shortD(nx)}`); }
 });
 document.addEventListener('keydown', e => { if (MR && !SH && e.key === 'Escape') { mrClose(); render(); } });
