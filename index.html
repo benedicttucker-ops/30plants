@@ -1972,6 +1972,17 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 .toast { width: max-content; max-width: min(520px, calc(100% - 32px)); border-radius: 20px; text-align: center; text-wrap: balance; }
 @media (prefers-reduced-motion: no-preference) { .shbetter { animation: shup .45s .62s both var(--ease); } }
 
+/* 3.26 nose readings through the day */
+.nreads { margin: 10px 0 2px; }
+.nrds { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 8px; }
+.nrd { display: inline-flex; align-items: center; gap: 5px; padding: 4px 4px 4px 10px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); font-size: 13px; }
+.nrd b { font-variant-numeric: tabular-nums; margin-right: 2px; }
+.nrd i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.nrdx { all: unset; cursor: pointer; display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; color: var(--muted); }
+.nrdx svg { width: 13px; height: 13px; }
+.nrdx:focus-visible { outline: 2px solid var(--accent); }
+.nltime { max-width: 160px; margin-bottom: 6px; }
+.ntdot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: 0; }
 </style>
 </head>
 <body>
@@ -1997,7 +2008,7 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.25.0';</script>
+<script>window.TP_VERSION = '3.26.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -4092,7 +4103,8 @@ function normalise(s) {
   // spare portions cooked on the day, kept to be offered on the days after: [{ id, r, m, sw, made, s, n }]
   s.spare = (Array.isArray(s.spare) ? s.spare : []).filter(x => isObj(x) && R[x.r] && DAY_KEY.test(x.made || '') && +x.n >= 1 && +x.m > 0).map(x => Object.assign(x, { n: Math.min(6, Math.round(+x.n)), sw: isObj(x.sw) ? x.sw : {} }));
   s.nose = isObj(s.nose) ? s.nose : {};
-  Object.keys(s.nose).forEach(k => { const n = s.nose[k]; if (!DAY_KEY.test(k) || !isObj(n)) { delete s.nose[k]; return; } n.sm = Number.isInteger(n.sm) && n.sm >= 1 && n.sm <= 5 ? n.sm : undefined; if (n.sm === undefined) delete n.sm; n.r = Number.isInteger(n.r) && n.r >= 0 && n.r <= 5 ? n.r : n.imp || n.sm ? 0 : 3; ['sy', 'cx'].forEach(f => { n[f] = Array.isArray(n[f]) ? [...new Set(n[f].filter(x => typeof x === 'string' && /^[a-z][a-z0-9_]{1,20}$/.test(x)))].slice(0, f === 'sy' ? 3 : 25) : []; }); });
+  Object.keys(s.nose).forEach(k => { const n = s.nose[k]; if (!DAY_KEY.test(k) || !isObj(n)) { delete s.nose[k]; return; } n.sm = Number.isInteger(n.sm) && n.sm >= 1 && n.sm <= 5 ? n.sm : undefined; if (n.sm === undefined) delete n.sm; n.r = Number.isInteger(n.r) && n.r >= 0 && n.r <= 5 ? n.r : n.imp || n.sm ? 0 : 3; ['sy', 'cx'].forEach(f => { n[f] = Array.isArray(n[f]) ? [...new Set(n[f].filter(x => typeof x === 'string' && /^[a-z][a-z0-9_]{1,20}$/.test(x)))].slice(0, f === 'sy' ? 3 : 25) : []; });
+    if (Array.isArray(n.rd)) { n.rd = n.rd.filter(x => isObj(x) && typeof x.t === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(x.t)).map(x => { const o = { t: x.t }; if (Number.isInteger(x.r) && x.r >= 1 && x.r <= 5) o.r = x.r; if (Number.isInteger(x.sm) && x.sm >= 1 && x.sm <= 5) o.sm = x.sm; return o; }).filter(o => o.r || o.sm).sort((a, b) => (a.t < b.t ? -1 : a.t > b.t ? 1 : 0)).slice(0, 40); if (!n.rd.length) delete n.rd; } else delete n.rd; });
   s.focus = isObj(s.focus) ? s.focus : {};
   Object.keys(s.focus).forEach(k => { const f = s.focus[k]; if (!DAY_KEY.test(k) || !isObj(f) || !Array.isArray(f.ids)) { delete s.focus[k]; return; } f.ids = [...new Set(f.ids.filter(x => typeof x === 'string' && /^(h:)?[a-z][a-z0-9_-]{1,30}$/.test(x)))].slice(0, 3); if (!DAY_KEY.test(f.from || '')) f.from = addDays(k, -7); });
   s.rev = s.rev && typeof s.rev === 'object' ? s.rev : {}; // weeks reviewed: week start -> the day it was done
@@ -7388,7 +7400,7 @@ function renderSheet(fresh) {
   const root = $('sheet-root');
   if (!SH) { root.innerHTML = ''; return; }
   const old = root.querySelector('.sheet'), top = old && !fresh ? old.scrollTop : 0;
-  const html = ({ wgoal: shWGoal, ckitems: shCkItems, cupboard: shCupboard, recipe: shRecipe, pick: shPick, xadd: shAdd, custom: shCustom, target: shTarget, settings: shSettings, confirm: shConfirm, setwhen: shSetWhen, leftadd: shLeftAdd, pack: shPack, backup: shBackup, lift: shLift, trswap: shTrSwap, trset: shTrSet, tvpick: shTvPick, tvaddex: shTvAddEx, tradd: shTrAdd, have: shHave, addi: shAddI, pscan: shPScan, mkup: shMkup, trre: shTrRe, weekmenu: shWeekMenu, night: shNight, swap: shSwap, idea: shIdea, fx: shFx })[SH.type]();
+  const html = ({ wgoal: shWGoal, ckitems: shCkItems, cupboard: shCupboard, recipe: shRecipe, pick: shPick, xadd: shAdd, custom: shCustom, target: shTarget, settings: shSettings, confirm: shConfirm, setwhen: shSetWhen, leftadd: shLeftAdd, pack: shPack, backup: shBackup, lift: shLift, trswap: shTrSwap, trset: shTrSet, tvpick: shTvPick, tvaddex: shTvAddEx, tradd: shTrAdd, have: shHave, addi: shAddI, pscan: shPScan, mkup: shMkup, trre: shTrRe, weekmenu: shWeekMenu, night: shNight, swap: shSwap, idea: shIdea, fx: shFx, nlog: shNoseLog })[SH.type]();
   root.innerHTML = `<div class="scrim" data-scrim="1"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(SH.title || 'Details')}"><div class="grab"></div>${html}</div></div>`;
   if (!fresh) root.querySelector('.scrim').style.animation = 'none';
   const sh = root.querySelector('.sheet'); if (!fresh) sh.style.animation = 'none';
@@ -11817,7 +11829,7 @@ function noseCard(k) {
       ${sy.length ? sy.map(id => noseAdvice(id, noseCond(k))).join('') : r >= 4 ? '<p class="small muted" style="margin:0">Logged. Good mornings show what to reproduce, so tap anything from yesterday that might explain it.</p>' : ''}`;
   }
   // part of the check-in card, just above its Save button; each tap saves straight away
-  return `<div class="nosecard ckf" role="group" aria-label="Nose"><div class="nshead">${idl(shArt('nose', 44))}<div><div class="cklbl">Nose this morning</div><b>How's your nose?</b></div>${r || sm || cx.length ? '<button class="btn link sm" data-a="nclear">Clear</button>' : ''}</div>${scale}${more}</div>`;
+  return `<div class="nosecard ckf" role="group" aria-label="Nose"><div class="nshead">${idl(shArt('nose', 44))}<div><div class="cklbl">Nose this morning</div><b>How's your nose?</b></div>${r || sm || cx.length ? '<button class="btn link sm" data-a="nclear">Clear</button>' : ''}</div>${scale}${noseReadings(k)}${more}</div>`;
 }
 // decongestant sprays: the MHRA's advice (April 2026) is no more than five days in a row, or the nose can rebound
 function noseSudafed(k) {
@@ -11825,21 +11837,63 @@ function noseSudafed(k) {
   return n >= 4 ? `<div class="callout warn">${ic('info')}<div><b>${n} days running on the Sudafed spray.</b> The MHRA's advice is no more than five days in a row: used for longer, decongestant sprays can leave the nose more blocked once you stop (rebound congestion).</div></div>` : '';
 }
 function noseEntry(k) { let n = S.nose[k]; if (!n || n.imp) n = S.nose[k] = { r: 0, sy: [], cx: [] }; n.at = todayKey(); return n; }
+/* 3.26 readings through the day: S.nose[day].rd = [{ t: 'HH:MM', r, sm }], logged from the nose card or the app
+   icon's long-press shortcut. The morning check-in stays its own reading; the day's figure for blockage and smell
+   is the average of every reading that day */
+const noseAvg = (k, f) => { const e = S.nose[k]; if (!e || e.imp) return null; const v = [e[f]].concat((e.rd || []).map(x => x[f])).filter(x => x >= 1); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+const noseR = k => noseAvg(k, 'r'), noseS = k => noseAvg(k, 'sm');
+const nowHM = () => { const d = new Date(); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+const nlLab = (L, v) => (L.find(x => x[0] === v) || [0, ''])[1];
+const noseEmpty = n => !n.r && !n.sm && !(n.sy || []).length && !(n.cx || []).length && !(n.rd || []).length;
+// today's readings on the nose card: each with its time, the day's average, and a button for one now
+function noseReadings(k) {
+  if (k !== todayKey()) return '';
+  const e = S.nose[k] && !S.nose[k].imp ? S.nose[k] : null, rd = e ? e.rd || [] : [], r = noseR(k), sm = noseS(k);
+  const chip = (x, i) => `<span class="nrd"><b>${esc(x.t)}</b>${x.r ? `<i style="background:${nlCol(NOSE_R, x.r)}"></i>${esc(nlLab(NOSE_R, x.r))}` : ''}${x.sm ? `${x.r ? ' · ' : ''}smell ${esc(nlLab(NOSE_SM, x.sm).toLowerCase())}` : ''}<button class="nrdx" data-a="nlrm" data-i="${i}" aria-label="Remove the ${esc(x.t)} reading">${ic('x')}</button></span>`;
+  return `<div class="nreads"><div class="nlbl">Through the day${rd.length && (r || sm) ? ` <span class="nhint">Day's average: ${r ? `blockage ${r.toFixed(1)}` : ''}${r && sm ? ', ' : ''}${sm ? `smell ${sm.toFixed(1)}` : ''}</span>` : ''}</div>
+    ${rd.length ? `<div class="nrds">${rd.map(chip).join('')}</div>` : ''}<button class="btn sm" data-a="nlog">${ic('plus')}How it is now</button></div>`;
+}
+const nlCol = (L, v) => { const c = (L.find(x => x[0] === v) || [])[2]; return c === 'leaf' ? 'var(--leaf)' : `var(--c-${c})`; };
+function shNoseLog() {
+  SH.title = 'Nose now';
+  const sc = (L, v0, f, lab) => `<div class="nscale" role="group" aria-label="${lab}">${L.map(([v, l, c]) => `<button data-a="nlv" data-f="${f}" data-v="${v}" aria-pressed="${v0 === v}"><i style="background:${c === 'leaf' ? 'var(--leaf)' : `var(--c-${c})`}"></i>${l}</button>`).join('')}</div>`;
+  const today = (S.nose[todayKey()] || {}).rd || [];
+  return `<div class="sheethead"><div><span class="eyebrow">${fmtDay(todayKey())}</span><h2>Nose now</h2></div>${closeBtn}</div>
+  <div class="field nltime"><label for="nl-t">Time</label><input id="nl-t" type="time" value="${esc(SH.t)}"></div>
+  <div class="nshd"><b>Blockage</b><span>how freely it breathes</span></div>${sc(NOSE_R, SH.r, 'r', 'Blockage now')}
+  <div class="nshd"><b>Smell</b><span>coffee, toothpaste, soap</span></div>${sc(NOSE_SM, SH.sm, 'sm', 'Smell now')}
+  <div class="btnrow" style="margin-top:14px"><button class="btn primary" data-a="nlsave" ${SH.r || SH.sm ? '' : 'disabled'}>Save reading</button></div>
+  <p class="small muted" style="margin:10px 0 0">${today.length ? `${today.length} reading${today.length === 1 ? '' : 's'} so far today. ` : ''}Either light on its own is fine. Today's average of all your readings, the morning one included, is what Trends uses for the day.</p>`;
+}
 Object.assign(ACT, {
-  nsm(d) { const k = ckK(), n = noseEntry(k); n.sm = n.sm === +d.v ? 0 : +d.v; if (!n.sm) delete n.sm; if (!n.r && !n.sm && !n.sy.length && !n.cx.length) delete S.nose[k]; save(); render(); },
+  nlog() { openSheet({ type: 'nlog', title: 'Nose now', t: nowHM(), r: 0, sm: 0 }); },
+  nlv(d) { if (!SH || SH.type !== 'nlog') return; const t = $('nl-t'); if (t && t.value) SH.t = t.value; SH[d.f] = SH[d.f] === +d.v ? 0 : +d.v; renderSheet(); },
+  nlsave() {
+    if (!SH || SH.type !== 'nlog' || !(SH.r || SH.sm)) return;
+    const tin = $('nl-t'), t = tin && /^([01]\d|2[0-3]):[0-5]\d$/.test(tin.value) ? tin.value : nowHM(), k = todayKey();
+    let n = S.nose[k]; if (!n || n.imp) n = S.nose[k] = { r: 0, sy: [], cx: [] };
+    const x = { t }; if (SH.r) x.r = SH.r; if (SH.sm) x.sm = SH.sm;
+    n.rd = (n.rd || []).concat(x).sort((a, b) => (a.t < b.t ? -1 : a.t > b.t ? 1 : 0));
+    save(); closeSheet(); render();
+    toast(`${t}: ${[x.r ? nlLab(NOSE_R, x.r).toLowerCase() : '', x.sm ? `smell ${nlLab(NOSE_SM, x.sm).toLowerCase()}` : ''].filter(Boolean).join(', ')}`);
+  },
+  nlrm(d) { const k = todayKey(), n = S.nose[k]; if (!n || !n.rd) return; n.rd.splice(+d.i, 1); if (!n.rd.length) delete n.rd; if (noseEmpty(n)) delete S.nose[k]; save(); render(); }
+});
+Object.assign(ACT, {
+  nsm(d) { const k = ckK(), n = noseEntry(k); n.sm = n.sm === +d.v ? 0 : +d.v; if (!n.sm) delete n.sm; if (noseEmpty(n)) delete S.nose[k]; save(); render(); },
   nrate(d) { const k = ckK(), n = noseEntry(k); n.r = +d.v; save(); render(); },
   nsym(d) { const k = ckK(), n = noseEntry(k), i = n.sy.indexOf(d.v); if (i >= 0) n.sy.splice(i, 1); else { if (n.sy.length >= 3) { toast('Three at most: take one off first'); return; } n.sy.push(d.v); } save(); render(); },
   nx(d) { const k = ckK(), n = noseEntry(k), i = n.cx.indexOf(d.v); if (i >= 0) n.cx.splice(i, 1); else n.cx.push(d.v); save(); render(); },
   nsyall() { UI.nSyAll = !UI.nSyAll; render(); },
   nxall() { UI.nXAll = true; render(); },
-  nclear() { const k = ckK(); delete S.nose[k]; save(); render(); }
+  nclear() { const k = ckK(), n = S.nose[k]; if (n && (n.rd || []).length) S.nose[k] = { r: 0, sy: [], cx: [], rd: n.rd, at: n.at }; else delete S.nose[k]; save(); render(); }
 });
 
 /* Trends: what works for you. Everything comes from what's already logged: the morning nose (condition and
    smell), sleep, the rinse and steroid checks, drinks, training and the chips. Each thing is set against the
    next morning, the two mornings after that, and runs of fortnights, and a permutation test says how likely
    the difference is to be chance. */
-const noseRated = () => Object.keys(S.nose).filter(k => S.nose[k].r && !S.nose[k].imp).sort();
+const noseRated = () => Object.keys(S.nose).filter(k => !S.nose[k].imp && noseR(k) !== null).sort();
 const noseHas = (k, ids) => (S.nose[k] && !S.nose[k].imp ? (S.nose[k].cx || []).some(x => ids.includes(x)) : null);
 const NOSE_SM = [[1, 'Gone', 'red'], [2, 'Faint', 'orange'], [3, 'Dulled', 'yellow'], [4, 'Normal', 'green'], [5, 'Sharp', 'leaf']];
 const NOSE_OUT = [['cond', 'Blockage'], ['smell', 'Smell'], ['dry', 'Dryness'], ['crust', 'Crusting'], ['drain', 'Draining'], ['sleep', 'Sleep']];
@@ -11853,8 +11907,7 @@ const nlCk = (m, id) => { const c = (S.ck[m] || {}).c; return c && id in c ? c[i
 const nlAlc = n => (n in S.alc ? +S.alc[n] : null);
 // what's measured on a morning: condition and smell that morning, and the night's sleep that ended it
 const NL_Y = {
-  cond: m => (S.nose[m] && !S.nose[m].imp && S.nose[m].r ? S.nose[m].r : null),
-  smell: m => (S.nose[m] && !S.nose[m].imp && S.nose[m].sm ? S.nose[m].sm : null),
+  cond: m => noseR(m), smell: m => noseS(m), // the day's average: the morning reading and any through the day
   sleep: m => { const s = (S.ck[m] || {}).sl; return s > 0 ? s : null; },
   dry: m => nlSym(m, NL_SYM.dry), crust: m => nlSym(m, NL_SYM.crust), drain: m => nlSym(m, NL_SYM.drain)
 };
@@ -11972,8 +12025,8 @@ function nlWins(out) {
 function noseTrends() {
   const keys = Object.keys(S.nose); if (!keys.length && !Object.keys(S.ck).length) return '';
   const tk = todayKey(), rated = noseRated(), imp = keys.filter(k => S.nose[k].imp);
-  const l14 = rated.filter(k => k > addDays(tk, -14)), good = l14.filter(k => S.nose[k].r >= 4).length;
-  const av = a => (a.length ? a.reduce((x, k) => x + S.nose[k].r, 0) / a.length : null);
+  const l14 = rated.filter(k => k > addDays(tk, -14)), good = l14.filter(k => noseR(k) >= 4).length;
+  const av = a => (a.length ? a.reduce((x, k) => x + noseR(k), 0) / a.length : null);
   const a4 = av(rated.filter(k => k > addDays(tk, -28))), b4 = av(rated.filter(k => k <= addDays(tk, -28) && k > addDays(tk, -56)));
   const L = noseLearn(), shown = o => L.filter(f => f.out === o && !f.next.early);
   const out = UI.nlOut || (shown('cond').length ? 'cond' : shown('sleep').length ? 'sleep' : 'cond');
@@ -11998,11 +12051,32 @@ function noseTrends() {
     ${rows.length ? `<div class="nlist">${rows.map(nlRow).join('')}</div>` : `<p class="small muted" style="margin:0">Nothing to compare yet for ${(NOSE_OUT.find(o => o[0] === out) || [0, ''])[1].toLowerCase()}}.</p>`}
     ${wkRows ? `<div class="eyebrow">Over weeks</div><div class="nlist">${wkRows}</div>` : ''}
     ${lag}${wins}${need}
-    ${noseRinse()}${noseNight()}${noseAlign()}
+    ${noseTimes()}${noseRinse()}${noseNight()}${noseAlign()}
     ${imp.length ? `<p class="small muted" style="margin:0">Plus ${imp.length} day${imp.length === 1 ? '' : 's'} from the nose app's log, before mornings were rated, so they're left out of the averages.</p>` : ''}
     ${srcs.length ? `<p class="small muted" style="margin:0;font-style:italic">${srcs.map(esc).join(' · ')}</p>` : ''}</section>`;
 }
 // morning against evening rinse, outcome by outcome, next morning only
+// through the day: blockage and smell by time of day over the last four weeks, from days with readings after the
+// morning one, so each day is compared with itself
+const NT_B = [['Morning', 5, 12], ['Afternoon', 12, 17], ['Evening', 17, 22], ['Night', 22, 29]];
+const ntSlot = t => { let h = +t.slice(0, 2); if (h < 5) h += 24; return NT_B.findIndex(([, a, b]) => h >= a && h < b); };
+function noseTimes() {
+  const tk = todayKey(), ks = Array.from({ length: 28 }, (_, i) => addDays(tk, -i)).filter(k => S.nose[k] && !S.nose[k].imp && (S.nose[k].rd || []).length);
+  const head = '<div class="eyebrow">Through the day</div>';
+  if (!ks.length) return `${head}<p class="small muted" style="margin:0">Log how your nose is at other times (the button on the nose card, or long-press the app icon and pick Log nose) and this shows how it changes from morning to night.</p>`;
+  const acc = NT_B.map(() => ({ r: [], sm: [] }));
+  ks.forEach(k => { const e = S.nose[k]; if (e.r) acc[0].r.push(e.r); if (e.sm) acc[0].sm.push(e.sm); e.rd.forEach(x => { const i = ntSlot(x.t); if (i < 0) return; if (x.r) acc[i].r.push(x.r); if (x.sm) acc[i].sm.push(x.sm); }); });
+  const mean = a => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null);
+  const cell = (a, L) => { const v = mean(a); return v === null ? '<span class="muted">–</span>' : `<span><i class="ntdot" style="background:${nlCol(L, Math.round(v))}"></i>${v.toFixed(1)} <small class="muted">(${a.length})</small></span>`; };
+  const rows = NT_B.map(([l], i) => (acc[i].r.length || acc[i].sm.length ? `<div class="lagrow"><span>${l}</span>${cell(acc[i].r, NOSE_R)}${cell(acc[i].sm, NOSE_SM)}</div>` : '')).join('');
+  // the clearest pattern, once each part of the day has a few readings
+  const ok = NT_B.map((b, i) => [b[0], mean(acc[i].r), acc[i].r.length]).filter(x => x[2] >= 3);
+  let line = '';
+  if (ok.length >= 2) { const best = ok.reduce((a, b) => (b[1] > a[1] ? b : a)), worst = ok.reduce((a, b) => (b[1] < a[1] ? b : a)); const when = x => (x === 'Night' ? 'at night' : `in the ${x.toLowerCase()}`); if (best[1] - worst[1] >= 0.4) line = `<b>On your readings, blockage is usually best ${when(best[0])} (${best[1].toFixed(1)}) and worst ${when(worst[0])} (${worst[1].toFixed(1)}).</b> `; else line = '<b>Blockage stays much the same through the day on your readings so far.</b> '; }
+  const nRd = ks.reduce((a, k) => a + S.nose[k].rd.length, 0);
+  return `${head}<div class="nlag"><div class="lagrow h"><span></span><span>Blockage</span><span>Smell</span></div>${rows}</div>
+    <p class="small" style="margin:0">${line}<span class="muted">${nRd} reading${nRd === 1 ? '' : 's'} through the day on ${ks.length} day${ks.length === 1 ? '' : 's'} in the last four weeks, plus those days' morning check-ins. Numbers in brackets are how many readings each average is from.</span></p>`;
+}
 function noseRinse() {
   const L = noseLearn(), g = (id, o) => L.find(f => f.id === id && f.out === o);
   const outs = NOSE_OUT.filter(([o]) => o !== 'sleep' && [g('rinseam', o), g('rinsepm', o)].some(f => f && !f.next.early));
@@ -12033,24 +12107,24 @@ function noseNight() {
 // blockage and smell, morning by morning: how closely they move together, and whether one follows the other
 const nlCorr = (xs, ys) => { const n = xs.length, mx = xs.reduce((a, b) => a + b, 0) / n, my = ys.reduce((a, b) => a + b, 0) / n; let sxy = 0, sxx = 0, syy = 0; for (let i = 0; i < n; i++) { sxy += (xs[i] - mx) * (ys[i] - my); sxx += (xs[i] - mx) ** 2; syy += (ys[i] - my) ** 2; } return sxx && syy ? sxy / Math.sqrt(sxx * syy) : null; };
 function noseAlign() {
-  const ks = Object.keys(S.nose).filter(k => !S.nose[k].imp && S.nose[k].r && S.nose[k].sm).sort();
+  const ks = Object.keys(S.nose).filter(k => !S.nose[k].imp && noseR(k) !== null && noseS(k) !== null).sort(), G = { r: noseR, sm: noseS };
   if (!ks.length) return '';
-  if (ks.length < 10) return `<div class="eyebrow">Blockage and smell</div><p class="small muted" style="margin:0">${ks.length} morning${ks.length === 1 ? '' : 's'} with both rated so far. At 10 this shows how closely they move together.</p>`;
-  const r0 = nlCorr(ks.map(k => S.nose[k].r), ks.map(k => S.nose[k].sm));
-  const pr = (a, b) => { const p = ks.filter(k => S.nose[addDays(k, 1)] && S.nose[addDays(k, 1)][b] && !S.nose[addDays(k, 1)].imp); return p.length >= 8 ? nlCorr(p.map(k => S.nose[k][a]), p.map(k => S.nose[addDays(k, 1)][b])) : null; };
+  if (ks.length < 10) return `<div class="eyebrow">Blockage and smell</div><p class="small muted" style="margin:0">${ks.length} day${ks.length === 1 ? '' : 's'} with both rated so far. At 10 this shows how closely they move together.</p>`;
+  const r0 = nlCorr(ks.map(noseR), ks.map(noseS));
+  const pr = (a, b) => { const p = ks.filter(k => G[b](addDays(k, 1)) !== null); return p.length >= 8 ? nlCorr(p.map(k => G[a](k)), p.map(k => G[b](addDays(k, 1)))) : null; };
   const lagS = pr('r', 'sm'), lagB = pr('sm', 'r');
-  const av = f => { const v = ks.filter(f).map(k => S.nose[k].sm); return v.length >= 3 ? v.reduce((a, b) => a + b, 0) / v.length : null; };
-  const blk = av(k => S.nose[k].r <= 2), clr = av(k => S.nose[k].r >= 4);
+  const av = f => { const v = ks.filter(f).map(noseS); return v.length >= 3 ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+  const blk = av(k => noseR(k) <= 2), clr = av(k => noseR(k) >= 4);
   const how = r0 === null ? 'not enough spread to tell' : r0 >= 0.6 ? 'closely' : r0 >= 0.35 ? 'somewhat' : r0 >= 0.15 ? 'a little' : 'hardly at all';
   const sm = v => (NOSE_SM.find(x => x[0] === Math.round(v)) || [0, ''])[1].toLowerCase();
   const lagLine = lagS !== null && r0 !== null && lagS - r0 >= 0.15 ? " Smell lines up better with the day before's blockage than the same day's, so it tends to lag a day behind." : lagB !== null && r0 !== null && lagB - r0 >= 0.15 ? " Blockage lines up better with the day before's smell, so changes in smell tend to show first." : '';
-  return `<div class="eyebrow">Blockage and smell</div><p class="small" style="margin:0"><b>Over ${ks.length} mornings, they move together ${how}${r0 !== null ? ` (r = ${r0.toFixed(2)})` : ''}.</b>${blk !== null && clr !== null ? ` On blocked mornings smell averages ${blk.toFixed(1)} (${sm(blk)}); on clear ones, ${clr.toFixed(1)} (${sm(clr)}).` : ''}${lagLine}</p>
+  return `<div class="eyebrow">Blockage and smell</div><p class="small" style="margin:0"><b>Over ${ks.length} days, they move together ${how}${r0 !== null ? ` (r = ${r0.toFixed(2)})` : ''}.</b>${blk !== null && clr !== null ? ` On blocked days smell averages ${blk.toFixed(1)} (${sm(blk)}); on clear ones, ${clr.toFixed(1)} (${sm(clr)}).` : ''}${lagLine}</p>
     <p class="small muted" style="margin:0">${r0 !== null && r0 < 0.35 ? 'A weak link means smell is being affected by something besides airflow, which is worth knowing on its own.' : 'r runs from 0 (no link) to 1 (they always move together).'}</p>`;
 }
 // kept for the slides and tips: next-morning condition, as before
 function noseStats() {
   const f = noseLearn().filter(x => x.out === 'cond' && !x.next.early).map(x => ({ id: x.id === 'alc6' ? 'alc6' : x.id, n: x.x.n, a: x.next.a, b: x.next.b, ny: x.next.ny, d: x.next.d, p: x.next.p }));
-  const r = noseRated(); return { n: r.length, avg: r.length ? r.reduce((a, k) => a + S.nose[k].r, 0) / r.length : null, f };
+  const r = noseRated(); return { n: r.length, avg: r.length ? r.reduce((a, k) => a + noseR(k), 0) / r.length : null, f };
 }
 // the check-in: what has worked for you before, given what the app knows about this morning
 function noseYours(k) {
@@ -12079,7 +12153,7 @@ Object.assign(ACT, { nlout(d) { UI.nlOut = d.v; render(); } });
 
 function noseLine(rated) {
   const tk = todayKey(), cur = startOf(tk), pts = [];
-  for (let i = 25; i >= 0; i--) { const st = addDays(cur, -7 * i), v = rated.filter(k => k >= st && k <= addDays(st, 6)).map(k => S.nose[k].r); if (v.length >= 2) pts.push({ st, v: v.reduce((a, b) => a + b, 0) / v.length }); }
+  for (let i = 25; i >= 0; i--) { const st = addDays(cur, -7 * i), v = rated.filter(k => k >= st && k <= addDays(st, 6)).map(noseR); if (v.length >= 2) pts.push({ st, v: v.reduce((a, b) => a + b, 0) / v.length }); }
   if (pts.length < 3) return '';
   const W = 300, H = 96, L = 44, R = 10, T = 8, B = 18, x = i => L + ((W - L - R) * i) / (pts.length - 1), y = v => T + (H - T - B) * (1 - (v - 1) / 4);
   const d = pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(p.v).toFixed(1)}`).join('');
@@ -12168,7 +12242,7 @@ function mrStats(a, b) {
   const alcDays = days.filter(k => k in S.alc), units = alcDays.reduce((p, k) => p + +S.alc[k], 0);
   const runDays = days.filter(k => k in S.run), runs = runDays.filter(k => S.run[k] === 1).length;
   const LD = liftDays().m; let liftDone = 0, liftPlan = 0; days.forEach(k => { if (LD[k]) liftDone += LD[k]; try { if (trDays(startOf(k)).includes(k)) liftPlan++; } catch (e) { /* no training plan */ } });
-  const sl = days.map(k => (S.ck[k] || {}).sl).filter(v => v > 0), ns = days.map(k => S.nose[k]).filter(n => n && n.r && !n.imp);
+  const sl = days.map(k => (S.ck[k] || {}).sl).filter(v => v > 0), ns = days.map(noseR).filter(v => v !== null);
   const w0 = wAvg(addDays(a, Math.min(6, daysBetween(a, b)))), w1 = wAvg(b);
   return {
     a, b, n: days.length, days, set,
@@ -12176,7 +12250,7 @@ function mrStats(a, b) {
     ferm: days.map(k => foodVal('ferm', k)).filter(v => v !== null && v !== undefined).reduce((p, q) => p + q, 0),
     units, unitsWk: alcDays.length ? (units / alcDays.length) * 7 : null, alcN: alcDays.length,
     runs, runsWk: runDays.length ? (runs / runDays.length) * 7 : null,
-    liftDone, liftPlan, sleep: avg(sl), nose: ns.length ? avg(ns.map(n => n.r)) : null, noseGood: ns.filter(n => n.r >= 4).length, noseN: ns.length,
+    liftDone, liftPlan, sleep: avg(sl), nose: ns.length ? avg(ns) : null, noseGood: ns.filter(v => v >= 4).length, noseN: ns.length,
     wDelta: w0 && w1 ? w1.v - w0.v : null, ck: days.filter(ckSaved).length
   };
 }
@@ -12297,8 +12371,8 @@ function mrDrink(s) {
   let run = 0, best = { n: 0 }, cur = null; s.days.forEach(k => { if (k in S.alc && +S.alc[k] === 0) { if (!run) cur = k; run++; if (run > best.n) best = { n: run, a: cur, b: k }; } else run = 0; });
   const big = s.days.filter(k => +S.alc[k] >= 6).sort((p, q) => S.alc[q] - S.alc[p])[0];
   let bigTxt = '';
-  if (big) { const dk = noseDrinks(big), nx = addDays(big, 1), nr = S.nose[nx] && !S.nose[nx].imp ? S.nose[nx].r : null, sl = (S.ck[nx] || {}).sl;
-    bigTxt = `<p>The one night that cost you most was ${DOWL[dayIndex(big)]} the ${dayOrd(big)}: ${fmtU(+S.alc[big])} units${dk.wine ? ', mostly wine' : dk.beer ? ', mostly beer' : ''}.${nr || sl ? ` The next morning${nr ? ` your nose scored ${nr} out of 5` : ''}${nr && sl ? ' and' : ''}${sl ? ` you slept ${fmtHM(sl)}` : ''}.` : ''}</p>`; }
+  if (big) { const dk = noseDrinks(big), nx = addDays(big, 1), nr = noseR(nx), sl = (S.ck[nx] || {}).sl;
+    bigTxt = `<p>The one night that cost you most was ${DOWL[dayIndex(big)]} the ${dayOrd(big)}: ${fmtU(+S.alc[big])} units${dk.wine ? ', mostly wine' : dk.beer ? ', mostly beer' : ''}.${nr || sl ? ` The next day${nr ? ` your nose averaged ${+nr.toFixed(1)} out of 5` : ''}${nr && sl ? ' and' : ''}${sl ? ` you slept ${fmtHM(sl)}` : ''}.` : ''}</p>`; }
   return `<p>${fmtU(alcR(s.units))} units across the month, ${fmtU(alcR(s.unitsWk))} a week.${t0 !== null && t1 !== null && Math.abs(t1 - t0) >= 0.3 ? ` Your 3-month average ${t1 < t0 ? 'fell' : 'rose'} from ${fmtU(alcR(t0))} to ${fmtU(alcR(t1))}.` : ''} ${dry} dry day${dry === 1 ? '' : 's'}${best.n >= 2 ? `, and the longest run was ${best.n}, from the ${dayOrd(best.a)} to the ${dayOrd(best.b)}` : ''}.</p>${bigTxt}`;
 }
 function mrMove(s) {
@@ -12314,7 +12388,7 @@ function mrBody(s) {
   const ws = Object.keys(w.waist).filter(k => k >= s.a && k <= s.b).sort(); if (ws.length >= 2) { const dd = w.waist[ws[ws.length - 1]] - w.waist[ws[0]]; parts.push(Math.abs(dd) < 0.01 ? 'Waist unchanged.' : `Waist ${dd < 0 ? 'down' : 'up'} ${+Math.abs(dd).toFixed(2)} in.`); }
   if (s.sleep) { const short = s.days.filter(k => (S.ck[k] || {}).sl > 0).sort((p, q) => S.ck[p].sl - S.ck[q].sl).slice(0, 3), drank = short.filter(k => +S.alc[addDays(k, -1)] >= 3).length;
     parts.push(`Sleep averaged ${s.sleep.toFixed(1)} hours${short.length === 3 && drank >= 2 ? `; ${drank === 3 ? 'all three' : 'two'} of your shortest nights followed drinking` : ''}.`); }
-  if (s.noseN) { const bad = s.days.filter(k => S.nose[k] && !S.nose[k].imp && S.nose[k].r <= 2), wine = bad.filter(k => noseDrinks(addDays(k, -1)).wine).length, dry = bad.filter(k => (S.nose[k].cx || []).some(x => ['heating', 'aircon', 'dryair'].includes(x))).length;
+  if (s.noseN) { const bad = s.days.filter(k => noseR(k) !== null && noseR(k) <= 2), wine = bad.filter(k => noseDrinks(addDays(k, -1)).wine).length, dry = bad.filter(k => (S.nose[k].cx || []).some(x => ['heating', 'aircon', 'dryair'].includes(x))).length;
     parts.push(`Your nose had ${s.noseGood} good morning${s.noseGood === 1 ? '' : 's'} out of ${s.noseN}${bad.length && (wine || dry) ? `, and the worst ones followed ${joinAnd([wine ? 'wine' : '', dry ? 'dry air or the heating' : ''].filter(Boolean))}` : ''}.`); }
   return parts.length ? `<p>${parts.join(' ')}</p>` : '';
 }
@@ -12588,6 +12662,8 @@ function repairDrinks() {
   nudgeWeek(UI.tab);
   render();
   if (fixMsg) toast(fixMsg, 9000); else if (noseMsg) toast(noseMsg, 7000); else if (mfMsg) toast(mfMsg, 10000);
+  // long-press shortcut on the app icon: ?nose=1 opens the nose logger straight away
+  if (/[?&]nose=1\b/.test(location.search)) { try { history.replaceState(history.state, '', location.pathname); } catch (e) { /* not allowed here */ } ACT.nlog(); }
   tloop();
 })();
 
