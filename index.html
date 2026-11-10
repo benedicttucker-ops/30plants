@@ -736,10 +736,15 @@ svg.inl.nk, .nk { color: var(--warn); }
 @media (max-width: 400px) { .nav button { font-size: 10.5px; } .nav button svg { width: 22px; height: 22px; } }
 
 /* sugar and sodium on the day hero */
-.lims { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: 12.5px; font-weight: 700; color: var(--muted); }
-.lims b { color: var(--ink); font-variant-numeric: tabular-nums; margin-left: 4px; }
-.lims i { font-style: normal; font-weight: 400; }
-.lims .over, .lims .over b { color: var(--warn); }
+.limb { display: grid; gap: 7px; }
+.limb .minilbl { margin-bottom: 3px; }
+.limb .minilbl small { font-weight: 400; font-size: 11.5px; margin-left: 4px; }
+.limb .bar.lim { height: 5px; }
+.limb .bar.lim .eat { background: var(--ink); opacity: .7; }
+.limb .over .bar.lim .plan { background: color-mix(in srgb, var(--warn) 50%, transparent); }
+.limb .over .minilbl small { color: var(--warn); }
+.limb .eatover .bar.lim .eat { background: var(--warn); opacity: 1; }
+.limb .eatover .minilbl b { color: var(--warn); }
 .adjt { font-weight: 400; color: var(--muted); }
 .adjm { font-size: 10px; margin-left: 1px; color: var(--accent); }
 .adjnote { display: flex; gap: 6px; align-items: flex-start; margin: 6px 0 0; font-size: 12px; line-height: 1.35; color: var(--muted); }
@@ -1982,6 +1987,10 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 .nrdx svg { width: 13px; height: 13px; }
 .nrdx:focus-visible { outline: 2px solid var(--accent); }
 .nltime { max-width: 160px; margin-bottom: 6px; }
+.nlag.t3 .lagrow { grid-template-columns: minmax(0, 1fr) repeat(2, 78px); }
+.nlag.t3 .lagrow > span:not(:first-child) { white-space: nowrap; }
+.nwx { margin: -2px 0 8px; font-size: 13px; color: var(--muted); }
+.lagrow.sub span:first-child { font-weight: 600; padding-top: 6px; }
 .ntdot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: 0; }
 </style>
 </head>
@@ -2008,7 +2017,7 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.26.0';</script>
+<script>window.TP_VERSION = '3.27.1';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -5154,7 +5163,7 @@ function vToday() {
     <div class="heroside"><div class="eyebrow">${k === tk ? 'Today · ' : ''}${fmtDay(k)}</div>
       <div><div class="minilbl"><span>Protein${adjTag(dg.protein)}</span><b>${fmtN(c.eatP)}<span class="muted"> / ${dg.protein.g}g</span></b></div><div class="bar leaf">${barI('plan', 'pP', c.planP / Math.max(1, dg.protein.g))}${barI('eat', 'pE', c.eatP / Math.max(1, dg.protein.g))}</div></div>
       <div><div class="minilbl"><span>Fibre${adjTag(dg.fibre)}</span><b>${fmtN(c.eatF)}<span class="muted"> / ${dg.fibre.g}g</span></b></div><div class="bar leaf">${barI('plan', 'fP', c.planF / Math.max(1, dg.fibre.g))}${barI('eat', 'fE', c.eatF / Math.max(1, dg.fibre.g))}</div></div>
-      <div class="lims" aria-label="Planned for the day"><span class="${c.planFS > dg.sugar.g ? 'over' : ''}">Sugar <b>${fmtFS(c.planFS)}</b><i>/${dg.sugar.g}g</i>${adjMark(dg.sugar)}</span><span class="${Math.round(c.planNa * 10) / 10 > dg.sodium.g ? 'over' : ''}">Sodium <b>${fmtNa(c.planNa)}</b><i>/${dg.sodium.g}g</i>${adjMark(dg.sodium)}</span><span class="${Math.round(c.planSF) > dg.satfat.g ? 'over' : ''}">Sat fat <b>${fmtN(c.planSF)}g</b><i>/${dg.satfat.g}g</i>${adjMark(dg.satfat)}</span></div>
+      ${limBars(c, dg)}
       ${adjNote(dg)}
       <div class="flags"><button class="flag ${ferm[0]}" data-a="flagopen" data-v="ferm" aria-expanded="${UI.flag === 'ferm'}">${ic('jar')}${ferm[1]}</button><button class="flag" data-a="flagopen" data-v="cols" aria-expanded="${UI.flag === 'cols'}" aria-label="${c.colours.size} colour group${c.colours.size === 1 ? '' : 's'} today. Tap for which plants">${cdots(c.colours)}</button></div>
       <button class="targetbtn" data-a="target">${fmtN(c.T)} kcal${c.dK ? ' incl. drinks' : c.custom ? ' today' : ''}${ic('edit')}</button></div>
@@ -5428,6 +5437,12 @@ function weekLedger(id, st) {
 // average for the week to land on the goal: protein and fibre up when the days so far ran short, limits down when over
 const NEED_IDS = { protein: 'protGoal', fibre: 'fibreGoal', sugar: 'fsMax', sodium: 'naMax', satfat: 'sfMax' };
 const adjTag = x => (x.adj ? `<small class="adjt"> · usual ${x.u}g</small>` : '');
+// 3.27.1 sugar, sodium and sat fat: eaten so far as the bar, the day's plan as the faint part behind it, the limit as
+// the full width. Orange once the plan goes over the limit
+function limBars(c, dg) {
+  const one = (lab, e, pl, lim, over, f, m, key) => `<div class="${over ? 'over' : ''}${f(e).replace(/g$/, '') > lim ? ' eatover' : ''}"><div class="minilbl"><span>${lab}${m} <small>${f(pl)} planned</small></span><b>${f(e).replace(/g$/, '')}<span class="muted"> / ${lim}g</span></b></div><div class="bar lim">${barI('plan', key + 'P', pl / Math.max(0.1, lim))}${barI('eat', key + 'E', e / Math.max(0.1, lim))}</div></div>`;
+  return `<div class="limb" aria-label="Sugar, sodium and saturated fat: eaten so far against the limit, with what's planned for the day">${one('Sugar', c.eatFS, c.planFS, dg.sugar.g, c.planFS > dg.sugar.g, fmtFS, adjMark(dg.sugar), 'su')}${one('Sodium', c.eatNa, c.planNa, dg.sodium.g, Math.round(c.planNa * 10) / 10 > dg.sodium.g, fmtNa, adjMark(dg.sodium), 'na')}${one('Sat fat', c.eatSF, c.planSF, dg.satfat.g, Math.round(c.planSF) > dg.satfat.g, v => `${fmtN(v)}g`, adjMark(dg.satfat), 'sf')}</div>`;
+}
 const adjMark = x => (x.adj ? `<sup class="adjm" aria-label="adjusted for the week, usually ${x.u}g">${x.up ? '↑' : '↓'}</sup>` : '');
 function adjNote(dg) {
   const ch = Object.keys(NEED_IDS).filter(id => dg[id].adj); if (!ch.length) return '';
@@ -6944,7 +6959,8 @@ function renderDock() {
   document.body.classList.add('has-dock');
   root.innerHTML = `<div class="tdock">${TM.map(t => `<button class="tpill ${t.rang ? 'ring' : t.end ? '' : 'paused'}" data-a="tmrpill" data-id="${t.id}" aria-label="${t.rang ? 'Stop timer' : 'Open timer step'}">${ic('clock')}<b data-tl="${t.id}">${t.rang ? 'Done' : mmss(tLeft(t))}</b><span>${esc(t.lbl)}${TM.length > 1 ? '' : ` · ${esc(t.rn)}`}</span></button>`).join('')}</div>`;
 }
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { tTick(); wake(); dayRollover(); } });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { tTick(); wake(); dayRollover(); wxFetch(); } });
+window.addEventListener('online', () => wxFetch());
 // a reloaded page has no sound until the first tap, so wake the audio then if timers are running
 document.addEventListener('pointerdown', () => { if (TM.length && !AC) audio(); }, { passive: true });
 
@@ -11829,7 +11845,7 @@ function noseCard(k) {
       ${sy.length ? sy.map(id => noseAdvice(id, noseCond(k))).join('') : r >= 4 ? '<p class="small muted" style="margin:0">Logged. Good mornings show what to reproduce, so tap anything from yesterday that might explain it.</p>' : ''}`;
   }
   // part of the check-in card, just above its Save button; each tap saves straight away
-  return `<div class="nosecard ckf" role="group" aria-label="Nose"><div class="nshead">${idl(shArt('nose', 44))}<div><div class="cklbl">Nose this morning</div><b>How's your nose?</b></div>${r || sm || cx.length ? '<button class="btn link sm" data-a="nclear">Clear</button>' : ''}</div>${scale}${noseReadings(k)}${more}</div>`;
+  return `<div class="nosecard ckf" role="group" aria-label="Nose"><div class="nshead">${idl(shArt('nose', 44))}<div><div class="cklbl">Nose this morning</div><b>How's your nose?</b></div>${r || sm || cx.length ? '<button class="btn link sm" data-a="nclear">Clear</button>' : ''}</div>${noseWxLine(k)}${scale}${noseReadings(k)}${more}</div>`;
 }
 // decongestant sprays: the MHRA's advice (April 2026) is no more than five days in a row, or the nose can rebound
 function noseSudafed(k) {
@@ -11922,6 +11938,112 @@ const NL_RES = {
   poornose: { sleep: [-1, 'a blocked nose is a risk factor for disturbed breathing in sleep', 'young'] }
 };
 const NL_SRC = { chong_st: 'Chong et al. 2016, Cochrane Database of Systematic Reviews (steroid sprays)', chong_sal: 'Chong et al. 2016, Cochrane Database of Systematic Reviews (saline irrigation)', nihlen: 'Nihlén et al. 2005, Respiratory Medicine', ebrahim: 'Ebrahim et al. 2013, Alcoholism: Clinical and Experimental Research', kredlow: 'Kredlow et al. 2015, Journal of Behavioral Medicine', young: 'Young et al. 1997, Journal of Allergy and Clinical Immunology' };
+/* 3.27 weather for the nose: Open-Meteo for New Cross, hour by hour, kept under its own key so it stays out of
+   backups and can always be fetched again. WX.d[day] = { t, dp, p, pm, no2, pol }: 24 hourly values each (null when
+   missing), for temperature, dew point, sea-level pressure, PM2.5, nitrogen dioxide and the highest pollen count */
+const WX_KEY = 'thirtyplants.wx', WX_LAT = 51.476, WX_LON = -0.035, WX_F = ['t', 'dp', 'p', 'pm', 'no2', 'pol'];
+const WX_POL = ['alder_pollen', 'birch_pollen', 'grass_pollen', 'mugwort_pollen', 'olive_pollen', 'ragweed_pollen'];
+function wxNorm(j) {
+  const o = { d: {}, at: 0, err: 0 }; if (!j || typeof j !== 'object') return o;
+  if (Number.isFinite(j.at)) o.at = j.at; if (Number.isFinite(j.err)) o.err = j.err;
+  const cut = dkey(new Date(Date.now() - 400 * 864e5));
+  if (j.d && typeof j.d === 'object') Object.keys(j.d).forEach(k => {
+    const d = j.d[k]; if (!/^\d{4}-\d\d-\d\d$/.test(k) || k < cut || !d || typeof d !== 'object') return;
+    const x = {}; let any = false;
+    WX_F.forEach(f => { x[f] = Array.from({ length: 24 }, (_, h) => { const v = Array.isArray(d[f]) ? d[f][h] : null; if (typeof v === 'number' && isFinite(v)) { any = true; return v; } return null; }); });
+    if (any) o.d[k] = x;
+  });
+  return o;
+}
+let WX = (() => { try { return wxNorm(JSON.parse(localStorage.getItem(WX_KEY) || 'null')); } catch (e) { return wxNorm(null); } })();
+let WXN = 0, WXBUSY = false;
+const wxBlank = () => Object.fromEntries(WX_F.map(f => [f, Array(24).fill(null)]));
+// one Open-Meteo answer into the store; map is field -> variable name, or a list whose highest value is kept
+function wxPut(j, map) {
+  const h = j && j.hourly; if (!h || !Array.isArray(h.time)) return 0;
+  let n = 0;
+  h.time.forEach((ts, i) => {
+    const k = String(ts).slice(0, 10), hr = +String(ts).slice(11, 13); if (!/^\d{4}-\d\d-\d\d$/.test(k) || !(hr >= 0 && hr < 24)) return;
+    const d = WX.d[k] || (WX.d[k] = wxBlank());
+    Object.keys(map).forEach(f => {
+      const src = [].concat(map[f]), vs = src.map(v => (Array.isArray(h[v]) ? h[v][i] : null)).filter(v => typeof v === 'number' && isFinite(v));
+      if (vs.length) { d[f][hr] = Math.round(Math.max(...vs) * 10) / 10; n++; }
+    });
+  });
+  return n;
+}
+// asks with the longest history first and steps down if the service turns that down, so one wrong guess about its
+// limits doesn't lose everything
+async function wxGet(urls) { let last; for (const u of urls) { try { return await offGet(u, 20000); } catch (e) { last = e; if (!/HTTP 4\d\d/.test(String(e && e.message))) break; } } throw last || new Error('no data'); }
+async function wxFetch(force) {
+  if (WXBUSY || !Object.keys(S.nose).some(k => noseR(k) !== null || noseS(k) !== null) || navigator.onLine === false) return;
+  if (!force && Date.now() - (WX.at || 0) < 3 * 36e5) return;
+  const tk = todayKey(), have = Object.keys(WX.d).filter(k => k < tk && WX.d[k].dp.some(v => v !== null)).sort();
+  // the first time, as far back as the service goes (about three months); after that, from the last day it has
+  const past = have.length ? Math.min(92, Math.max(2, daysBetween(have[have.length - 1], tk) + 2)) : 92;
+  const pasts = [past].concat([31, 7].filter(x => x < past));
+  const base = p => `latitude=${WX_LAT}&longitude=${WX_LON}&timezone=Europe%2FLondon&past_days=${p}&forecast_days=2`;
+  WXBUSY = true;
+  try {
+    const [a, b] = await Promise.allSettled([
+      wxGet(pasts.map(p => `https://api.open-meteo.com/v1/forecast?${base(p)}&hourly=temperature_2m,dew_point_2m,pressure_msl`)),
+      wxGet(pasts.flatMap(p => [`https://air-quality-api.open-meteo.com/v1/air-quality?${base(p)}&hourly=pm2_5,nitrogen_dioxide,${WX_POL.join(',')}`, `https://air-quality-api.open-meteo.com/v1/air-quality?${base(p)}&hourly=pm2_5,nitrogen_dioxide`]))
+    ]);
+    let n = 0;
+    if (a.status === 'fulfilled') n += wxPut(a.value, { t: 'temperature_2m', dp: 'dew_point_2m', p: 'pressure_msl' });
+    if (b.status === 'fulfilled') n += wxPut(b.value, { pm: 'pm2_5', no2: 'nitrogen_dioxide', pol: WX_POL });
+    if (n) { WX.at = Date.now(); WX.err = 0; } else WX.err = Date.now();
+    WX = wxNorm(WX); WXN++; NLC = null;
+    try { localStorage.setItem(WX_KEY, JSON.stringify(WX)); } catch (e) { /* storage full: kept for this session */ }
+    // shown at once unless you're in the middle of something
+    const ae = document.activeElement;
+    if (n && !SH && !(ae && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName))) render();
+  } finally { WXBUSY = false; }
+}
+const wxAt = (k, h, f) => { const d = WX.d[k], v = d && d[f] ? d[f][h] : null; return typeof v === 'number' ? v : null; };
+// hours from 'from' o'clock the day before k up to and including 'to' o'clock on k
+function wxSpan(k, f, from, to) { const y = addDays(k, -1), v = []; for (let h = from; h < 24; h++) v.push(wxAt(y, h, f)); for (let h = 0; h <= to; h++) v.push(wxAt(k, h, f)); return v.filter(x => x !== null); }
+const wxMean = (v, need) => (v.length >= need ? v.reduce((a, b) => a + b, 0) / v.length : null);
+// how damp the air would be indoors once heated to 20°C, from the dew point outside (Magnus formula)
+const wxIn = dp => { const e = t => 6.112 * Math.exp(17.62 * t / (243.12 + t)); return Math.min(100, Math.round(100 * e(dp) / e(20))); };
+// a morning m: the night before it (6pm to 8am) for dew point and temperature, the 24 hours to 8am for the air,
+// and the change in pressure over those 24 hours
+let WXDC = {}, WXDN = -1;
+function wxDay(m) {
+  if (WXDN !== WXN) { WXDC = {}; WXDN = WXN; }
+  if (m in WXDC) return WXDC[m];
+  const tn = wxSpan(m, 't', 18, 8), dp = wxMean(wxSpan(m, 'dp', 18, 8), 10), p0 = wxAt(addDays(m, -1), 8, 'p'), p1 = wxAt(m, 8, 'p');
+  const pl = wxSpan(m, 'pol', 9, 8), n2 = wxSpan(m, 'no2', 9, 8);
+  const o = dp === null && tn.length < 10 ? null : { dp, tmin: tn.length >= 10 ? Math.min(...tn) : null, tmax: tn.length >= 10 ? Math.max(...tn) : null, pd: p0 !== null && p1 !== null ? p1 - p0 : null, pm: wxMean(wxSpan(m, 'pm', 9, 8), 16), no2: n2.length >= 16 ? Math.max(...n2) : null, pol: pl.length >= 16 ? Math.max(...pl) : null };
+  return (WXDC[m] = o);
+}
+// where "dry", "cold" and so on start: your own spread of days, so there are always some each way. Fixed floors
+// keep "falling pressure" falling and "polluted" above clean-air levels
+let WXCUT = null, WXCN = -1;
+function wxCuts() {
+  if (WXCUT && WXCN === WXN) return WXCUT;
+  const tk = todayKey(), ds = Object.keys(WX.d).filter(k => k <= tk).map(wxDay).filter(Boolean);
+  const q = (f, p) => { const a = ds.map(d => d[f]).filter(v => v !== null).sort((x, y) => x - y); return a.length >= 15 ? a[Math.round(p * (a.length - 1))] : null; };
+  const r = (v, g) => (v === null ? null : g(Math.round(v)));
+  WXCUT = { dp: r(q('dp', 1 / 3), v => v), tmin: r(q('tmin', 1 / 3), v => v), pd: r(q('pd', 1 / 4), v => Math.min(-3, v)), pm: r(q('pm', 2 / 3), v => Math.max(5, v)) };
+  WXCN = WXN; return WXCUT;
+}
+const wxF = (f, test) => m => { const c = wxCuts()[f], d = wxDay(m); return c === null || c === undefined || !d || d[f] === null ? null : test(d[f], c); };
+// UK bands: the Daily Air Quality Index for PM2.5 (24-hour mean) and nitrogen dioxide (hourly), and the Met
+// Office's grass pollen counts, used here for every kind of pollen
+const wxAir = d => { const b = [[35, 53, 70], [200, 400, 600]], lv = (v, t) => (v === null ? -1 : t.findIndex(x => v <= x) < 0 ? 3 : t.findIndex(x => v <= x)); const i = Math.max(lv(d.pm, b[0]), lv(d.no2, b[1])); return i < 0 ? '' : ['low', 'moderate', 'high', 'very high'][i]; };
+const wxPol = v => (v === null ? '' : v < 1 ? 'none' : v < 30 ? 'low' : v < 50 ? 'moderate' : v < 150 ? 'high' : 'very high');
+const wxDryW = ih => (ih < 30 ? 'very dry' : ih < 40 ? 'dry' : ih <= 60 ? 'comfortable' : 'damp');
+// the line on the nose card
+function noseWxLine(k) {
+  const d = wxDay(k); if (!d) return '';
+  const parts = [];
+  if (d.tmin !== null) { const a = Math.round(d.tmin), b = Math.round(d.tmax); parts.push(a === b ? `${a}°C` : `${a} to ${b}°C`); }
+  if (d.dp !== null) { const ih = wxIn(d.dp); parts.push(`${wxDryW(ih)} air (about ${ih}% indoors at 20°C)`); }
+  const air = wxAir(d); if (air) parts.push(`pollution ${air}`);
+  const pl = wxPol(d.pol); if (pl) parts.push(pl === 'none' ? 'no pollen' : `pollen ${pl}`);
+  return parts.length ? `<p class="nwx">${esc(`Overnight in New Cross: ${parts.join(' · ')}`)}</p>` : '';
+}
 // the things compared, each read for a morning m: true, false, or unknown. wk: how a fortnight is judged for the long run
 const NL_X = [
   { id: 'steroid', n: 'Steroid the night before', sh: 'the steroid', helps: 1, out: ['cond', 'smell', 'sleep', 'dry', 'crust', 'drain'], f: m => nlCk(m, 'steroid'), wk: { n: 'Steroid most nights for two weeks', f: m => nlCk(m, 'steroid') } },
@@ -11937,7 +12059,13 @@ const NL_X = [
   { id: 'late', n: 'Ate late or heavy', sh: 'eating late', helps: -1, out: ['cond', 'sleep', 'dry', 'crust', 'drain'], f: m => noseHas(m, ['latefood']) },
   { id: 'sudafed', n: 'Sudafed spray the day before', sh: 'the Sudafed spray', helps: 0, out: ['cond', 'smell', 'sleep', 'dry', 'crust', 'drain'], f: m => noseHas(m, ['sudafed']) },
   { id: 'picked', n: 'Picked or blew hard', sh: 'picking', helps: -1, out: ['cond', 'dry', 'crust', 'drain'], f: m => noseHas(m, ['picked']) },
-  { id: 'poornose', n: 'A rough nose that day', sh: 'a rough nose', helps: -1, out: ['sleep'], f: m => { const y = NL_Y.cond(addDays(m, -1)); return y === null ? null : y <= 2; } }
+  { id: 'poornose', n: 'A rough nose that day', sh: 'a rough nose', helps: -1, out: ['sleep'], f: m => { const y = NL_Y.cond(addDays(m, -1)); return y === null ? null : y <= 2; } },
+  // the weather (3.27): where each one starts comes from your own spread of days, so the name carries the figure
+  { id: 'wxdry', get n() { const c = wxCuts().dp; return `Dry air overnight${c !== null ? ` (dew point under ${c}°C)` : ''}`; }, sh: 'dry weather', helps: -1, out: ['cond', 'smell', 'sleep', 'dry', 'crust', 'drain'], f: wxF('dp', (v, c) => v < c) },
+  { id: 'wxcold', get n() { const c = wxCuts().tmin; return `A cold night${c !== null ? ` (under ${c}°C)` : ''}`; }, sh: 'a cold night', helps: -1, out: ['cond', 'sleep', 'drain'], f: wxF('tmin', (v, c) => v < c) },
+  { id: 'wxpress', get n() { const c = wxCuts().pd; return `Falling pressure${c !== null ? ` (down ${-c} hPa or more in a day)` : ''}`; }, sh: 'falling pressure', helps: -1, out: ['cond', 'smell'], f: wxF('pd', (v, c) => v <= c) },
+  { id: 'wxair', get n() { const c = wxCuts().pm; return `More polluted air${c !== null ? ` (PM2.5 over ${c})` : ''}`; }, sh: 'polluted air', helps: -1, out: ['cond', 'smell', 'dry', 'crust', 'drain'], f: wxF('pm', (v, c) => v > c) },
+  { id: 'wxpol', n: 'Pollen moderate or higher', sh: 'pollen', helps: -1, out: ['cond', 'smell', 'drain', 'sleep'], f: m => { const d = wxDay(m); return !d || d.pol === null ? null : d.pol >= 30; } }
 ];
 // a seeded shuffle, so the same data always gives the same answer
 function nlRand(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
@@ -12046,15 +12174,54 @@ function noseTrends() {
   const srcs = [...new Set(rows.concat(wk).filter(f => f.res).map(f => f.res.s))];
   return `<section class="wsum nosetr" id="tr-nose"><div class="nshead">${idl(shArt('nose', 52))}<div><div class="eyebrow">Nose · what works for you</div><b>${head}</b><small>${esc(sub)}</small></div></div>
     ${noseLine(rated)}
-    <p class="small" style="margin:0"><b>${nC} clear finding${nC === 1 ? '' : 's'}, ${nL} leaning</b>, ${nE} still too early. Checked against blockage, smell, dryness, crusting and draining each morning, and the night's sleep.</p>
+    <p class="small" style="margin:0"><b>${nC} clear finding${nC === 1 ? '' : 's'}, ${nL} leaning</b>, ${nE} still too early. Checked against blockage, smell, dryness, crusting and draining each morning, and the night's sleep, with the weather in New Cross alongside your own habits.</p>
     ${tabs}
     ${rows.length ? `<div class="nlist">${rows.map(nlRow).join('')}</div>` : `<p class="small muted" style="margin:0">Nothing to compare yet for ${(NOSE_OUT.find(o => o[0] === out) || [0, ''])[1].toLowerCase()}}.</p>`}
     ${wkRows ? `<div class="eyebrow">Over weeks</div><div class="nlist">${wkRows}</div>` : ''}
     ${lag}${wins}${need}
-    ${noseTimes()}${noseRinse()}${noseNight()}${noseAlign()}
+    ${noseTimes()}${noseWx()}${noseRinse()}${noseNight()}${noseAlign()}
     ${imp.length ? `<p class="small muted" style="margin:0">Plus ${imp.length} day${imp.length === 1 ? '' : 's'} from the nose app's log, before mornings were rated, so they're left out of the averages.</p>` : ''}
     ${srcs.length ? `<p class="small muted" style="margin:0;font-style:italic">${srcs.map(esc).join(' · ')}</p>` : ''}</section>`;
 }
+// the weather at the time of each reading: the morning check-in counts as 8am. Split into thirds of your own
+// readings, so each row has enough to go on
+const WXG = [['dp', 'Air', ['Driest', 'Middle', 'Dampest'], 'dew point', '°C', ['driest air', 'dampest air']], ['t', 'Temperature', ['Coldest', 'Middle', 'Warmest'], '', '°C', ['coldest weather', 'warmest weather']], ['pm', 'PM2.5 pollution', ['Cleanest', 'Middle', 'Dirtiest'], '', '', ['cleanest air', 'dirtiest air']]];
+function noseWx() {
+  const head = '<div class="eyebrow">Weather in New Cross</div>', tk = todayKey();
+  if (!Object.keys(WX.d).length) return `${head}<p class="small muted" style="margin:0">${WX.err ? 'Couldn’t reach the weather service yet. It tries again each time the app opens with a connection.' : 'The weather comes in once the app is online: about three months back, then each day after.'} <button class="btn link sm" data-a="wxnow">Try now</button></p>`;
+  const pts = [];
+  Object.keys(S.nose).forEach(k => {
+    const e = S.nose[k]; if (e.imp || k > tk) return;
+    const add = (h, r, sm) => { if (r || sm) pts.push({ r: r || 0, sm: sm || 0, dp: wxAt(k, h, 'dp'), t: wxAt(k, h, 't'), pm: wxAt(k, h, 'pm'), pol: wxAt(k, h, 'pol') }); };
+    add(8, e.r, e.sm); (e.rd || []).forEach(x => add(+x.t.slice(0, 2), x.r, x.sm));
+  });
+  const mean = a => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null);
+  const cell = (a, L) => { const v = mean(a); return v === null ? '<span class="muted">–</span>' : `<span><i class="ntdot" style="background:${nlCol(L, Math.round(v))}"></i>${v.toFixed(1)} <small class="muted">(${a.length})</small></span>`; };
+  const fmtV = (v, u) => `${Math.round(v)}${u}`;
+  let rows = '', best = null;
+  WXG.forEach(([f, lab, names, what, u, words]) => {
+    const p = pts.filter(x => x[f] !== null); if (p.length < 9) return;
+    const v = p.map(x => x[f]).sort((a, b) => a - b), c1 = v[Math.floor(v.length / 3)], c2 = v[Math.floor(2 * v.length / 3)];
+    if (c1 === c2) return;
+    const g = [p.filter(x => x[f] < c1), p.filter(x => x[f] >= c1 && x[f] < c2), p.filter(x => x[f] >= c2)];
+    const rng = [`under ${fmtV(c1, u)}`, `${fmtV(c1, u)} to ${fmtV(c2, u)}`, `${fmtV(c2, u)} and over`];
+    rows += `<div class="lagrow sub"><span>${lab}${what ? ` <small class="muted">(${what})</small>` : ''}</span><span></span><span></span></div>` + g.map((x, i) => `<div class="lagrow"><span>${names[i]} <small class="muted">${rng[i]}</small></span>${cell(x.filter(z => z.r).map(z => z.r), NOSE_R)}${cell(x.filter(z => z.sm).map(z => z.sm), NOSE_SM)}</div>`).join('');
+    const lo = g[0].filter(z => z.r).map(z => z.r), hi = g[2].filter(z => z.r).map(z => z.r);
+    if (lo.length >= 3 && hi.length >= 3) { const d = mean(hi) - mean(lo); if (!best || Math.abs(d) > Math.abs(best.d)) best = { d, lo: mean(lo), hi: mean(hi), words }; }
+  });
+  const pp = pts.filter(x => x.pol !== null), hiP = pp.filter(x => x.pol >= 30);
+  if (hiP.length >= 3 && pp.length - hiP.length >= 3) rows += `<div class="lagrow sub"><span>Pollen</span><span></span><span></span></div>` + [[pp.filter(x => x.pol < 30), 'None or low'], [hiP, 'Moderate or higher']].map(([x, l]) => `<div class="lagrow"><span>${l}</span>${cell(x.filter(z => z.r).map(z => z.r), NOSE_R)}${cell(x.filter(z => z.sm).map(z => z.sm), NOSE_SM)}</div>`).join('');
+  let line = '';
+  if (best && Math.abs(best.d) >= 0.4) { const [b, w] = best.d > 0 ? [[best.words[1], best.hi], [best.words[0], best.lo]] : [[best.words[0], best.lo], [best.words[1], best.hi]]; line = `<b>On your readings, blockage is best in the ${b[0]} (${b[1].toFixed(1)}) and worst in the ${w[0]} (${w[1].toFixed(1)}).</b> `; }
+  else if (rows) line = '<b>No weather pattern stands out in your readings yet.</b> ';
+  const tbl = rows ? `<div class="nlag t3"><div class="lagrow h"><span style="text-align:left">At the time of the reading</span><span>Blockage</span><span>Smell</span></div>${rows}</div>` : `<p class="small muted" style="margin:0">Once there are a few more readings with weather to match, this splits them by how dry, cold and polluted the air was at the time.</p>`;
+  const nd = Object.keys(WX.d).filter(k => k <= tk).length, upd = WX.at ? new Date(WX.at) : null;
+  const when = upd ? `updated ${dkey(upd) === tk ? '' : `${fmtDay(dkey(upd))}, `}${String(upd.getHours()).padStart(2, '0')}:${String(upd.getMinutes()).padStart(2, '0')}` : 'not updated yet';
+  return `${head}${tbl}
+    <p class="small" style="margin:0">${line}<span class="muted">The day-by-day weather rows above use the night before each morning. Dew point is how much water the air holds: the lower it is, the drier your flat gets once the heating warms that air. Weather, heating and the time of year all move together, so treat a pattern here as a lead rather than the cause. Pollen is modelled for the area, not counted, and sits at nothing outside the season.</span></p>
+    <p class="small muted" style="margin:0">Weather data by Open-Meteo.com for New Cross, ${nd} day${nd === 1 ? '' : 's'}, ${when}${WX.err > WX.at ? '; the last try didn’t get through' : ''}. <button class="btn link sm" data-a="wxnow">Update now</button></p>`;
+}
+Object.assign(ACT, { wxnow() { toast('Fetching the weather…'); wxFetch(true).then(() => { if (WX.err > WX.at) toast('Couldn’t reach the weather service'); else render(); }); } });
 // morning against evening rinse, outcome by outcome, next morning only
 // through the day: blockage and smell by time of day over the last four weeks, from days with readings after the
 // morning one, so each day is compared with itself
@@ -12074,7 +12241,7 @@ function noseTimes() {
   let line = '';
   if (ok.length >= 2) { const best = ok.reduce((a, b) => (b[1] > a[1] ? b : a)), worst = ok.reduce((a, b) => (b[1] < a[1] ? b : a)); const when = x => (x === 'Night' ? 'at night' : `in the ${x.toLowerCase()}`); if (best[1] - worst[1] >= 0.4) line = `<b>On your readings, blockage is usually best ${when(best[0])} (${best[1].toFixed(1)}) and worst ${when(worst[0])} (${worst[1].toFixed(1)}).</b> `; else line = '<b>Blockage stays much the same through the day on your readings so far.</b> '; }
   const nRd = ks.reduce((a, k) => a + S.nose[k].rd.length, 0);
-  return `${head}<div class="nlag"><div class="lagrow h"><span></span><span>Blockage</span><span>Smell</span></div>${rows}</div>
+  return `${head}<div class="nlag t3"><div class="lagrow h"><span></span><span>Blockage</span><span>Smell</span></div>${rows}</div>
     <p class="small" style="margin:0">${line}<span class="muted">${nRd} reading${nRd === 1 ? '' : 's'} through the day on ${ks.length} day${ks.length === 1 ? '' : 's'} in the last four weeks, plus those days' morning check-ins. Numbers in brackets are how many readings each average is from.</span></p>`;
 }
 function noseRinse() {
@@ -12665,6 +12832,7 @@ function repairDrinks() {
   // long-press shortcut on the app icon: ?nose=1 opens the nose logger straight away
   if (/[?&]nose=1\b/.test(location.search)) { try { history.replaceState(history.state, '', location.pathname); } catch (e) { /* not allowed here */ } ACT.nlog(); }
   tloop();
+  setTimeout(() => wxFetch(), 1500);
 })();
 
 window.ThirtyPlants = { trendsDebug: () => { TC = null; MCACHE = metrics(); return MCACHE.map(m => ({ id: m.id, light: m.light(), wins: Object.fromEntries(WINS.map(([w]) => [w, aggWin(m, w)])) })); }, alcBinges: () => alcBinges(), wAdvice, wSlope, weekUse, spareFrom, carryInto, wasteOf, R, ING, dayCalc, weekCalc, planWeek, suggestMode, shopTotals, sessions, state: () => S, art, prepModel, splitStep, stepTimers, timers: () => TM };
