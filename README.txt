@@ -1,4 +1,4 @@
-THIRTY PLANTS 3.28.1: putting it on your Android phone
+THIRTY PLANTS 3.29.0: putting it on your Android phone
 
 The app has to be opened from a web address (not as a file) for Chrome to install it.
 Free route with GitHub Pages:
@@ -20,3 +20,8 @@ It's kept on the phone under its own key, separately from your plans, so it isn'
 
 Points and levels (3.28): the game counts from the Monday of the week you install this version. Its points,
 badges, level and colour choices are part of your plans, so they're in the backup file too.
+
+Dumbbells and bodyweight (3.29): the Train tab has a kit picker for each week (Vitruvian, Dumbbells or
+Bodyweight), and each session can have its own. The sets for every muscle stay the same; only the exercises
+change. Dumbbells are logged per dumbbell and go up in 2 kg steps to 24 kg, after which the reps get harder
+instead (slower lowering, a pause, 1½ reps, then a harder exercise). Bodyweight uses the pull-up bar and benches.

@@ -2154,6 +2154,9 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 .mdnew { margin-top: 8px; }
 .mdsz small { opacity: .7; font-weight: 400; }
 .mdtypes .chip.on, .mdsz .chip.on { background: var(--accent); color: var(--accent-ink, #fff); border-color: var(--accent); }
+.chips.ladrow { margin: 6px 0 2px; gap: 6px; }
+.chips.ladrow .chip { font-size: 12px; padding: 4px 9px; }
+.wchead.tvkit { margin: 6px 0 2px 60px; }
 </style>
 </head>
 <body>
@@ -2179,7 +2182,7 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.28.1';</script>
+<script>window.TP_VERSION = '3.29.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -3666,6 +3669,42 @@ const EX_ROWS = [
   ['legraise', 'Lying leg raise', ['core'], [], { bw: 1, tip: 'Lower back pressed down, lower the legs slowly.' }],
   ['crunch', 'Lying cable crunch', ['core'], [], { tip: 'Lie with your head towards the platform, rope by the ears. Curl the ribs towards the hips.' }],
   ['woodchop', 'Low-to-high woodchop', ['core'], [], { per: 'side', tip: 'One handle from the platform, rotate up and across, arms long.' }],
+  // dumbbells (adjustable, up to 24 kg each): kit db · each = a pair, logged as the weight of one dumbbell
+  // rng and rir: the rep range and how close to failure, used in place of the slot's (lighter kit goes closer to failure)
+  ['dbbench', 'Dumbbell bench press', ['chest'], ['triceps', 'delts'], { kit: 'db', each: 1, rng: [8, 15], rir: '0–1', tip: 'Flat bench. Lower the dumbbells to the sides of the chest for a deep stretch, then press up and slightly in. Lower them onto your thighs to finish.' }],
+  ['dbincbench', 'Incline dumbbell press', ['chest'], ['delts', 'triceps'], { kit: 'db', each: 1, rng: [8, 15], rir: '0–1', tip: 'Bench at about 30°. Lower to the sides of the upper chest, elbows a little in from the shoulders.' }],
+  ['dbpress', 'Seated dumbbell press', ['delts'], ['triceps'], { kit: 'db', each: 1, rng: [8, 15], rir: '0–1', tip: 'Bench upright, back on the pad. Dumbbells from the shoulders to overhead, ending above the ears.' }],
+  ['dblat', 'Dumbbell lateral raise', ['delts'], [], { kit: 'db', each: 1, rng: [12, 25], rir: '0–1', tip: 'Lean forward slightly, lead with the elbows, up to shoulder height. Lower slowly.' }],
+  ['dbrear', 'Dumbbell rear delt fly, chest on incline bench', ['rear'], ['back'], { kit: 'db', each: 1, rng: [12, 25], rir: '0–1', tip: 'Light. Chest on the pad, arms slightly bent, sweep the dumbbells out wide and pause.' }],
+  ['dbcsrow', 'Chest-supported dumbbell row', ['back'], ['rear', 'biceps'], { kit: 'db', each: 1, rng: [10, 20], rir: '0–1', tip: 'Chest on the incline bench. Pull the dumbbells to the hips, pause, then let the shoulder blades stretch forward at the bottom.' }],
+  ['dbrow', 'Single-arm dumbbell row', ['back'], ['rear', 'biceps'], { kit: 'db', per: 'side', rng: [10, 20], rir: '0–1', tip: 'Knee and hand on the bench. Pull the dumbbell to the hip; let the shoulder stretch forward at the bottom.' }],
+  ['dbcurl', 'Incline dumbbell curl', ['biceps'], [], { kit: 'db', each: 1, rng: [10, 20], rir: '0–1', tip: 'Sit back on the incline bench, arms hanging behind the body for a long stretch. No swing.' }],
+  ['dbhammer', 'Dumbbell hammer curl', ['biceps'], [], { kit: 'db', each: 1, rng: [10, 20], rir: '0–1', tip: 'Palms facing each other, elbows pinned to your sides.' }],
+  ['dbohtri', 'Overhead dumbbell extension', ['triceps'], [], { kit: 'db', rng: [10, 20], rir: '0–1', tip: 'Seated on the upright bench, one dumbbell in both hands behind the head. Go deep into the stretch.' }],
+  ['dbsquat', 'Heels-raised dumbbell squat', ['quads', 'glutes'], ['core'], { kit: 'db', each: 1, low: 1, rng: [8, 15], rir: '0–1', tip: 'Heels on a plate or wedge, a dumbbell at each shoulder or hanging at your sides. Sit straight down, knees well forward.' }],
+  ['dbgoblet', 'Goblet squat', ['quads'], ['glutes', 'core'], { kit: 'db', low: 1, rng: [10, 20], rir: '0–1', tip: 'One dumbbell held upright at the chest, heels raised if you like. Upright chest, sit down between the heels.' }],
+  ['dbrdl', 'Dumbbell Romanian deadlift', ['hams', 'glutes'], ['back'], { kit: 'db', each: 1, low: 1, rng: [8, 15], rir: '0–1', tip: 'Dumbbells in front of the thighs, soft knees. Push the hips back until you feel a deep hamstring stretch.' }],
+  ['dbdl', 'Dumbbell deadlift', ['hams', 'glutes'], ['back', 'quads'], { kit: 'db', each: 1, low: 1, rng: [8, 15], rir: '0–1', tip: 'Dumbbells at your sides. Bend the knees and hips until they touch the floor, then stand tall. Flat back throughout.' }],
+  ['dbslrdl', 'Single-leg dumbbell RDL', ['hams'], ['glutes'], { kit: 'db', per: 'leg', low: 1, rng: [8, 15], rir: '0–1', tip: 'Dumbbell in the opposite hand, hinge on one leg, back leg long. Free hand on the bench for balance.' }],
+  ['dbthrust', 'Dumbbell hip thrust', ['glutes'], ['hams'], { kit: 'db', low: 1, rng: [12, 25], rir: '0–1', tip: 'Upper back on the bench, one dumbbell across the hips (pad it). Drive up and pause with the ribs down.' }],
+  ['dbslthrust', 'Single-leg hip thrust with a dumbbell', ['glutes'], ['hams'], { kit: 'db', per: 'leg', rng: [8, 20], rir: '0–1', tip: 'Upper back on the bench, one foot down, the dumbbell on that hip.' }],
+  ['dbcalf', 'Single-leg calf raise holding a dumbbell', ['calves'], [], { kit: 'db', per: 'leg', rng: [8, 20], rir: '0–1', tip: 'Ball of the foot on a step, the dumbbell in the hand on the working side. Full stretch and a pause at the bottom.' }],
+  ['dbcrunch', 'Dumbbell crunch', ['core'], [], { kit: 'db', rng: [10, 20], rir: '1', tip: 'On the floor, a dumbbell held on the chest. Curl the ribs towards the hips.' }],
+  // bodyweight, with the pull-up bar and the benches: kit bw
+  ['bwdefpush', 'Deficit push-up', ['chest'], ['triceps', 'delts'], { kit: 'bw', bw: 1, rng: [8, 25], rir: '0–1', tip: 'Hands on two dumbbells or stacks of books so the chest drops below the hands. Feet on the bench once 25 come easily.' }],
+  ['bwpush', 'Push-up, feet on the bench', ['chest'], ['delts', 'triceps'], { kit: 'bw', bw: 1, rng: [8, 25], rir: '0–1', tip: 'Feet on the bench, hands on the floor, so it works the upper chest more. Too hard? Start with flat push-ups.' }],
+  ['pike', 'Pike push-up, feet on the bench', ['delts'], ['triceps'], { kit: 'bw', bw: 1, rng: [6, 15], rir: '0–1', tip: 'Feet on the bench, hips high so the body makes an upside-down L. Lower your head towards the floor just in front of the hands.' }],
+  ['invrow', 'Inverted row under a sturdy table', ['back'], ['rear', 'biceps'], { kit: 'bw', bw: 1, rng: [8, 20], rir: '0–1', tip: 'Lie under a solid table, grip the edge, body straight. Pull the chest up to the edge. Feet on a chair makes it harder.' }],
+  ['bplat', 'Single-arm backpack lateral raise', ['delts'], [], { kit: 'bw', per: 'side', rng: [12, 25], rir: '0–1', tip: 'A filled backpack held by its top handle. Hold a door frame with the other hand and lean slightly away. Log the backpack\'s weight if you know it.' }],
+  ['bprear', 'Face-down rear delt raise on the incline bench', ['rear'], ['back'], { kit: 'bw', rng: [12, 25], rir: '0–1', tip: 'Chest on the pad, arms hanging. Sweep them out wide and pause. Hold two full water bottles once it gets easy.' }],
+  ['bpcurl', 'Backpack curl', ['biceps'], [], { kit: 'bw', rng: [10, 25], rir: '0–1', tip: 'A filled backpack held by the top handle, or by both straps. Elbows pinned to your sides.' }],
+  ['bwtri', 'Bench triceps extension', ['triceps'], [], { kit: 'bw', bw: 1, rng: [8, 20], rir: '0–1', tip: 'Hands on the edge of the bench, body straight as in a push-up. Bend the elbows so your head drops below the edge, then straighten. Knees down makes it easier.' }],
+  ['slbox', 'Single-leg box squat to the bench', ['quads', 'glutes'], ['core'], { kit: 'bw', bw: 1, per: 'leg', low: 1, rng: [6, 15], rir: '1', tip: 'Stand in front of the bench on one leg, the other leg out in front. Sit back until you touch the bench without resting, then stand.' }],
+  ['bwslrdl', 'Single-leg RDL with a backpack', ['hams', 'glutes'], ['back'], { kit: 'bw', per: 'leg', low: 1, rng: [8, 20], rir: '0–1', tip: 'A filled backpack in the opposite hand, hinge on one leg, back leg long. Free hand on the bench for balance.' }],
+  ['nordic', 'Nordic curl, lowering only', ['hams'], [], { kit: 'bw', bw: 1, rng: [3, 8], rir: '1', tip: 'Kneel on a cushion with your heels hooked under the sofa. Keep the body straight and lower forwards as slowly as you can, catch yourself with your hands, then push back up. Expect sore hamstrings for the first week or two.' }],
+  ['slide', 'Sliding leg curl', ['hams'], ['glutes'], { kit: 'bw', bw: 1, rng: [8, 20], rir: '0–1', tip: 'On your back, heels on a towel on a smooth floor. Lift the hips and pull the heels in, then slide them out slowly. Do one leg at a time once 20 come easily.' }],
+  ['bwslthrust', 'Single-leg hip thrust', ['glutes'], ['hams'], { kit: 'bw', bw: 1, per: 'leg', rng: [10, 25], rir: '0–1', tip: 'Upper back on the bench, one foot down. Drive up and pause with the ribs down.' }],
+  ['bwcalf', 'Single-leg calf raise on a step', ['calves'], [], { kit: 'bw', bw: 1, per: 'leg', rng: [10, 25], rir: '0–1', tip: 'Ball of the foot on a step, a hand on the wall. Full stretch and a pause at the bottom.' }],
   // in old sessions only (you don't want these)
   ['bss', 'Bulgarian split squat', ['quads', 'glutes'], [], { per: 'leg', hide: 1 }],
   ['lunge', 'Reverse lunge', ['quads', 'glutes'], [], { per: 'leg', hide: 1 }],
@@ -3745,6 +3784,38 @@ const SLOTDEF = {};
 Object.values(SESS).forEach(se => se.slots.forEach(([id, ex, role, alts, only]) => { if (!SLOTDEF[id]) SLOTDEF[id] = { id, ex, role, alts, only }; }));
 // a rearranged week's sessions are named re:<week start>:<number> (here, not in train.js, because saved data is checked while the app loads)
 const RE_ID = /^re:(\d{4}-\d{2}-\d{2}):(\d+)$/;
+/* each slot's exercises with dumbbells and with bodyweight: the same job and sets, aimed at at least the same muscles,
+   so the week's sets for each muscle count the same whichever kit you use. The first is the default. */
+const KITS = { vit: 'Vitruvian', db: 'Dumbbells', bw: 'Bodyweight' };
+const KIT_SL = {
+  ua1: { db: ['dbbench', 'dbincbench'], bw: ['bwdefpush', 'bwpush'] },
+  ua2: { db: ['chin', 'pullup', 'negchin'], bw: ['chin', 'pullup', 'negchin'] },
+  ua3: { db: ['dbcsrow', 'dbrow'], bw: ['invrow'] },
+  ua4: { db: ['dbpress'], bw: ['pike'] },
+  ua5: { db: ['dblat'], bw: ['bplat'] },
+  ua6: { db: ['dbcurl', 'dbhammer'], bw: ['bpcurl'] },
+  la1: { db: ['dbsquat', 'dbgoblet'], bw: ['slbox', 'sissy'] },
+  la2: { db: ['dbrdl', 'dbslrdl'], bw: ['bwslrdl', 'nordic'] },
+  la3: { db: ['dbthrust', 'dbslthrust'], bw: ['bwslthrust'] },
+  la4: { db: ['dbcalf'], bw: ['bwcalf'] },
+  la5: { db: ['knee', 'hlr', 'legraise', 'dbcrunch'], bw: ['knee', 'hlr', 'legraise'] },
+  ub1: { db: ['dbpress'], bw: ['pike'] },
+  ub2: { db: ['dbincbench', 'dbbench'], bw: ['bwpush', 'bwdefpush'] },
+  ub3: { db: ['dbrow', 'dbcsrow'], bw: ['invrow'] },
+  ub4: { db: ['pullup', 'chin', 'negpull'], bw: ['pullup', 'chin', 'negpull'] },
+  ub5: { db: ['dblat'], bw: ['bplat'] },
+  ub6: { db: ['dbohtri'], bw: ['bwtri'] },
+  ub7: { db: ['dbrear'], bw: ['bprear'] },
+  lb1: { db: ['dbdl', 'dbrdl'], bw: ['bwslrdl', 'nordic'] },
+  lb2: { db: ['dbsquat', 'dbgoblet'], bw: ['slbox', 'sissy'] },
+  lb3: { db: ['dbslrdl'], bw: ['nordic', 'slide'] },
+  lb4: { db: ['dbthrust', 'dbslthrust'], bw: ['bwslthrust'] },
+  lb5: { db: ['dbcalf'], bw: ['bwcalf'] },
+  lb6: { db: ['dbcrunch', 'knee', 'hlr', 'legraise'], bw: ['hlr', 'knee', 'legraise'] },
+  fb4: { db: ['dbgoblet', 'dbsquat'], bw: ['slbox', 'sissy'] }
+};
+const exKit = id => (EX[id] && EX[id].kit) || 'vit';
+const kitAll = sl => (KIT_SL[sl] ? [...KIT_SL[sl].db, ...KIT_SL[sl].bw] : []);
 
 </script>
 <script>
@@ -9578,7 +9649,9 @@ function trNormalise(s) {
   t.n = t.n === 3 ? 3 : 4;
   t.dose = t.dose === 'min' ? 'min' : 'eff';
   t.rest = t.rest !== false;
-  ['swaps', 'nope', 'weeks', 'logs', 'adds'].forEach(f => { if (!isObj(t[f])) t[f] = {}; });
+  ['swaps', 'nope', 'weeks', 'logs', 'adds', 'kswaps'].forEach(f => { if (!isObj(t[f])) t[f] = {}; });
+  // swaps made with dumbbells or bodyweight: { db: { slot: exercise }, bw: { ... } }
+  Object.keys(t.kswaps).forEach(k => { const m = t.kswaps[k]; if (!['db', 'bw'].includes(k) || !isObj(m)) { delete t.kswaps[k]; return; } Object.keys(m).forEach(sl => { if (!KIT_SL[sl] || !KIT_SL[sl][k].includes(m[sl])) delete m[sl]; }); });
   // sets added to a week's ledger by hand: { id: { id, date, ex, sets, at } }
   Object.keys(t.adds).forEach(id => { const a = t.adds[id]; if (!isObj(a) || !DAY_KEY.test(a.date || '') || !EX[a.ex] || !(Math.round(+a.sets) >= 1)) { delete t.adds[id]; return; } a.id = id; a.sets = Math.min(30, Math.round(+a.sets)); a.at = +a.at || 0; });
   Object.keys(t.swaps).forEach(sl => { if (!SLOTDEF[sl] || !EX[t.swaps[sl]]) delete t.swaps[sl]; });
@@ -9598,6 +9671,9 @@ function trNormalise(s) {
     }
     if (w.dose !== undefined && w.dose !== 'min' && w.dose !== 'eff') delete w.dose;
     if (w.deload !== undefined) w.deload = !!w.deload;
+    // the week's kit (Vitruvian when not set), and any session given its own: { session id: kit }
+    if (w.kit !== undefined && !['db', 'bw'].includes(w.kit)) delete w.kit;
+    if (w.sk !== undefined) { if (!isObj(w.sk)) delete w.sk; else { Object.keys(w.sk).forEach(s => { if (!KITS[w.sk[s]]) delete w.sk[s]; }); if (!Object.keys(w.sk).length) delete w.sk; } }
   });
   Object.keys(t.logs).forEach(id => {
     const l = t.logs[id];
@@ -9606,6 +9682,8 @@ function trNormalise(s) {
     if (!SESS[l.sess]) l.rt = typeof l.rt === 'string' && l.rt ? l.rt : 'Session';
     l.ex = l.ex.filter(e => isObj(e) && e.ex && Array.isArray(e.sets));
     l.ex.forEach(e => { if (e.n !== undefined && !(Math.round(+e.n) >= 1)) delete e.n; else if (e.n !== undefined) e.n = Math.min(10, Math.round(+e.n)); if (e.nd !== undefined && e.nd !== 1) delete e.nd; });
+    if (l.kit !== undefined && !['db', 'bw'].includes(l.kit)) delete l.kit;
+    l.ex.forEach(e => { if (e.lad !== undefined) { const v = Math.round(+e.lad); if (v >= 1 && v <= 4) e.lad = v; else delete e.lad; } });
     l.ex.forEach(e => { e.sets = e.sets.filter(isObj).map(x => ({ kg: x.kg == null ? '' : String(x.kg), reps: x.reps == null ? '' : String(x.reps), rir: x.rir == null ? '' : String(x.rir), done: !!x.done })); });
     if (!['cut', 'maint', 'bulk'].includes(l.phase)) l.phase = 'cut';
     if (l.dose !== 'min') l.dose = 'eff';
@@ -9614,21 +9692,40 @@ function trNormalise(s) {
 
 /* ── the plan ── */
 const slotOk = id => EX[id] && !EX[id].hide && !S.tr.nope[id];
-const slotOpts = sl => { const d = SLOTDEF[sl]; return d ? [d.ex, ...d.alts].filter(slotOk) : []; };
+const slotOpts = (sl, kit) => {
+  const d = SLOTDEF[sl]; if (!d) return [];
+  if (kit && kit !== 'vit') return KIT_SL[sl] ? KIT_SL[sl][kit].filter(slotOk) : [];
+  return [d.ex, ...d.alts].filter(slotOk);
+};
 // the exercise in a slot: your swap, unless you've since ruled it out; otherwise the first you haven't
-function slotEx(sl) { const d = SLOTDEF[sl], sw = S.tr.swaps[sl]; if (sw && slotOk(sw)) return sw; return slotOpts(sl)[0] || d.ex; }
+// (with dumbbells or bodyweight, the swap you made with that kit)
+function slotEx(sl, kit) {
+  const d = SLOTDEF[sl];
+  if (kit && kit !== 'vit') { const sw = (S.tr.kswaps[kit] || {})[sl], o = slotOpts(sl, kit); if (sw && o.includes(sw)) return sw; return o[0] || (KIT_SL[sl] ? KIT_SL[sl][kit][0] : d.ex); }
+  const sw = S.tr.swaps[sl]; if (sw && slotOk(sw)) return sw; return slotOpts(sl)[0] || d.ex;
+}
+// a rearranged session's exercise with a kit: its own pick if it's for that kit, else the slot's
+const reEx = (e, kit) => (slotOk(e.ex) && exKit(e.ex) === (kit || 'vit') ? e.ex : slotEx(e.sl, kit));
+// the week's kit, and a session's (which can differ)
+const trKitWk = st => (S.tr.weeks[st] && S.tr.weeks[st].kit) || 'vit';
+const trKit = (st, sess) => { const w = S.tr.weeks[st]; return (w && w.sk && w.sk[sess]) || trKitWk(st); };
+// adjustable dumbbells: 2 kg steps up to 24 kg each. Past that the reps get harder instead, a step at a time
+const DB_MAX = 24, DB_STEP = 2;
+const LAD = ['Normal reps', '3-second lowering', 'Pause at the bottom', '1½ reps', 'Harder version'];
+const LAD_TIP = ['', 'Take 3 seconds to lower each rep.', 'Pause for a second at the bottom of each rep.', 'Down, halfway up, back down, then all the way up: that\'s one rep.', 'Swap to a harder exercise from the name above.'];
 const roleOf = sl => ROLES[SLOTDEF[sl] ? SLOTDEF[sl].role : 'acc'];
 const slotSets = (sl, phase, dose) => roleOf(sl).sets[phase][dose === 'min' ? 0 : 1];
-const slotReps = (sl, phase) => roleOf(sl).reps[phase] || roleOf(sl).reps.cut;
+const slotReps = (sl, phase, ex) => (EX[ex] && EX[ex].rng) || roleOf(sl).reps[phase] || roleOf(sl).reps.cut;
 const RIR_DELOAD = { '1–2': '3–4', 2: '4', '0–1': '2–3', 1: '3' };
-const slotRir = (sl, deload) => { const r = roleOf(sl).rir; return deload ? RIR_DELOAD[r] || r : r; };
+const slotRir = (sl, deload, ex) => { const r = (EX[ex] && EX[ex].rir) || roleOf(sl).rir; return deload ? RIR_DELOAD[r] || r : r; };
 const sessSlots = (sess, phase) => SESS[sess].slots.filter(x => !x[4] || x[4] === phase).map(x => x[0]);
-const repTxt = (sl, phase, ex) => { const [lo, hi] = slotReps(sl, phase), e = EX[ex] || {}; return `${lo}–${hi}${e.per ? ` a ${e.per}` : ''}`; };
+const repTxt = (sl, phase, ex) => { const [lo, hi] = slotReps(sl, phase, ex), e = EX[ex] || {}; return `${lo}–${hi}${e.per ? ` a ${e.per}` : ''}`; };
 const mins = s => (s >= 60 ? `${Math.floor(s / 60)}${s % 60 ? `:${pad(s % 60)}` : ''} min` : `${s} s`);
 // about how long a session takes: 40 s a set plus the rest after it, a minute to set up each exercise, five to warm up
-function sessMins(sess, phase, dose) {
-  let t = 300;
-  sessSlots(sess, phase).forEach(sl => { const n = slotSets(sl, phase, dose); if (n) t += 60 + n * (40 + roleOf(sl).rest); });
+// (sets with dumbbells or bodyweight run to more reps, so about 15 s longer each)
+function sessMins(sess, phase, dose, kit) {
+  let t = 300; const per = kit && kit !== 'vit' ? 55 : 40;
+  sessSlots(sess, phase).forEach(sl => { const n = slotSets(sl, phase, dose); if (n) t += 60 + n * (per + roleOf(sl).rest); });
   return Math.round(t / 300) * 5;
 }
 const trSplit = n => SPLITS[n >= 4 ? 4 : 3];
@@ -9706,48 +9803,64 @@ function trLast(ex, date, except) {
   for (let i = all.length - 1; i >= 0; i--) {
     const l = all[i]; if (l.id === except || l.date > date) continue;
     const e = l.ex.find(x => x.ex === ex); if (!e) continue;
-    const s = setsOf(e); if (s.length) return { date: l.date, sets: s, deload: !!l.deload, id: l.id };
+    const s = setsOf(e); if (s.length) return { date: l.date, sets: s, deload: !!l.deload, id: l.id, lad: e.lad || 0 };
   }
   return null;
 }
 // a session's sets in a few characters: "40 kg × 8, 8, 7" when the weight stayed the same, else each set as weight×reps
-function setsTxt(sets, bw) {
+function setsTxt(sets, bw, each) {
   const kgs = sets.map(x => tnum(x.kg));
-  if (sets.length > 1 && kgs.every(k => k === kgs[0])) { const k = kgs[0]; return `${bw ? (k ? `BW+${k} kg` : 'BW') : k === null ? '?' : `${k} kg`} × ${sets.map(x => x.reps).join(', ')}`; }
+  if (sets.length > 1 && kgs.every(k => k === kgs[0])) { const k = kgs[0]; return `${bw ? (k ? `BW+${k} kg` : 'BW') : k === null ? '?' : `${k} kg${each ? ' each' : ''}`} × ${sets.map(x => x.reps).join(', ')}`; }
   return sets.map(x => setStr(x, bw)).join(', ');
 }
 const setStr = (x, bw) => { const kg = tnum(x.kg); return `${bw ? (kg ? `+${kg}` : 'BW') : kg === null ? '?' : kg}×${x.reps}`; };
 // what to put on the bar next: add a step once every set reaches the top of the range, drop back if the first set fell well short
 function trSuggest(ex, sl, phase, date, except) {
-  const e = EX[ex] || {}, [lo, hi] = sl ? slotReps(sl, phase) : [8, 12], last = trLast(ex, date, except);
-  if (!last) return { kg: null, txt: e.bw ? 'Bodyweight: as many clean reps as you can, stopping 1 short. Log extra kg only if you add weight.' : `First time: pick a weight you could lift about 3 more times than ${hi}, then settle it over the sets.` };
+  const e = EX[ex] || {}, [lo, hi] = sl ? slotReps(sl, phase, ex) : e.rng || [8, 12], last = trLast(ex, date, except);
+  if (!last && e.kit === 'db') return { kg: null, txt: `First time: pick a dumbbell you could lift about ${hi + 3} times, then settle it over the sets.${e.each ? ' Log the weight of one dumbbell.' : ''}` };
+  if (!last) return { kg: null, txt: e.bw ? `Bodyweight: as many clean reps as you can, stopping ${e.rir === '0–1' ? '0 or 1' : '1'} short. Log extra kg only if you add weight.` : `First time: pick a weight you could lift about 3 more times than ${hi}, then settle it over the sets.` };
   const kgOf = x => Math.max(0, tnum(x.kg) || 0), kgs = last.sets.map(kgOf), top = Math.max(...kgs), work = last.sets.filter(x => kgOf(x) === top), reps = last.sets.map(x => x.reps).join(', ');
   const allHi = work.length >= Math.min(2, last.sets.length) && work.every(x => tnum(x.reps) >= hi);
   const easy = work.length > 0 && work.every(x => x.rir === '4+' || tnum(x.rir) >= 4);
+  if (e.kit) { const k = trKitSuggest(e, last, hi, allHi, easy, top, work, reps); if (k) return k; }
   if (e.bw) return allHi ? { kg: top || 0, txt: `Every set hit ${hi}+ last time. Slow the lowering to 3 seconds, or add weight if you can.` } : { kg: top || 0, txt: `Last time: ${reps} reps. Aim for one more rep on a set or two.` };
   if (!top) return { kg: null, txt: `Last time: ${reps} reps, no weight logged.` };
   const inc = Math.max(e.low ? 2 : 1, Math.round(top * (e.low ? 0.05 : 0.025)));
   if (!last.deload && (allHi || easy)) return { kg: top + inc, up: true, txt: `${allHi ? `Every set hit ${hi}+` : 'It felt easy'} last time, so add ${inc} kg.` };
-  if (!last.deload && tnum(work[0].reps) < lo - 1) { const d = Math.max(1, Math.round(top * 0.05)); return { kg: top - d, down: true, txt: `The first set fell short of ${lo} last time, so drop ${d} kg and build back up.` }; }
+  if (!last.deload && tnum(work[0].reps) < lo - 1) { const d = e.kit === 'db' ? Math.min(DB_STEP, top) : Math.max(1, Math.round(top * 0.05)); return { kg: top - d, down: true, txt: `The first set fell short of ${lo} last time, so drop ${d} kg and build back up.` }; }
   return { kg: top, txt: `Same weight as last time (${reps}); beat it by a rep somewhere.${phase === 'cut' ? ' On a cut, holding your weights is a win.' : ''}` };
+}
+// with dumbbells: 2 kg up once every set reaches the top of the range, until the 24s; then, and with bodyweight, the reps
+// get harder a step at a time (slower lowering, a pause, 1½ reps, a harder exercise) instead. Over 30 reps counts as the top too:
+// sets that light build less, so it's time for the next step. Returns null to fall through to the usual advice.
+function trKitSuggest(e, last, hi, allHi, easy, top, work, reps) {
+  const lad = last.lad || 0, over = work.some(x => tnum(x.reps) > 30), capped = e.kit === 'bw' || top >= DB_MAX, kg = e.bw ? top || 0 : top || null;
+  if (!last.deload && capped && (allHi || easy || over)) {
+    if (lad >= 4) return { kg, lad: 4, ladOn: true, txt: 'Top of the range even at the hardest step. Swap to a harder exercise from the name above.' };
+    const nx = lad + 1;
+    return { kg, lad: nx, ladOn: true, up: true, txt: `Every set hit ${over ? '30 or more' : `${hi}+`} last time${e.kit === 'db' ? ' with the heaviest dumbbell' : ''}, so make the reps harder: ${LAD[nx].toLowerCase()}. ${LAD_TIP[nx]}` };
+  }
+  if (lad) return { kg, lad, ladOn: true, txt: `Last time: ${reps} reps, ${LAD[lad].toLowerCase()}. Same again and beat it by a rep somewhere. ${LAD_TIP[lad]}` };
+  if (e.kit === 'db' && !last.deload && (allHi || easy) && top) { const nk = Math.min(DB_MAX, top + DB_STEP); return { kg: nk, up: true, txt: `${allHi ? `Every set hit ${hi}+` : 'It felt easy'} last time, so go up to ${nk} kg${e.each ? ' each' : ''}.` }; }
+  return null;
 }
 // (high-rep sets count as 20 reps, so a light pump set doesn't swamp the estimate)
 const bestE1 = sets => { let b = 0; sets.forEach(x => { const kg = tnum(x.kg), r = tnum(x.reps); if (kg > 0 && r > 0) b = Math.max(b, e1rm(kg, Math.min(r, 20))); }); return b || null; };
 
 /* ── a new session ── */
 function trNewLog(date, sess) {
-  const st = startOf(date), phase = trPhase(), deload = trDeload(st), rs = trReSes(sess), m = RE_ID.exec(sess || ''), dose = rs ? trRe(m[1]).dose : trDose(st);
+  const st = startOf(date), phase = trPhase(), deload = trDeload(st), rs = trReSes(sess), m = RE_ID.exec(sess || ''), dose = rs ? trRe(m[1]).dose : trDose(st), kit = trKit(st, sess), kk = kit !== 'vit' ? { kit } : {};
   const base = rs ? `re${m[2]}` : sess;
   let id = `t${date}${base}`; for (let i = 2; S.tr.logs[id]; i++) id = `t${date}${base}${i}`;
   if (rs) {
-    const ex = rs.ex.map(e => { const x = slotOk(e.ex) ? e.ex : slotEx(e.sl), sg = trSuggest(x, e.sl, phase, date, id); return { slot: e.sl, ex: x, n: e.n, feel: '', note: '', sets: Array.from({ length: e.n }, () => ({ kg: sg.kg !== null ? String(sg.kg) : '', reps: '', rir: '', done: false })) }; });
-    return { id, date, sess, rt: rs.lab, phase, dose, deload, readiness: null, note: '', ex, fin: false, created: Date.now(), updated: Date.now() };
+    const ex = rs.ex.map(e => { const x = reEx(e, kit), sg = trSuggest(x, e.sl, phase, date, id); return { slot: e.sl, ex: x, n: e.n, ...(sg.lad ? { lad: sg.lad } : {}), feel: '', note: '', sets: Array.from({ length: e.n }, () => ({ kg: sg.kg !== null ? String(sg.kg) : '', reps: '', rir: '', done: false })) }; });
+    return { id, date, sess, rt: rs.lab, phase, dose, deload, ...kk, readiness: null, note: '', ex, fin: false, created: Date.now(), updated: Date.now() };
   }
   const ex = sessSlots(sess, phase).map(sl => {
-    const x = slotEx(sl), n = slotSets(sl, phase, dose), sg = trSuggest(x, sl, phase, date, id);
-    return { slot: sl, ex: x, feel: '', note: '', sets: Array.from({ length: n }, () => ({ kg: sg.kg !== null ? String(sg.kg) : '', reps: '', rir: '', done: false })) };
+    const x = slotEx(sl, kit), n = slotSets(sl, phase, dose), sg = trSuggest(x, sl, phase, date, id);
+    return { slot: sl, ex: x, ...(sg.lad ? { lad: sg.lad } : {}), feel: '', note: '', sets: Array.from({ length: n }, () => ({ kg: sg.kg !== null ? String(sg.kg) : '', reps: '', rir: '', done: false })) };
   });
-  return { id, date, sess, phase, dose, deload, readiness: null, note: '', ex, fin: false, created: Date.now(), updated: Date.now() };
+  return { id, date, sess, phase, dose, deload, ...kk, readiness: null, note: '', ex, fin: false, created: Date.now(), updated: Date.now() };
 }
 // resize a session to a dose: only blank, unticked sets at the end go, so nothing logged is lost
 function trApplyDose(l, dose) {
@@ -9781,9 +9894,9 @@ function sesPct(l) {
 const fmtQtr = v => { const q = Math.round(v * 4) / 4, w = Math.floor(q), f = q - w; return `${w || !f ? w : ''}${f === 0.25 ? '¼' : f === 0.5 ? '½' : f === 0.75 ? '¾' : ''}`; };
 const phaseTxt = phase => ({ cut: 'Cutting, so the weights stay heavy and the volume moderate: the job is to keep every bit of muscle while the fat comes off.', maint: 'Holding steady: heavy weights, moderate volume, and a rep or two added wherever it comes.', bulk: 'Bulking: more sets and a few more reps, adding weight as soon as the top of each range comes easily.' }[phase]);
 // a planned session's exercises and sets at a dose, before it's started
-function trSesEx(id, phase, dose) {
-  if (SESS[id]) return sessSlots(id, phase).map(sl => ({ ex: slotEx(sl), n: slotSets(sl, phase, dose) })).filter(e => e.n > 0);
-  const x = trReSes(id); return x ? x.ex.map(e => ({ ex: slotOk(e.ex) ? e.ex : slotEx(e.sl), n: e.n })) : [];
+function trSesEx(id, phase, dose, kit) {
+  if (SESS[id]) return sessSlots(id, phase).map(sl => ({ ex: slotEx(sl, kit), n: slotSets(sl, phase, dose) })).filter(e => e.n > 0);
+  const x = trReSes(id); return x ? x.ex.map(e => ({ ex: reEx(e, kit), n: e.n })) : [];
 }
 // which session is open on the week list: the one you picked, else the one to do next
 function trOpenKey(st) {
@@ -9797,7 +9910,7 @@ function trWeekRow(r, o) {
   let sub, chip, body;
   if (l) {
     const did = tvDone(l), tgt = tvTarget(l), left = l.ex.filter(e => !e.nd && exTgt(l, e) > 0 && exDone(e) < exTgt(l, e)), all = !left.length, nd = l.ex.filter(e => e.nd).length, pc = Math.round(sesPct(l) * 100);
-    sub = `${r.extra ? 'Extra · ' : ''}${did} of ${tgt} sets · ${pc}%${nd ? ` · ${nd} not done` : ''} · ${all ? (l.fin ? 'finished' : 'every set in') : `${left.length} exercise${left.length === 1 ? '' : 's'} left`}`;
+    sub = `${r.extra ? 'Extra · ' : ''}${l.kit ? `${KITS[l.kit]} · ` : ''}${did} of ${tgt} sets · ${pc}%${nd ? ` · ${nd} not done` : ''} · ${all ? (l.fin ? 'finished' : 'every set in') : `${left.length} exercise${left.length === 1 ? '' : 's'} left`}`;
     chip = all && l.fin ? `<span class="wt wt-ok">${ic('check')}Done</span>` : !l.fin ? '<span class="wt wt-warn">Started</span>' : `<span class="wt wt-warn">${left.length} left</span>`;
     const items = l.ex.map((e, i) => ({ e, i })).filter(({ e }) => exTgt(l, e) > 0 || e.sets.length).map(({ e, i }) => {
       const d = exDone(e), n = Math.max(exTgt(l, e), 1), full = d >= n;
@@ -9807,10 +9920,10 @@ function trWeekRow(r, o) {
     }).join('');
     body = `<ul class="tvxs">${items}</ul><div class="btnrow tvxgo">${!l.fin || !all ? `<button class="btn sm primary" data-a="tvstart" data-s="${esc(l.sess)}" data-id="${l.id}">${ic('play')}Carry on</button>` : `<button class="btn sm" data-a="tvopen" data-id="${l.id}">Open the session</button>`}</div>`;
   } else {
-    const se = trSesInfo(r.sess, phase, dose, null), list = trSesEx(r.sess, phase, dose);
-    sub = `${esc(se.d)}${se.nEx ? ` · ${se.nEx} exercise${se.nEx === 1 ? '' : 's'}${se.mins ? ` · about ${se.mins} min` : ''}` : ''}`;
+    const kit = trKit(startOf(r.k), r.sess), se = trSesInfo(r.sess, phase, dose, null, kit), list = trSesEx(r.sess, phase, dose, kit);
+    sub = `${kit !== 'vit' ? `${KITS[kit]} · ` : ''}${esc(se.d)}${se.nEx ? ` · ${se.nEx} exercise${se.nEx === 1 ? '' : 's'}${se.mins ? ` · about ${se.mins} min` : ''}` : ''}`;
     chip = today ? '<span class="wt">Today</span>' : ic('chev');
-    body = `<ul class="tvxs">${list.map(e => `<li class="tvx"><span class="bx" aria-hidden="true"></span><span>${esc(exName(e.ex))}</span><span class="v">${e.n} set${e.n === 1 ? '' : 's'}</span></li>`).join('')}</ul><div class="btnrow tvxgo"><button class="btn sm primary" data-a="tvstart" data-s="${esc(r.sess)}">${ic('play')}${today ? 'Start' : 'Start it today'}</button></div>`;
+    body = `<ul class="tvxs">${list.map(e => `<li class="tvx"><span class="bx" aria-hidden="true"></span><span>${esc(exName(e.ex))}</span><span class="v">${e.n} set${e.n === 1 ? '' : 's'}</span></li>`).join('')}</ul><div class="wchead tvkit"><span class="small muted">Kit</span><div class="seg mini3" role="group" aria-label="Kit for this session">${Object.keys(KITS).map(v => `<button data-a="trskit" data-s="${esc(r.sess)}" data-k="${r.k}" data-v="${v}" aria-pressed="${kit === v}">${KITS[v]}</button>`).join('')}</div></div><div class="btnrow tvxgo"><button class="btn sm primary" data-a="tvstart" data-s="${esc(r.sess)}">${ic('play')}${today ? 'Start' : 'Start it today'}</button></div>`;
   }
   const name = l ? trSN(l.sess, l) : trSesInfo(r.sess, phase, dose, null).n;
   return `<li class="${isOpen ? 'open' : ''}"><button class="tvrow ${today ? 'today' : ''}" data-a="tropen" data-v="${key}" aria-expanded="${isOpen}">${day}<span class="n"><b>${esc(name)}</b><small>${sub}</small></span>${isOpen ? ic('down') : chip}</button>${isOpen ? body : ''}</li>`;
@@ -9833,6 +9946,8 @@ function vTrain() {
     : trDeloadDue(st) ? `<div class="callout warn">${ic('info')}<div><b>Five hard weeks in a row.</b> A lighter week now usually pays you back: minimal dose, same weights, stopping further short.<div class="btnrow"><button class="btn sm primary" data-a="trdeload" data-v="1">Make this a deload week</button><button class="btn sm ghost" data-a="trdeload" data-v="0">Not yet</button></div></div></div>` : '';
   const week = `<section class="wsum trweek"><div class="wchead"><div class="eyebrow">This week · w/c ${shortD(st)}</div><span class="phasechip p-${phase}">${PHASE_N[phase]}</span></div>
     ${pick}${hint ? `<p class="small muted" style="margin:-2px 0 0">${hint}</p>` : ''}${sum}
+    <div class="wchead trkit"><span class="small muted">Kit this week</span><div class="seg mini3" role="group" aria-label="Kit this week">${Object.keys(KITS).map(v => `<button data-a="trkit" data-v="${v}" aria-pressed="${trKitWk(st) === v}">${KITS[v]}</button>`).join('')}</div></div>
+    ${trKitWk(st) !== 'vit' ? `<p class="small muted" style="margin:-2px 0 0">${trKitWk(st) === 'db' ? 'Dumbbells' : 'Bodyweight, the pull-up bar and the benches'}: the same sets for every muscle, more reps and stopping closer to failure. Tap a session to give it a different kit.</p>` : ''}
     <ul class="tvlist">${rows}</ul>${noDay.length ? `<p class="small muted" style="margin:0">No day left this week for ${joinAnd(noDay.map(x => SESS[x].n))}. The big lifts come first, so ${noDay.length > 1 ? 'those are' : 'that\'s'} the one${noDay.length > 1 ? 's' : ''} to skip, or log ${noDay.length > 1 ? 'them' : 'it'} on another day.</p>` : ''}${doneAll}
     <div class="btnrow trbtns"><button class="btn sm" data-a="trre">${ic('wand')}${plan.re ? 'Rearrange again' : 'Rearrange'}</button><button class="btn sm" data-a="tvpick">${ic('plus')}Log a session</button></div>
     ${plan.re ? '<div class="btnrow" style="margin-top:-4px"><button class="btn sm ghost" data-a="trreundo">Back to the usual plan</button></div>' : `<div class="wchead"><span class="small muted">Dose this week</span><div class="seg mini3" role="group" aria-label="Dose">${['min', 'eff'].map(v => `<button data-a="trdose" data-v="${v}" aria-pressed="${dose === v}" ${del ? 'disabled' : ''}>${DOSE_N[v]}</button>`).join('')}</div></div>`}
@@ -9860,8 +9975,8 @@ function trPastCard() {
   }).join('')}</div>${wks.length > shown.length ? `<button class="btn ghost" style="width:100%" data-a="trall">Show ${wks.length - shown.length} older week${wks.length - shown.length === 1 ? '' : 's'}</button>` : ''}</section>`;
 }
 // a session's name, what it is, how many exercises and roughly how long
-function trSesInfo(id, phase, dose, l) {
-  if (SESS[id]) return { n: SESS[id].n, d: SESS[id].d, nEx: sessSlots(id, phase).length, mins: sessMins(id, phase, dose) };
+function trSesInfo(id, phase, dose, l, kit) {
+  if (SESS[id]) return { n: SESS[id].n, d: SESS[id].d, nEx: sessSlots(id, phase).length, mins: sessMins(id, phase, dose, kit) };
   const x = trReSes(id);
   if (!x) return { n: trSN(id, l), d: 'Rearranged', nEx: l ? l.ex.length : 0, mins: 0 };
   return { n: x.lab, d: `Rearranged · ${exName(x.ex[0].ex)} first`, nEx: x.ex.length, mins: x.mins };
@@ -9869,6 +9984,7 @@ function trSesInfo(id, phase, dose, l) {
 // main lifts first, in session order, then anything else you've logged
 function trLiftOrder() {
   const o = []; ['ua', 'la', 'ub', 'lb', 'fb'].forEach(s => SESS[s].slots.forEach(x => { [x[1], ...x[3]].forEach(id => { if (!o.includes(id)) o.push(id); }); }));
+  ['db', 'bw'].forEach(k => ['ua', 'la', 'ub', 'lb', 'fb'].forEach(s => SESS[s].slots.forEach(x => { (KIT_SL[x[0]] ? KIT_SL[x[0]][k] : []).forEach(id => { if (!o.includes(id)) o.push(id); }); })));
   return o;
 }
 function trLiftSeries(ex) {
@@ -9887,14 +10003,14 @@ function trLiftsCard() {
   trLogsAll().forEach(l => l.ex.forEach(e => { if (setsOf(e).length) seen.add(e.ex); }));
   if (!seen.size) return '';
   const ids = [...seen].sort((a, b) => (order.indexOf(a) < 0 ? 999 : order.indexOf(a)) - (order.indexOf(b) < 0 ? 999 : order.indexOf(b)));
-  const tk = todayKey(), inPlan = new Set(Object.keys(SLOTDEF).map(slotEx));
+  const tk = todayKey(), inPlan = new Set(Object.keys(SLOTDEF).flatMap(sl => Object.keys(KITS).map(k => slotEx(sl, k))));
   const rows = id => {
     const ser = trLiftSeries(id), e = EX[id] || {}, last = ser[ser.length - 1];
     const val = s => (e.bw ? s.reps : s.e1), now = val(last);
     const base = ser.find(s => s.date >= addDays(tk, -35)) || ser[0], ch = ser.length > 1 && now !== null && val(base) !== null ? now - val(base) : null;
     const big = e.bw ? `${last.reps}<small> reps</small>` : now ? `${Math.round(now)}<small> kg</small>` : `${last.reps}<small> reps</small>`;
     const chTxt = ch === null || base === last ? '' : Math.abs(ch) < 0.05 ? `<small>same as ${shortD(base.date)}</small>` : `<small class="${ch > 0.4 ? 'up' : ch < -0.4 ? 'down' : ''}">${ch > 0 ? '+' : ''}${e.bw ? Math.round(ch) : Math.round(ch * 10) / 10}${e.bw ? '' : ' kg'} since ${shortD(base.date)}</small>`;
-    return `<li><button class="liftrow" data-a="liftopen" data-v="${esc(id)}"><span class="n"><b>${esc(exName(id))}</b><small>${shortD(last.date)} · ${esc(setsTxt(last.sets, e.bw))}</small></span>${spark(ser.slice(-12).map(val))}<span class="v">${big}${chTxt}</span></button></li>`;
+    return `<li><button class="liftrow" data-a="liftopen" data-v="${esc(id)}"><span class="n"><b>${esc(exName(id))}</b><small>${shortD(last.date)} · ${esc(setsTxt(last.sets, e.bw, e.each))}</small></span>${spark(ser.slice(-12).map(val))}<span class="v">${big}${chTxt}</span></button></li>`;
   };
   // the lifts in your plan now; anything else you've logged goes under More
   const now = ids.filter(id => inPlan.has(id)), rest = ids.filter(id => !inPlan.has(id));
@@ -9931,8 +10047,9 @@ function trWhyCard() {
     <p><b>Rest.</b> Three minutes between heavy sets beat one minute for both strength and size, so the big lifts get proper rests.</p>
     <p><b>Exercise picks.</b> Moves that load the muscle at full stretch grow it more: overhead triceps work over pushdowns, standing calf raises over seated, deep presses and rows.</p>
     <p><b>Rearranging.</b> With the weekly sets the same, training a muscle once or three times a week builds about the same, so a missed session can be made up on the days left. Returns from extra sets shrink within a session as well as across the week, so the planner gives a muscle no more than 8 sets in one session, keeps each session to about an hour, and doesn't repeat a heavy leg lift on consecutive days.</p>
+    <p><b>Dumbbells and bodyweight.</b> Each session keeps its sets with any kit; only the exercises change. Lighter weights taken close to failure build about as much muscle as heavy ones, though heavy ones build more top-end strength, so the reps go up and the sets stop 0 to 1 short. Once sets pass about 30 reps the load is too light to do much, so the reps get harder instead: slower lowering, a pause, 1½ reps, then a harder exercise. Push-ups matched to a bench press load grew the chest and triceps just as much.</p>
     <p><b>Deloads.</b> Coaches agree on a lighter week every so often, cutting sets and how close you go to failure. Here that's suggested after five hard weeks.</p>
-    <p class="small muted">Spiering et al. 2021 (Journal of Strength and Conditioning Research); Iversen et al. 2021 (Sports Medicine); Pelland et al. 2024 (SportRxiv); Robinson et al. 2024 (Sports Medicine); Murphy &amp; Koehler 2022 (Scand J Med Sci Sports); Schoenfeld et al. 2016 (JSCR); Maeo et al. 2022 (Eur J Sport Sci); Kinoshita et al. 2023 (Frontiers in Physiology); Helms et al. 2015 (J Sports Med Phys Fitness); Bell et al. 2023 (Sports Medicine Open); Schoenfeld, Grgic &amp; Krieger 2019 (Journal of Sports Sciences).</p></div></details>`;
+    <p class="small muted">Schoenfeld et al. 2017 and Lopez et al. 2021 (low vs high loads); Lasevicius et al. 2018 (how light is too light); Kikuchi &amp; Nakazato 2017 (push-ups vs bench press); Spiering et al. 2021 (Journal of Strength and Conditioning Research); Iversen et al. 2021 (Sports Medicine); Pelland et al. 2024 (SportRxiv); Robinson et al. 2024 (Sports Medicine); Murphy &amp; Koehler 2022 (Scand J Med Sci Sports); Schoenfeld et al. 2016 (JSCR); Maeo et al. 2022 (Eur J Sport Sci); Kinoshita et al. 2023 (Frontiers in Physiology); Helms et al. 2015 (J Sports Med Phys Fitness); Bell et al. 2023 (Sports Medicine Open); Schoenfeld, Grgic &amp; Krieger 2019 (Journal of Sports Sciences).</p></div></details>`;
 }
 
 /* ── one lift: chart and history ── */
@@ -9942,7 +10059,7 @@ function shLift() {
   const mk = SH.m || (e.bw ? 'reps' : 'e1'), pts = ser.map(s => ({ d: s.date, v: s[mk] })).filter(p => p.v !== null && p.v > 0);
   const seg = `<div class="seg mini4" role="group" aria-label="Measure">${Object.entries(LIFT_M).filter(([k]) => !(e.bw && k !== 'reps')).map(([k, [l]]) => `<button data-a="liftm" data-v="${k}" aria-pressed="${mk === k}">${l}</button>`).join('')}</div>`;
   const best = ser.reduce((b, s) => (s.e1 && (!b || s.e1 > b.e1) ? s : b), null);
-  const table = ser.slice().reverse().map(s => `<tr><td>${shortD(s.date)}</td><td>${esc(setsTxt(s.sets, e.bw))}</td><td>${s[mk] ? Math.round(s[mk] * 10) / 10 : '–'}</td><td>${s.feel || '–'}</td></tr>${s.note ? `<tr><td></td><td colspan="3" class="small muted">${esc(s.note)}</td></tr>` : ''}`).join('');
+  const table = ser.slice().reverse().map(s => `<tr><td>${shortD(s.date)}</td><td>${esc(setsTxt(s.sets, e.bw, e.each))}</td><td>${s[mk] ? Math.round(s[mk] * 10) / 10 : '–'}</td><td>${s.feel || '–'}</td></tr>${s.note ? `<tr><td></td><td colspan="3" class="small muted">${esc(s.note)}</td></tr>` : ''}`).join('');
   return `<div class="sheethead"><div><span class="eyebrow">Lift</span><h2>${esc(exName(id))}</h2></div>${closeBtn}</div>
     ${seg}${trChartLine(pts, LIFT_M[mk][1])}
     ${best && !e.bw ? `<p class="small" style="margin:6px 0 0">Best estimated one-rep max: <b>${Math.round(best.e1)} kg</b>, on ${shortD(best.date)}.</p>` : ''}
@@ -9996,6 +10113,7 @@ function renderTV() {
   const head = `<section class="tvcard"><h3>Before you lift</h3>
     <div class="field" style="margin:6px 0 0"><span class="lab">Readiness: 1 is wrecked, 10 is flying</span><div class="scale10" role="group" aria-label="Readiness">${scale}</div></div>
     ${bwTxt ? `<p class="small muted" style="margin:8px 0 0">Bodyweight: ${esc(bwTxt)}.</p>` : ''}
+    <div class="wchead" style="margin-top:8px"><span class="small muted">Kit</span><div class="seg mini3" role="group" aria-label="Kit for this session">${Object.keys(KITS).map(v => `<button data-a="tvkit" data-v="${v}" aria-pressed="${(l.kit || 'vit') === v}">${KITS[v]}</button>`).join('')}</div></div>
     ${RE_ID.test(l.sess) ? '' : `<div class="wchead" style="margin-top:8px"><span class="small muted">Dose for this session${l.deload ? ' (deload)' : ''}</span><div class="seg mini3" role="group" aria-label="Dose">${['min', 'eff'].map(v => `<button data-a="tvdose" data-v="${v}" aria-pressed="${l.dose === v}">${DOSE_N[v]}</button>`).join('')}</div></div>`}
     <div class="field" style="margin:8px 0 0"><label for="tv-note">Session note</label><textarea id="tv-note" data-tf="note" rows="2" placeholder="Sleep, stress, food, anything relevant">${esc(l.note || '')}</textarea></div></section>`;
   const cards = l.ex.map((e, i) => tvCard(l, e, i)).join('');
@@ -10012,22 +10130,23 @@ function renderTV() {
 }
 function tvCard(l, e, i) {
   const x = EX[e.ex] || {}, sl = e.slot, def = SLOTDEF[sl], ph = l.phase, tgt = exTgt(l, e);
-  const opts = def ? [...new Set([e.ex, ...slotOpts(sl)])] : [e.ex];
+  const opts = def ? [...new Set([e.ex, ...slotOpts(sl, l.kit)])] : [e.ex];
   const sel = opts.length > 1 ? `<select class="tvname" data-tf="swap" data-e="${i}" aria-label="Exercise">${opts.map(id => `<option value="${esc(id)}" ${id === e.ex ? 'selected' : ''}>${esc(exName(id))}</option>`).join('')}</select>` : `<b class="tvname1">${esc(exName(e.ex))}</b>`;
   if (!e.sets.length) return `<article class="tvex skip" id="tvx-${i}"><div class="tvex-top">${sel}</div><p class="small muted" style="margin:4px 0 0">${def && !slotSets(sl, ph, l.dose) ? 'Not in the minimal dose.' : 'No sets.'}</p><button class="btn sm" data-a="tvaddset" data-e="${i}" data-v="${def ? Math.max(1, slotSets(sl, ph, 'eff')) : 1}">${ic('plus')}Add ${def ? Math.max(1, slotSets(sl, ph, 'eff')) : 1} set${def && slotSets(sl, ph, 'eff') === 1 ? '' : 's'}</button></article>`;
   const last = trLast(e.ex, l.date, l.id), sg = def ? trSuggest(e.ex, sl, ph, l.date, l.id) : null;
   const rx = def ? `${tgt} × ${repTxt(sl, ph, e.ex)}` : `${e.sets.length} sets`, r = def ? roleOf(sl) : null;
   const rows = e.sets.map((s, j) => `<span class="sn">${j + 1}</span>
-    <input type="number" inputmode="decimal" step="0.5" min="0" data-tf="kg" data-e="${i}" data-s="${j}" value="${esc(s.kg)}" placeholder="${x.bw ? '+kg' : 'kg'}" aria-label="Set ${j + 1} ${x.bw ? 'added ' : ''}kg">
-    <input type="number" inputmode="numeric" min="0" data-tf="reps" data-e="${i}" data-s="${j}" value="${esc(s.reps)}" placeholder="${def ? slotReps(sl, ph).join('–') : 'reps'}" aria-label="Set ${j + 1} reps">
+    <input type="number" inputmode="decimal" step="0.5" min="0" data-tf="kg" data-e="${i}" data-s="${j}" value="${esc(s.kg)}" placeholder="${x.bw ? '+kg' : x.each ? 'kg each' : 'kg'}" aria-label="Set ${j + 1} ${x.bw ? 'added ' : ''}kg${x.each ? ' per dumbbell' : ''}">
+    <input type="number" inputmode="numeric" min="0" data-tf="reps" data-e="${i}" data-s="${j}" value="${esc(s.reps)}" placeholder="${def ? slotReps(sl, ph, e.ex).join('–') : 'reps'}" aria-label="Set ${j + 1} reps">
     <select data-tf="rir" data-e="${i}" data-s="${j}" aria-label="Set ${j + 1} reps in reserve"><option value="">–</option>${['0', '1', '2', '3', '4+'].map(v => `<option ${s.rir === v ? 'selected' : ''}>${v}</option>`).join('')}</select>
     <button class="stick" data-a="tvtick" data-e="${i}" data-s="${j}" aria-pressed="${!!s.done}" aria-label="Set ${j + 1} done">${ic('check')}</button>`).join('');
   return `<article class="tvex ${e.nd ? 'nd' : ''}" id="tvx-${i}">
     <div class="tvex-top">${sel}<span class="rx">${rx}</span></div>
     ${e.nd ? `<p class="tvndn">${ic('x')}Marked not done on the week list. Log a set and it counts again.</p>` : ''}
-    ${r ? `<p class="small muted" style="margin:2px 0 0">Stop ${slotRir(sl, l.deload)} short · rest ${mins(r.rest)}${x.bw ? ' · bodyweight' : ''}</p>` : ''}
-    <p class="small" style="margin:4px 0 0">${last ? `Last time (${shortD(last.date)}): ${esc(setsTxt(last.sets, x.bw))}` : '<span class="muted">No earlier sets for this one.</span>'}</p>
-    ${sg && last ? `<p class="tvhint ${sg.up ? 'up' : sg.down ? 'down' : ''}">${sg.kg !== null && !x.bw ? `<b>${sg.kg} kg</b> · ` : ''}${esc(sg.txt)}</p>` : sg ? `<p class="tvhint">${esc(sg.txt)}</p>` : ''}
+    ${r ? `<p class="small muted" style="margin:2px 0 0">Stop ${slotRir(sl, l.deload, e.ex)} short · rest ${mins(r.rest)}${x.bw ? ' · bodyweight' : x.each ? ' · kg per dumbbell' : ''}</p>` : ''}
+    <p class="small" style="margin:4px 0 0">${last ? `Last time (${shortD(last.date)}): ${esc(setsTxt(last.sets, x.bw, x.each))}` : '<span class="muted">No earlier sets for this one.</span>'}</p>
+    ${sg && last ? `<p class="tvhint ${sg.up ? 'up' : sg.down ? 'down' : ''}">${sg.kg !== null && !x.bw ? `<b>${sg.kg} kg${x.each ? ' each' : ''}</b> · ` : ''}${esc(sg.txt)}</p>` : sg ? `<p class="tvhint">${esc(sg.txt)}</p>` : ''}
+    ${x.kit && (e.lad || (sg && sg.ladOn)) ? `<div class="chips ladrow" role="group" aria-label="How hard each rep is">${LAD.map((n, k) => `<button class="chip" data-a="tvlad" data-e="${i}" data-v="${k}" aria-pressed="${(e.lad || 0) === k}">${n}</button>`).join('')}</div>` : ''}
     ${x.tip ? `<details class="tvhow"><summary>How${ic('chev')}</summary><p class="small">${esc(x.tip)}</p></details>` : ''}
     <label class="feel">Feel before this lift <select data-tf="feel" data-e="${i}"><option value="">–</option>${Array.from({ length: 10 }, (_, k) => `<option ${String(e.feel) === String(k + 1) ? 'selected' : ''}>${k + 1}</option>`).join('')}</select></label>
     <div class="setgrid"><span class="h">Set</span><span class="h">${x.bw ? '+kg' : 'kg'}</span><span class="h">Reps</span><span class="h">RIR</span><span class="h"></span>${rows}</div>
@@ -10159,6 +10278,18 @@ Object.assign(ACT, {
     trSave(); render();
   },
   trdose(d) { trWk(startOf(todayKey())).dose = d.v; trSave(); render(); },
+  // the week's kit; sessions given their own keep it unless it now matches the week's
+  trkit(d) { const st = startOf(todayKey()), w = trWk(st); if (d.v === 'vit') delete w.kit; else w.kit = d.v; if (w.sk) { Object.keys(w.sk).forEach(s => { if (w.sk[s] === trKitWk(st)) delete w.sk[s]; }); if (!Object.keys(w.sk).length) delete w.sk; } trSave(); render(); },
+  trskit(d) { const st = startOf(d.k || todayKey()), w = trWk(st); w.sk = w.sk || {}; if (d.v === trKitWk(st)) delete w.sk[d.s]; else w.sk[d.s] = d.v; if (!Object.keys(w.sk).length) delete w.sk; trSave(); render(); },
+  // switching kit mid-session: exercises not started yet move over; anything with sets logged stays as it is
+  tvkit(d) {
+    const l = tvLog(); if (!l || (l.kit || 'vit') === d.v) return;
+    if (d.v === 'vit') delete l.kit; else l.kit = d.v;
+    let kept = 0;
+    l.ex.forEach((e, i) => { if (!SLOTDEF[e.slot]) return; if (e.sets.some(s => tnum(s.reps) > 0 || s.done)) { kept++; return; } tvSwapTo(l, i, slotEx(e.slot, l.kit)); });
+    trSave(l); renderTV(); toast(`${KITS[d.v]} for this session${kept ? `; ${kept} exercise${kept === 1 ? '' : 's'} with sets logged stay${kept === 1 ? 's' : ''} as ${kept === 1 ? 'it is' : 'they are'}` : ''}`);
+  },
+  tvlad(d) { const l = tvLog(); if (!l) return; const e = l.ex[+d.e], v = +d.v; if (!e) return; if (v >= 1 && v <= 4) e.lad = v; else delete e.lad; trSave(l); renderTV(); },
   trdeload(d) { trWk(startOf(todayKey())).deload = d.v === '1'; trSave(); render(); toast(d.v === '1' ? 'Deload week: minimal dose, same weights' : 'A normal week'); },
   tvstart(d) {
     if (d.id && S.tr.logs[d.id]) { tvOpen(d.id); return; }
@@ -10199,13 +10330,14 @@ Object.assign(ACT, {
   tvnope(d) {
     const l = tvLog(); if (!l) return;
     const e = l.ex[+d.e], was = e.ex; S.tr.nope[was] = 1; if (S.tr.swaps[e.slot] === was) delete S.tr.swaps[e.slot];
-    tvSwapTo(l, +d.e, slotEx(e.slot)); trSave(l); renderTV(); toast(`${exName(was)} ruled out; bring it back from the plan`);
+    Object.values(S.tr.kswaps).forEach(m => { if (m[e.slot] === was) delete m[e.slot]; });
+    tvSwapTo(l, +d.e, slotEx(e.slot, l.kit)); trSave(l); renderTV(); toast(`${exName(was)} ruled out; bring it back from the plan`);
   },
   tvaddex() { openSheet({ type: 'tvaddex' }); },
   tvaddexgo(d) {
     const l = tvLog(); if (!l) return;
-    const sl = d.v, x = slotEx(sl), sg = trSuggest(x, sl, l.phase, l.date, l.id), n = Math.max(1, slotSets(sl, l.phase, l.dose));
-    l.ex.push({ slot: sl, ex: x, feel: '', note: '', sets: Array.from({ length: n }, () => ({ kg: sg.kg !== null ? String(sg.kg) : '', reps: '', rir: '', done: false })) });
+    const sl = d.v, x = slotEx(sl, l.kit), sg = trSuggest(x, sl, l.phase, l.date, l.id), n = Math.max(1, slotSets(sl, l.phase, l.dose));
+    l.ex.push({ slot: sl, ex: x, ...(sg.lad ? { lad: sg.lad } : {}), feel: '', note: '', sets: Array.from({ length: n }, () => ({ kg: sg.kg !== null ? String(sg.kg) : '', reps: '', rir: '', done: false })) });
     trSave(l); closeSheet(); renderTV(); const c = $(`tvx-${l.ex.length - 1}`); if (c) c.scrollIntoView({ block: 'start' });
   },
   tvdel() {
@@ -10229,6 +10361,7 @@ Object.assign(ACT, {
 function tvSwapTo(l, i, x) {
   const e = l.ex[i]; if (!e || e.ex === x) return;
   e.ex = x;
+  { const g0 = trSuggest(x, e.slot, l.phase, l.date, l.id); if (g0.lad) e.lad = g0.lad; else delete e.lad; }
   if (!e.sets.some(s => tnum(s.reps) > 0 || s.done)) { const g = trSuggest(x, e.slot, l.phase, l.date, l.id).kg; e.sets.forEach(s => { s.kg = g !== null ? String(g) : ''; }); }
 }
 /* ── the week's ledger: every set done, from sessions or added by hand, counted against the doses muscle by muscle ── */
@@ -10254,7 +10387,7 @@ function trLedger(st) {
   if (re) re.ses.forEach(x => x.ex.forEach(e => put(e.ex, e.n, e.sl)));
   else split.forEach(sess => sessSlots(sess, phase).forEach(sl => { const n = slotSets(sl, phase, dose); if (n) put(slotEx(sl), n, sl); }));
   // sets done tick off the plan's exercise for the slot they filled, or one they're an alternative to; the rest are extras
-  const alt = (p, ex) => p.slots.some(sl => SLOTDEF[sl] && [SLOTDEF[sl].ex, ...SLOTDEF[sl].alts].includes(ex));
+  const alt = (p, ex) => p.slots.some(sl => SLOTDEF[sl] && [SLOTDEF[sl].ex, ...SLOTDEF[sl].alts, ...kitAll(sl)].includes(ex));
   lots.forEach(x => {
     // after a rearrangement, its list only counts what was done in its sessions, or logged or added by hand since
     const fits = !re || x.re || (x.id ? x.date >= re.at : re.atMs ? x.created > re.atMs : x.date > re.at);
@@ -10320,11 +10453,11 @@ const RE_TYPES = { full: { lab: 'Full body', m: null }, upper: { lab: 'Upper', m
 const RE_ORDER = { main: 0, heavy: 0, comp: 1, pull: 1, acc: 2, iso: 3, core: 4 };
 const RE_SECS = 3600, RE_MUS = 8;
 // your plan's picks (with your swaps), then an alternative only for a muscle none of them reaches
-function trReCands(phase) {
+function trReCands(phase, kit) {
   const out = [], seen = new Set(), add = (sl, ex) => { if (seen.has(ex) || !slotOk(ex)) return; seen.add(ex); out.push({ sl, ex, role: SLOTDEF[sl].role }); };
   const slots = Object.keys(SLOTDEF).filter(sl => !SLOTDEF[sl].only || SLOTDEF[sl].only === phase);
-  slots.forEach(sl => add(sl, slotEx(sl)));
-  Object.keys(MUSC).forEach(m => { if (out.some(c => EX[c.ex].p.includes(m))) return; for (const sl of slots) { const a = slotOpts(sl).find(x => EX[x].p.includes(m)); if (a) { add(sl, a); break; } } });
+  slots.forEach(sl => add(sl, slotEx(sl, kit)));
+  Object.keys(MUSC).forEach(m => { if (out.some(c => EX[c.ex].p.includes(m))) return; for (const sl of slots) { const a = slotOpts(sl, kit).find(x => EX[x].p.includes(m)); if (a) { add(sl, a); break; } } });
   return out;
 }
 function trReBuild(st, dose, days, lay) {
@@ -10336,7 +10469,7 @@ function trReBuild(st, dose, days, lay) {
   if (n === 1 || lay === 'full') types = days.map(() => 'full');
   else if (lay === 'split') types = tot(UPPER_M) >= tot(LOWER_M) ? alt('upper', 'lower') : alt('lower', 'upper');
   else types = tot(RE_TYPES.pushlegs.m) >= tot(RE_TYPES.pullhinge.m) ? alt('pushlegs', 'pullhinge') : alt('pullhinge', 'pushlegs');
-  const has = (t, m) => !RE_TYPES[t].m || RE_TYPES[t].m.includes(m), lead = x => EX[x].p[0], cands = trReCands(phase), ses = [];
+  const has = (t, m) => !RE_TYPES[t].m || RE_TYPES[t].m.includes(m), lead = x => EX[x].p[0], cands = trReCands(phase, trKitWk(st)), ses = [];
   // each muscle's sets go in at least two at a time, spread over the sessions that train it
   const into = {};
   M.forEach(m => { const E = types.map((t, i) => (has(t, m) ? i : -1)).filter(i => i >= 0), k = Math.max(1, Math.min(E.length, Math.floor(gap[m] / 2))); into[m] = E.length ? [...new Set(Array.from({ length: k }, (_, j) => E[Math.floor((j * E.length) / k)]))] : []; });
@@ -10403,10 +10536,10 @@ function shTvPick() {
 function shTvAddEx() {
   SH.title = 'Add an exercise';
   const l = tvLog(), have = new Set(l ? l.ex.map(e => e.slot) : []);
-  const sl = Object.keys(SLOTDEF).filter(x => !have.has(x) && slotOpts(x).length);
-  const seen = new Set(), list = sl.filter(x => { const e = slotEx(x); if (seen.has(e)) return false; seen.add(e); return true; });
+  const kit = l ? l.kit : undefined, sl = Object.keys(SLOTDEF).filter(x => !have.has(x) && slotOpts(x, kit).length);
+  const seen = new Set(), list = sl.filter(x => { const e = slotEx(x, kit); if (seen.has(e)) return false; seen.add(e); return true; });
   return `<div class="sheethead"><div><span class="eyebrow">This session</span><h2>Add an exercise</h2></div>${closeBtn}</div>
-    <div class="opts">${list.map(x => `<button class="opt plain" data-a="tvaddexgo" data-v="${x}"><b>${esc(exName(slotEx(x)))}</b><span class="d">${esc(roleOf(x).n)} · ${esc(EX[slotEx(x)].p.map(m => MUSC[m]).join(', '))}</span></button>`).join('')}</div>`;
+    <div class="opts">${list.map(x => `<button class="opt plain" data-a="tvaddexgo" data-v="${x}"><b>${esc(exName(slotEx(x, kit)))}</b><span class="d">${esc(roleOf(x).n)} · ${esc(EX[slotEx(x, kit)].p.map(m => MUSC[m]).join(', '))}</span></button>`).join('')}</div>`;
 }
 
 document.addEventListener('input', e => {
@@ -10423,7 +10556,8 @@ document.addEventListener('change', e => {
   else if (f === 'feel') l.ex[+t.dataset.e].feel = t.value;
   else if (f === 'swap') {
     const i = +t.dataset.e, sl = l.ex[i].slot; tvSwapTo(l, i, t.value);
-    if (SLOTDEF[sl]) { if (t.value === SLOTDEF[sl].ex) delete S.tr.swaps[sl]; else S.tr.swaps[sl] = t.value; }
+    if (SLOTDEF[sl] && l.kit && KIT_SL[sl]) { const m = S.tr.kswaps[l.kit] = S.tr.kswaps[l.kit] || {}; if (t.value === KIT_SL[sl][l.kit][0]) delete m[sl]; else if (KIT_SL[sl][l.kit].includes(t.value)) m[sl] = t.value; }
+    else if (SLOTDEF[sl] && exKit(t.value) === 'vit') { if (t.value === SLOTDEF[sl].ex) delete S.tr.swaps[sl]; else S.tr.swaps[sl] = t.value; }
     trSave(l); renderTV(); return;
   } else return;
   trSave(l);
