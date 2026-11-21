@@ -1992,6 +1992,161 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 .nwx { margin: -2px 0 8px; font-size: 13px; color: var(--muted); }
 .lagrow.sub span:first-child { font-weight: 600; padding-top: 6px; }
 .ntdot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: 0; }
+
+/* the game (3.28): gold for points and levels */
+:root { --gold: #B9842A; --gold-soft: #F7EBCF; --gold-ink: #6E4C0E; --bad: #C2402F; --bad-soft: #F7DEDA; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --gold: #E3B256; --gold-soft: #3A2E17; --gold-ink: #F1D9A4; --bad: #EE7A6B; --bad-soft: #3B1F1B; } }
+:root[data-theme="dark"] { --gold: #E3B256; --gold-soft: #3A2E17; --gold-ink: #F1D9A4; --bad: #EE7A6B; --bad-soft: #3B1F1B; }
+/* unlockable accent colours */
+:root[data-acc="forest"] { --accent: #2F6B45; --accent-soft: #DCEBDD; }
+:root[data-acc="ocean"] { --accent: #1F5F8B; --accent-soft: #DCE8F2; }
+:root[data-acc="ember"] { --accent: #B2501B; --accent-soft: #F6E2D3; }
+:root[data-acc="plum"] { --accent: #6A3A8C; --accent-soft: #EADFF2; }
+:root[data-acc="gold"] { --accent: #9A6B12; --accent-soft: #F5E9CC; }
+@media (prefers-color-scheme: dark) {
+  :root[data-acc="forest"]:not([data-theme="light"]) { --accent: #7CC796; --accent-soft: #1C3224; }
+  :root[data-acc="ocean"]:not([data-theme="light"]) { --accent: #79B6E3; --accent-soft: #172B3A; }
+  :root[data-acc="ember"]:not([data-theme="light"]) { --accent: #F0A06D; --accent-soft: #3A2417; }
+  :root[data-acc="plum"]:not([data-theme="light"]) { --accent: #C59BE6; --accent-soft: #2E2139; }
+  :root[data-acc="gold"]:not([data-theme="light"]) { --accent: #E8C068; --accent-soft: #3A2E17; }
+}
+:root[data-theme="dark"][data-acc="forest"] { --accent: #7CC796; --accent-soft: #1C3224; }
+:root[data-theme="dark"][data-acc="ocean"] { --accent: #79B6E3; --accent-soft: #172B3A; }
+:root[data-theme="dark"][data-acc="ember"] { --accent: #F0A06D; --accent-soft: #3A2417; }
+:root[data-theme="dark"][data-acc="plum"] { --accent: #C59BE6; --accent-soft: #2E2139; }
+:root[data-theme="dark"][data-acc="gold"] { --accent: #E8C068; --accent-soft: #3A2E17; }
+
+.gmlv { display: inline-flex; align-items: center; gap: 4px; background: var(--gold-soft); color: var(--gold-ink); border-radius: 999px; padding: 4px 9px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+.gmlv svg { width: 13px; height: 13px; color: var(--gold); }
+/* the strip on Today */
+.gmstrip { display: block; width: 100%; text-align: left; border: 1px solid color-mix(in srgb, var(--gold) 45%, var(--line)); background: color-mix(in srgb, var(--gold-soft) 55%, var(--surface)); border-radius: 16px; padding: 10px 12px 11px; margin: 10px 0 12px; color: var(--ink); }
+.gmsh { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+.gmsh .eyebrow { color: var(--gold-ink); }
+.gmcs { display: flex; flex-wrap: wrap; gap: 6px; }
+.gmc { display: inline-flex; align-items: center; gap: 5px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 4px 8px; font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.gmc i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.gmc svg { width: 13px; height: 13px; }
+.gmc.ok { background: var(--leaf-soft); border-color: transparent; color: var(--leaf); }
+.gmc.mid i { background: var(--warn); }
+.gmc.off { background: var(--bad-soft); border-color: transparent; color: var(--bad); }
+.gmc.off i { background: var(--bad); }
+/* the Day's done card */
+.gmdone { margin: 14px 0 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; text-align: center; }
+.gmdone p { margin: 0 0 10px; }
+.gmgo { width: 100%; background: var(--leaf) !important; border-color: var(--leaf) !important; color: var(--surface) !important; }
+.gmgo svg { width: 18px; height: 18px; }
+.gmdone.closed { display: flex; align-items: center; gap: 12px; text-align: left; }
+.gmdone.closed .t { flex: 1; display: grid; gap: 1px; }
+.gmdone.closed small { color: var(--muted); font-size: 12px; }
+/* the full-screen cards */
+.gmov { position: fixed; inset: 0; z-index: 60; background: var(--scrim); display: flex; align-items: flex-end; justify-content: center; }
+.gmsheet { position: relative; width: 100%; max-width: 560px; max-height: calc(100% - 24px); overflow: auto; background: var(--bg); border-radius: 24px 24px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px)); box-shadow: var(--shadow); }
+.gmov.gmres { align-items: stretch; background: var(--bg); }
+.gmov.gmres .gmsheet { max-height: none; height: 100%; border-radius: 0; text-align: center; padding-top: calc(28px + env(safe-area-inset-top, 0px)); background: linear-gradient(var(--gmbg, var(--bg)), var(--bg) 46%); box-shadow: none; }
+.gmov.gmres.t-great { --gmbg: color-mix(in srgb, var(--gold) 16%, var(--bg)); }
+.gmov.gmres.t-good { --gmbg: color-mix(in srgb, var(--leaf) 12%, var(--bg)); }
+.gmov.gmres.t-bad { --gmbg: color-mix(in srgb, var(--bad) 16%, var(--bg)); }
+.gmx { position: absolute; right: 10px; top: calc(10px + env(safe-area-inset-top, 0px)); }
+.gmrow { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.gmh { font-family: var(--f-display); font-weight: 800; font-size: 34px; line-height: 1; margin: 8px 0 6px; text-transform: none; }
+.gmh.big { font-size: 42px; margin: 6px 0 14px; }
+.gmlead { margin: 0 0 12px; font-size: 14px; color: var(--muted); line-height: 1.4; }
+.gmyest { display: flex; gap: 6px; align-items: flex-start; margin: 0 0 8px; font-size: 13px; color: var(--muted); }
+.gmyest svg { width: 16px; height: 16px; flex: none; margin-top: 1px; color: var(--leaf); }
+.gmyest.bad svg { color: var(--bad); }
+.gmlist { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 2px 14px; margin: 0 0 12px; text-align: left; }
+.gmaim { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--line); }
+.gmaim:first-child { border-top: 0; }
+.gmart { flex: none; display: grid; place-items: center; }
+.gmart svg { display: block; }
+.gmt { flex: 1; min-width: 0; display: grid; gap: 1px; }
+.gmt b { font-size: 15px; line-height: 1.25; }
+.gmt small { font-size: 13px; color: var(--muted); line-height: 1.35; }
+.gmpts { font-family: var(--f-display); font-weight: 800; font-size: 21px; color: var(--gold); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.gmpts.neg { color: var(--bad); }
+.gmpts.nil { color: var(--muted); opacity: .6; }
+.gmfoot { margin: 0 2px 12px; }
+.gmfoot svg, .gmsub svg { width: 14px; height: 14px; color: var(--c-orange); vertical-align: -2px; }
+.gmbig { width: 100%; padding-block: 13px; font-size: 16px; }
+.gmsub { margin: 10px 0 14px; font-size: 14px; color: var(--muted); }
+.gmsub b { color: var(--ink); }
+.gmring { --p: 0; width: 120px; height: 120px; margin: 0 auto; border-radius: 50%; background: conic-gradient(var(--gmring, var(--gold)) calc(var(--p) * 1%), var(--surface-2) 0); display: grid; place-items: center; }
+.gmov.gmres.t-bad .gmring { --gmring: var(--bad); }
+.gmov.gmres.t-good .gmring { --gmring: var(--leaf); }
+.gmring > span { width: 98px; height: 98px; border-radius: 50%; background: var(--surface); display: grid; place-content: center; text-align: center; }
+.gmring b { font-family: var(--f-display); font-weight: 800; font-size: 42px; line-height: .9; font-variant-numeric: tabular-nums; }
+.gmring small { font-size: 12px; color: var(--muted); }
+.gmjob { background: var(--surface-2); border-radius: 16px; padding: 12px 14px; margin: 0 0 14px; text-align: left; }
+.gmjob p { margin: 4px 0 0; font-size: 14.5px; line-height: 1.4; }
+.gmbar { height: 10px; border-radius: 6px; background: var(--surface-2); overflow: hidden; margin: 6px 0 14px; }
+.gmbar i { display: block; height: 100%; border-radius: 6px; background: var(--gold); }
+.gmbar.sm { height: 6px; margin: 5px 0 0; display: block; }
+.gmbar.sm i { background: var(--warn); }
+.gmnews { display: flex; align-items: center; gap: 12px; text-align: left; background: var(--gold-soft); border-radius: 16px; padding: 10px 12px; margin: 0 0 12px; }
+.gmnews span { display: grid; gap: 1px; }
+.gmnews .eyebrow { color: var(--gold-ink); }
+.gmnews small { font-size: 12.5px; color: var(--muted); }
+/* medals: a drawing in a gold ring */
+.gmmedal { --ms: 54px; width: var(--ms); height: var(--ms); flex: none; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 35% 30%, #FFF6DC, #F0D489 58%, #C9952B); box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--gold); }
+.gmmedal svg { display: block; }
+.gmmedal.off { background: var(--surface-2); box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--line); filter: grayscale(1); opacity: .5; }
+/* Trends › Rewards */
+.gmcab { display: grid; gap: 4px; }
+.gmlvcard { background: var(--gold-soft); border-radius: 16px; padding: 12px 14px 4px; }
+.gmlvcard .eyebrow { color: var(--gold-ink); display: block; }
+.gmlvn { font-family: var(--f-display); font-weight: 800; font-size: 26px; line-height: 1.05; }
+.gmlvcard .gmbar { background: color-mix(in srgb, var(--surface) 70%, transparent); margin: 10px 0 6px; }
+.gmlvcard p { margin: 0 0 8px; }
+.gmsubh { margin: 14px 0 6px; font-size: 14px; }
+.gmbadges { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 6px; }
+.gmb { border: 0; background: none; padding: 4px 0; display: grid; justify-items: center; gap: 6px; color: var(--ink); font-size: 11.5px; font-weight: 700; line-height: 1.2; text-align: center; }
+.gmb.off span:last-child { color: var(--muted); font-weight: 400; }
+.gmbadgeinfo { background: var(--surface-2); border-radius: 14px; padding: 10px 12px; margin-top: 8px; }
+.gmbadgeinfo p { margin: 4px 0 0; }
+.gmnear { display: flex; gap: 12px; align-items: center; padding: 6px 0; }
+.gmnear > span:not(.gmmedal) { flex: 1; display: grid; }
+.gmnear small { font-size: 12.5px; color: var(--muted); }
+.gmcab .chip.on { background: var(--accent); color: var(--accent-ink, #fff); border-color: var(--accent); }
+.gmcab .chip[disabled] { opacity: .5; }
+.gmdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.gmday { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 6px 2px; display: grid; justify-items: center; gap: 0; font-size: 11px; color: var(--muted); }
+.gmday b { font-family: var(--f-display); font-size: 20px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.gmday.great { background: var(--gold-soft); border-color: transparent; }
+.gmday.bad { background: var(--bad-soft); border-color: transparent; }
+/* the weekly review's reward slides */
+.rvshow.s-gold { --shbg: color-mix(in srgb, var(--gold) 26%, var(--bg)); --shink: var(--gold-ink); }
+.gmrew .gmbig-medal { margin: 6px 0 4px; }
+.gmrew .gmmedal { box-shadow: 0 0 0 6px var(--surface), 0 0 0 9px var(--gold), 0 14px 34px color-mix(in srgb, var(--gold) 45%, transparent); }
+.gmrewn { margin: 4px 0 0; font-family: var(--f-display); font-weight: 800; font-size: 28px; }
+.gmrew .shcard p, .gmwk { font-size: 14.5px; margin: 4px 0 6px; }
+.gmwk { gap: 0; }
+/* celebrations */
+#fx .gmbit, #fx .gmleaf, #fx .gmspark, #fx .gmstar { position: fixed; pointer-events: none; }
+.gmbit { width: 8px; height: 13px; border-radius: 2px; }
+.gmleaf { width: 14px; height: 9px; border-radius: 0 10px 0 10px; }
+.gmspark { width: 6px; height: 6px; border-radius: 50%; }
+.gmstar { width: 3px; height: 3px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 6px 2px var(--gold); }
+@media (prefers-reduced-motion: no-preference) {
+  .gmsheet.in { animation: gmup .38s var(--ease) both; }
+  .gmov.gmres .gmsheet.in { animation: gmfade .3s ease both; }
+  .gmov.gmres .gmring { animation: shpop .6s .1s both cubic-bezier(.2, 1.4, .4, 1); }
+  .gmov.gmres .gmnews { animation: shpop .6s .45s both cubic-bezier(.2, 1.4, .4, 1); }
+  .gmov.gmres .gmlist, .gmov.gmres .gmjob { animation: shup .45s .3s both var(--ease); }
+  .gmrew .gmmedal { animation: gmspin .9s .1s both cubic-bezier(.2, 1.3, .4, 1); }
+  .gmbit { animation: gmburst 1.6s cubic-bezier(.15, .7, .3, 1) forwards; }
+  .gmleaf { animation: gmfall 3s ease-in forwards; }
+  .gmspark { animation: gmpop 1.2s ease-out both; }
+  .gmstar { animation: gmshoot 1.4s ease-out both; }
+}
+@keyframes gmup { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes gmfade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes gmspin { from { transform: rotateY(180deg) scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes gmburst { 0% { transform: translate(0, 0) rotate(0); opacity: 1; } 70% { opacity: 1; } 100% { transform: translate(var(--dx), calc(var(--dy) + 140px)) rotate(var(--rot)); opacity: 0; } }
+@keyframes gmfall { 0% { transform: translate(0, 0) rotate(0); opacity: 0; } 10% { opacity: 1; } 100% { transform: translate(var(--dx), 105vh) rotate(var(--rot)); opacity: .9; } }
+@keyframes gmpop { 0% { transform: translate(0, 0) scale(.4); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(var(--dx), calc(var(--dy) + 30px)) scale(1); opacity: 0; } }
+@keyframes gmshoot { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
+.gmmore { margin: -4px 0 12px; }
+.gmrew .gmbadges { width: 100%; }
 </style>
 </head>
 <body>
@@ -2017,7 +2172,7 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.27.1';</script>
+<script>window.TP_VERSION = '3.28.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -4167,6 +4322,7 @@ function normalise(s) {
     });
   });
   trNormalise(s); // training sessions, swaps and weeks
+  s.game = gmNorm(s.game);
   return s;
 }
 let NSC = {}; // drinks: night shares and the nights near each week, cleared on every save and render
@@ -4926,6 +5082,7 @@ const P = {
   check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>', chev: '<path d="M9 5l7 7-7 7"/>', left: '<path d="M15 5l-7 7 7 7"/>', down: '<path d="M6 9l6 6 6-6"/>',
   gear: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
   plus: '<path d="M12 5v14M5 12h14"/>', x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  flame: '<path d="M12 3c.6 3.2 4.5 5.2 4.5 9.6a4.5 4.5 0 0 1-9 .4c0-2.1 1.1-3.4 2.3-4.4-.1 1.7.6 2.8 1.6 3.3.1-3.3-.1-6.1.6-8.9z"/>',
   star: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.9z"/>',
   fish: '<path d="M3 12c3-4 7-6 11-6 3 0 5 2 7 6-2 4-4 6-7 6-4 0-8-2-11-6z"/><path d="M16 11v.01"/>',
   jar: '<path d="M8 3h8v3H8z"/><path d="M7 6h10l1 3v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9z"/><path d="M9 13h6"/>',
@@ -5186,7 +5343,7 @@ function vToday() {
   const tiles = `<div class="tiles"><button class="tile ${wc.ptsEat >= g ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${fmtPts(wc.ptsEat)}<small>/${g}</small></span><span class="l">Plants eaten</span></button>
     <button class="tile ${wc.oilyE >= set.oilyGoal ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${wc.oilyE}<small>/${set.oilyGoal}</small></span><span class="l">Oily fish</span></button>
     <button class="tile ${wc.fermEatDays >= 6 ? 'good' : wc.fermEatDays >= 4 ? 'mid' : ''}" data-a="tab" data-v="week"><span class="v">${wc.fermEatDays}<small>/7</small></span><span class="l">Fermented days</span></button></div>`;
-  return `${weekNav(st)}<div class="strip">${strip}</div>${k === tk ? mrCard() : ''}${fxCard(k)}${spareCard(k)}${hero}${k === tk ? todayPrompts() : ''}<div class="meals">${rows.join('')}</div>${mkupBar(k, c)}<div class="extras">${extras}<button class="btn link" data-a="xadd">${ic('plus')}Log something else</button></div>${tiles}${wrap}`;
+  return `${weekNav(st)}<div class="strip">${strip}</div>${gmStrip(k)}${k === tk ? mrCard() : ''}${fxCard(k)}${spareCard(k)}${hero}${k === tk ? todayPrompts() : ''}<div class="meals">${rows.join('')}</div>${mkupBar(k, c)}<div class="extras">${extras}<button class="btn link" data-a="xadd">${ic('plus')}Log something else</button></div>${tiles}${gmDoneCard(k)}${wrap}`;
 }
 /* making up the gap: from 4pm, a meal still to come can be swapped for one that fixes what today is short of
    (fibre, fermented) without going over on sat fat, sugar or salt, within the calories left; new plants come next */
@@ -6129,6 +6286,7 @@ function vTrends() {
   if (nGap !== null) also.push(['gaps', 'Still to fill in', nGap ? `${nGap} week${nGap === 1 ? '' : 's'} with gaps` : 'Nothing missing', nGap, () => gapCard(true)]);
   if (top.length) also.push(['top', 'Most often on your plan', `Last 8 weeks · ${esc(R[top[0][0]].n.split(/ with | & |,/)[0].toLowerCase())} tops it, ${top[0][1]} time${top[0][1] > 1 ? 's' : ''}`, 0, () => `<div class="alsobody">${topHtml}</div>`]);
   { const ml = mrList(); if (ml) also.push(ml); }
+  if (S.game && S.game.from) { const T = gmTotal(), nb = Object.keys(S.game.b).filter(id => GMB[id]).length; also.unshift(['rewards', 'Rewards and badges', `Level ${T.lv} · ${esc(T.name)} · ${nb} of ${GM_BADGES.length} badges`, 0, gmCabinet]); }
   also.push(['nose', 'Nose care guide', 'The routine and the reference from the nose app', 0, noseGuide]);
   if (missing.length) also.push(['miss', 'Not on your plan for four weeks', `${missing.length} plant${missing.length > 1 ? 's' : ''}, ${esc(PLANTS[missing[0]][0].toLowerCase())} to ${esc(PLANTS[missing[missing.length - 1]][0].toLowerCase())}`, 0, () => `<div class="alsobody">${missHtml}</div>`]);
   const alsoHtml = also.length ? `<section class="trsec"><h3 class="eyebrow">Also here</h3><div class="trlist">${also.map(([k, n, sub, badge, body]) => { const open = !!(UI.tAlso || {})[k]; return `<div class="also ${open ? 'open' : ''}"><button class="alsohead" data-a="talso" data-v="${k}" aria-expanded="${open}"><span class="trn"><b>${n}</b><small>${sub}</small></span>${badge ? `<span class="abadge">${badge}</span>` : ''}${ic('chev', false, 'chev')}</button>${open ? body() : ''}</div>`; }).join('')}</div></section>` : '';
@@ -6983,7 +7141,7 @@ function syncHistory() {
   if (window.TP_PREVIEW) return;
   setTimeout(() => {
     try {
-      const open = !!(SH || WZ || PM || RV || TV || FS || MR || UI.trends);
+      const open = !!(SH || WZ || PM || RV || TV || FS || MR || GM || UI.trends);
       if (open && !ARMED) { history.pushState({ tp: 1 }, ''); ARMED = true; }
       else if (!open && ARMED) { ARMED = false; SKIPPOP = true; history.back(); }
     } catch (e) { /* history unavailable */ }
@@ -6993,7 +7151,7 @@ window.addEventListener('popstate', () => {
   if (SKIPPOP) { SKIPPOP = false; return; }
   if (!ARMED) return;
   ARMED = false;
-  if (SH) closeSheet(); else if (MR) { mrClose(); render(); } else if (FS) fsClose(); else if (TV) ACT.tvclose(); else if (RV) closeReview(); else if (WZ) closeWizard(); else if (PM) closePrep(); else if (UI.trends) ACT.trback();
+  if (GM) { gmClose(); render(); } else if (SH) closeSheet(); else if (MR) { mrClose(); render(); } else if (FS) fsClose(); else if (TV) ACT.tvclose(); else if (RV) closeReview(); else if (WZ) closeWizard(); else if (PM) closePrep(); else if (UI.trends) ACT.trback();
 });
 
 const AISLES = [['veg', 'Fruit, veg & herbs'], ['meat', 'Meat'], ['fish', 'Fish'], ['dairy', 'Dairy & eggs'], ['chilled', 'Chilled'], ['bakery', 'Bakery'], ['frozen', 'Frozen'], ['dry', 'Pasta, rice & grains'], ['tins', 'Tins & jars'], ['world', 'World foods'], ['nuts', 'Nuts, seeds & dried fruit'], ['baking', 'Baking'], ['drinks', 'Drinks'], ['oils', 'Oils & sauces'], ['spices', 'Herbs & spices']];
@@ -7380,7 +7538,7 @@ function vOut() {
 
 /* ───────────── sheets ───────────── */
 let SH = null, pending = null;
-function openSheet(o) { SH = o; renderSheet(true); syncHistory(); }
+function openSheet(o) { if (GM && GM.t === 'aims') { GM = null; gmRender(); } SH = o; renderSheet(true); syncHistory(); }
 function closeSheet() { if (SCAN.stream) stopScan(); SH = null; pending = null; $('sheet-root').innerHTML = ''; if (!WZ && !PM && !RV && !TV) document.body.style.overflow = ''; syncHistory(); }
 // a big title shrinks until its longest word fits (MOZZARELLA or PUTTANESCA beside the picture on a narrow phone)
 // the header steps down until it fits: tighter spacing, then the current section as an icon, then no dots on the
@@ -10481,7 +10639,7 @@ function shSlides(st) {
   const head = !scored.length ? 'A quiet week' : ok === scored.length ? 'A clean sweep' : !off ? 'A strong week' : ok >= scored.length * 0.6 ? 'A good week' : ok >= scored.length * 0.35 ? 'A mixed week' : 'A tough week';
   return [{ type: 'intro', st: 'intro', n: shown.length }]
     .concat(shown.map((m, i) => Object.assign({ type: 'metric', idx: i + 1, of: shown.length }, m)))
-    .concat([{ type: 'score', st: 'score', head, ok, mid, off, all: ms, best, up }, { type: 'focus', st: 'focus', focus }, { type: 'why', st: 'focus' }]);
+    .concat([{ type: 'score', st: 'score', head, ok, mid, off, all: ms, best, up }], gmWeekSlides(st), [{ type: 'focus', st: 'focus', focus }, { type: 'why', st: 'focus' }]);
 }
 
 /* ── the drawings: one per goal, in the same inked style as the dishes ── */
@@ -10568,6 +10726,7 @@ function shArt(key, size, cls) {
 
 /* ── the slides ── */
 function shSlide(sl, i, n) {
+  if (sl.type === 'gweek' || sl.type === 'glevel' || sl.type === 'gbadge' || sl.type === 'gbadges') return gmSlide(sl);
   if (sl.type === 'intro') return `<div class="shslide"><div class="eyebrow shgrp">Week of ${fmtRange(RV.st)}</div><h2 class="shname big">How did the week go?</h2>
     <div class="shart">${shArt('intro', 210)}</div><p class="shline">${sl.n ? `${nWord(sl.n, 'goal')} to go through, one at a time.` : 'Nothing logged for this week yet.'}</p><p class="shdet">Tap the right of the screen for the next one, the left to go back.</p></div>`;
   if (sl.type === 'metric') {
@@ -12761,11 +12920,511 @@ Object.assign(ACT, {
 document.addEventListener('keydown', e => { if (MR && !SH && e.key === 'Escape') { mrClose(); render(); } });
 
 /* ───────────── shell ───────────── */
+/* ───────────── the game (3.28): aims, points, streaks, levels, badges and unlocks ─────────────
+   Points come from the same figures as Trends. Calories earn for landing in the day's band, never for going under it.
+   A day scores live, so changing it after it's closed changes its points. Days left open close themselves overnight,
+   without the bonus for closing it yourself. Badges and levels, once reached, stay. */
+const GM_LV = ['Seedling', 'Sprout', 'Kitchen Rookie', 'Prep Cook', 'Plant Spotter', 'Gut Gardener', 'Plant Hunter', 'Fermentation Fiend', 'Fibre Fanatic', 'Omega Angler',
+  'Macro Marshal', 'Batch Boss', 'Rainbow Eater', 'Iron Will', 'Gut Guru', 'Thirty Club Regular', 'Head Chef', 'Habit Machine', 'Legend of the Larder', 'Thirty Plants Master'];
+const gmT = n => (n <= 1 ? 0 : 250 * (n - 1) + 25 * (n - 1) * (n - 2)); // points needed for level n
+const gmLvOf = pts => { let n = 1; while (gmT(n + 1) <= pts) n++; return n; };
+const gmLvName = n => (n <= GM_LV.length ? GM_LV[n - 1] : `${GM_LV[GM_LV.length - 1]} ${n - GM_LV.length + 1}`);
+// unlocks: accent colours and celebrations, by level
+const GM_ACC = { berry: ['Berry', 1], forest: ['Forest', 3], ocean: ['Ocean', 5], ember: ['Ember', 9], plum: ['Plum', 12], gold: ['Gold', 20] };
+const GM_FX = { confetti: ['Confetti', 1], leaves: ['Falling leaves', 2], fireworks: ['Fireworks', 7], stars: ['Shooting stars', 15] };
+const GM_UNLOCKS = Object.entries(GM_ACC).filter(([, v]) => v[1] > 1).map(([id, v]) => ({ t: 'acc', id, n: `${v[0]} colours`, lv: v[1] }))
+  .concat(Object.entries(GM_FX).filter(([, v]) => v[1] > 1).map(([id, v]) => ({ t: 'fx', id, n: `${v[0]} celebration`, lv: v[1] }))).sort((a, b) => a.lv - b.lv);
+// badges: [id, name, drawing, how, research key]
+const GM_BADGES = [
+  ['plants30', 'Thirty Club', 'plants', 'A week with 30 or more plant points', 'agp'],
+  ['plants45', 'Plant Hoarder', 'plants', 'A week with 45 or more plant points', 'agp'],
+  ['rainbow', 'Full Rainbow', 'colours', 'Every colour group in a week', 'whitehead'],
+  ['omega', 'Omega Week', 'fish', 'Your oily fish goal met in a week', 'fish'],
+  ['live7', 'Live Every Day', 'ferm', 'Something fermented every day for a week', 'wastyk'],
+  ['prot7', 'Protein Pro', 'protein', 'Your protein goal 7 days running', 'morton'],
+  ['fibre7', 'Fibre Week', 'fibre', 'Your fibre goal 7 days running', 'reynolds'],
+  ['sf7', 'Sat Fat Sensible', 'satfat', 'Under the sat fat limit 7 days running', 'hooper'],
+  ['sug7', 'Sugar Smart', 'sugar', 'Under the sugar limit 7 days running', 'knuppel'],
+  ['salt7', 'Salt Sensible', 'sodium', 'Under the sodium limit 7 days running', 'salt'],
+  ['streak7', 'On a Roll', 'focus', 'A 7-day streak', ''],
+  ['streak30', 'Unstoppable', 'focus', 'A 30-day streak', ''],
+  ['lifts', 'Full Week of Lifts', 'lift', 'Every planned session done in a week', 'singh'],
+  ['runner', 'Runner', 'run', 'Two or more runs in a week', 'pedisic'],
+  ['dry', 'Dry Spell', 'alcohol', 'A week under 7 units', 'ebrahim'],
+  ['steady', 'Steady Month', 'alcohol', 'Four weeks running under 14 units, none of them a binge week', 'ebrahim'],
+  ['perfect', 'Perfect Day', 'score', 'Every aim met in a day, with nothing lost', ''],
+  ['perfweek', 'Perfect Week', 'score', '7 days running at three-quarters of the points or more', ''],
+  ['pb', 'Personal Best', 'score', 'Your best week for points (from your third week)', ''],
+  ['sleep', 'Well Rested', 'sleep', 'Your sleep goal 7 nights running', 'oyetakin'],
+  ['ckin', 'Check-in Habit', 'check', 'Checked in 14 days running', ''],
+  ['budget', 'On Budget', 'kcal', 'Calories on budget 4 weeks running', ''],
+  ['closer', 'Closer', 'check', 'Closed the day yourself 7 days running', ''],
+  ['lv10', 'Double Digits', 'intro', 'Reached level 10', '']
+];
+const GMB = Object.fromEntries(GM_BADGES.map(b => [b[0], { id: b[0], n: b[1], art: b[2], how: b[3], res: b[4] }]));
+
+// self-contained, as it runs while the data loads
+function gmNorm(g) {
+  const isO = x => !!x && typeof x === 'object' && !Array.isArray(x), dk = /^\d{4}-\d{2}-\d{2}$/;
+  g = isO(g) ? g : {};
+  const o = { from: dk.test(g.from || '') ? g.from : null, d: {}, b: {}, lv: {}, seen: dk.test(g.seen || '') ? g.seen : null,
+    acc: typeof g.acc === 'string' ? g.acc : 'berry', fx: typeof g.fx === 'string' ? g.fx : 'confetti', shown: { lv: 1, b: {} } };
+  if (isO(g.d)) Object.keys(g.d).forEach(k => {
+    const x = g.d[k]; if (!dk.test(k) || !isO(x)) return; const y = {};
+    if (x.c) { y.c = 1; y.auto = x.auto ? 1 : 0; y.at = +x.at || 0; }
+    if (isO(x.g)) { const gg = {}; ['protein', 'fibre', 'sugar', 'sodium', 'satfat'].forEach(f => { if (x.g[f] !== null && x.g[f] !== '' && Number.isFinite(+x.g[f])) gg[f] = +x.g[f]; }); if (Object.keys(gg).length) y.g = gg; }
+    if (Object.keys(y).length) o.d[k] = y;
+  });
+  if (isO(g.b)) Object.keys(g.b).forEach(id => { if (dk.test(g.b[id] || '')) o.b[id] = g.b[id]; });
+  if (isO(g.lv)) Object.keys(g.lv).forEach(n => { if (+n > 1 && dk.test(g.lv[n] || '')) o.lv[+n] = g.lv[n]; });
+  if (isO(g.shown)) { o.shown.lv = Math.max(1, +g.shown.lv || 1); if (isO(g.shown.b)) Object.keys(g.shown.b).forEach(id => { o.shown.b[id] = 1; }); }
+  return o;
+}
+const G = () => S.game;
+let GMC = null, GMN = -1, GMD = '';
+function gmCache() { const tk = todayKey(); if (GMN !== SAVEN || GMD !== tk || !GMC) { GMC = { day: {}, wk: {}, lift: null, tot: null }; GMN = SAVEN; GMD = tk; } return GMC; }
+const gmOn = k => !!G().from && k >= G().from;
+const gmClosed = k => !!(G().d[k] && G().d[k].c);
+// the day's goals: fixed once the day starts, so a later edit to an earlier day doesn't move the target under you
+// a fair aim: after a big week the app's limit can drop near zero; points need something a day can actually hit,
+// so limits stop at 70% of usual and protein and fibre at 125%
+function gmFair(id, v, usual) { return id === 'protein' || id === 'fibre' ? Math.min(v, Math.round(usual * 1.25)) : Math.max(v, Math.round(usual * 0.7 * 10) / 10); }
+function gmGoals(k) {
+  const e = G().d[k], dg = dayGoals(k), set = setAt(k), o = {};
+  Object.keys(NEED_IDS).forEach(id => { o[id] = e && e.g && e.g[id] !== undefined ? e.g[id] : gmFair(id, dg[id].g, set[NEED_IDS[id]]); });
+  return o;
+}
+function gmLiftDays() { const C = gmCache(); if (!C.lift) C.lift = liftDays(); return C.lift; }
+function gmLift(k) {
+  const st = startOf(k); let row = null;
+  try { const pl = trPlan(st); row = pl.rows.find(x => x.k === k && (x.sess || x.log)) || null; } catch (e) { row = null; }
+  const done = Math.min(1, gmLiftDays().m[k] || 0);
+  return { planned: !!row, name: row ? trSN(row.log ? row.log.sess : row.sess, row.log) : '', done };
+}
+function gmUnits(k, c) { if (k in S.alc) return +S.alc[k]; return c && c.night ? drinkPlanU(c.night) : 0; }
+function gmPlants(k, live) {
+  const st = startOf(k), before = new Set(), c = dcc(k);
+  for (let x = st; x < k; x = addDays(x, 1)) { const cc = dcc(x); if (cc) cc.plants.forEach(p => before.add(p)); }
+  const after = new Set(before); if (c) (live ? c.plantsEaten : c.plants).forEach(p => after.add(p));
+  const plan = new Set(before); if (c) c.plants.forEach(p => plan.add(p));
+  return { add: ptsOf(after) - ptsOf(before), wk: ptsOf(after), planAdd: ptsOf(plan) - ptsOf(before), planWk: ptsOf(plan) };
+}
+const GM_TXT = { satfat: 'Sat fat', sugar: 'Added sugar', sodium: 'Sodium' }, GM_SHORT = { satfat: 'Sat fat', sugar: 'Sugar', sodium: 'Sodium' };
+const gmFmt = (id, v) => (id === 'sodium' ? `${v.toFixed(1)}g` : `${fmtN(v)}g`);
+// a limit: full points under it, some for close, then points lost the further over it goes
+const gmLimPts = (v, lim, full) => (v <= lim + 0.05 ? [full, 'ok'] : v <= lim * 1.15 ? [Math.round(full * 0.4), 'mid'] : v <= lim * 1.3 ? [0, 'off'] : v <= lim * 1.6 ? [-5, 'bad'] : [-10, 'bad']);
+// one day's points. live: from what's eaten so far (for the strip); otherwise the whole day, as Trends counts it
+function gmDay(k, live) {
+  const C = gmCache(), key = k + (live ? 'L' : '');
+  if (C.day[key]) return C.day[key];
+  const c = S.days[k] ? dcc(k) : null;
+  if (!c || !c.hasPlan) return (C.day[key] = { k, items: [], got: 0, max: 0, pct: 0, pen: 0, empty: true });
+  const set = setAt(k), g = gmGoals(k), items = [], goal = WT().goal || 'lose', tk = todayKey();
+  const add = o => items.push(Object.assign({ got: 0, max: 0, st: 'pend', line: '' }, o));
+  // calories: the day's own target
+  const K = live ? c.eatK : c.planK, T = Math.max(1, c.T), r = K / T;
+  const band = goal === 'gain' ? [0.97, 1.08] : goal === 'maintain' ? [0.95, 1.05] : [0.9, 1.02];
+  let kp;
+  if (r >= band[0] && r <= band[1]) kp = [15, 'ok', 'Right in your band'];
+  else if (r > band[1]) kp = r <= band[1] + 0.04 ? [8, 'mid', `${fmtN(K - T)} over, just`] : r <= band[1] + 0.13 ? [-5, 'bad', `${fmtN(K - T)} kcal over`] : [-10, 'bad', `${fmtN(K - T)} kcal over`];
+  else kp = r >= band[0] - 0.05 ? [8, 'mid', `${fmtN(T - K)} under the band`] : [0, 'off', `${fmtN(T - K)} kcal under: no points for eating too little`];
+  if (live && kp[1] !== 'bad') kp = [0, 'pend', `${fmtN(K)} of ${fmtN(T)} so far`];
+  add({ id: 'kcal', art: 'kcal', n: `Calories ${fmtN(K)}`, aim: `Land near ${fmtN(T)} kcal`, got: kp[0], max: 15, st: kp[1], line: kp[2], prog: `${fmtN(K)}/${fmtN(T)}` });
+  // protein and fibre
+  const P = live ? c.eatP : c.planP, F = live ? c.eatF : c.planF;
+  const pp = P >= g.protein - 0.5 ? [15, 'ok'] : live ? [0, 'pend'] : P >= g.protein * 0.9 ? [8, 'mid'] : P >= g.protein * 0.8 ? [4, 'mid'] : [0, 'off'];
+  add({ id: 'protein', art: 'protein', n: `Protein ${fmtN(P)}g`, aim: `Protein ${g.protein}g`, got: pp[0], max: 15, st: pp[1], line: pp[1] === 'ok' ? 'Goal hit' : `${fmtN(Math.max(0, g.protein - P))}g short of ${g.protein}g`, prog: `Protein ${fmtN(P)}/${g.protein}g` });
+  const fp = F >= g.fibre - 0.5 ? [10, 'ok'] : live ? [0, 'pend'] : F >= g.fibre * 0.8 ? [5, 'mid'] : [0, 'off'];
+  add({ id: 'fibre', art: 'fibre', n: `Fibre ${fmtN(F)}g`, aim: `Fibre ${g.fibre}g`, got: fp[0], max: 10, st: fp[1], line: fp[1] === 'ok' ? 'Goal hit' : fp[1] === 'mid' ? `${fmtN(g.fibre - F)}g short, half points` : `${fmtN(Math.max(0, g.fibre - F))}g short of ${g.fibre}g`, prog: `Fibre ${fmtN(F)}/${g.fibre}g` });
+  // the limits
+  [['satfat', live ? c.eatSF : c.planSF, c.planSF], ['sugar', live ? c.eatFS : c.planFS, c.planFS], ['sodium', live ? c.eatNa : c.planNa, c.planNa]].forEach(([id, v, pv]) => {
+    const lim = g[id]; let lp = gmLimPts(v, lim, 10);
+    if (live && lp[0] >= 0) lp = [0, v > lim + 0.05 ? 'off' : 'pend'];
+    const over = v - lim, pct = Math.round((over / lim) * 100);
+    add({ id, art: id, n: `${GM_TXT[id]} ${gmFmt(id, v)}`, aim: `${GM_TXT[id]} under ${gmFmt(id, lim)}`, got: lp[0], max: 10, st: lp[1], lim, plan: pv,
+      line: over <= 0.05 ? `${gmFmt(id, -over)} under the limit` : `${gmFmt(id, over)} over, ${pct}% over the limit`, prog: `${GM_SHORT[id]} ${gmFmt(id, v).replace(/g$/, '')}/${gmFmt(id, lim)}` });
+  });
+  // fermented, oily fish, new plants
+  if (c.fermPlan || c.fermEat) { const ok = live ? c.fermEat : c.fermPlan; add({ id: 'ferm', art: 'ferm', n: 'Something fermented', aim: `Fermented: ${c.fermSrc.length ? c.fermSrc[0] : 'planned'}`, got: ok ? 5 : 0, max: 5, st: ok ? 'ok' : live ? 'pend' : 'off', line: c.fermSrc.length ? c.fermSrc.join(', ') : '', prog: ok ? 'Fermented' : 'Fermented to come' }); }
+  const fishPlan = FOOD.fish(c), fishEat = SLOTS.filter(s => c.slots[s].kind === 'recipe' && !c.slots[s].gone && c.slots[s].done && c.slots[s].r.oily).length + c.own.oily.filter(x => x.done).length;
+  if (fishPlan) { const ok = live ? fishEat > 0 : true; const wcF = weekCalc(startOf(k)); add({ id: 'fish', art: 'fish', n: 'Oily fish', aim: 'Oily fish', got: ok ? 10 : 0, max: 10, st: ok ? 'ok' : 'pend', line: `${wcF.oilyP} of ${set.oilyGoal} for the week`, prog: ok ? 'Oily fish' : 'Oily fish to come' }); }
+  const pl = gmPlants(k, live), np = live ? pl.add : pl.add;
+  add({ id: 'plants', art: 'plants', n: `${fmtPts(np)} new plant point${np === 1 ? '' : 's'}`, aim: `${fmtPts(pl.planAdd)} new plant points → ${fmtPts(pl.planWk)}`, got: Math.min(10, Math.round(np * 2)), max: 10, st: np * 2 >= 10 ? 'ok' : np > 0 ? 'mid' : live ? 'pend' : 'off', line: `${fmtPts(pl.wk)} for the week so far`, prog: `+${fmtPts(np)} plants` });
+  // training, cardio, check-in
+  const L = gmLift(k);
+  if (L.planned || L.done > 0) add({ id: 'lift', art: 'lift', n: L.done >= 0.99 ? `${L.name || 'Session'} done` : L.done > 0 ? `${L.name || 'Session'}, ${Math.round(L.done * 100)}% done` : `${L.name || 'Session'} not done`, aim: L.name || 'Training session', got: Math.round(20 * L.done), max: 20, st: L.done >= 0.99 ? 'ok' : L.done > 0 ? 'mid' : live || k === tk ? 'pend' : 'off', line: L.done > 0 ? '' : 'It moves to the next training day', prog: L.done >= 0.99 ? `${L.name || 'Session'}` : `${L.name || 'Session'} to do` });
+  if (S.run[k] === 1) add({ id: 'run', art: 'run', n: 'Run or cardio', aim: 'Run or cardio', got: 10, max: 10, st: 'ok', line: 'Bonus', prog: 'Run' });
+  const ck = ckSaved(k); add({ id: 'ck', art: 'check', n: ck ? 'Checked in' : 'No check-in', aim: 'Check in', got: ck ? 5 : 0, max: 5, st: ck ? 'ok' : live || k === tk ? 'pend' : 'off', line: '', prog: ck ? 'Checked in' : 'Check-in' });
+  // a binge day (over 8 units) costs points
+  const u = gmUnits(k, c); if (u > ALC.binge) add({ id: 'alc', art: 'alcohol', n: `${fmtU(u)} units`, aim: '', got: -10, max: 0, st: 'bad', line: `Over ${ALC.binge} units counts as a binge day`, prog: `${fmtU(u)} units` });
+  // closing the day yourself
+  const e = G().d[k];
+  if (!live) add({ id: 'close', art: 'check', n: e && e.c && !e.auto ? 'Closed it yourself' : e && e.c ? 'Closed for you overnight' : 'Close the day yourself', aim: 'Close the day', got: e && e.c && !e.auto ? 5 : 0, max: 5, st: e && e.c && !e.auto ? 'ok' : e && e.c ? 'off' : 'pend', line: '', prog: '' });
+  const got = items.reduce((a, x) => a + x.got, 0), max = items.reduce((a, x) => a + x.max, 0), pen = items.reduce((a, x) => a + Math.min(0, x.got), 0), pct = max ? Math.max(0, got) / max : 0;
+  const tier = pct >= 0.75 && pen > -10 ? 'great' : pct >= 0.5 && pen > -15 ? 'good' : 'bad';
+  return (C.day[key] = { k, items, got, max, pct, pen, tier, c });
+}
+// a finished week's bonuses
+function gmWeek(st) {
+  const C = gmCache(); if (C.wk[st]) return C.wk[st];
+  const end = addDays(st, 6), out = { st, items: [], got: 0, done: end < todayKey() };
+  if (!G().from || end < G().from || !out.done) return (C.wk[st] = out);
+  const wc = weekCalc(st), set = setAt(st), add = (id, art, n, got) => out.items.push({ id, art, n, got });
+  if (wc.planned >= 4) {
+    if (wc.ptsPlan >= set.plantGoal) add('plants', 'plants', `${fmtPts(wc.ptsPlan)} plant points`, 40);
+    if (wc.cols.size >= set.colourGoal) add('colours', 'colours', 'Every colour group', 20);
+    if (wc.oilyP >= set.oilyGoal) add('fish', 'fish', `Oily fish ${wc.oilyP} of ${set.oilyGoal}`, 25);
+    if (wc.fermDays >= 6) add('ferm', 'ferm', `Fermented ${wc.fermDays} days`, 15);
+    let kc = null; try { kc = wkScore(st).find(x => x.id === 'kcal'); } catch (e) { kc = null; }
+    if (kc && kc.st === 'ok') add('kcal', 'kcal', 'Calories on budget', 25);
+  }
+  const days = weekDays(st), units = days.reduce((a, k) => a + gmUnits(k, S.days[k] ? dcc(k) : null), 0);
+  if (units >= ALC.big) add('alc', 'alcohol', `${fmtU(units)} units: a binge week`, -30);
+  else if (units < ALC.week) add('alc', 'alcohol', `${fmtU(units)} units, under ${ALC.week}`, 25);
+  try { const pl = trPlan(st), done = trLogsIn(st).filter(l => l.fin || tvDone(l)).length; if (pl.planned > 0 && done >= pl.planned) add('lift', 'lift', `All ${pl.planned} sessions done`, 30); } catch (e) { /* no plan */ }
+  const runs = days.filter(k => S.run[k] === 1).length; if (runs >= 2) add('run', 'run', `${runs} runs`, 15);
+  out.got = out.items.reduce((a, x) => a + x.got, 0);
+  return (C.wk[st] = out);
+}
+function gmWeekTotal(st) { const days = weekDays(st).filter(k => gmClosed(k)), d = days.reduce((a, k) => a + gmDay(k).got, 0); return { days: d, bonus: gmWeek(st).got, all: d + gmWeek(st).got, n: days.length }; }
+function gmTotal() {
+  const C = gmCache(); if (C.tot) return C.tot;
+  let pts = 0; const wks = new Set();
+  Object.keys(G().d).forEach(k => { if (gmClosed(k) && gmOn(k)) { pts += gmDay(k).got; wks.add(startOf(k)); } });
+  wks.forEach(st => { pts += gmWeek(st).got; });
+  pts = Math.max(0, pts);
+  const reached = Object.keys(G().lv).reduce((a, n) => Math.max(a, +n), 1), lv = Math.max(gmLvOf(pts), reached);
+  return (C.tot = { pts, lv, name: gmLvName(lv), next: gmT(lv + 1), cur: gmT(lv) });
+}
+// days in a row (back from the latest closed day) at 60% of the points or more; days with nothing planned don't count either way
+function gmStreak() {
+  const tk = todayKey(); let n = 0, k = gmClosed(tk) ? tk : addDays(tk, -1);
+  for (let i = 0; i < 400 && gmOn(k); i++, k = addDays(k, -1)) {
+    const x = gmDay(k); if (x.empty) continue;
+    if (!gmClosed(k) || x.pct < 0.6) break; n++;
+  }
+  return n;
+}
+// runs of days meeting a test, over closed days in order
+function gmRun(test, need) {
+  let run = 0, best = 0;
+  Object.keys(G().d).filter(k => gmClosed(k) && gmOn(k)).sort().forEach(k => { const x = gmDay(k); if (x.empty) return; if (test(x, k)) { run++; best = Math.max(best, run); } else run = 0; });
+  return { best, run, met: best >= need };
+}
+const gmIt = (x, id) => x.items.find(i => i.id === id);
+function gmBadgeCheck() {
+  const tk = todayKey(), set = setAt(tk), have = G().b, got = {}, wks = [];
+  if (!G().from) return got;
+  for (let st = startOf(G().from); addDays(st, 6) < tk; st = addDays(st, 7)) wks.push(st);
+  const wkTest = (id, f) => { if (have[id]) return; const w = wks.find(f); if (w) got[id] = addDays(w, 6); };
+  wkTest('plants30', st => weekCalc(st).ptsPlan >= 30);
+  wkTest('plants45', st => weekCalc(st).ptsPlan >= 45);
+  wkTest('rainbow', st => weekCalc(st).cols.size >= 5);
+  wkTest('omega', st => weekCalc(st).oilyP >= setAt(st).oilyGoal);
+  wkTest('live7', st => weekCalc(st).fermDays >= 7);
+  wkTest('lifts', st => gmWeek(st).items.some(i => i.id === 'lift'));
+  wkTest('runner', st => weekDays(st).filter(k => S.run[k] === 1).length >= 2);
+  wkTest('dry', st => weekDays(st).reduce((a, k) => a + gmUnits(k, S.days[k] ? dcc(k) : null), 0) < 7);
+  const units = st => weekDays(st).reduce((a, k) => a + gmUnits(k, S.days[k] ? dcc(k) : null), 0);
+  if (!have.steady) { let r = 0; for (const st of wks) { r = units(st) < ALC.week ? r + 1 : 0; if (r >= 4) { got.steady = addDays(st, 6); break; } } }
+  if (!have.budget) { let r = 0; for (const st of wks) { r = gmWeek(st).items.some(i => i.id === 'kcal') ? r + 1 : 0; if (r >= 4) { got.budget = addDays(st, 6); break; } } }
+  if (!have.pb && wks.length >= 3) { const tot = wks.map(st => gmWeekTotal(st).all); const i = tot.findIndex((v, j) => j >= 2 && v > Math.max(...tot.slice(0, j))); if (i >= 0) got.pb = addDays(wks[i], 6); }
+  const dayTest = (id, need, f) => { if (!have[id] && gmRun(f, need).met) got[id] = tk; };
+  const ok = id => x => { const it = gmIt(x, id); return !!it && it.st === 'ok'; };
+  dayTest('prot7', 7, ok('protein')); dayTest('fibre7', 7, ok('fibre'));
+  dayTest('sf7', 7, ok('satfat')); dayTest('sug7', 7, ok('sugar')); dayTest('salt7', 7, ok('sodium'));
+  dayTest('perfweek', 7, x => x.pct >= 0.75);
+  dayTest('closer', 7, (x, k) => !G().d[k].auto);
+  if (!have.perfect && Object.keys(G().d).some(k => { if (!gmClosed(k) || !gmOn(k)) return false; const x = gmDay(k); return !x.empty && x.pen === 0 && x.items.every(i => i.max === 0 || i.got >= i.max); })) got.perfect = tk;
+  const st7 = gmStreak(); if (!have.streak7 && st7 >= 7) got.streak7 = tk; if (!have.streak30 && st7 >= 30) got.streak30 = tk;
+  const runOf = (f, need) => { let r = 0; for (let k = G().from; k < tk; k = addDays(k, 1)) { r = f(k) ? r + 1 : 0; if (r >= need) return true; } return false; };
+  if (!have.sleep && runOf(k => S.ck[k] && S.ck[k].sl >= (setAt(k).sleepGoal || 7), 7)) got.sleep = tk;
+  if (!have.ckin && runOf(k => ckSaved(k), 14)) got.ckin = tk;
+  if (!have.lv10 && gmTotal().lv >= 10) got.lv10 = tk;
+  return got;
+}
+// once a render: start the game, fix today's goals, close days left open, record badges and levels
+function gmSync() {
+  if (!S.game) S.game = gmNorm(null);
+  const C = gmCache(); if (C.synced) return; C.synced = true;
+  const g = G(), tk = todayKey(); let ch = false;
+  if (!g.from) { g.from = startOf(tk); ch = true; } // the week you start in counts, so its review has rewards
+  const c = S.days[tk] ? dcc(tk) : null;
+  if (c && c.hasPlan && !(g.d[tk] && g.d[tk].g)) { const dg = dayGoals(tk); (g.d[tk] = g.d[tk] || {}).g = Object.fromEntries(Object.keys(NEED_IDS).map(id => [id, gmFair(id, dg[id].g, setAt(tk)[NEED_IDS[id]])])); ch = true; }
+  for (let k = g.from; k < tk; k = addDays(k, 1)) {
+    if (gmClosed(k)) continue; const d = S.days[k]; if (!d) continue;
+    const cc = dcc(k); if (!cc || !cc.hasPlan) continue;
+    g.d[k] = Object.assign(g.d[k] || {}, { c: 1, auto: 1, at: Date.now() }); ch = true;
+  }
+  if (ch) save();
+  const nb = gmBadgeCheck(); if (Object.keys(nb).length) { Object.assign(g.b, nb); ch = true; }
+  const T = gmTotal(); for (let n = 2; n <= gmLvOf(T.pts); n++) if (!g.lv[n]) { g.lv[n] = tk; ch = true; }
+  if (ch) save();
+}
+
+/* ── what to aim for today ── */
+function gmAims(k) {
+  const x = gmDay(k), L = gmDay(k, true), c = x.c, set = setAt(k), dg = dayGoals(k), g = gmGoals(k), out = [];
+  const it = id => x.items.find(i => i.id === id);
+  // limits first when the week has pulled them down, or the plan is already over
+  ['satfat', 'sugar', 'sodium'].forEach(id => {
+    const i = it(id); if (!i) return; const tight = g[id] < setAt(k)[NEED_IDS[id]] - 0.05, over = i.plan > i.lim + 0.05;
+    if (!tight && !over) return;
+    const worst = SLOTS.map(s => { const o = c.slots[s]; if (o.done || o.gone || (o.kind !== 'recipe' && o.kind !== 'custom')) return null; const v = o.kind === 'custom' ? +o[id === 'satfat' ? 'sf' : id === 'sugar' ? 'fs' : 'na'] || 0 : (o.r[id === 'satfat' ? 'sf' : id === 'sugar' ? 'fs' : 'na'] || 0) * (o.m || 1); return { s, v, n: o.kind === 'custom' ? o.c.n : o.r.n }; }).filter(Boolean).sort((a, b) => b.v - a.v)[0];
+    out.push({ pri: over ? 0 : 1, art: id, n: i.aim, pts: 10, line: over ? `Planned ${gmFmt(id, i.plan)}, so ${gmFmt(id, i.plan - i.lim)} to trim${worst && worst.v > 0 ? `; the ${SLOTNAME[worst.s].toLowerCase()} has the most` : ''}.` : `Planned ${gmFmt(id, i.plan)}. Down from ${gmFmt(id, setAt(k)[NEED_IDS[id]])} because the week's running over.` });
+  });
+  const lf = it('lift'); if (lf) out.push({ pri: 1, art: 'lift', n: lf.aim, pts: 20, line: lf.got >= 20 ? 'Done already.' : 'On the plan for today.' });
+  const fi = it('fish'); if (fi) out.push({ pri: 2, art: 'fish', n: 'Oily fish', pts: 10, line: fi.line + '.' });
+  const pl = it('plants'); if (pl) { const p = gmPlants(k); out.push({ pri: 2, art: 'plants', n: `${fmtPts(p.planAdd)} new plant point${p.planAdd === 1 ? '' : 's'} → ${fmtPts(p.planWk)}`, pts: Math.min(10, Math.round(p.planAdd * 2)), line: p.planWk >= set.plantGoal ? `That's ${set.plantGoal} for the week reached.` : `${fmtPts(Math.max(0, set.plantGoal - p.planWk))} more to ${set.plantGoal} for the week.` }); }
+  const pr = it('protein'), fb = it('fibre');
+  out.push({ pri: 3, art: 'protein', n: `Protein ${g.protein}g · fibre ${g.fibre}g`, pts: 25, line: `Planned ${fmtN(c.planP)}g and ${fmtN(c.planF)}g.${c.planP < g.protein - 0.5 ? ` ${fmtN(g.protein - c.planP)}g of protein to find.` : ''}${c.planF < g.fibre - 0.5 ? ` ${fmtN(g.fibre - c.planF)}g of fibre to find.` : ''}` });
+  const fe = it('ferm'); if (fe) out.push({ pri: 4, art: 'ferm', n: 'Something fermented', pts: 5, line: `${fe.line || 'Planned'}.` });
+  const kc = it('kcal'); out.push({ pri: 4, art: 'kcal', n: kc.aim, pts: 15, line: 'Points for landing in the band, none for going well under.' });
+  const lims = ['satfat', 'sugar', 'sodium'].filter(id => !out.some(o => o.art === id));
+  if (lims.length) out.push({ pri: 5, art: lims[0], n: `${joinAnd(lims.map(id => GM_TXT[id].toLowerCase()))} under the limits`.replace(/^./, m => m.toUpperCase()), pts: 10 * lims.length, line: lims.map(id => `${GM_TXT[id]} ${gmFmt(id, it(id).plan)} of ${gmFmt(id, it(id).lim)}`).join(' · ') });
+  return { aims: out.sort((a, b) => a.pri - b.pri).slice(0, 6), max: x.max, live: L };
+}
+// the line at the top of the aims card: how the week's going
+function gmWeekLine(k) {
+  const st = startOf(k), n = daysBetween(st, k);
+  if (!n) return 'A fresh week. Every point counts from here.';
+  const good = [], bad = [], set = setAt(k), nm = { protein: 'protein', fibre: 'fibre', sugar: 'sugar', sodium: 'sodium', satfat: 'sat fat' };
+  Object.keys(NEED_IDS).forEach(id => {
+    const L = weekLedger(id); if (!L || !L.nPast) return; const gl = set[NEED_IDS[id]];
+    const diff = (L.so - gl) * L.nPast, lo = id !== 'protein' && id !== 'fibre';
+    if (lo ? diff > gl * 0.1 : diff < -gl * 0.1) bad.push({ id, d: Math.abs(diff), rel: Math.abs(diff) / gl });
+    else good.push(id);
+  });
+  const wp = gmPlants(addDays(k, -1)).wk;
+  const pace = wp / n * 7 >= set.plantGoal; if (pace) good.unshift('plants');
+  const gl = good.map(id => id === 'plants' ? 'plants' : nm[id]).slice(0, 2);
+  bad.sort((a, b) => b.rel - a.rel);
+  const b0 = bad[0], gg = gmGoals(k);
+  const head = gl.length ? `The week's going well on ${joinAnd(gl)}.` : 'The week needs a good day.';
+  if (!b0) return `${head} Nothing to rein in. Keep it going.`;
+  const unit = b0.id === 'sodium' ? `${b0.d.toFixed(1)}g` : `${fmtN(b0.d)}g`, lo = b0.id !== 'protein' && b0.id !== 'fibre';
+  return `${head} ${capF(nm[b0.id])} is the one to ${lo ? 'rein in' : 'push'}: you're ${unit} ${lo ? 'over' : 'short'} across ${DOW[dayIndex(st)]}–${DOW[dayIndex(addDays(k, -1))]}${Math.abs(gg[b0.id] - set[NEED_IDS[b0.id]]) > 0.05 ? `, so today's aim is ${b0.id === 'sodium' ? gg[b0.id].toFixed(1) : fmtN(gg[b0.id])}g` : ''}.`;
+}
+
+/* ── on Today: the small aims strip, and the Day's done card ── */
+function gmStrip(k) {
+  if (k !== todayKey() || !gmOn(k)) return '';
+  const x = gmDay(k), L = gmDay(k, true); if (x.empty) return '';
+  const T = gmTotal(), sk = gmStreak();
+  const ids = ['satfat', 'sugar', 'sodium', 'plants', 'fish', 'lift', 'protein', 'fibre', 'ferm'];
+  const chip = i => { const v = L.items.find(y => y.id === i.id) || i, cls = v.st === 'ok' ? 'ok' : v.st === 'bad' || v.st === 'off' ? 'off' : (v.id === 'satfat' || v.id === 'sugar' || v.id === 'sodium') && v.plan > v.lim + 0.05 ? 'mid' : '';
+    return `<span class="gmc ${cls}">${v.st === 'ok' ? ic('check') : `<i></i>`}${esc(v.prog)}</span>`; };
+  const shown = ids.map(id => x.items.find(i => i.id === id)).filter(Boolean).filter(i => !['sugar', 'sodium'].includes(i.id) || i.plan > i.lim * 0.8 || (L.items.find(y => y.id === i.id) || {}).st === 'off');
+  const banked = Math.max(0, L.items.reduce((a, i) => a + (i.st === 'ok' || i.got < 0 ? i.got : 0), 0));
+  return `<button class="gmstrip" data-a="gmaims" aria-label="Today's aims: ${banked} of ${x.max} points so far. Level ${T.lv}, ${sk}-day streak. Open"><span class="gmsh"><span class="eyebrow">Today's aims · ${banked} of ${x.max} pts</span><span class="gmlv">${ic('star', true)}${T.lv}${sk ? ` · ${ic('flame', true)}${sk}` : ''}</span></span><span class="gmcs">${shown.map(chip).join('')}</span></button>`;
+}
+function gmDoneCard(k) {
+  if (!gmOn(k) || k > todayKey()) return '';
+  const x = gmDay(k); if (x.empty) return '';
+  if (gmClosed(k)) { const e = G().d[k]; return `<section class="gmdone closed"><span>${idl(shArt('score', 46))}</span><span class="t"><span class="eyebrow">${e.auto ? 'Closed for you overnight' : 'Day closed'}</span><b>${fmtN(x.got)} of ${x.max} points</b><small>Change anything and the points change with it.</small></span><button class="btn sm" data-a="gmview" data-k="${k}">See it</button></section>`; }
+  return `<section class="gmdone"><p class="small muted">Finished eating? Close the day to bank your points, plus 5 for doing it yourself.</p><button class="btn primary gmgo" data-a="gmclose" data-k="${k}">${ic('check')}Day's done</button></section>`;
+}
+
+/* ── the full-screen cards: today's aims, and the day's result ── */
+let GM = null;
+const GM_HEAD = {
+  great: ['Cracking day.', 'That\'s the stuff.', 'Textbook.', 'Nailed it.', 'Proper good day.'],
+  good: ['Solid day.', 'Not bad at all.', 'Decent effort.', 'Good enough, nearly great.'],
+  bad: ['Not your finest.', 'That one got away.', 'Rough day.', 'We need a word.']
+};
+function gmPick(arr, k) { return arr[hashStr(k) % arr.length]; }
+function gmLvArt(n, size) {
+  const pts = Array.from({ length: 10 }, (_, i) => { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 22 : 46; return `${(60 + Math.cos(a) * r).toFixed(1)},${(62 + Math.sin(a) * r).toFixed(1)}`; }).join(' ');
+  return `<svg class="shsvg" viewBox="0 0 120 120" width="${size}" height="${size}" aria-hidden="true"><polygon points="${pts}" fill="var(--c-yellow)" stroke="var(--ink)" stroke-width="2.6" stroke-linejoin="round"/><text x="60" y="${n > 9 ? 73 : 75}" text-anchor="middle" font-family="Big Shoulders Display, sans-serif" font-weight="800" font-size="${n > 9 ? 30 : 36}" fill="var(--ink)">${n}</text></svg>`;
+}
+function gmLvMedal(n, size) { return `<span class="gmmedal" style="--ms:${size}px">${gmLvArt(n, Math.round(size * 0.86))}</span>`; }
+function gmMedal(art, size, off) { return `<span class="gmmedal ${off ? 'off' : ''}" style="--ms:${size}px">${shArt(art, Math.round(size * 0.78))}</span>`; }
+function gmAimsHtml(k) {
+  const A = gmAims(k), T = gmTotal(), sk = gmStreak(), y = addDays(k, -1), yx = gmClosed(y) && gmOn(y) ? gmDay(y) : null, ye = G().d[y];
+  const extra = A.max - A.aims.reduce((a, x) => a + x.pts, 0);
+  return `<div class="gmov" role="dialog" aria-modal="true" aria-label="Today's aims"><div class="gmsheet in">
+    <div class="gmrow"><span class="eyebrow">${fmtDay(k)} · day ${daysBetween(startOf(k), k) + 1} of 7</span><span class="gmlv">${ic('star', true)}Lvl ${T.lv}</span></div>
+    <h2 class="gmh">Today's aims</h2>
+    ${yx ? `<p class="gmyest ${yx.tier}">${ic(yx.tier === 'bad' ? 'warn' : 'check')}<span>Yesterday: <b>${fmtN(yx.got)} of ${yx.max} points</b>${ye && ye.auto ? ', closed for you overnight' : ''}.</span></p>` : ''}
+    <p class="gmlead">${esc(gmWeekLine(k))}</p>
+    <div class="gmlist">${A.aims.map(a => `<div class="gmaim"><span class="gmart">${shArt(a.art, 40)}</span><span class="gmt"><b>${esc(a.n)}</b><small>${esc(a.line)}</small></span><span class="gmpts">+${a.pts}</span></div>`).join('')}</div>
+    <div class="gmrow gmfoot"><span class="small"><b>${A.max} points</b> up for grabs${extra > 0 ? `, ${extra} of them for checking in, closing the day and the rest` : ''}</span><span class="small">${sk ? `${ic('flame', true)}${sk}-day streak` : 'No streak yet'}</span></div>
+    <button class="btn primary gmbig" data-a="gmgo">Let's go</button></div></div>`;
+}
+function gmDoneHtml(k) {
+  const x = gmDay(k), T = gmTotal(), sk = gmStreak(), e = G().d[k] || {}, tier = x.tier;
+  const items = x.items.filter(i => i.max > 0 || i.got !== 0).sort((a, b) => (tier === 'bad' ? a.got - b.got : b.got - a.got));
+  const pct = Math.round(x.pct * 100), head = gmPick(GM_HEAD[tier], k);
+  const okN = x.items.filter(i => i.st === 'ok').length, now = k === todayKey();
+  const sub = tier === 'bad' ? `${now && !sk ? 'Streak\'s back to 0. ' : ''}Here's the damage:` : tier === 'great' ? `${nWord(okN, 'aim')} met${now && sk ? `, and the streak's alive: ${ic('flame', true)}<b>${nWord(sk, 'day')}</b>` : ''}.` : `${nWord(okN, 'aim')} met.${now ? (sk ? ` Streak: ${ic('flame', true)}<b>${sk}</b>` : ' Under 60% of the points, so the streak starts again.') : ''}`;
+  // news: levels and badges not shown yet
+  const news = [];
+  const up = T.lv - G().shown.lv;
+  if (up > 0) { const un = GM_UNLOCKS.filter(u => u.lv > G().shown.lv && u.lv <= T.lv); news.push(`<div class="gmnews">${gmLvMedal(T.lv, 54)}<span><span class="eyebrow">Level up${up > 1 ? ` · ${up} levels` : ''}</span><b>Level ${T.lv} · ${esc(gmLvName(T.lv))}</b>${un.length ? `<small>Unlocked: ${esc(joinAnd(un.map(u => u.n)))}. Pick it in Trends › Rewards.</small>` : ''}</span></div>`); }
+  const nb = Object.keys(G().b).filter(id => !G().shown.b[id] && GMB[id]);
+  nb.slice(0, 3).forEach(id => { const b = GMB[id]; news.push(`<div class="gmnews">${gmMedal(b.art, 54)}<span><span class="eyebrow">New badge</span><b>${esc(b.n)}</b><small>${esc(b.how)}</small></span></div>`); });
+  if (nb.length > 3) news.push(`<p class="small muted gmmore">And ${nWord(nb.length - 3, 'more badge')} in Trends › Rewards.</p>`);
+  const tm = gmTomorrow(k);
+  const prog = T.next > T.cur ? Math.min(1, (T.pts - T.cur) / (T.next - T.cur)) : 1;
+  return `<div class="gmov gmres t-${tier}" role="dialog" aria-modal="true" aria-label="How the day went"><div class="gmsheet in">
+    <button class="iconbtn gmx" data-a="gmshut" aria-label="Close">${ic('x')}</button>
+    <span class="eyebrow">${fmtDay(k)} · ${e.c ? (e.auto ? 'closed for you overnight' : 'day closed') : 'so far'}</span>
+    <h2 class="gmh big">${esc(head)}</h2>
+    <div class="gmring" style="--p:${pct}"><span><b>${fmtN(x.got)}</b><small>of ${x.max} pts</small></span></div>
+    <p class="gmsub">${sub}</p>
+    ${news.join('')}
+    <div class="gmlist">${items.map(i => `<div class="gmaim"><span class="gmart">${shArt(i.art, 36)}</span><span class="gmt"><b>${esc(i.n)}</b>${i.line ? `<small>${esc(i.line)}</small>` : ''}</span><span class="gmpts ${i.got < 0 ? 'neg' : i.got === 0 ? 'nil' : ''}">${i.got > 0 ? '+' : i.got < 0 ? '−' : ''}${Math.abs(i.got)}</span></div>`).join('')}</div>
+    ${tm ? `<div class="gmjob"><span class="eyebrow">Tomorrow's job</span><p>${tm}</p></div>` : ''}
+    <div class="gmrow"><span class="small"><b>Level ${T.lv}</b> · ${esc(T.name)}</span><span class="small">${fmtN(T.pts)} / ${fmtN(T.next)}</span></div>
+    <div class="gmbar"><i style="width:${(prog * 100).toFixed(1)}%"></i></div>
+    <button class="btn primary gmbig" data-a="gmshut">Done</button></div></div>`;
+}
+// what tomorrow needs, from the week so far with today counted in
+function gmTomorrow(k) {
+  const st = startOf(k), end = addDays(st, 6), nx = addDays(k, 1); if (k !== todayKey()) return '';
+  if (nx > end) return 'New week tomorrow, clean slate. Your weekly rewards come with the review.';
+  const set = setAt(k), days = weekDays(st), left = days.filter(d => d > k).length, nm = { sugar: 'Sugar', sodium: 'Sodium', satfat: 'Sat fat' }, out = [];
+  ['satfat', 'sugar', 'sodium'].forEach(id => {
+    const gl = set[NEED_IDS[id]], so = days.filter(d => d <= k).map(d => (S.days[d] ? dcc(d) : null)).filter(c => c && c.hasPlan);
+    if (!so.length) return; const sum = so.reduce((a, c) => a + FOOD[id](c), 0), n = so.length + left, need = (gl * n - sum) / left;
+    const aim = gmFair(id, need, gl);
+    if (aim < gl - (id === 'sodium' ? 0.05 : 0.5)) out.push(`${nm[id]} aim drops to <b>${id === 'sodium' ? aim.toFixed(1) : fmtN(aim)}g</b>`);
+  });
+  const x = gmDay(k);
+  if (out.length) return `${joinAnd(out)} to claw back the week.${x.tier === 'bad' ? ' No shop puddings. You\'ve got this.' : ''}`;
+  if (x.tier === 'bad') { const miss = x.items.filter(i => i.st === 'off' || i.st === 'bad').map(i => i.id); return miss.includes('protein') ? 'Get the protein in early: something with eggs, skyr or fish before lunch.' : miss.includes('fibre') ? 'Beans, oats or an extra veg side to get the fibre back up.' : 'Back to the plan as it stands. One good day resets the mood.'; }
+  return '';
+}
+function gmRender() {
+  let root = $('gm-root'); if (!root) { root = document.createElement('div'); root.id = 'gm-root'; document.body.appendChild(root); }
+  if (!GM) { root.innerHTML = ''; return; }
+  root.innerHTML = GM.t === 'aims' ? gmAimsHtml(GM.k) : gmDoneHtml(GM.k);
+  document.body.style.overflow = 'hidden';
+  const sh = root.querySelector('.gmsheet'); if (sh && GM.fresh === false) sh.classList.remove('in'); GM.fresh = false;
+}
+function gmOpen(t, k) { GM = { t, k, fresh: true }; gmRender(); syncHistory(); }
+function gmClose() { if (!GM) return; const t = GM.t; GM = null; gmRender(); if (!WZ && !PM && !SH && !RV && !FS && !MR) document.body.style.overflow = ''; syncHistory(); return t; }
+// first open of a new day, once nothing else is on screen
+function gmAimsDue() {
+  const tk = todayKey(); if (!S.game || G().seen === tk || !gmOn(tk)) return false;
+  const x = gmDay(tk); if (x.empty) return false;
+  return true;
+}
+// after the render settles, so a sheet opened at start-up (the nose shortcut) comes first; the card waits for it to close
+let GMT = 0;
+function gmMaybeAims() { clearTimeout(GMT); GMT = setTimeout(() => { if (GM || SH || WZ || PM || RV || TV || FS || MR || window.TP_PREVIEW) return; if (gmAimsDue()) gmOpen('aims', todayKey()); }, 0); }
+
+/* ── celebrations ── */
+function gmCelebrate(el, kind) {
+  if (reduced() || !el) return;
+  const fx = $('fx'), r = el.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, cols = ['green', 'yellow', 'red', 'orange', 'purple'];
+  const f = kind || G().fx || 'confetti';
+  const make = (cls, css, life) => { const s = document.createElement('i'); s.className = cls; s.style.cssText = css; fx.appendChild(s); setTimeout(() => s.remove(), life); };
+  if (f === 'leaves') for (let i = 0; i < 18; i++) make('gmleaf', `left:${Math.round(Math.random() * innerWidth)}px;top:-20px;background:var(--c-${['green', 'orange', 'yellow'][i % 3]});--dx:${Math.round(Math.random() * 80 - 40)}px;--rot:${Math.round(Math.random() * 540)}deg;animation-delay:${(Math.random() * 0.6).toFixed(2)}s`, 3200);
+  else if (f === 'fireworks') for (let b = 0; b < 3; b++) { const bx = cx + (b - 1) * 90, by = cy - 60 - b * 30; for (let i = 0; i < 14; i++) { const a = (i / 14) * Math.PI * 2, d = 50 + Math.random() * 30; make('gmspark', `left:${bx}px;top:${by}px;background:var(--c-${cols[(i + b) % 5]});--dx:${Math.round(Math.cos(a) * d)}px;--dy:${Math.round(Math.sin(a) * d)}px;animation-delay:${b * 0.25}s`, 1600); } }
+  else if (f === 'stars') for (let i = 0; i < 9; i++) make('gmstar', `left:${Math.round(Math.random() * innerWidth * 0.6)}px;top:${Math.round(Math.random() * 160)}px;--dx:${Math.round(160 + Math.random() * 120)}px;--dy:${Math.round(80 + Math.random() * 60)}px;animation-delay:${(i * 0.12).toFixed(2)}s`, 2000);
+  else for (let i = 0; i < 28; i++) { const a = -Math.PI / 2 + (Math.random() - 0.5) * 2.4, d = 90 + Math.random() * 120; make('gmbit', `left:${cx}px;top:${cy}px;background:var(--c-${cols[i % 5]});--dx:${Math.round(Math.cos(a) * d)}px;--dy:${Math.round(Math.sin(a) * d)}px;--rot:${Math.round(Math.random() * 720)}deg`, 1700); }
+}
+
+/* ── Trends › Rewards: level, streak, badges, unlocks ── */
+function gmCabinet() {
+  const T = gmTotal(), sk = gmStreak(), have = G().b, tk = todayKey(), st = startOf(tk), wt = gmWeekTotal(st);
+  const prog = T.next > T.cur ? Math.min(1, (T.pts - T.cur) / (T.next - T.cur)) : 1, nb = Object.keys(have).filter(id => GMB[id]).length;
+  const near = gmNear();
+  const last = []; for (let k = addDays(tk, -1), i = 0; i < 7 && gmOn(k); i++, k = addDays(k, -1)) { const x = gmDay(k); if (!x.empty) last.push([k, x]); }
+  const un = GM_UNLOCKS.concat([{ t: 'acc', id: 'berry', n: 'Berry colours', lv: 1 }, { t: 'fx', id: 'confetti', n: 'Confetti celebration', lv: 1 }]);
+  const opt = (t, map) => Object.entries(map).map(([id, v]) => { const open = T.lv >= v[1], on = G()[t] === id; return `<button class="chip ${on ? 'on' : ''}" ${open ? `data-a="gmset" data-t="${t}" data-v="${id}"` : 'disabled'} aria-pressed="${on}">${open ? '' : ic('star')}${esc(v[0])}${open ? '' : ` · L${v[1]}`}</button>`; }).join('');
+  return `<div class="alsobody gmcab">
+    <div class="gmlvcard"><div class="gmrow"><span><span class="eyebrow">Level ${T.lv}</span><b class="gmlvn">${esc(T.name)}</b></span><span class="gmlv">${ic('star', true)}${fmtN(T.pts)} pts</span></div>
+      <div class="gmbar"><i style="width:${(prog * 100).toFixed(1)}%"></i></div><p class="small muted">${fmtN(T.next - T.pts)} points to level ${T.lv + 1} · ${esc(gmLvName(T.lv + 1))}. This week: ${fmtN(wt.days)} points from ${nWord(wt.n, 'closed day')}. Streak: ${nWord(sk, 'day')}.</p></div>
+    <h4 class="gmsubh">Badges · ${nb} of ${GM_BADGES.length}</h4>
+    <div class="gmbadges">${GM_BADGES.map(([id, n, art, how]) => `<button class="gmb ${have[id] ? '' : 'off'}" data-a="gmbadge" data-v="${id}" aria-label="${esc(n)}: ${have[id] ? `earned ${fmtDay(have[id])}` : esc(how)}">${gmMedal(art, 54, !have[id])}<span>${esc(n)}</span></button>`).join('')}</div>
+    ${UI.gmBadge && GMB[UI.gmBadge] ? (() => { const b = GMB[UI.gmBadge], r = b.res ? fxRes(b.res) : []; return `<div class="gmbadgeinfo"><b>${esc(b.n)}</b><p class="small">${esc(b.how)}. ${have[b.id] ? `Earned ${fmtDay(have[b.id])}.` : 'Not yet.'}</p>${r.length ? `<p class="small muted">${r[0]}</p>` : ''}</div>`; })() : ''}
+    ${near.length ? `<h4 class="gmsubh">Closest to unlocking</h4>${near.map(n => `<div class="gmnear">${gmMedal(GMB[n.id].art, 40, true)}<span><b>${esc(GMB[n.id].n)}</b><small>${esc(GMB[n.id].how)} · ${n.txt}</small><span class="gmbar sm"><i style="width:${(n.p * 100).toFixed(0)}%"></i></span></span></div>`).join('')}` : ''}
+    <h4 class="gmsubh">Colours</h4><div class="chips">${opt('acc', GM_ACC)}</div>
+    <h4 class="gmsubh">Celebration</h4><div class="chips">${opt('fx', GM_FX)}</div><button class="btn link sm" data-a="gmtry">Try it</button>
+    ${last.length ? `<h4 class="gmsubh">The last week</h4><div class="gmdays">${last.map(([k, x]) => `<button class="gmday ${x.tier}" data-a="gmview" data-k="${k}"><span>${DOW[dayIndex(k)].slice(0, 2)} ${parse(k).getDate()}</span><b>${fmtN(x.got)}</b><small>of ${x.max}</small></button>`).join('')}</div>` : ''}
+    <p class="small muted">How points work: calories in your band 15, protein 15, fibre 10, each of sat fat, sugar and sodium under its limit 10 (going well over costs up to 10), up to 10 for new plants, 10 for oily fish, 5 for fermented, 20 for a planned session, 10 for a run, 5 for checking in and 5 for closing the day yourself. A day over ${ALC.binge} units costs 10. Finished weeks add bonuses for plants, colours, fish, fermented, calories, lifting, runs and keeping under ${ALC.week} units (a binge week costs 30).</p>
+  </div>`;
+}
+function gmNear() {
+  const have = G().b, out = [], tk = todayKey(), set = setAt(tk);
+  const run = (id, need, f) => { if (have[id]) return; const r = gmRun(f, need); if (r.run > 0) out.push({ id, p: r.run / need, txt: `${r.run} so far` }); };
+  const ok = id => x => { const it = gmIt(x, id); return !!it && it.st === 'ok'; };
+  run('salt7', 7, ok('sodium')); run('sf7', 7, ok('satfat')); run('sug7', 7, ok('sugar')); run('prot7', 7, ok('protein')); run('fibre7', 7, ok('fibre')); run('closer', 7, (x, k) => !G().d[k].auto);
+  if (!have.streak7) { const s = gmStreak(); if (s) out.push({ id: 'streak7', p: s / 7, txt: `${s} so far` }); }
+  if (!have.plants30) { const p = gmPlants(tk).wk; out.push({ id: 'plants30', p: Math.min(1, p / 30), txt: `${fmtPts(p)} this week` }); }
+  return out.sort((a, b) => b.p - a.p).slice(0, 3);
+}
+function gmAccApply() { const a = S.game && S.game.acc && S.game.acc !== 'berry' && GM_ACC[S.game.acc] ? S.game.acc : ''; if (a) document.documentElement.dataset.acc = a; else delete document.documentElement.dataset.acc; }
+
+/* ── the weekly review: reward cards after the scorecard ── */
+function gmWeekSlides(st) {
+  if (!S.game || !G().from || addDays(st, 6) < G().from) return [];
+  const wt = gmWeekTotal(st), wk = gmWeek(st), end = addDays(st, 6), out = [];
+  const prev = gmOn(addDays(st, -1)) ? gmWeekTotal(addDays(st, -7)).all : null;
+  const days = weekDays(st).filter(k => gmClosed(k)).map(k => [k, gmDay(k)]).filter(([, x]) => !x.empty);
+  const best = days.slice().sort((a, b) => b[1].got - a[1].got)[0];
+  out.push({ type: 'gweek', st: 'gold', wt, wk, prev, best, n: days.length });
+  const lvs = Object.keys(G().lv).filter(n => G().lv[n] >= st && G().lv[n] <= addDays(end, 1)).map(Number).sort((a, b) => a - b);
+  if (lvs.length) out.push({ type: 'glevel', st: 'gold', n: lvs[lvs.length - 1], from: lvs[0] });
+  const bs = Object.keys(G().b).filter(id => GMB[id] && G().b[id] >= st && G().b[id] <= addDays(end, 1));
+  bs.slice(0, 4).forEach(id => out.push({ type: 'gbadge', st: 'gold', id }));
+  if (bs.length > 4) out.push({ type: 'gbadges', st: 'gold', ids: bs.slice(4) });
+  return out;
+}
+function gmSlide(sl) {
+  if (sl.type === 'gweek') {
+    const up = sl.prev !== null && sl.wt.all > sl.prev;
+    return `<div class="shslide"><div class="eyebrow shgrp">Your points</div><h2 class="shname big">${fmtN(sl.wt.all)} points</h2>
+      <div class="shart sm">${shArt('score', 150)}</div>
+      <p class="shline">${sl.n ? `${nWord(sl.n, 'day')} closed${sl.best ? `, best on ${DOWL[dayIndex(sl.best[0])]} with ${fmtN(sl.best[1].got)}` : ''}.` : 'No days closed this week.'}${sl.prev !== null ? ` ${up ? 'Up' : 'Down'} on last week's ${fmtN(sl.prev)}.` : ''}</p>
+      ${sl.wk.items.length ? `<div class="shcard live gmwk">${sl.wk.items.map(i => `<div class="gmaim"><span class="gmart">${shArt(i.art, 32)}</span><span class="gmt"><b>${esc(i.n)}</b></span><span class="gmpts ${i.got < 0 ? 'neg' : ''}">${i.got > 0 ? '+' : '−'}${Math.abs(i.got)}</span></div>`).join('')}</div>` : '<p class="shdet">No weekly bonuses this time.</p>'}</div>`;
+  }
+  if (sl.type === 'glevel') {
+    const un = GM_UNLOCKS.filter(u => u.lv >= (sl.from || sl.n) && u.lv <= sl.n);
+    return `<div class="shslide gmrew"><div class="eyebrow shgrp">Level up${sl.from && sl.from < sl.n ? ` · ${sl.n - sl.from + 1} levels` : ''}</div><h2 class="shname big">Level ${sl.n}</h2>
+      <div class="gmbig-medal">${gmLvMedal(sl.n, 150)}</div><h3 class="gmrewn">${esc(gmLvName(sl.n))}</h3>
+      ${un.length ? `<div class="shcard live"><span class="eyebrow">Unlocked</span><p>${esc(joinAnd(un.map(u => u.n)))}. Pick it in Trends › Rewards.</p></div>` : `<p class="shdet">${fmtN(gmT(sl.n + 1) - gmTotal().pts > 0 ? gmT(sl.n + 1) - gmTotal().pts : 0)} points to the next level.</p>`}</div>`;
+  }
+  if (sl.type === 'gbadge') {
+    const b = GMB[sl.id], r = b.res ? fxRes(b.res) : [];
+    return `<div class="shslide gmrew"><div class="eyebrow shgrp">New badge</div><h2 class="shname big">${esc(b.n)}</h2>
+      <div class="gmbig-medal">${gmMedal(b.art, 150)}</div><p class="shline">${esc(b.how)}.</p>
+      ${r.length ? `<div class="shcard live"><span class="eyebrow">What it's doing for you</span><p>${r[0]}</p></div>` : ''}</div>`;
+  }
+  if (sl.type === 'gbadges') return `<div class="shslide gmrew"><div class="eyebrow shgrp">More badges</div><h2 class="shname big">${nWord(sl.ids.length, 'more badge')}</h2>
+      <div class="gmbadges live">${sl.ids.map(id => `<span class="gmb">${gmMedal(GMB[id].art, 54)}<span>${esc(GMB[id].n)}</span></span>`).join('')}</div><p class="shdet">All of them are in Trends › Rewards.</p></div>`;
+  return '';
+}
+
+Object.assign(ACT, {
+  gmaims() { gmOpen('aims', todayKey()); },
+  gmgo() { G().seen = todayKey(); save(); gmClose(); render(); },
+  gmclose(d) {
+    const k = d.k || UI.day; if (!gmOn(k)) return;
+    G().d[k] = Object.assign(G().d[k] || {}, { c: 1, auto: 0, at: Date.now() }); save(); render();
+    gmOpen('done', k);
+    const x = gmDay(k); if (x.tier !== 'bad') setTimeout(() => gmCelebrate(document.querySelector('.gmring')), 350);
+  },
+  gmview(d) { gmOpen('done', d.k); },
+  gmshut() {
+    const t = GM && GM.t;
+    if (t === 'done') { const T = gmTotal(); G().shown.lv = Math.max(G().shown.lv, T.lv); Object.keys(G().b).forEach(id => { G().shown.b[id] = 1; }); save(); }
+    if (t === 'aims') G().seen = todayKey();
+    gmClose(); render();
+  },
+  gmbadge(d) { UI.gmBadge = UI.gmBadge === d.v ? null : d.v; render(); },
+  gmset(d) { const t = d.t, v = d.v, map = t === 'acc' ? GM_ACC : GM_FX; if (!map[v] || gmTotal().lv < map[v][1]) return; G()[t] = v; save(); gmAccApply(); render(); if (t === 'fx') gmCelebrate(document.querySelector('.gmlvcard'), v); },
+  gmtry() { gmCelebrate(document.querySelector('.gmlvcard')); }
+});
+
 const TABS = [['today', 'Today', 'today'], ['week', 'Week', 'week'], ['out', 'Out', 'glass'], ['prep', 'Prep', 'prep'], ['shop', 'Shop', 'shop']];
 let RENDERED = false;
 function render() {
   lockMode(startOf(todayKey())); if (UI.week !== startOf(todayKey())) lockMode(UI.week);
   TC = null; MCACHE = null; SETC = {}; CARRYC = {}; LOC = {}; FOODC = {}; HAVEC = {}; NSC = {}; TRW = null; applyPacks();
+  gmSync(); gmAccApply();
   const wc = weekCalc(startOf(todayKey())), g = setAt(todayKey()).plantGoal, ph = pillHtml(wc, g);
   $('pill').innerHTML = ph.html; $('pill').setAttribute('aria-label', ph.label); $('pill').setAttribute('aria-pressed', UI.trends); pillAnim(wc.ptsEat, g);
   $('gear').innerHTML = ic('gear'); $('wandbtn').innerHTML = ic('wand');
@@ -12793,6 +13452,7 @@ function render() {
   if (TV) renderTV();
   if (RV) renderRV();
   else if (wm && !UI.trends && !WZ && !PM && !SH && S.revSeen !== todayKey() && !ckSaved(todayKey())) { const due = rvDue(); if (due) { S.revSeen = todayKey(); save(); openReview(due, 'auto'); } }
+  if (GM) gmRender(); else gmMaybeAims();
 }
 
 /* one-off repair (3.9.1). In the week of 12 Oct a night out went from 2 to 3½ pints by being taken off and put back,

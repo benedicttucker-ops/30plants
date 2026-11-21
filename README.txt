@@ -1,4 +1,4 @@
-THIRTY PLANTS 3.27.1: putting it on your Android phone
+THIRTY PLANTS 3.28.0: putting it on your Android phone
 
 The app has to be opened from a web address (not as a file) for Chrome to install it.
 Free route with GitHub Pages:
@@ -17,3 +17,6 @@ On a laptop you can also just double-click index.html to use it in a browser (no
 Weather (3.27): when the app is online it fetches hourly weather, air pollution and pollen for New Cross
 from Open-Meteo (free, no account), about three months back the first time and then a day or two at a time.
 It's kept on the phone under its own key, separately from your plans, so it isn't part of the backup file.
+
+Points and levels (3.28): the game counts from the Monday of the week you install this version. Its points,
+badges, level and colour choices are part of your plans, so they're in the backup file too.
