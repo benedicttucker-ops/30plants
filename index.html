@@ -2147,6 +2147,13 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 @keyframes gmshoot { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
 .gmmore { margin: -4px 0 12px; }
 .gmrew .gmbadges { width: 100%; }
+
+/* your own drinks (3.28.1) */
+.mded { border: 0; background: none; padding: 2px 4px; margin-left: 2px; color: var(--muted); vertical-align: -3px; }
+.mded svg { width: 15px; height: 15px; }
+.mdnew { margin-top: 8px; }
+.mdsz small { opacity: .7; font-weight: 400; }
+.mdtypes .chip.on, .mdsz .chip.on { background: var(--accent); color: var(--accent-ink, #fff); border-color: var(--accent); }
 </style>
 </head>
 <body>
@@ -2172,7 +2179,7 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.28.0';</script>
+<script>window.TP_VERSION = '3.28.1';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -4322,6 +4329,7 @@ function normalise(s) {
     });
   });
   trNormalise(s); // training sessions, swaps and weeks
+  s.myDrinks = mdNorm(s.myDrinks);
   s.game = gmNorm(s.game);
   return s;
 }
@@ -4412,7 +4420,12 @@ const DRINKS = [
   ['prosecco', 'Glass of prosecco', 'prosecco', 90, 'wine', 1.4], ['spiritdiet', 'Spirit & diet mixer', 'spirit & diet', 60, 'cocktail', 1],
   ['double', 'Double & diet mixer', 'double', 115, 'cocktail', 2], ['spiritfull', 'Spirit & full-sugar mixer', 'spirit & mixer', 140, 'cocktail', 1],
   ['shot', 'Shot', 'shot', 60, 'cocktail', 1], ['cocktail', 'Cocktail', 'cocktail', 250, 'cocktail', 2],
-  ['seltzer', 'Hard seltzer (can)', 'seltzer', 90, 'pint', 1.7], ['latefood', 'Late-night food (chips, kebab…)', 'late food', 600, 'snack', 0]
+  ['seltzer', 'Hard seltzer (can)', 'seltzer', 90, 'pint', 1.7],
+  ['premium', 'Pint of premium lager (5%)', 'premium pint', 235, 'pint', 2.8], ['can', 'Can of beer (440ml, 4.5%)', 'can', 170, 'pint', 2],
+  ['winesm', 'Small wine (125ml)', 'small wine', 100, 'wine', 1.6], ['winebottle', 'Bottle of wine (750ml)', 'bottle of wine', 610, 'wine', 9.8],
+  ['spritz', 'Aperol spritz', 'spritz', 140, 'wine', 1.4], ['mulled', 'Mulled wine (175ml)', 'mulled wine', 165, 'wine', 1.8],
+  ['port', 'Port or sherry (50ml)', 'port', 80, 'wine', 1],
+  ['latefood', 'Late-night food (chips, kebab…)', 'late food', 600, 'snack', 0]
 ];
 // draught pints go up and down in halves; everything else is whole glasses, bottles and cans
 const DR = Object.fromEntries(DRINKS.map(d => [d[0], { id: d[0], n: d[1], sh: d[2], k: d[3], g: d[4], u: d[5], step: /^Pint of/.test(d[1]) ? 0.5 : 1 }]));
@@ -6573,10 +6586,10 @@ function ckCard() {
   const ran0 = S.run[y] === 1, ran = dr && dr.run !== undefined ? dr.run : ran0, rt0 = S.run[k] === 1, rt = dr && dr.runt !== undefined ? dr.runt : rt0;
   const wp0 = y in S.wpd ? String(S.wpd[y]) : '', wp = dr && dr.wpd !== undefined ? dr.wpd : wp0;
   const wpdF = ckField('ck-wpd', 'WPD', '', 0.5, wp, '0').replace('id="ck-wpd"', `id="ck-wpd" data-init="${wp0}"`).replace('aria-label="WPD in "', 'aria-label="WPD yesterday"');
-  const usual = DR[S.set.usualDrink] || DR.lager, quick = [usual, DR.wine, DR.winel, DR.spiritdiet].filter((x, i, a) => x && a.indexOf(x) === i && x.u > 0).slice(0, 4);
+  const usual = DR[S.set.usualDrink] || DR.lager, quick = [usual, ...mdList().slice(-2).map(id => DR[id]), DR.wine, DR.winel, DR.spiritdiet].filter((x, i, a) => x && a.indexOf(x) === i && x.u > 0).slice(0, 5);
   const yest = `<div class="ckf"><div class="cklbl">Yesterday${night ? ` · night out planned, ${fmtU(drinkU(night))} units` : ''}</div>
     ${ckField('ck-u', 'Alcohol', 'units', 0.5, av, '0').replace('id="ck-u"', `id="ck-u" data-init="${av0}"`)}
-    <div class="chips ckq">${quick.map(d => `<button class="chip" data-a="ckaddu" data-v="${d.u}">+ ${esc(d.sh)} <small>${d.u}</small></button>`).join('')}<button class="chip" data-a="ckzero">None</button></div>
+    <div class="chips ckq">${quick.map(d => `<button class="chip" data-a="ckaddu" data-v="${d.u}">+ ${esc(d.sh)} <small>${d.u}</small></button>`).join('')}<button class="chip" data-a="mdcalc">${ic('plus')}Work it out</button><button class="chip" data-a="ckzero">None</button></div>
     ${wpdF}
     <div class="ckrow"><span id="ckn-run">Cardio or a run yesterday</span><button class="switch" role="switch" aria-checked="${ran}" aria-labelledby="ckn-run" data-a="cktog"><span></span></button><input type="hidden" data-ckrun="1" data-init="${ran0 ? 1 : 0}" value="${ran ? 1 : 0}"></div>
     <div class="ckrow"><span id="ckn-runt">Cardio or a run ${k === todayKey() ? 'today' : `on ${DOW[dayIndex(k)]}`} <small class="muted">if you've done it</small></span><button class="switch" role="switch" aria-checked="${rt}" aria-labelledby="ckn-runt" data-a="cktog"><span></span></button><input type="hidden" data-ckrunt="1" data-init="${rt0 ? 1 : 0}" value="${rt ? 1 : 0}"></div></div>`;
@@ -7574,7 +7587,7 @@ function renderSheet(fresh) {
   const root = $('sheet-root');
   if (!SH) { root.innerHTML = ''; return; }
   const old = root.querySelector('.sheet'), top = old && !fresh ? old.scrollTop : 0;
-  const html = ({ wgoal: shWGoal, ckitems: shCkItems, cupboard: shCupboard, recipe: shRecipe, pick: shPick, xadd: shAdd, custom: shCustom, target: shTarget, settings: shSettings, confirm: shConfirm, setwhen: shSetWhen, leftadd: shLeftAdd, pack: shPack, backup: shBackup, lift: shLift, trswap: shTrSwap, trset: shTrSet, tvpick: shTvPick, tvaddex: shTvAddEx, tradd: shTrAdd, have: shHave, addi: shAddI, pscan: shPScan, mkup: shMkup, trre: shTrRe, weekmenu: shWeekMenu, night: shNight, swap: shSwap, idea: shIdea, fx: shFx, nlog: shNoseLog })[SH.type]();
+  const html = ({ wgoal: shWGoal, ckitems: shCkItems, cupboard: shCupboard, recipe: shRecipe, pick: shPick, xadd: shAdd, custom: shCustom, target: shTarget, settings: shSettings, confirm: shConfirm, setwhen: shSetWhen, leftadd: shLeftAdd, pack: shPack, backup: shBackup, lift: shLift, trswap: shTrSwap, trset: shTrSet, tvpick: shTvPick, tvaddex: shTvAddEx, tradd: shTrAdd, have: shHave, addi: shAddI, pscan: shPScan, mkup: shMkup, trre: shTrRe, weekmenu: shWeekMenu, night: shNight, mydrink: shMyDrink, swap: shSwap, idea: shIdea, fx: shFx, nlog: shNoseLog })[SH.type]();
   root.innerHTML = `<div class="scrim" data-scrim="1"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(SH.title || 'Details')}"><div class="grab"></div>${html}</div></div>`;
   if (!fresh) root.querySelector('.scrim').style.animation = 'none';
   const sh = root.querySelector('.sheet'); if (!fresh) sh.style.animation = 'none';
@@ -7904,15 +7917,17 @@ function shNight() {
   const o = SH.o, k = SH.k, usual = DR[S.set.usualDrink] || DR.lager;
   SH.title = 'Night out';
   const total = drinkK(o), units = drinkU(o);
-  const common = [S.set.usualDrink, 'lager', 'guinness', 'cider', 'wine', 'spiritdiet', 'cocktail', 'latefood'].filter((x, i, a) => a.indexOf(x) === i && DR[x]);
-  const row = id => { const d = DR[id], n = o.drinks[id] || 0; return `<div class="drink ${n ? 'has' : ''}"><span class="nm">${esc(d.n)}<small>${d.k} kcal${d.u ? ` · ${d.u} unit${d.u === 1 ? '' : 's'}` : ''}</small></span><div class="stepper sm"><button data-a="drinkstep" data-id="${id}" data-v="-1" aria-label="${d.step < 1 ? 'Half a pint less' : 'One fewer'}: ${esc(d.n)}">−</button><span>${halfN(n)}</span><button data-a="drinkstep" data-id="${id}" data-v="1" aria-label="${d.step < 1 ? 'Half a pint more' : 'One more'}: ${esc(d.n)}">+</button></div></div>`; };
+  const mine = (S.myDrinks || []).filter(m => DR[m.id] && (!m.hide || o.drinks[m.id])).map(m => m.id);
+  const common = [S.set.usualDrink, ...mine, 'lager', 'guinness', 'cider', 'wine', 'spiritdiet', 'cocktail', 'latefood'].filter((x, i, a) => a.indexOf(x) === i && DR[x]);
+  const row = id => { const d = DR[id], n = o.drinks[id] || 0; return `<div class="drink ${n ? 'has' : ''}"><span class="nm">${esc(d.n)}${d.mine && !d.hide ? ` <button class="mded" data-a="mdedit" data-id="${id}" aria-label="Edit ${esc(d.n)}">${ic('edit')}</button>` : ''}<small>${d.est ? 'about ' : ''}${d.k} kcal${d.u ? ` · ${d.u} unit${d.u === 1 ? '' : 's'}` : ''}</small></span><div class="stepper sm"><button data-a="drinkstep" data-id="${id}" data-v="-1" aria-label="${d.step < 1 ? 'Half a pint less' : 'One fewer'}: ${esc(d.n)}">−</button><span>${halfN(n)}</span><button data-a="drinkstep" data-id="${id}" data-v="1" aria-label="${d.step < 1 ? 'Half a pint more' : 'One more'}: ${esc(d.n)}">+</button></div></div>`; };
   const rest = DRINKS.map(d => d[0]).filter(id => !common.includes(id));
   const restOpen = rest.some(id => o.drinks[id]);
   return `<div class="sheethero">${nightArt(o, 80)}<div><span class="eyebrow">${fmtDay(k)}</span><h2>Night out</h2></div>${closeBtn}</div>
     <div class="field"><label for="n-note">What's on (optional)</label><input id="n-note" value="${esc(o.note || '')}" placeholder="e.g. Friday drinks"></div>
     <section><h4>Rough drinks · quick fill with ${esc(usual.n.toLowerCase())}</h4><div class="chips">${LEVELS.map(([v, l, n]) => `<button class="chip" data-a="nightlvl" data-v="${n}">${l} · ${n}</button>`).join('')}</div>
       <div class="drinks">${common.map(row).join('')}</div>
-      <details class="more" ${restOpen ? 'open' : ''}><summary>More drinks${ic('chev')}</summary><div class="drinks">${rest.map(row).join('')}</div></details></section>
+      <details class="more" ${restOpen ? 'open' : ''}><summary>More drinks${ic('chev')}</summary><div class="drinks">${rest.map(row).join('')}</div></details>
+      <button class="btn link sm mdnew" data-a="mdnew">${ic('plus')}Your own drink: strength and size</button></section>
     <section><h4>Dinner</h4><div class="opts" role="radiogroup">
       <button class="opt" role="radio" data-a="nightdin" data-v="home" aria-checked="${o.dinner !== 'out'}"><span class="rd"></span><b>Eat at home first</b><span class="d">Keeps the planned dinner</span></button>
       <button class="opt" role="radio" data-a="nightdin" data-v="out" aria-checked="${o.dinner === 'out'}"><span class="rd"></span><b>Eat out</b><span class="d">Replaces the planned dinner</span></button></div>
@@ -8288,7 +8303,7 @@ function shSettings() {
   <details class="more"><summary>Meal budgets${ic('chev')}</summary><div class="fieldrow three">${num('s-bb', 'Breakfast', b.b)}${num('s-bl', 'Lunch', b.l)}${num('s-bs', 'Snack', b.s)}${num('s-bd', 'Dinner', b.d)}${num('s-bp', 'Pudding', b.p)}</div>
     <p class="small muted" id="bud-note">${budNoteText(b, st.latteOn ? st.latteK : 0, st.target)}</p></details>
   <details class="more"><summary>Weekly goals${ic('chev')}</summary><div class="fieldrow">${num('s-plants', 'Plant points', st.plantGoal)}${num('s-col', 'Colour groups', st.colourGoal)}${num('s-oily', 'Oily fish meals', st.oilyGoal)}${num('s-red', 'Red meat (max)', st.redMax)}</div></details>
-  <section><h4>Nights out</h4><div class="fieldrow"><div class="field"><label for="s-usual">Usual drink</label><select id="s-usual">${DRINKS.filter(d => d[0] !== 'latefood').map(d => `<option value="${d[0]}" ${st.usualDrink === d[0] ? 'selected' : ''}>${esc(d[1])}</option>`).join('')}</select></div>
+  <section><h4>Nights out</h4><div class="fieldrow"><div class="field"><label for="s-usual">Usual drink</label><select id="s-usual">${drinkOpts(st.usualDrink)}</select></div>
     <div class="field"><label for="s-dm">Drinks count</label><select id="s-dm"><option value="spread" ${st.drinkMode === 'spread' ? 'selected' : ''}>Across the week</option><option value="day" ${st.drinkMode === 'day' ? 'selected' : ''}>On the night</option></select></div></div>
     ${num('s-dok', 'Dinner out, rough kcal', st.dinnerOutK)}</section>
   <section><h4>Going over</h4><div class="field"><label for="s-oc">When something you log takes a day over</label><select id="s-oc"><option value="1" ${st.overCarry ? 'selected' : ''}>Take it off the rest of the week</option><option value="0" ${st.overCarry ? '' : 'selected'}>Leave it on the day</option></select></div>
@@ -8468,7 +8483,7 @@ function wzStep() {
         <label class="check" style="margin-top:0"><input type="checkbox" data-a="wzoutdin" data-v="${k}" ${w.din ? 'checked' : ''}> Eating out too</label>` : ''}</div>`;
     }).join('');
     return `<div class="wz-head">${art({ type: 'pint', main: 'yellow' }, 64)}<div><h2>Nights out</h2><p>Flip on the nights you're going out, and untick any snack or pudding you won't have. The plan makes up the plants in your other meals. Fine-tune the drinks later on the Out tab.</p></div></div>
-      <div class="field"><label for="wz-usual">Usual drink (for the quick amounts)</label><select id="wz-usual">${DRINKS.filter(d => d[0] !== 'latefood').map(d => `<option value="${d[0]}" ${WZ.usual === d[0] ? 'selected' : ''}>${esc(d[1])}</option>`).join('')}</select></div>
+      <div class="field"><label for="wz-usual">Usual drink (for the quick amounts)</label><select id="wz-usual">${drinkOpts(WZ.usual)}</select></div>
       <div class="wzouts">${rows}</div>
       <p class="small muted">${tot ? `About ${fmtN(tot)} kcal of drinks. ${S.set.drinkMode === 'spread' ? `Spread over the week, that's ${fmtN(tot / 7)} kcal a day off food.` : 'Counted on each night.'}` : 'Leave these off for a quiet week.'}</p>`;
   }
@@ -13419,12 +13434,137 @@ Object.assign(ACT, {
   gmtry() { gmCelebrate(document.querySelector('.gmlvcard')); }
 });
 
+/* ───────────── your own drinks (3.28.1): strength and size give the units; calories are estimated from the type, or yours ─────────────
+   Units = ml × ABV ÷ 1000 (the UK definition: 10ml of pure alcohol). Calories = the alcohol (0.789 g/ml, 7 kcal/g)
+   plus a typical figure for the rest of that type of drink. Changing a drink you've already had keeps the old one for those nights. */
+const MD_TYPES = {
+  beer: ['Beer or lager', 'beer', 'pint', 14, 0], stout: ['Stout', 'stout', 'pint', 12, 0], cider: ['Cider', 'cider', 'pint', 18, 0],
+  wine: ['Wine', 'wine', 'wine', 10, 0], fizz: ['Fizz', 'fizz', 'wine', 6, 0],
+  spirit: ['Spirit, neat or with a diet mixer', 'spirit', 'cocktail', 0, 0], mixer: ['Spirit with a sugary mixer', 'spirit & mixer', 'cocktail', 0, 60],
+  cocktail: ['Cocktail', 'cocktail', 'cocktail', 0, 120], seltzer: ['Hard seltzer', 'seltzer', 'pint', 2, 0], other: ['Other', 'drink', 'cocktail', 0, 0]
+};
+const MD_SIZES = [[25, 'Single'], [50, 'Double'], [125, 'Small glass'], [175, 'Glass'], [250, 'Large glass'], [330, 'Bottle'], [440, 'Can'], [500, 'Large can'], [568, 'Pint'], [750, 'Bottle (75cl)']];
+const mdUnits = (ml, abv) => Math.round(ml * abv / 100) / 10;
+const mdEst = (t, ml, abv) => { const T = MD_TYPES[t] || MD_TYPES.other; return Math.round((ml * abv / 100 * 0.789 * 7 + ml / 100 * T[3] + T[4]) / 5) * 5; };
+const mdSizeName = ml => { const s = MD_SIZES.find(x => x[0] === ml); return s ? s[1] : `${ml}ml`; };
+const mdAutoName = (t, ml, abv) => `${mdSizeName(ml)} of ${(MD_TYPES[t] || MD_TYPES.other)[1]} (${+abv}%)`;
+// self-contained, as it runs while the data loads
+function mdNorm(a) {
+  if (!Array.isArray(a)) return [];
+  const T = ['beer', 'stout', 'cider', 'wine', 'fizz', 'spirit', 'mixer', 'cocktail', 'seltzer', 'other'], seen = {};
+  return a.filter(m => m && typeof m === 'object' && typeof m.id === 'string' && /^md[a-z0-9]{1,20}$/.test(m.id) && !seen[m.id] && (seen[m.id] = 1)).map(m => {
+    const ml = Math.min(3000, Math.max(1, Math.round(+m.ml) || 0)), abv = Math.min(80, Math.max(0, Math.round((+m.abv || 0) * 10) / 10));
+    const o = { id: m.id, n: String(m.n || '').slice(0, 60), t: T.includes(m.t) ? m.t : 'other', ml: ml || 568, abv };
+    if (m.k !== null && m.k !== undefined && m.k !== '' && Number.isFinite(+m.k) && +m.k >= 0) o.k = Math.min(3000, Math.round(+m.k));
+    if (m.hide) o.hide = 1;
+    return o;
+  });
+}
+// the drink list: the app's own, then yours
+function drMine() {
+  Object.keys(DR).forEach(id => { if (DR[id].mine) delete DR[id]; });
+  (S.myDrinks || []).forEach(m => {
+    const T = MD_TYPES[m.t] || MD_TYPES.other, n = m.n || mdAutoName(m.t, m.ml, m.abv);
+    DR[m.id] = { id: m.id, n, sh: m.n ? n : n.replace(/\s*\([\d.]+%\)$/, '').toLowerCase(), k: m.k !== undefined ? m.k : mdEst(m.t, m.ml, m.abv), g: T[2], u: mdUnits(m.ml, m.abv), step: m.ml >= 500 ? 0.5 : 1, mine: true, hide: !!m.hide, est: m.k === undefined };
+  });
+}
+const mdList = () => (S.myDrinks || []).filter(m => !m.hide).map(m => m.id).filter(id => DR[id]);
+const drinkOpts = sel => DRINKS.filter(d => d[0] !== 'latefood').map(d => [d[0], d[1]]).concat(mdList().map(id => [id, DR[id].n])).map(([id, n]) => `<option value="${id}" ${sel === id ? 'selected' : ''}>${esc(n)}</option>`).join('');
+// has a past night (or a logged night) had this drink?
+const mdUsed = id => Object.keys(S.days).some(k => k < todayKey() && S.days[k].out && S.days[k].out.drinks && S.days[k].out.drinks[id]);
+
+function keepMd() {
+  if (!SH || SH.type !== 'mydrink') return;
+  const f = SH.f; f.n = $('md-n').value.trim(); f.ml = $('md-ml').value; f.abv = $('md-abv').value; f.k = $('md-k').value;
+}
+function mdLine(f) {
+  const ml = +f.ml, abv = +f.abv;
+  if (!(ml > 0) || !(abv >= 0) || f.abv === '') return 'Add the size and strength to work out the units.';
+  const u = mdUnits(ml, abv), est = mdEst(f.t, ml, abv), n = SH && SH.mode === 'ck' ? SH.cnt || 1 : 1;
+  return `${fmtU(u)} unit${u === 1 ? '' : 's'} · about ${est} kcal${f.k !== '' && +f.k >= 0 && +f.k !== est ? ` (you've set ${fmtN(+f.k)})` : ''}${n > 1 ? ` · ${n} of them: ${fmtU(u * n)} units` : ''}`;
+}
+function shMyDrink() {
+  const f = SH.f, ed = !!SH.id, ck = SH.mode === 'ck';
+  SH.title = ed ? 'Edit your drink' : ck ? 'Work out the units' : 'Your own drink';
+  const est = +f.ml > 0 && f.abv !== '' ? mdEst(f.t, +f.ml, +f.abv) : '';
+  return `<div class="sheethero">${art({ type: (MD_TYPES[f.t] || MD_TYPES.other)[2], main: f.t === 'stout' ? 'purple' : f.t === 'wine' ? 'red' : f.t === 'fizz' || f.t === 'beer' || f.t === 'cider' ? 'yellow' : 'orange', cols: ['yellow', 'green', 'red'] }, 70)}<div><span class="eyebrow">${ck ? 'Check-in' : 'Night out'}</span><h2>${esc(SH.title)}</h2></div>${closeBtn}</div>
+    <section><h4>Type</h4><div class="chips mdtypes" role="radiogroup" aria-label="Type of drink">${Object.entries(MD_TYPES).map(([id, T]) => `<button class="chip ${f.t === id ? 'on' : ''}" role="radio" aria-checked="${f.t === id}" data-a="mdtype" data-v="${id}">${esc(T[0])}</button>`).join('')}</div></section>
+    <section><h4>Size and strength</h4>
+      <div class="fieldrow"><div class="field"><label for="md-ml">Size (ml)</label><input id="md-ml" type="number" inputmode="numeric" min="1" max="3000" value="${esc(String(f.ml))}"></div>
+      <div class="field"><label for="md-abv">Strength (% ABV)</label><input id="md-abv" type="number" inputmode="decimal" step="0.1" min="0" max="80" value="${esc(String(f.abv))}" placeholder="e.g. 4.5"></div></div>
+      <div class="chips mdsz">${MD_SIZES.map(([ml, n]) => `<button class="chip ${+f.ml === ml ? 'on' : ''}" data-a="mdml" data-v="${ml}">${esc(n)} <small>${ml}</small></button>`).join('')}</div>
+      <p class="small muted">For spirits the size is the measure: 25ml for a single, 50ml for a double.</p></section>
+    <section><h4>Calories</h4><div class="field"><label for="md-k">Calories per drink <small class="muted">optional</small></label><input id="md-k" type="number" inputmode="numeric" min="0" max="3000" value="${esc(String(f.k))}" placeholder="${est ? `About ${est}` : 'Worked out for you'}"></div>
+      <p class="small muted">Left empty, it's worked out from the alcohol plus what's typical for ${esc((MD_TYPES[f.t] || MD_TYPES.other)[1])}. Put the label's figure in if you know it.</p></section>
+    ${ck ? '' : `<div class="field"><label for="md-n">Name <small class="muted">optional</small></label><input id="md-n" value="${esc(f.n)}" maxlength="60" placeholder="${esc(+f.ml > 0 && f.abv !== '' ? mdAutoName(f.t, +f.ml, +f.abv) : 'e.g. Pint of Neck Oil')}"></div>`}
+    ${ck ? `<input id="md-n" type="hidden" value=""><div class="ckrow"><span>How many</span><div class="stepper sm"><button data-a="mdcnt" data-v="-1" aria-label="One fewer">−</button><span>${SH.cnt || 1}</span><button data-a="mdcnt" data-v="1" aria-label="One more">+</button></div></div>` : ''}
+    <p class="totline" id="md-line" aria-live="polite">${esc(mdLine(f))}</p>
+    ${ed && mdUsed(SH.id) ? `<p class="small muted">You've had this one before. Changes apply from now; past nights keep the old figures.</p>` : ''}
+    <div class="btnrow"><button class="btn primary" data-a="mdsave">${ck ? 'Add the units' : ed ? 'Save changes' : 'Save drink'}</button>${SH.back ? '<button class="btn ghost" data-a="mdback">Back</button>' : ''}${ed ? '<button class="btn ghost danger" data-a="mdhide">Remove</button>' : ''}</div>
+    ${ck ? `<label class="check"><input type="checkbox" id="md-keep" ${SH.keep ? 'checked' : ''}> Save it as one of your drinks too</label>` : ''}`;
+}
+document.addEventListener('input', e => {
+  if (!SH || SH.type !== 'mydrink' || !/^md-(ml|abv|k)$/.test(e.target.id)) return;
+  keepMd(); const el = $('md-line'); if (el) el.textContent = mdLine(SH.f);
+  const f = SH.f, k = $('md-k'), n = $('md-n'), ok = +f.ml > 0 && f.abv !== '' && +f.abv >= 0;
+  if (k) k.placeholder = ok ? `About ${mdEst(f.t, +f.ml, +f.abv)}` : 'Worked out for you';
+  if (n && n.type !== 'hidden') n.placeholder = ok ? mdAutoName(f.t, +f.ml, +f.abv) : 'e.g. Pint of Neck Oil';
+});
+function mdBack(addId) {
+  const back = SH.back; if (!back) { closeSheet(); render(); return; }
+  if (addId && back.type === 'night') back.o.drinks[addId] = (back.o.drinks[addId] || 0) + 1;
+  SH = back; renderSheet(); syncHistory();
+}
+Object.assign(ACT, {
+  mdnew() { keepNightFields(); const back = SH; openSheet({ type: 'mydrink', back, f: { t: 'beer', ml: 568, abv: '', k: '', n: '' } }); },
+  mdedit(d) { const m = (S.myDrinks || []).find(x => x.id === d.id); if (!m) return; keepNightFields(); const back = SH && SH.type === 'night' ? SH : null; openSheet({ type: 'mydrink', back, id: m.id, f: { t: m.t, ml: m.ml, abv: m.abv, k: m.k !== undefined ? m.k : '', n: m.n } }); },
+  mdcalc() { keepCk(); openSheet({ type: 'mydrink', mode: 'ck', cnt: 1, f: { t: 'beer', ml: 568, abv: '', k: '', n: '' } }); },
+  mdtype(d) { keepMd(); SH.f.t = d.v; if (d.v === 'spirit' || d.v === 'mixer') { if (+SH.f.ml > 100) SH.f.ml = 25; if (SH.f.abv === '') SH.f.abv = 40; } else if ((d.v === 'wine' || d.v === 'fizz') && +SH.f.ml === 568) SH.f.ml = d.v === 'fizz' ? 125 : 175; else if ((d.v === 'beer' || d.v === 'stout' || d.v === 'cider') && +SH.f.ml < 250) SH.f.ml = 568; renderSheet(); },
+  mdml(d) { keepMd(); SH.f.ml = +d.v; renderSheet(); },
+  mdcnt(d) { keepMd(); SH.keep = !!($('md-keep') && $('md-keep').checked); SH.cnt = Math.max(1, Math.min(20, (SH.cnt || 1) + +d.v)); renderSheet(); },
+  mdback() { mdBack(); },
+  mdsave() {
+    keepMd(); const f = SH.f, ml = Math.round(+f.ml), abv = Math.round(+f.abv * 10) / 10;
+    if (!(ml > 0 && ml <= 3000)) { toast('Put in the size, in ml'); return; }
+    if (f.abv === '' || !(abv >= 0 && abv <= 80)) { toast('Put in the strength, as a % (e.g. 4.5)'); return; }
+    const kk = f.k === '' ? undefined : Math.max(0, Math.round(+f.k)), ck = SH.mode === 'ck';
+    const keep = ck && $('md-keep') && $('md-keep').checked;
+    let id = null;
+    if (!ck || keep) {
+      if (!Array.isArray(S.myDrinks)) S.myDrinks = [];
+      const rec = { t: f.t, ml, abv, n: (f.n || '').slice(0, 60) }; if (kk !== undefined) rec.k = kk;
+      const old = SH.id ? S.myDrinks.find(x => x.id === SH.id) : null;
+      if (old && !mdUsed(old.id)) { Object.keys(old).forEach(x => { if (x !== 'id') delete old[x]; }); Object.assign(old, rec); id = old.id; }
+      else { let i = 0; do { id = 'md' + (Date.now() + i++).toString(36); } while (S.myDrinks.some(x => x.id === id)); S.myDrinks.push(Object.assign({ id }, rec)); if (old) old.hide = 1; }
+      // a night planned from today on moves onto the new version
+      if (old && old.id !== id) Object.keys(S.days).forEach(k => { const o = S.days[k].out; if (k >= todayKey() && o && o.drinks && o.drinks[old.id]) { o.drinks[id] = (o.drinks[id] || 0) + o.drinks[old.id]; delete o.drinks[old.id]; } });
+      if (S.set.usualDrink === (old && old.id)) S.set.usualDrink = id;
+      drMine(); save();
+    }
+    if (ck) {
+      const u = mdUnits(ml, abv) * (SH.cnt || 1); closeSheet();
+      const el = $('ck-u'); if (el) el.value = fmtU((+el.value || 0) + u); // the next render reads the box into the draft
+      render(); toast(`${fmtU(u)} units added`); return;
+    }
+    const back = SH.back, wasNew = !SH.id;
+    if (back && back.type === 'night' && SH.id && id !== SH.id && back.o.drinks[SH.id]) { back.o.drinks[id] = back.o.drinks[SH.id]; delete back.o.drinks[SH.id]; }
+    mdBack(wasNew ? id : null); toast(wasNew ? `${DR[id].n} saved` : 'Drink updated');
+  },
+  mdhide() {
+    const id = SH.id, back = SH.back, m = (S.myDrinks || []).find(x => x.id === id); if (!m) return;
+    ask(`Remove ${DR[id] ? DR[id].n : 'this drink'}?`, 'It comes off your list. Nights you\'ve already had keep it.', 'Remove', () => {
+      m.hide = 1; if (S.set.usualDrink === id) S.set.usualDrink = 'lager'; drMine(); save(); toast('Removed');
+      if (back && back.type === 'night') { SH = back; renderSheet(); syncHistory(); }
+    }, true);
+  }
+});
+
 const TABS = [['today', 'Today', 'today'], ['week', 'Week', 'week'], ['out', 'Out', 'glass'], ['prep', 'Prep', 'prep'], ['shop', 'Shop', 'shop']];
 let RENDERED = false;
 function render() {
   lockMode(startOf(todayKey())); if (UI.week !== startOf(todayKey())) lockMode(UI.week);
   TC = null; MCACHE = null; SETC = {}; CARRYC = {}; LOC = {}; FOODC = {}; HAVEC = {}; NSC = {}; TRW = null; applyPacks();
-  gmSync(); gmAccApply();
+  drMine(); gmSync(); gmAccApply();
   const wc = weekCalc(startOf(todayKey())), g = setAt(todayKey()).plantGoal, ph = pillHtml(wc, g);
   $('pill').innerHTML = ph.html; $('pill').setAttribute('aria-label', ph.label); $('pill').setAttribute('aria-pressed', UI.trends); pillAnim(wc.ptsEat, g);
   $('gear').innerHTML = ic('gear'); $('wandbtn').innerHTML = ic('wand');
