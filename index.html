@@ -2157,6 +2157,27 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 .chips.ladrow { margin: 6px 0 2px; gap: 6px; }
 .chips.ladrow .chip { font-size: 12px; padding: 4px 9px; }
 .wchead.tvkit { margin: 6px 0 2px 60px; }
+/* 3.30: Fit my day, shop swaps, multi-pot */
+.fitgrp { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 10px; row-gap: 2px; margin: 0 0 10px; }
+.fitgrp .eyebrow { grid-column: 1 / -1; }
+.check.fitck { margin-top: 4px; font-size: 14px; align-items: flex-start; line-height: 1.25; }
+.check.fitck input { margin-top: 0; }
+.check.fitck .small { display: block; font-weight: 400; }
+.fitres { display: grid; gap: 8px; margin: 10px 0 0; }
+.fitrow { display: grid; gap: 2px; border: 1.5px solid var(--line); border-radius: 14px; padding: 9px 11px; background: var(--surface); }
+.fitrow.same { border-style: dashed; }
+.fitrow .old { color: var(--muted); text-decoration: line-through; font-size: 13.5px; }
+.fitrow .wins, .pick .wins { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.fitrow .wins i, .pick .wins i { font-style: normal; font-size: 11.5px; font-weight: 700; border-radius: 6px; padding: 1px 6px; background: var(--leaf-soft); color: var(--leaf); }
+.pick .wins i.warn { background: var(--warn-soft); color: var(--warn); }
+.fittot { margin-top: 10px; }
+.fitlink { display: flex; justify-content: center; margin: 4px 0 -6px; }
+.chips.pksrc .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.potl { margin: 10px 0 0; background: var(--surface-2); border-radius: 12px; padding: 9px 11px; display: grid; gap: 5px; }
+.potr { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 8px; align-items: center; font-size: 12.5px; color: var(--muted); }
+.potb { position: relative; height: 12px; border-radius: 6px; background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
+.potb i { position: absolute; top: 0; bottom: 0; border-radius: 6px; background: var(--accent); }
+.potax { display: flex; justify-content: space-between; font-size: 11px; }
 </style>
 </head>
 <body>
@@ -2182,7 +2203,7 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.29.0';</script>
+<script>window.TP_VERSION = '3.30.1';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -2509,7 +2530,36 @@ const ING_ROWS = [
   ['chickpeapasta','Chickpea pasta',350,21,8,'dry',['chickpea']],
   ['basmati','White basmati rice',355,8,1,'dry',[]],
   ['kraut','Sauerkraut (live)',20,1,2.5,'chilled',['cabbage'],{fe:30}],
-  ['mango','Mango',60,0.7,1.6,'veg',['mango']]
+  ['mango','Mango',60,0.7,1.6,'veg',['mango']],
+  // 3.30: shop-bought lunches and dinners, bars and a diet drink, one pack each. Figures from each shop's own product page, Nov 2026
+  ['pret_chavo',"Pret: Chicken, Avocado & Basil, 240g pack",199.58,9.63,3.08,'grab',['avocado','basil','lettuce','wheat'],{u:'pack',uw:240,sb:"Pret: Chicken, Avocado & Basil"}],
+  ['pret_avobowl',"Pret: Chicken & Avo Protein Bowl, 288g pack",126.04,11.74,1.46,'grab',['spinach','avocado','soya','lemon','sesame','chilli','lime'],{u:'pack',uw:288,sb:"Pret: Chicken & Avo Protein Bowl"}],
+  ['pret_satay',"Pret: Chicken Satay Wrap, 249g pack",185.14,9.8,1.85,'grab',['coconut','soya','carrot','mooli','cabbage','cucumber','spinach','corianderleaf','rye'],{u:'pack',uw:249,sb:"Pret: Chicken Satay Wrap"}],
+  ['pret_shawarma',"Pret: Shawarma Spiced Chicken Flatbread, 254g pack",178.35,11.22,3.07,'grab',['chickpea','cabbage','carrot','redonion','cucumber','spinach'],{u:'pack',uw:254,sb:"Pret: Shawarma Spiced Chicken Flatbread"}],
+  ['pret_chipotle',"Pret: Chipotle Chicken hot bowl, 533g pack",133.02,9.4,2.61,'grab',['blackbean','greenlentil','redpepper','avocado','redonion','corianderleaf','lime','chilli'],{u:'pack',uw:533,sb:"Pret: Chipotle Chicken hot bowl"}],
+  ['sb_hpchick',"Sainsbury's: High Protein Chicken Salad sandwich, 240g pack",165.83,12.54,2.58,'grab',['tomato','cucumber','lettuce','wheat'],{u:'pack',uw:240,sb:"Sainsbury's: High Protein Chicken Salad sandwich"}],
+  ['sb_chswc',"Sainsbury's: Chicken & Sweetcorn sandwich, 183g pack",174.86,11.26,3.83,'grab',['sweetcorn','wheat'],{u:'pack',uw:183,sb:"Sainsbury's: Chicken & Sweetcorn sandwich"}],
+  ['sb_tunaswc',"Sainsbury's: Tuna & Sweetcorn sandwich, 190g pack",169.47,11.21,3.53,'grab',['sweetcorn','wheat'],{u:'pack',uw:190,sb:"Sainsbury's: Tuna & Sweetcorn sandwich"}],
+  ['sb_chbacon',"Sainsbury's: Chicken & Bacon sandwich, 186g pack",232.8,15.54,3.23,'grab',['wheat'],{u:'pack',uw:186,sb:"Sainsbury's: Chicken & Bacon sandwich"}],
+  ['sb_salmoncc',"Sainsbury's: Smoked Salmon & Cream Cheese sandwich, 162g pack",226.54,11.48,2.35,'grab',['oats','lemon'],{u:'pack',uw:162,sb:"Sainsbury's: Smoked Salmon & Cream Cheese sandwich"}],
+  ['sb_misosalmon',"Sainsbury's: Miso Hot Smoked Salmon Salad, 280g pack",133.93,5.75,2.82,'grab',['brownrice','barley','soya','quinoa','lime','parsley','corianderleaf','ginger','carrot','spinach','turmeric'],{u:'pack',uw:280,sb:"Sainsbury's: Miso Hot Smoked Salmon Salad"}],
+  ['ms_chavo',"M&S: Roast Chicken & Avocado sandwich, 238g pack",189.92,11.68,2.82,'grab',['avocado','spinach','basil','wheat'],{u:'pack',uw:238,sb:"M&S: Roast Chicken & Avocado sandwich"}],
+  ['ms_chsalad',"M&S: Roast Chicken & Salad sandwich, 235g pack",154.04,10.89,2.6,'grab',['tomato','cucumber','lettuce','wheat'],{u:'pack',uw:235,sb:"M&S: Roast Chicken & Salad sandwich"}],
+  ['ms_pestopasta',"M&S: Pesto Chicken Pasta Salad, 210g pack",179.05,9.0,1.19,'grab',['spinach','tomato','basil','pinenut','lemon','garlic','oregano'],{u:'pack',uw:210,sb:"M&S: Pesto Chicken Pasta Salad"}],
+  ['ms_sriracha',"M&S: Sriracha Salmon Salad, 255g pack",156.86,9.29,2.59,'grab',['soya','brownrice','blackrice','quinoa','spinach','corianderleaf','chilli'],{u:'pack',uw:255,sb:"M&S: Sriracha Salmon Salad"}],
+  ['ms_nutty',"M&S: Nutty Super Wholefood Salad, 285g pack",144.91,8.32,6.49,'grab',['cannellini','sesame','quinoa','soya','blackbean','spelt','carrot','broccoli','greenbean','peanut','pumpkinseed','rocket','almond','pistachio','corianderleaf','ginger','lime','date','garlic'],{u:'pack',uw:285,sb:"M&S: Nutty Super Wholefood Salad"}],
+  ['ms_romesco',"M&S: Romesco Chicken, 400g pack",115.0,8.8,2.1,'grab',['quinoa','redpepper','cauliflower','spinach','tomato','almond','paprika','parsley','garlic','lemon','turmeric'],{u:'pack',uw:400,sb:"M&S: Romesco Chicken"}],
+  ['ms_hssalmon',"M&S: Hot Smoked Salmon & New Potato Salad, 340g pack",75.0,4.21,1.0,'grab',['potato','cucumber','spinach','springonion','chives','lemon','dill'],{u:'pack',uw:340,sb:"M&S: Hot Smoked Salmon & New Potato Salad"}],
+  ['wt_chsalad',"Waitrose: Roast Chicken Salad sandwich, 208g pack",149.04,11.68,3.08,'grab',['tomato','lettuce','cucumber','wheat'],{u:'pack',uw:208,sb:"Waitrose: Roast Chicken Salad sandwich"}],
+  ['wt_chavo',"Waitrose: Chicken & Avocado sandwich, 210g pack",182.38,10.0,3.52,'grab',['avocado','cannellini','spinach','basil','garlic','wheat'],{u:'pack',uw:210,sb:"Waitrose: Chicken & Avocado sandwich"}],
+  ['wt_salmoncc',"Waitrose: Smoked Salmon & Cream Cheese sandwich, 175g pack",206.29,11.2,1.6,'grab',['oats','lemon'],{u:'pack',uw:175,sb:"Waitrose: Smoked Salmon & Cream Cheese sandwich"}],
+  ['nero_protroll',"Caff\u00e8 Nero: Chicken & Avocado Protein Roll, 200g pack",199.0,17.6,4.2,'grab',['linseed','sunflowerseed','poppyseed','avocado','cucumber','corianderleaf','mint','broadbean'],{u:'pack',uw:200,sb:"Caff\u00e8 Nero: Chicken & Avocado Protein Roll"}],
+  ['nero_tuna',"Caff\u00e8 Nero: Tuna & Cucumber Sandwich, 199g pack",242.21,11.06,3.32,'grab',['cucumber','caper','springonion','redonion','lemon','wheat'],{u:'pack',uw:199,sb:"Caff\u00e8 Nero: Tuna & Cucumber Sandwich"}],
+  ['nero_pesto',"Caff\u00e8 Nero: Chicken & Pesto Tostati, 144g pack",250.0,11.81,1.46,'grab',['basil','tomato'],{u:'pack',uw:144,sb:"Caff\u00e8 Nero: Chicken & Pesto Tostati"}],
+  ['nero_tunamelt',"Caff\u00e8 Nero: Tuna Melt Panini, 185g pack",263.78,11.19,2.65,'grab',['redpepper','tomato','redonion','parsley','lemon'],{u:'pack',uw:185,sb:"Caff\u00e8 Nero: Tuna Melt Panini"}],
+  ['snk_bbpb',"Barebells Peanut Butter bar, 55g",360.0,36.36,3.64,'grab',['peanut','cacao'],{u:'pack',uw:55,sb:"Barebells Peanut Butter bar"}],
+  ['snk_kind',"KIND Dark Chocolate Nuts & Sea Salt bar, 40g",542.5,17.0,15.0,'grab',['almond','peanut','cacao'],{u:'pack',uw:40,sb:"KIND Dark Chocolate Nuts & Sea Salt bar"}],
+  ['dietcoke','Diet Coke, 330ml can',0.4,0,0,'grab',[],{ml:1,u:'can',uw:330,sb:'Diet Coke 330ml (or any diet soft drink)'}]
 ];
 
 /* Recipe rows: [id, name, slots, meta, 'ingredient grams, …', 'step|step|…']
@@ -2892,7 +2942,102 @@ const RECIPE_ROWS = [
 ['g_babybel','2 Babybel Light & an apple','s',{c:'Shop-bought',t:0,g:'quick',shop:1}, 'babybel 40, apple 150', 'Grab two Mini Babybel Light and an apple.'],
 ['g_eggpot','Egg & spinach protein pot','s',{c:'Shop-bought',t:0,g:'quick',shop:1}, 'eggpot 90', 'Grab an egg & spinach protein pot from the chiller.'],
 ['g_houmous','Carrot & houmous pot','s',{c:'Shop-bought',t:0,g:'quick',shop:1}, 'carrothoum 100', 'Grab a carrot & houmous snack pot from the chiller.'],
-['g_fulfil','Fulfil protein bar','s',{c:'Shop-bought',t:0,g:'quick',shop:1}, 'fulfil 55', 'Grab a Fulfil bar, Chocolate Peanut Butter.']
+['g_fulfil','Fulfil protein bar','s',{c:'Shop-bought',t:0,g:'quick',shop:1}, 'fulfil 55', 'Grab a Fulfil bar, Chocolate Peanut Butter.'],
+/* 3.30. sw: offered in swaps (the meal picker, Fit my day) and never planned on its own. st: the shop.
+   mp: multi-pot, for the odd special dinner; pots: which pot is on when, in minutes, for the timeline */
+['sh_pret_chavo',"Pret Chicken, Avocado & Basil",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'pret'}, 'pret_chavo 240', "Pick up the Chicken, Avocado & Basil at Pret."],
+['sh_pret_avobowl',"Pret Chicken & Avo Protein Bowl",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'pret'}, 'pret_avobowl 288', "Pick up the Chicken & Avo Protein Bowl at Pret."],
+['sh_pret_satay',"Pret Chicken Satay Wrap",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'pret'}, 'pret_satay 249', "Pick up the Chicken Satay Wrap at Pret."],
+['sh_pret_shawarma',"Pret Shawarma Spiced Chicken Flatbread",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'pret'}, 'pret_shawarma 254', "Pick up the Shawarma Spiced Chicken Flatbread at Pret."],
+['sh_pret_chipotle',"Pret Chipotle Chicken hot bowl",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'pret'}, 'pret_chipotle 533', "Pick up the Chipotle Chicken hot bowl at Pret."],
+['sh_sb_hpchick',"Sainsbury's High Protein Chicken Salad sandwich",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'sains'}, 'sb_hpchick 240', "Pick up the High Protein Chicken Salad sandwich at Sainsbury's."],
+['sh_sb_chswc',"Sainsbury's Chicken & Sweetcorn sandwich",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'sains'}, 'sb_chswc 183', "Pick up the Chicken & Sweetcorn sandwich at Sainsbury's."],
+['sh_sb_tunaswc',"Sainsbury's Tuna & Sweetcorn sandwich",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'sains'}, 'sb_tunaswc 190', "Pick up the Tuna & Sweetcorn sandwich at Sainsbury's."],
+['sh_sb_chbacon',"Sainsbury's Chicken & Bacon sandwich",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'sains'}, 'sb_chbacon 186', "Pick up the Chicken & Bacon sandwich at Sainsbury's."],
+['sh_sb_salmoncc',"Sainsbury's Smoked Salmon & Cream Cheese sandwich",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'sains'}, 'sb_salmoncc 162', "Pick up the Smoked Salmon & Cream Cheese sandwich at Sainsbury's."],
+['sh_sb_misosalmon',"Sainsbury's Miso Hot Smoked Salmon Salad",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'sains'}, 'sb_misosalmon 280', "Pick up the Miso Hot Smoked Salmon Salad at Sainsbury's."],
+['sh_ms_chavo',"M&S Roast Chicken & Avocado sandwich",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'ms'}, 'ms_chavo 238', "Pick up the Roast Chicken & Avocado sandwich at M&S."],
+['sh_ms_chsalad',"M&S Roast Chicken & Salad sandwich",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'ms'}, 'ms_chsalad 235', "Pick up the Roast Chicken & Salad sandwich at M&S."],
+['sh_ms_pestopasta',"M&S Pesto Chicken Pasta Salad",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'ms'}, 'ms_pestopasta 210', "Pick up the Pesto Chicken Pasta Salad at M&S."],
+['sh_ms_sriracha',"M&S Sriracha Salmon Salad",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'ms'}, 'ms_sriracha 255', "Pick up the Sriracha Salmon Salad at M&S."],
+['sh_ms_nutty',"M&S Nutty Super Wholefood Salad",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'ms'}, 'ms_nutty 285', "Pick up the Nutty Super Wholefood Salad at M&S."],
+['sh_ms_romesco',"M&S Romesco Chicken",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'ms'}, 'ms_romesco 400', "Pick up the Romesco Chicken at M&S."],
+['sh_ms_hssalmon',"M&S Hot Smoked Salmon & New Potato Salad",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'ms'}, 'ms_hssalmon 340', "Pick up the Hot Smoked Salmon & New Potato Salad at M&S."],
+['sh_wt_chsalad',"Waitrose Roast Chicken Salad sandwich",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'waitrose'}, 'wt_chsalad 208', "Pick up the Roast Chicken Salad sandwich at Waitrose."],
+['sh_wt_chavo',"Waitrose Chicken & Avocado sandwich",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'waitrose'}, 'wt_chavo 210', "Pick up the Chicken & Avocado sandwich at Waitrose."],
+['sh_wt_salmoncc',"Waitrose Smoked Salmon & Cream Cheese sandwich",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'waitrose'}, 'wt_salmoncc 175', "Pick up the Smoked Salmon & Cream Cheese sandwich at Waitrose."],
+['sh_nero_protroll',"Caff\u00e8 Nero Chicken & Avocado Protein Roll",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'nero'}, 'nero_protroll 200', "Pick up the Chicken & Avocado Protein Roll at Caff\u00e8 Nero."],
+['sh_nero_tuna',"Caff\u00e8 Nero Tuna & Cucumber Sandwich",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'nero'}, 'nero_tuna 199', "Pick up the Tuna & Cucumber Sandwich at Caff\u00e8 Nero."],
+['sh_nero_pesto',"Caff\u00e8 Nero Chicken & Pesto Tostati",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'nero'}, 'nero_pesto 144', "Pick up the Chicken & Pesto Tostati at Caff\u00e8 Nero."],
+['sh_nero_tunamelt',"Caff\u00e8 Nero Tuna Melt Panini",'ld',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'nero'}, 'nero_tunamelt 185', "Pick up the Tuna Melt Panini at Caff\u00e8 Nero."],
+['sh_snk_bbpb',"Barebells Peanut Butter bar",'s',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'any'}, 'snk_bbpb 55', "Grab a Barebells Peanut Butter bar."],
+['sh_snk_kind',"KIND Dark Chocolate Nuts & Sea Salt bar",'s',{c:'Shop-bought',t:0,g:'quick',shop:1,sw:1,st:'any'}, 'snk_kind 40', "Grab a KIND Dark Chocolate Nuts & Sea Salt bar."],
+['md_sb1',"Sainsbury's meal deal: chicken salad sandwich, Barebells & Diet Coke",'ld',{c:'Shop-bought',t:0,g:'quick deal',shop:1,sw:1,st:'sains'}, 'sb_hpchick 240, snk_bbpb 55, dietcoke 330', "Meal deal: the High Protein Chicken Salad sandwich, a Barebells Peanut Butter bar and a Diet Coke."],
+['md_sb2',"Sainsbury's meal deal: smoked salmon sandwich, KIND bar & Diet Coke",'ld',{c:'Shop-bought',t:0,g:'quick deal',shop:1,sw:1,st:'sains'}, 'sb_salmoncc 162, snk_kind 40, dietcoke 330', "Meal deal: the Smoked Salmon & Cream Cheese sandwich, a KIND Dark Chocolate Nuts & Sea Salt bar and a Diet Coke."],
+['md_sb3',"Sainsbury's meal deal: tuna & sweetcorn, Propercorn & Diet Coke",'ld',{c:'Shop-bought',t:0,g:'quick deal',shop:1,sw:1,st:'sains'}, 'sb_tunaswc 190, propercorn 20, dietcoke 330', "Meal deal: the Tuna & Sweetcorn sandwich, a 20g Propercorn and a Diet Coke."],
+['md_wt1',"Waitrose meal deal: roast chicken salad sandwich, KIND bar & Diet Coke",'ld',{c:'Shop-bought',t:0,g:'quick deal',shop:1,sw:1,st:'waitrose'}, 'wt_chsalad 208, snk_kind 40, dietcoke 330', "Meal deal: the Roast Chicken Salad sandwich, a KIND Dark Chocolate Nuts & Sea Salt bar and a Diet Coke."],
+['md_wt2',"Waitrose meal deal: chicken & avocado, kombucha & an apple",'ld',{c:'Shop-bought',t:0,g:'quick deal',shop:1,sw:1,st:'waitrose'}, 'wt_chavo 210, kombuchacan 330, apple 150', "Meal deal: the Chicken & Avocado sandwich and a can of kombucha, plus an apple."],
+['md_ms1',"M&S meal deal: roast chicken & salad sandwich, an apple & Diet Coke",'ld',{c:'Shop-bought',t:0,g:'quick deal',shop:1,sw:1,st:'ms'}, 'ms_chsalad 235, apple 150, dietcoke 330', "Meal deal: the Roast Chicken & Salad sandwich, an apple and a Diet Coke."],
+['mp_teishoku','Grilled mackerel teishoku: shiitake rice, sesame spinach & miso','d',{c:'Japanese',t:45,g:'multipot fish',mp:1,sw:1,pots:'Rice pot 0-30;Grill 22-32;Pan 25-32'},
+ 'mackerel 130, brownrice 70, shiitake 80, miso 15, spinach 150, sesame 6, ginger 6, soy 5, springonion 10, ricevin 5',
+ 'Rinse the rice, then simmer it with 2½ times its volume of water, lid on, for 25 min. Lay the sliced shiitake on top for the last 10 min to steam.|Meanwhile toast the sesame in a dry pan for 2 min, then grind half of it with the soy and a splash of the rice vinegar to a paste.|Mix the miso with the grated ginger, the rest of the rice vinegar and 2 tbsp water for a dressing. Don\'t heat it: it keeps the miso live.|Heat the grill to high. Score the mackerel skin and grill it skin up for 6–7 min until blistered.|While the fish grills, wilt the spinach in the sesame pan for 1–2 min, squeeze it dry and toss with the sesame paste.|Plate the rice with the shiitake, the spinach, the mackerel with the miso dressing spooned over, and the spring onion and the rest of the sesame on top.'],
+['mp_bibimbap','Gochujang chicken bibimbap with kimchi','d',{c:'Korean',t:45,g:'multipot rice',mp:1,sw:1,pots:'Rice pot 0-30;Wok 15-30;Small pan 28-33'},
+ 'chicken 150, brownrice 70, gochujang 12, spinach 100, carrot 70, beansprouts 70, egg 55, kimchi 60, sesameoil 3, sesame 3, garlic 4',
+ 'Simmer the rice, lid on, for 25–30 min.|Slice the chicken thinly and toss with half the gochujang and the garlic.|In the wok, flash-cook each vegetable separately with a drop of sesame oil: carrot matchsticks 2 min, beansprouts 1 min, spinach 1 min. Set each aside in its own pile.|Stir-fry the chicken in the same wok for 5–6 min until cooked and sticky.|Fry the egg in a small pan for 3 min, keeping the yolk runny.|Bowl the rice, arrange the vegetables, chicken and kimchi in sections, top with the egg and sesame, and loosen the rest of the gochujang with a little water to drizzle over. Mix at the table.'],
+['mp_larb','Larb gai with toasted rice, herbs & charred beans','d',{c:'Thai',t:40,g:'multipot rice',mp:1,sw:1,pots:'Rice pot 0-30;Dry pan 0-8;Wok 20-30'},
+ 'chickenmince 150, brownrice 70, lime 20, fishsauce 8, redonion 40, mint 6, coriander 8, chilli 5, lettuce 80, cucumber 80, greenbeans 100',
+ 'Put 60g of the rice on to simmer, lid on, for 25–30 min.|Toast the other 10g of raw rice in a dry pan for 6–8 min until deep golden, then crush it in a mortar or with a rolling pin. This is khao khua.|Char the green beans in the dry pan for 5 min, turning, then set aside.|Cook the mince in the wok with 3 tbsp water for 6–7 min, breaking it up, until just cooked. Take it off the heat.|Stir in the lime juice, fish sauce, chilli, sliced red onion, torn herbs and most of the toasted rice.|Serve with the rice, lettuce cups, cucumber and charred beans, with the last of the toasted rice on top.'],
+['mp_moilee','Keralan trout moilee with lemon rice & bean thoran','d',{c:'Keralan',t:45,g:'multipot fish curry',mp:1,sw:1,pots:'Rice pot 0-25;Curry pan 10-35;Thoran pan 20-30'},
+ 'trout 150, coconutmilk 80, onion 60, ginger 6, chilli 5, turmeric 1, brownrice 70, lemon 15, greenbeans 120, cumin 1, oil 6',
+ 'Simmer the rice, lid on, for 25 min; stir in the lemon zest and juice at the end.|In the curry pan, soften the sliced onion, ginger and half the chilli in half the oil for 8 min without browning. Add the turmeric for 1 min.|Pour in the coconut milk and 70ml water and simmer gently for 5 min.|Slide in the trout and poach it in the sauce for 6–8 min, spooning the sauce over.|Meanwhile, for the thoran, warm the rest of the oil in a second pan with the cumin and the rest of the chilli, add the finely chopped beans and 2 tbsp water and cook for 6 min.|Serve the moilee over the lemon rice with the thoran on the side.'],
+['mp_joojeh','Yoghurt chicken, dill & broad bean rice and shirazi salad','d',{c:'Persian',t:50,g:'multipot rice',mp:1,sw:1,pots:'Rice pot 0-30;Grill pan 20-35;Bowl 25-30'},
+ 'chicken 150, liveyog 110, turmeric 1, lemon 15, basmati 65, broadbeans 70, dill 8, parsley 8, chives 5, tomato 100, cucumber 100, redonion 30',
+ 'Marinate the chicken in 30g of the yoghurt with the turmeric, lemon zest and half the juice for at least 10 min.|Simmer the rice for 10 min, drain, then return it to the pan with the broad beans and the chopped dill, parsley and chives, lid on, on the lowest heat for 15 min to steam and crisp at the base.|Cook the chicken in a hot griddle pan for 12–14 min, turning, until charred and cooked through.|Dice the tomato, cucumber and red onion small and dress with the rest of the lemon juice: that\'s the shirazi.|Serve the rice with its crust, the chicken and salad, and the rest of the yoghurt cold on the side.'],
+['mp_chermoula','Chermoula sea bream, spiced chickpeas & herb couscous','d',{c:'Moroccan',t:40,g:'multipot fish',mp:1,sw:1,pots:'Blender 0-5;Pan 5-20;Oven 15-30;Bowl 20-25'},
+ 'bream 150, chickpeas 120, couscous 55, coriander 12, parsley 10, cumin 2, smokedpap 1, lemon 20, garlic 5, cherrytom 120, oil 8',
+ 'Heat the oven to 200°C fan. Blitz most of the coriander and parsley with the garlic, cumin, paprika, half the lemon juice and half the oil: that\'s the chermoula.|Fry the chickpeas and halved tomatoes in the rest of the oil for 10 min until the tomatoes collapse. Stir in a spoonful of chermoula.|Spread the rest of the chermoula over the bream and roast it for 10–12 min.|Pour 80ml boiling water over the couscous, cover for 5 min, then fluff with the remaining herbs and lemon.|Serve the bream on the chickpeas with the couscous.'],
+['mp_souvlaki','Chicken souvlaki, lemon potatoes & horiatiki with tzatziki','d',{c:'Greek',t:55,g:'multipot',mp:1,sw:1,pots:'Oven 0-45;Griddle 30-42;Bowl 35-40'},
+ 'chicken 150, potato 200, lemon 25, oregano 1, garlic 6, liveyog 90, cucumber 100, tomato 100, redonion 30, olives 15, feta 15, oil 8',
+ 'Heat the oven to 200°C fan. Toss the halved potatoes with half the oil, half the lemon juice, half the garlic, the oregano and 50ml water. Roast for 40–45 min, turning once, until the liquid has gone and the edges are golden.|Cube the chicken and marinate with the rest of the oil, lemon zest and a pinch of oregano.|For the tzatziki, grate half the cucumber, squeeze it dry and stir into the yoghurt with the rest of the garlic.|Thread the chicken onto skewers and griddle for 10–12 min, turning, until charred.|Chop the rest of the cucumber with the tomato, onion and olives, and crumble the feta over.|Serve the skewers on the potatoes with the salad and tzatziki.'],
+['mp_orzotto','Barley orzotto with roast squash, cavolo nero & crisp trout','d',{c:'Italian',t:55,g:'multipot fish grain',mp:1,sw:1,pots:'Oven 0-35;Pot 5-45;Pan 38-45'},
+ 'trout 140, barley 70, squash 150, kale 80, parmesan 10, stock 250, onion 50, garlic 5, thyme 0.5, lemon 10, oil 8',
+ 'Heat the oven to 200°C fan. Roast the cubed squash with half the oil and the thyme for 30–35 min.|Soften the onion and garlic in a little oil for 5 min, add the barley, then the stock and about 150ml water a ladle at a time over 35–40 min, stirring now and then, until creamy but with bite.|Stir in the shredded cavolo nero for the last 5 min, then half the roast squash, mashed, and the parmesan.|Fry the trout skin down in a hot pan with the last of the oil for 4–5 min until crisp, then flip for 1 min.|Serve the orzotto topped with the rest of the squash, the trout and a squeeze of lemon.'],
+['mp_romesco','Cod with romesco, crushed potatoes & charred broccoli','d',{c:'Catalan',t:45,g:'multipot fish',mp:1,sw:1,pots:'Pot 0-20;Blender 5-10;Griddle 20-30;Oven 25-35'},
+ 'cod 170, potato 220, roastpep 80, almonds 15, garlic 5, smokedpap 1, rwvin 5, broccoli 150, oil 10, parsley 5',
+ 'Heat the oven to 200°C fan. Boil the potatoes for 15–18 min until tender, then drain and lightly crush with half the oil.|Toast the almonds in a dry pan for 3 min, then blitz with the peppers, garlic, paprika and vinegar into a thick sauce: that\'s the romesco.|Char the broccoli on a hot griddle for 6–8 min, turning.|Roast the cod with a little oil for 8–10 min until it just flakes.|Spread romesco on the plate, add the potatoes, broccoli and cod, and scatter the parsley.'],
+['mp_mole','Black bean mole chicken, lime rice & pink onions','d',{c:'Mexican',t:50,g:'multipot rice',mp:1,sw:1,pots:'Bowl 0-30;Rice pot 0-30;Mole pan 5-40'},
+ 'chicken 150, blackbeans 100, cocoa 5, passata 100, smokedpap 2, cumin 2, cinnamon 0.5, onion 50, brownrice 60, lime 20, redonion 30, coriander 8, avocado 40',
+ 'Slice the red onion thinly and steep it in half the lime juice: it turns pink in 20 min.|Simmer the rice, lid on, for 25–30 min.|Soften the onion in a pan for 6 min, add the paprika, cumin, cinnamon and cocoa for 1 min, then the passata, half the black beans and 100ml water. Simmer 10 min and blitz smooth: that\'s the mole.|Add the chicken, sliced, and the rest of the beans to the mole and simmer for 12–15 min until cooked.|Stir the rest of the lime juice and zest and half the coriander through the rice.|Serve the mole on the rice with the pink onions, avocado and the rest of the coriander.'],
+['mp_tandoori','Tandoori salmon, tarka dal with spinach & kachumber','d',{c:'Punjabi',t:45,g:'multipot fish curry',mp:1,sw:1,pots:'Dal pot 0-30;Oven 20-32;Tarka pan 28-32'},
+ 'salmon 120, redlentils 50, turmeric 1, spinach 100, liveyog 30, garam 1.5, garlic 6, ginger 6, cumin 2, chilli 3, tomato 80, cucumber 80, redonion 30, lemon 10, coriander 6, oil 6',
+ 'Rinse the lentils and simmer with the turmeric and 300ml water for 25 min, stirring now and then, until soft. Wilt the spinach in for the last 2 min.|Mix the yoghurt with the garam masala, half the garlic and half the ginger, spread over the salmon and leave 10 min.|Heat the oven to 220°C fan and roast the salmon for 10–12 min until charred at the edges.|For the tarka, heat the oil and sizzle the cumin, the rest of the garlic and ginger and the chilli for 1–2 min until golden, then pour it over the dal.|Dice the tomato, cucumber and onion with the lemon and coriander: that\'s the kachumber.|Serve the dal with the salmon and kachumber.'],
+['mp_pho','Chicken pho with charred ginger & onion broth','d',{c:'Vietnamese',t:50,g:'multipot soup noodles',mp:1,sw:1,pots:'Dry pan 0-8;Broth pot 8-40;Noodle pot 30-35'},
+ 'chicken 150, ricenoodles 60, stock 250, onion 70, ginger 20, cinnamon 0.5, fishsauce 5, beansprouts 60, coriander 8, mint 5, lime 15, chilli 4, pakchoi 100',
+ 'Char the halved onion and the ginger, cut side down, in a dry pan for 6–8 min until blackened in places.|Put them in a pot with the stock, cinnamon and 350ml water and simmer for 25 min.|Slide the whole chicken breast into the broth and poach for 12–14 min, then lift it out and slice it. Strain the broth and season with the fish sauce.|Cook the noodles for 3–4 min, adding the pak choi for the last minute. Drain.|Bowl the noodles, pak choi and chicken, ladle over the hot broth and top with beansprouts, herbs, chilli and lime.'],
+['mp_brasa','Pollo a la brasa, roast sweet potato, quinoa & green sauce','d',{c:'Peruvian',t:50,g:'multipot grain',mp:1,sw:1,pots:'Oven 0-40;Quinoa pot 15-30;Blender 30-35'},
+ 'thigh 150, sweetpotato 150, quinoa 50, coriander 15, lime 15, chilli 5, garlic 5, liveyog 90, cumin 1.5, smokedpap 1, redonion 30, tomato 80',
+ 'Heat the oven to 200°C fan. Rub the chicken with the cumin, paprika and half the garlic. Roast it with the sweet potato wedges for 35–40 min, turning the potato once.|Simmer the quinoa for 15 min, drain and leave to steam.|Blitz the coriander, chilli, lime juice and the rest of the garlic with the yoghurt: that\'s the green sauce.|Toss the quinoa with the diced tomato and red onion.|Serve the chicken and sweet potato with the quinoa and plenty of green sauce.'],
+['mp_satsivi','Georgian walnut chicken, beetroot pkhali & herbed spelt','d',{c:'Georgian',t:50,g:'multipot grain',mp:1,sw:1,pots:'Spelt pot 0-25;Poaching pan 0-20;Blender 20-30'},
+ 'chicken 150, walnuts 20, garlic 6, groundcor 1, beetroot 120, dill 6, coriander 8, spelt 60, stock 200, rwvin 6, pomegranate 20',
+ 'Simmer the spelt for 25 min until tender, then drain.|Poach the chicken in the stock for 15–18 min, then lift it out and keep 100ml of the stock.|Blitz 15g of the walnuts with the garlic, ground coriander, half the vinegar and the warm stock into a pourable sauce.|Blitz the beetroot with the rest of the walnuts and vinegar and half the herbs to a coarse paste: that\'s the pkhali.|Toss the spelt with the rest of the herbs.|Slice the chicken, pour the walnut sauce over and serve with the spelt, pkhali and pomegranate.'],
+['mp_mujadara','Mujadara with spiced chicken & tahini yoghurt','d',{c:'Lebanese',t:55,g:'multipot grain',mp:1,sw:1,pots:'Onion pan 0-35;Lentil pot 5-35;Grill pan 25-35'},
+ 'chicken 140, puy 100, brownrice 50, onion 120, cumin 2, tahini 10, liveyog 90, lemon 10, parsley 8, cucumber 80, tomato 80, oil 8',
+ 'Cook the sliced onion very slowly in most of the oil for 30–35 min, stirring now and then, until deep brown and sweet.|Simmer the rice for 25 min. Stir in the lentils, half the cumin and half the onions for the last 5 min.|Rub the chicken with the rest of the cumin and oil and cook in a griddle pan for 12–14 min, turning.|Whisk the tahini with the yoghurt and lemon juice: that\'s the sauce.|Serve the mujadara topped with the rest of the onions, the sliced chicken, the tahini yoghurt and a chopped salad of cucumber, tomato and parsley.'],
+['mp_provencal','Provençal chicken, oven ratatouille & rosemary beans','d',{c:'French',t:55,g:'multipot tray',mp:1,sw:1,pots:'Oven 0-45;Bean pot 25-40;Pan 30-42'},
+ 'chicken 150, aubergine 100, courgette 100, redpepper 80, cannellini 100, rosemary 2, garlic 6, olives 15, passata 80, basil 4, oil 10',
+ 'Heat the oven to 200°C fan. Roast the cubed aubergine, courgette and pepper with half the oil for 25 min, then stir in the passata and roast 15 min more.|Warm the beans gently with the rosemary, half the garlic and a splash of water for 10–12 min, then crush a few against the pan.|Brown the chicken in a pan with the rest of the oil for 4 min a side, then add the rest of the garlic and cook 6–8 min more until cooked through.|Chop the olives and basil together.|Serve the chicken on the ratatouille and beans with the olive and basil scattered over.'],
+['mp_steamedbream','Ginger-spring onion steamed bream, garlic greens & rice','d',{c:'Cantonese',t:40,g:'multipot fish rice',mp:1,sw:1,pots:'Rice pot 0-30;Steamer 18-28;Wok 22-28;Small pan 28-30'},
+ 'bream 160, ginger 15, springonion 25, soy 8, sesameoil 4, brownrice 70, pakchoi 120, broccoli 80, garlic 5, oil 6',
+ 'Simmer the rice, lid on, for 25–30 min.|Lay the bream on a plate with a few slices of ginger and steam it over a pan of simmering water for 8–10 min.|Stir-fry the broccoli and pak choi in the wok with the garlic and a splash of water for 4–5 min.|Shred the rest of the ginger and the spring onion and pile them on the cooked fish. Pour over the soy.|Heat the oil and sesame oil in a small pan until shimmering, about 2 min, and pour it sizzling over the fish.|Serve with the rice and greens.'],
+['mp_jerk','Jerk chicken, rice & peas and mango slaw','d',{c:'Caribbean',t:55,g:'multipot rice',mp:1,sw:1,pots:'Oven 0-35;Rice pot 5-35;Bowl 25-30'},
+ 'thigh 150, brownrice 60, kidneybeans 80, coconutmilk 60, thyme 0.5, nutmeg 0.3, cinnamon 0.5, chilli 5, springonion 15, garlic 5, mango 80, redcabbage 80, lime 15, coriander 6',
+ 'Heat the oven to 200°C fan. Blitz the chilli, half the spring onion, the garlic, thyme, nutmeg, cinnamon and half the lime juice into a paste, rub it over the chicken and roast for 30–35 min.|Simmer the rice with the coconut milk, beans and 150ml water, lid on, for 25–30 min: that\'s rice and peas.|Shred the cabbage, dice the mango and toss with the rest of the lime, spring onion and the coriander.|Serve the chicken with the rice and peas and the slaw.'],
+['mp_kofte','Turkey kofte, bulgur pilaf, ezme & garlic yoghurt','d',{c:'Turkish',t:45,g:'multipot grain',mp:1,sw:1,pots:'Bulgur pot 0-20;Bowl 5-15;Grill pan 20-32'},
+ 'turkeymince 150, bulgur 60, onion 40, tompuree 10, redpepper 80, tomato 100, parsley 10, sumac 1, liveyog 90, garlic 4, cumin 2, smokedpap 1, mint 3',
+ 'Soften half the onion in a pot for 5 min, stir in the tomato purée and bulgur, add 150ml water and simmer, lid on, for 12 min. Leave it to steam.|For the ezme, finely chop the tomato, pepper, the rest of the onion and half the parsley with the sumac.|Mix the mince with the cumin, paprika, mint and the rest of the parsley and shape into four long kofte.|Cook them in a hot griddle pan for 10–12 min, turning.|Stir the garlic into the yoghurt.|Serve the kofte on the bulgur with the ezme and garlic yoghurt.'],
+['mp_garbanzos','Espinacas con garbanzos with seared prawns & picada','d',{c:'Spanish',t:40,g:'multipot',mp:1,sw:1,pots:'Pan 0-10;Chickpea pan 10-30;Hot pan 28-33'},
+ 'prawns 160, chickpeas 120, spinach 150, garlic 6, smokedpap 2, cumin 1, sourdough 40, almonds 10, rwvin 5, lemon 10, oil 10',
+ 'Fry the bread and almonds in half the oil for 4–5 min until golden, then pound or blitz with half the garlic and the vinegar: that\'s the picada.|In a second pan, soften the rest of the garlic in a little oil for 1 min, add the paprika and cumin, then the chickpeas and 100ml water and simmer 8 min.|Stir in the spinach until wilted, then the picada to thicken.|Sear the prawns in a very hot pan with the last of the oil for 2–3 min until pink.|Serve the prawns on the chickpeas with lemon.']
 ];
 
 
@@ -3859,13 +4004,16 @@ const SATF = {
   smokedpap: 1.9, cajun: 0.8, cumin: 1.5, groundcor: 1, turmeric: 1.8, garam: 1.5, curry: 1.5, chilliflakes: 2.5, cinnamon: 0.3, nutmeg: 26, cardamom: 0.7, fennelseed: 0.5,
   oregano: 1.5, thyme: 2.7, bay: 2.3, sumac: 0.5, zaatar: 2, rasel: 1, liveyog: 0.8, quark: 0.1, oatmilk: 0.2, tempeh: 2
 };
+// 3.30: the shop-bought packs, per 100g from their labels; added sugar estimated from the ingredients (dressings, sauces, chocolate)
+Object.assign(SALT_FS, {"pret_chavo": [0.83, 0.62], "pret_avobowl": [0.75, 1.04], "pret_satay": [0.96, 2.01], "pret_shawarma": [0.76, 2.36], "pret_chipotle": [0.47, 0.94], "sb_hpchick": [0.53, 0.42], "sb_chswc": [0.55, 0.55], "sb_tunaswc": [0.56, 0.53], "sb_chbacon": [0.79, 0.54], "sb_salmoncc": [1.23, 0.62], "sb_misosalmon": [0.63, 1.07], "ms_chavo": [0.9, 0.42], "ms_chsalad": [0.68, 0.43], "ms_pestopasta": [0.75, 0.24], "ms_sriracha": [0.68, 0.78], "ms_nutty": [0.6, 1.4], "ms_romesco": [0.38, 0.5], "ms_hssalmon": [0.28, 0.59], "wt_chsalad": [0.55, 0.48], "wt_chavo": [0.7, 0.48], "wt_salmoncc": [1.41, 0.29], "nero_protroll": [0.69, 0.25], "nero_tuna": [0.9, 0.5], "nero_pesto": [0.83, 0.69], "nero_tunamelt": [0.86, 0.54], "snk_bbpb": [0.22, 0.0], "snk_kind": [0.8, 13.75], "dietcoke": [0.02, 0]});
+Object.assign(SATF, {"pret_chavo": 2.0, "pret_avobowl": 1.35, "pret_satay": 1.41, "pret_shawarma": 0.63, "pret_chipotle": 1.67, "sb_hpchick": 0.58, "sb_chswc": 0.71, "sb_tunaswc": 0.63, "sb_chbacon": 2.2, "sb_salmoncc": 2.41, "sb_misosalmon": 0.64, "ms_chavo": 1.39, "ms_chsalad": 0.68, "ms_pestopasta": 1.19, "ms_sriracha": 1.49, "ms_nutty": 0.81, "ms_romesco": 0.8, "ms_hssalmon": 0.29, "wt_chsalad": 0.48, "wt_chavo": 1.38, "wt_salmoncc": 2.0, "nero_protroll": 1.35, "nero_tuna": 0.95, "nero_pesto": 1.53, "nero_tunamelt": 1.57, "snk_bbpb": 6.0, "snk_kind": 6.75});
 for (const id in ING) { const v = SALT_FS[id] || []; ING[id].sa = v[0] || 0; ING[id].fs = v[1] || 0; ING[id].sf = SATF[id] || 0; }
 const LOSALT_NA = 13.3; // g sodium per 100g LoSalt (ordinary salt is about 39)
 const TSP_SALT = 6;      // grams in a level teaspoon
-const OILY = new Set(['salmon', 'mackerel', 'smokedmack', 'sardines', 'trout']);
+const OILY = new Set(['salmon', 'mackerel', 'smokedmack', 'sardines', 'trout', 'sb_salmoncc', 'sb_misosalmon', 'ms_sriracha', 'ms_hssalmon', 'wt_salmoncc']); // the shop ones carry about 40–50g of salmon
 const BLUEFISH = new Set(['mackerel', 'smokedmack', 'sardines']);
 const RED = new Set(['beefmince', 'steak', 'porkmince']);
-const ANIMAL = new Set(['chicken', 'thigh', 'turkeymince', 'beefmince', 'steak', 'porkmince', 'salmon', 'mackerel', 'smokedmack', 'sardines', 'trout', 'bream', 'cod', 'prawns', 'tuna']);
+const ANIMAL = new Set(['chicken', 'thigh', 'turkeymince', 'beefmince', 'steak', 'porkmince', 'salmon', 'mackerel', 'smokedmack', 'sardines', 'trout', 'bream', 'cod', 'prawns', 'tuna', 'pret_chavo', 'pret_avobowl', 'pret_satay', 'pret_shawarma', 'pret_chipotle', 'sb_hpchick', 'sb_chswc', 'sb_tunaswc', 'sb_chbacon', 'sb_salmoncc', 'sb_misosalmon', 'ms_chavo', 'ms_chsalad', 'ms_pestopasta', 'ms_sriracha', 'ms_romesco', 'ms_hssalmon', 'wt_chsalad', 'wt_chavo', 'wt_salmoncc', 'nero_protroll', 'nero_tuna', 'nero_pesto', 'nero_tunamelt']);
 const R = {}, RL = [];
 function isFerm(r, m) { return r.items.some(it => { const g = ING[it.i]; return g.fe && it.g * m >= g.fe * 0.9; }); }
 function finish(r, I = ING) {
@@ -3884,7 +4032,7 @@ function finish(r, I = ING) {
 for (const row of RECIPE_ROWS) {
   const [id, n, slots, m, ings, steps] = row;
   const items = ings.split(',').map(s => { const [i, g] = s.trim().split(/\s+/); return { i, g: +g }; });
-  const r = finish({ id, n, slots: slots.split(''), c: m.c || '', t: m.t || 0, tags: (m.g || '').split(/\s+/).filter(Boolean), fr: m.fr || 0, fz: !!m.fz, prep: !!m.prep, treat: !!m.treat, shop: !!m.shop, note: m.n || '', mk: m.mk || 0, items, steps: steps.split('|') });
+  const r = finish({ id, n, slots: slots.split(''), c: m.c || '', t: m.t || 0, tags: (m.g || '').split(/\s+/).filter(Boolean), fr: m.fr || 0, fz: !!m.fz, prep: !!m.prep, treat: !!m.treat, shop: !!m.shop, sw: !!m.sw, st: m.st || '', mp: !!m.mp, pots: m.pots || '', note: m.n || '', mk: m.mk || 0, items, steps: steps.split('|') });
   if (r.prep && r.slots.includes('l') && !m.fr && !r.rice) r.fr = 4;
   R[id] = r; RL.push(r);
 }
@@ -3909,6 +4057,7 @@ function seasonLo(r) {
 }
 for (const r of RL) {
   if (r.items.some(it => it.i === 'losalt')) continue;
+  if (r.sw && r.shop) continue; // a shop-bought pack comes salted as it is
   const said = r.steps.some(x => SALT_WORD.test(x)); SALT_WORD.lastIndex = 0;
   r.lo = { said };
   seasonLo(r);
@@ -4117,6 +4266,7 @@ const packable = r => !!(r && SNACKPACK[r.id]);
 // where the shop-bought snacks are sold; ranges in the smaller local shops vary
 const GRAB_WHERE = { biokefir: 'Biotiful: Sainsbury\'s, Tesco and Waitrose', kombuchacan: 'Remedy: all three', fagepot: 'Fage pots: all three', arlapro: 'Arla Protein Natural: Sainsbury\'s and Tesco; newer, so not every local has it',
   babybel: 'Babybel: all three', propercorn: 'Propercorn: all three', eggpot: 'Egg pots: Waitrose and M&S do egg & spinach; Sainsbury\'s and Tesco do egg protein pots', carrothoum: 'Carrot & houmous pots: each has its own', fulfil: 'Fulfil: all three' };
+Object.assign(GRAB_WHERE, {"pret_chavo": "Pret", "pret_avobowl": "Pret", "pret_satay": "Pret", "pret_shawarma": "Pret", "pret_chipotle": "Pret", "sb_hpchick": "Sainsbury's", "sb_chswc": "Sainsbury's", "sb_tunaswc": "Sainsbury's", "sb_chbacon": "Sainsbury's", "sb_salmoncc": "Sainsbury's", "sb_misosalmon": "Sainsbury's", "ms_chavo": "M&S", "ms_chsalad": "M&S", "ms_pestopasta": "M&S", "ms_sriracha": "M&S", "ms_nutty": "M&S", "ms_romesco": "M&S", "ms_hssalmon": "M&S", "wt_chsalad": "Waitrose", "wt_chavo": "Waitrose", "wt_salmoncc": "Waitrose", "nero_protroll": "Caff\u00e8 Nero", "nero_tuna": "Caff\u00e8 Nero", "nero_pesto": "Caff\u00e8 Nero", "nero_tunamelt": "Caff\u00e8 Nero", "snk_bbpb": "Sainsbury's and Waitrose", "snk_kind": "Sainsbury's and Waitrose", "dietcoke": "Anywhere"});
 const grabWhere = r => r.items.map(it => GRAB_WHERE[it.i]).filter(Boolean);
 const fridgeLife = r => r.rice ? 1 : packable(r) ? SNACKPACK[r.id][0] : r.fr;
 // the steps for a batch: snacks get their packing steps
@@ -4924,7 +5074,7 @@ function wasteOf(c, carry, cUntil, days, st) {
 
 /* ───────────── auto planner ───────────── */
 let PSET = null; const PS = () => PSET || S.set; // the portions and goals of the week being planned
-const pool = (slot, pred) => { const all = RL.filter(r => r.slots.includes(slot) && !r.treat && !r.mine && (!pred || pred(r))), ok = all.filter(r => !S.nope[r.id]); return ok.length ? ok : all; };
+const pool = (slot, pred) => { const all = RL.filter(r => r.slots.includes(slot) && !r.treat && !r.mine && !r.sw && (!pred || pred(r))), ok = all.filter(r => !S.nope[r.id]); return ok.length ? ok : all; };
 function argmax(arr, f) { let best = null, bv = -Infinity; for (const x of arr) { const v = f(x); if (v > bv) { bv = v; best = x; } } return best; }
 const feasible = (r, offs) => offs.every(o => storageFor(r, o) !== 'over');
 function slotScale() { const st = PS(); return (st.target - (st.latteOn ? st.latteK : 0)) / SLOTS.reduce((a, s) => a + st.bud[s], 0); }
@@ -5427,7 +5577,7 @@ function vToday() {
   const tiles = `<div class="tiles"><button class="tile ${wc.ptsEat >= g ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${fmtPts(wc.ptsEat)}<small>/${g}</small></span><span class="l">Plants eaten</span></button>
     <button class="tile ${wc.oilyE >= set.oilyGoal ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${wc.oilyE}<small>/${set.oilyGoal}</small></span><span class="l">Oily fish</span></button>
     <button class="tile ${wc.fermEatDays >= 6 ? 'good' : wc.fermEatDays >= 4 ? 'mid' : ''}" data-a="tab" data-v="week"><span class="v">${wc.fermEatDays}<small>/7</small></span><span class="l">Fermented days</span></button></div>`;
-  return `${weekNav(st)}<div class="strip">${strip}</div>${gmStrip(k)}${k === tk ? mrCard() : ''}${fxCard(k)}${spareCard(k)}${hero}${k === tk ? todayPrompts() : ''}<div class="meals">${rows.join('')}</div>${mkupBar(k, c)}<div class="extras">${extras}<button class="btn link" data-a="xadd">${ic('plus')}Log something else</button></div>${tiles}${gmDoneCard(k)}${wrap}`;
+  return `${weekNav(st)}<div class="strip">${strip}</div>${gmStrip(k)}${k === tk ? mrCard() : ''}${fxCard(k)}${spareCard(k)}${hero}${k === tk ? todayPrompts() : ''}<div class="meals">${rows.join('')}</div>${fitBar(k, c)}${mkupBar(k, c)}<div class="extras">${extras}<button class="btn link" data-a="xadd">${ic('plus')}Log something else</button></div>${tiles}${gmDoneCard(k)}${wrap}`;
 }
 /* making up the gap: from 4pm, a meal still to come can be swapped for one that fixes what today is short of
    (fibre, fermented) without going over on sat fat, sugar or salt, within the calories left; new plants come next */
@@ -5453,7 +5603,7 @@ function mkupOpts(k, s, G) {
   return near.concat(all.filter(x => x.miss.length > 5 && nutOk({ sf: x.sf, na: x.na, f: x.f }))).slice(0, 3);
 }
 function mkupAll(k, s, G, isIn, cur) {
-  return RL.filter(r => r.slots.includes(s) && !r.shop && !S.nope[r.id] && (!cur || r.id !== cur.id) && (r.t || 0) <= 45).map(r => {
+  return RL.filter(r => r.slots.includes(s) && !r.shop && !r.sw && !S.nope[r.id] && (!cur || r.id !== cur.id) && (r.t || 0) <= 45).map(r => {
     const m = G.kc > 0 ? r.k ? G.kc / r.k : 1 : 0; if (m < 0.5) return null;
     const mm = Math.min(1.8, Math.max(0.5, Math.max(m > 1.8 ? 1.8 : m, r.fermMinM || 0))), k0 = r.k * mm;
     if (k0 > G.kc + 60) return null;
@@ -6362,7 +6512,7 @@ function vTrends() {
   eachDay(addDays(tk, -56), addDays(tk, -1), k => { const c = dcc(k); if (!c || !c.hasPlan) return; SLOTS.forEach(s => { const o = c.slots[s]; if (o.kind === 'recipe') { cnt[o.r.id] = (cnt[o.r.id] || 0) + 1; if (k >= addDays(tk, -28)) o.r.plants.forEach(x => recent.add(x)); } }); });
   const top = Object.entries(cnt).sort((a, b) => b[1] - a[1] || R[a[0]].n.localeCompare(R[b[0]].n)).slice(0, 6);
   const topHtml = top.length ? `<div class="hlist">${top.map(([id, n]) => `<div class="hdish"><button class="hopen" data-a="open" data-r="${id}">${art(R[id], 36)}<span>${esc(R[id].n)}<small>${n} time${n > 1 ? 's' : ''}</small></span></button>${thumbs(id, true)}</div>`).join('')}</div>` : '';
-  const uses = {}; RL.forEach(r => r.plants.forEach(x => { uses[x] = (uses[x] || 0) + 1; }));
+  const uses = {}; RL.forEach(r => { if (!r.sw) r.plants.forEach(x => { uses[x] = (uses[x] || 0) + 1; }); });
   const missing = Object.keys(cnt).length ? Object.keys(PLANTS).filter(x => PLANTS[x][1] >= 1 && !recent.has(x) && uses[x]).sort((a, b) => uses[b] - uses[a]).slice(0, 18) : [];
   const missHtml = missing.length ? `<div class="plantgrid">${missing.map(x => `<button class="pchip" data-a="plantfind" data-v="${x}">${PLANTS[x][2] ? `<i class="c-${PLANTS[x][2]}"></i>` : ''}${esc(PLANTS[x][0])}</button>`).join('')}</div><p class="small muted" style="margin:6px 0 0">Tap one to see recipes with it.</p>` : '';
   // the extras, folded away at the bottom so the figures come first
@@ -7658,7 +7808,7 @@ function renderSheet(fresh) {
   const root = $('sheet-root');
   if (!SH) { root.innerHTML = ''; return; }
   const old = root.querySelector('.sheet'), top = old && !fresh ? old.scrollTop : 0;
-  const html = ({ wgoal: shWGoal, ckitems: shCkItems, cupboard: shCupboard, recipe: shRecipe, pick: shPick, xadd: shAdd, custom: shCustom, target: shTarget, settings: shSettings, confirm: shConfirm, setwhen: shSetWhen, leftadd: shLeftAdd, pack: shPack, backup: shBackup, lift: shLift, trswap: shTrSwap, trset: shTrSet, tvpick: shTvPick, tvaddex: shTvAddEx, tradd: shTrAdd, have: shHave, addi: shAddI, pscan: shPScan, mkup: shMkup, trre: shTrRe, weekmenu: shWeekMenu, night: shNight, mydrink: shMyDrink, swap: shSwap, idea: shIdea, fx: shFx, nlog: shNoseLog })[SH.type]();
+  const html = ({ wgoal: shWGoal, ckitems: shCkItems, cupboard: shCupboard, recipe: shRecipe, pick: shPick, xadd: shAdd, custom: shCustom, target: shTarget, settings: shSettings, confirm: shConfirm, setwhen: shSetWhen, leftadd: shLeftAdd, pack: shPack, backup: shBackup, lift: shLift, trswap: shTrSwap, trset: shTrSet, tvpick: shTvPick, tvaddex: shTvAddEx, tradd: shTrAdd, have: shHave, addi: shAddI, pscan: shPScan, mkup: shMkup, fit: shFit, trre: shTrRe, weekmenu: shWeekMenu, night: shNight, mydrink: shMyDrink, swap: shSwap, idea: shIdea, fx: shFx, nlog: shNoseLog })[SH.type]();
   root.innerHTML = `<div class="scrim" data-scrim="1"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(SH.title || 'Details')}"><div class="grab"></div>${html}</div></div>`;
   if (!fresh) root.querySelector('.scrim').style.animation = 'none';
   const sh = root.querySelector('.sheet'); if (!fresh) sh.style.animation = 'none';
@@ -7963,7 +8113,7 @@ function shRecipe() {
   return `<div class="sheethero">${art(r, 96)}<div><span class="eyebrow">${r.slots.map(s => SLOTNAME[s]).join(' / ')} · ${esc(r.c)} · ${tmin(r.t)}</span><h2>${dsc ? nameDot(r.n, 'rdesc', r.id, SH.desc, 'rdesc') : esc(r.n)}</h2></div>
     <div style="display:grid;gap:2px;align-self:start"><button class="iconbtn" data-a="close" aria-label="Close">${ic('x')}</button>${thumbs(r.id)}</div></div>
     ${dsc ? descBox(r, 'rdesc', SH.desc) : ''}
-    <section style="margin-top:12px">${badges(r)}</section>
+    <section style="margin-top:12px">${badges(r)}</section>${r.mp ? potLine(r) : ''}
     <section style="margin-top:10px"><div class="nutri"><div><b>${fmtN(r.k * m)}</b><span>kcal</span></div><div><b>${fmtN(r.p * m)}g</b><span>protein</span></div><div><b>${fmtN(r.f * m)}g</b><span>fibre</span></div><div><b>${fmtPts(r.pts)}</b><span>plants</span></div></div><p class="small muted" style="margin:6px 2px 0">Sodium ${fmtNa(r.na * m)} (${(r.na * m * 2.5).toFixed(1)}g salt) · added sugar ${fmtFS(r.fs * m)} · sat fat ${fmtN(r.sf * m)}g${r.na * m > (SH.k ? setAt(SH.k) : S.set).naMax * 0.5 ? ' · a salty one: over half the day\'s sodium' : ''}</p></section>
     ${ctx}
     <section><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h4 style="margin:0">Ingredients</h4><div class="stepper"><button data-a="serv" data-v="-1" aria-label="Fewer portions">−</button><span>${n} portion${n > 1 ? 's' : ''}</span><button data-a="serv" data-v="1" aria-label="More portions">+</button></div></div>
@@ -8055,14 +8205,14 @@ function shPick() {
   }
   const extra = k ? `<div class="btnrow" style="margin-top:10px"><button class="btn sm" data-a="custom" data-k="${k}" data-s="${s}">Eat something else</button><button class="btn sm ghost" data-a="skip" data-k="${k}" data-s="${s}">Skip</button>${cur ? `<button class="btn sm ghost" data-a="clearslot" data-k="${k}" data-s="${s}">Clear</button>` : ''}</div>` : '';
   return `<div class="sheethead"><div><span class="eyebrow">${k ? fmtDay(k) : fmtRange(st)}</span><h2>${SLOTNAME[s]}</h2></div>${closeBtn}</div>
-    ${note}${swapDays}<input class="search" id="pq" type="search" placeholder="Search" value="${esc(SH.q || '')}" aria-label="Search recipes" style="margin-top:10px">${pickPlants(k)}${k ? `<button class="btn ghost ideabtn" data-a="ideas">${ic('plus')}What have you got? Get recipe ideas</button>` : ''}${extra}
-    <p class="small muted">${(SH.pf || []).length ? 'Meals using the most of those plants first.' : 'Sorted by new plants for this week.'}</p><div class="plist" id="pk-list">${pickList()}</div>`;
+    ${note}${swapDays}${!SH.bkey && k ? pickSrc(s) : ''}<input class="search" id="pq" type="search" placeholder="Search" value="${esc(SH.q || '')}" aria-label="Search recipes" style="margin-top:10px">${pickPlants(k)}${k ? `<button class="btn ghost ideabtn" data-a="ideas">${ic('plus')}What have you got? Get recipe ideas</button>` : ''}${extra}
+    <p class="small muted">${(SH.pf || []).length ? 'Meals using the most of those plants first.' : SH.src === 'shop' && k ? 'Ranked by how well each fits the rest of the day.' : 'Sorted by new plants for this week.'}</p><div class="plist" id="pk-list">${pickList()}</div>`;
 }
 // find meals by plant: this week's leftovers come first, and any plant can be added; meals using more of them sort higher
 function pickPlants(k) {
   const lo = k ? leftoversOn(k) : {}, loPl = [...new Set(Object.keys(lo).flatMap(i => (ING[i] && ING[i].pl) || []))].filter(x => PLANTS[x]);
   const pf = SH.pf || [], shown = [...new Set([...pf, ...loPl])];
-  const all = Object.keys(PLANTS).filter(x => !shown.includes(x) && RL.some(r => r.slots.includes(SH.s) && r.plants.includes(x))).sort((a, b) => PLANTS[a][0].localeCompare(PLANTS[b][0]));
+  const all = Object.keys(PLANTS).filter(x => !shown.includes(x) && RL.some(r => r.slots.includes(SH.s) && !r.sw && r.plants.includes(x))).sort((a, b) => PLANTS[a][0].localeCompare(PLANTS[b][0]));
   return `<div class="pfilt"><span class="eyebrow">Find meals with</span><div class="chips">${shown.map(x => `<button class="chip" data-a="pfilt" data-v="${x}" aria-pressed="${pf.includes(x)}">${esc(PLANTS[x][0])}${loPl.includes(x) ? '<small> · left over</small>' : ''}</button>`).join('')}
     ${nutChips()}<select class="chip pfadd" id="pf-add" aria-label="Add a plant to find meals with"><option value="">+ A plant</option>${all.map(x => `<option value="${x}">${esc(PLANTS[x][0])}</option>`).join('')}</select>${pf.length ? '<button class="chip" data-a="pfclear">Clear</button>' : ''}</div></div>`;
 }
@@ -8080,10 +8230,11 @@ function pickList() {
   const { k, s } = SH, st = SH.st || startOf(k), wc = weekCalc(st), q = (SH.q || '').toLowerCase(), cur = k ? peekD(k).sl[s] : null;
   const lo = k ? leftoversOn(k) : {};
   const pf = SH.pf || [], hits = r => pf.filter(x => r.plants.includes(x));
-  const opts = RL.filter(r => r.slots.includes(s) && textMatch(r, q) && (!pf.length || hits(r).length) && (!SH.nut || nutOk(pickPortion(r, k, s)))).map(r => ({ r, h: hits(r), g: r.plants.reduce((a, x) => a + (wc.plan.has(x) ? 0 : PLANTS[x][1]), 0), lu: r.id === cur ? [] : usesUp(r, lo) }))
+  const opts = RL.filter(r => r.slots.includes(s) && pickSrcOk(r) && textMatch(r, q) && (!pf.length || hits(r).length) && (!SH.nut || nutOk(pickPortion(r, k, s)))).map(r => ({ r, h: hits(r), g: r.plants.reduce((a, x) => a + (wc.plan.has(x) ? 0 : PLANTS[x][1]), 0), lu: r.id === cur ? [] : usesUp(r, lo) }))
     .sort((a, b) => (b.h.length - a.h.length) || (b.r.id === cur) - (a.r.id === cur) || (!!S.nope[a.r.id] - !!S.nope[b.r.id]) || (!!S.favs[b.r.id] - !!S.favs[a.r.id]) || (b.lu.length - a.lu.length) || (b.g - a.g) || a.r.n.localeCompare(b.r.n));
+  if (SH.src === 'shop' && k) { const G = mkupGap(k, s); opts.forEach(o => { o.fit = shopFit(o.r, G); }); opts.sort((a, b) => b.fit.sc - a.fit.sc); }
   if (!opts.length) return `<p class="small muted">No ${SLOTNAME[s].toLowerCase()}s ${pf.length ? `use ${pf.length > 1 ? 'any of those plants' : 'that plant'}` : 'fit'}${SH.nut && Object.keys(SH.nut).length ? ' with those filters' : ''}${q ? ' and match the search' : ''}.</p>`;
-  return opts.map(({ r, g, lu, h }) => `<button class="pick ${r.id === cur ? 'cur' : ''}" data-a="choose" data-r="${r.id}">${art(r, 44)}<span>${pf.length > 1 ? `<span class="mt pfhit">Uses ${esc(joinAnd(h.map(x => PLANTS[x][0].toLowerCase())))}</span>` : ''}<span class="nm">${S.favs[r.id] ? ic('thup', false, 'inl lk') : S.nope[r.id] ? ic('thdown', false, 'inl nk') : ''}${esc(r.n)}</span><span class="mt">${fmtN(r.k)} kcal · ${fmtN(r.p)}g protein${g ? ` · <span class="gain">+${fmtPts(g)} new plant${g === 1 ? '' : 's'}</span>` : ''}${r.oily ? ' · oily fish' : ''}${r.fermBase ? ' · fermented' : ''}${r.mine ? ' · your idea' : ''}${s === 's' && S.set.prepSnacks && packable(r) ? ' · packs for work' : ''}${r.shop ? ' · shop-bought' : ''}${lu.length ? ` · <span class="gain">uses up ${esc(joinAnd(lu.slice(0, 2).map(i => shortN(i).toLowerCase())))}${lu.length > 2 ? ' and more' : ''}</span>` : ''}</span></span></button>`).join('') || '<div class="empty">No matches.</div>';
+  return opts.map(({ r, g, lu, h, fit }, i) => `<button class="pick ${r.id === cur ? 'cur' : ''}" data-a="choose" data-r="${r.id}">${art(r, 44)}<span>${pf.length > 1 ? `<span class="mt pfhit">Uses ${esc(joinAnd(h.map(x => PLANTS[x][0].toLowerCase())))}</span>` : ''}<span class="nm">${S.favs[r.id] ? ic('thup', false, 'inl lk') : S.nope[r.id] ? ic('thdown', false, 'inl nk') : ''}${esc(r.n)}</span><span class="mt">${fmtN(r.k)} kcal · ${fmtN(r.p)}g protein${g ? ` · <span class="gain">+${fmtPts(g)} new plant${g === 1 ? '' : 's'}</span>` : ''}${r.oily ? ' · oily fish' : ''}${r.fermBase ? ' · fermented' : ''}${r.mine ? ' · your idea' : ''}${s === 's' && S.set.prepSnacks && packable(r) ? ' · packs for work' : ''}${r.shop ? (r.st && STORE_N[r.st] ? ` · ${esc(STORE_N[r.st])}` : ' · shop-bought') : ''}${r.mp ? ` · multi-pot · ${tmin(r.t)}` : ''}${lu.length ? ` · <span class="gain">uses up ${esc(joinAnd(lu.slice(0, 2).map(i => shortN(i).toLowerCase())))}${lu.length > 2 ? ' and more' : ''}</span>` : ''}</span>${fit ? `<span class="wins">${i === 0 ? '<i>Best fit</i>' : ''}${fit.wins.slice(0, 3).map(t => `<i>${esc(t)}</i>`).join('')}${fit.warn.map(t => `<i class="warn">${esc(t)}</i>`).join('')}</span>` : ''}</span></button>`).join('') || '<div class="empty">No matches.</div>';
 }
 // optional figures from a food label; salt is entered as on the pack and kept as sodium
 function labelFields(px, o) {
@@ -8487,7 +8638,7 @@ function wzNightK(k) { const w = WZ.out[k]; if (!w) return 0; const drinks = w.l
 const wzTrimD = () => { WZ.picks.d = WZ.picks.d.slice(0, wzMax('d')); };
 function wzSessions() { const one = { key: 'A', date: addDays(WZ.start, -1) }, two = addDays(WZ.start, 3); return { pre: one.date, mid: two }; }
 function wzPool(s) {
-  let list = RL.filter(r => r.slots.includes(s) && !r.treat && ((s !== 'b' && s !== 'l') || r.prep));
+  let list = RL.filter(r => r.slots.includes(s) && !r.treat && !r.sw && ((s !== 'b' && s !== 'l') || r.prep));
   if (s === 'd') list.sort((a, b) => (a.slots[0] === 'l') - (b.slots[0] === 'l'));
   const f = WZ.f[s] || '';
   list = list.filter(r => tagMatch(r, f));
@@ -9309,7 +9460,7 @@ function rvMeals() {
   const nx = days[i + 1];
   return `${rvHead('Meals', "Go through each day. On days you ticked meals, anything left unticked starts as not had; on days you didn't, the plan counts as eaten. Tap any meal to change it.")}
     ${tabs}
-    <section class="wsum rvdayc"><div class="rvdh"><b>${DOWL[dayIndex(k)]} ${parse(k).getDate()} ${MONS[parse(k).getMonth()]}</b>${night ? `<span class="small muted">Night out · ${esc(drinkSummary(night))}</span>` : ''}</div>
+    <section class="wsum rvdayc"><div class="rvdh"><b>${DOWL[dayIndex(k)]} ${parse(k).getDate()} ${MONS[parse(k).getMonth()]}</b>${night ? `<span class="small muted">Night out · ${esc(drinkSummary(night))}${c.dK >= 1 ? ` · ${fmtN(c.dK)} kcal` : ''}</span>` : ''}</div>
       <div class="rvmls">${rows || '<p class="small muted" style="margin:0">Nothing planned.</p>'}</div>
       ${extra}
       <div class="btnrow"><button class="btn sm" data-a="rvadd" data-k="${k}">${ic('plus')}Something else on ${DOW[dayIndex(k)]}</button>${nx ? `<button class="btn sm primary" data-a="rvmday" data-k="${nx}">${DOW[dayIndex(nx)]}${ic('chev')}</button>` : ''}</div></section>`;
@@ -9352,6 +9503,14 @@ function rvPlants() {
     <section class="wsum"><div class="cklbl">Snacks, meals out and extras</div>${xl}<div class="cklbl" style="margin-top:4px">Log something on</div><div class="rv7">${weekDays(st).map(k => `<button class="chip rvdc" data-a="rvadd" data-k="${k}" aria-label="Log something on ${fmtDay(k)}">${DOW[dayIndex(k)].slice(0, 2)}</button>`).join('')}</div></section>`;
 }
 
+// 3.30.1: units set in the Alcohol step set that night's drinks too, the way the morning check-in does,
+// so their calories count. Clearing a day only removes a night the units themselves added.
+function rvAlcKcal(k) {
+  if (k > todayKey()) return;
+  if (k in S.alc) logDrinks(k, +S.alc[k]);
+  else { const d = S.days[k], o = outOf(d); if (o && o.logged) delete d.out; }
+  TC = null; MCACHE = null; CARRYC = {}; FOODC = {};
+}
 function rvAlcTot() {
   const days = weekDays(RV.st), known = days.filter(k => k in S.alc), tot = known.reduce((a, k) => a + +S.alc[k], 0), unk = 7 - known.length, hi = known.filter(k => +S.alc[k] > ALC.binge).length;
   const st = !known.length ? 'none' : tot < ALC.week ? 'ok' : tot <= ALC.week * 1.5 ? 'mid' : 'off';
@@ -9457,9 +9616,9 @@ Object.assign(ACT, {
   rvxdel(d) { const dd = S.days[d.k]; if (!dd) return; const x = dd.x[+d.i]; if (!x) return; dd.x.splice(+d.i, 1); save(); renderRV(); toast(`Removed ${x.n}`); },
   rvadd(d) { UI.day = d.k; openSheet({ type: 'xadd', dk: d.k, pl: [] }); },
   rvcol(d) { const k = rvHistKey(S.hist.wc, RV.st), v = +d.v; if (S.hist.wc[k] === v) delete S.hist.wc[k]; else S.hist.wc[k] = v; save(); renderRV(); },
-  rvu(d) { const k = d.k, v = k in S.alc ? +S.alc[k] : null; S.alc[k] = v === null ? (+d.v > 0 ? 0.5 : 0) : rvStep(v, +d.v, 0.5); save(); renderRV(); },
-  rvuset(d) { S.alc[d.k] = +d.v; save(); renderRV(); },
-  rvanone() { weekDays(RV.st).forEach(k => { if (!(k in S.alc)) S.alc[k] = 0; }); save(); renderRV(); },
+  rvu(d) { const k = d.k, v = k in S.alc ? +S.alc[k] : null; S.alc[k] = v === null ? (+d.v > 0 ? 0.5 : 0) : rvStep(v, +d.v, 0.5); rvAlcKcal(k); save(); renderRV(); },
+  rvuset(d) { S.alc[d.k] = +d.v; rvAlcKcal(d.k); save(); renderRV(); },
+  rvanone() { weekDays(RV.st).forEach(k => { if (!(k in S.alc)) { S.alc[k] = 0; rvAlcKcal(k); } }); save(); renderRV(); },
   rvrun(d) { const k = d.k; S.run[k] = S.run[k] === 1 ? 0 : 1; save(); renderRV(); },
   rvrnone() { weekDays(RV.st).forEach(k => { if (!(k in S.run)) S.run[k] = 0; }); save(); renderRV(); },
   rvfood(d) {
@@ -9578,7 +9737,7 @@ Object.assign(ACT, {
 });
 function rvInput(e) {
   const id = e.target.id, v = e.target.value;
-  if (id.startsWith('rv-u-')) { const k = id.slice(5); if (v === '') delete S.alc[k]; else if (+v >= 0) S.alc[k] = Math.round(+v * 10) / 10; save(); const t = $('rv-atot'); if (t) t.innerHTML = rvAlcTot(); const row = e.target.closest('.rvrow'); if (row) row.classList.toggle('unk', v === ''); return true; }
+  if (id.startsWith('rv-u-')) { const k = id.slice(5); if (v === '') delete S.alc[k]; else if (+v >= 0) S.alc[k] = Math.round(+v * 10) / 10; rvAlcKcal(k); save(); const t = $('rv-atot'); if (t) t.innerHTML = rvAlcTot(); const row = e.target.closest('.rvrow'); if (row) row.classList.toggle('unk', v === ''); return true; }
   if (id === 'rv-plq') { RV.plq = v; $('rv-plgrid').innerHTML = rvPlGrid(); return true; }
   if (id === 'rv-sl' && RV.sel) { const k = RV.sel, n = +v; if (v === '' || !(n > 0)) { if (S.ck[k]) { delete S.ck[k].sl; rvCkTidy(k); } } else rvCk(k).sl = Math.min(16, Math.round(n * 4) / 4); save(); const c = document.querySelector('.rvc.sl.sel'); if (c) { const x = (S.ck[k] || {}).sl; c.textContent = x ? String(+x.toFixed(2)) : ''; c.classList.toggle('y', !!x); } return true; }
   if (id === 'rv-pts') { const k = rvHistKey(S.hist.w, RV.st), n = +v; if (v === '' || !(n > 0)) delete S.hist.w[k]; else S.hist.w[k] = Math.round(n * 4) / 4; save(); return true; }
@@ -11136,7 +11295,7 @@ function ideaSteps(items, tplId) {
 // the app's own recipes for the slot that use the most of what you've got, and what else each needs
 function ideaMatches(have, s) {
   const hs = new Set(have);
-  return RL.filter(r => r.slots.includes(s) && !r.mine && !r.shop).map(r => {
+  return RL.filter(r => r.slots.includes(s) && !r.mine && !r.shop && !r.sw).map(r => {
     const ids = [...new Set(r.items.map(it => it.from || it.i))], used = have.filter(i => ids.includes(i));
     const extra = ids.filter(i => !hs.has(i) && ING[i] && !['spices', 'oils'].includes(ING[i].a) && !['losalt', 'stock', 'garlic', 'onion'].includes(i) && !S.stock[i]);
     return { r, used, extra };
@@ -13691,6 +13850,207 @@ Object.assign(ACT, {
       if (back && back.type === 'night') { SH = back; renderSheet(); syncHistory(); }
     }, true);
   }
+});
+
+/* ───────────── 3.30: Fit my day, shop-bought swaps and multi-pot meals ───────────── */
+const STORE_N = {"sains": "Sainsbury's", "waitrose": "Waitrose", "ms": "M&S", "nero": "Caff\u00e8 Nero", "pret": "Pret"};
+const STORE_ORDER = ['sains', 'waitrose', 'ms', 'nero', 'pret'];
+/* Fit my day: today only. Ticks say what has to be true by the end of the day; it swaps the meals still to come
+   (never anything eaten, packed or your own entry) and keeps as many as it can. Each option is tried on the real day,
+   portions and all, so the totals are what Today would show after the swap. */
+const FIT_DEF = { ferm: true, oily: false, sf: true, fs: true, na: true, shop: true, mp: false, box: false };
+const fitOpt = () => Object.assign({}, FIT_DEF, UI.fit || {});
+function fitSlots(k, c, opt) {
+  return SLOTS.filter(s => {
+    const o = c.slots[s];
+    if (o.done || o.gone) return false;
+    if (o.kind === 'empty') return s !== 'p';
+    if (o.kind !== 'recipe') return false; // your own entries and skipped meals stay as they are
+    if (o.packed || o.lo || o.kept) return false;
+    if (o.prepped && !opt.box) return false;
+    return true;
+  });
+}
+// try a set of meals on the day without saving anything; the day is put back exactly as it was
+function fitSim(k, pick, fc) {
+  const d = S.days[k], saved = {};
+  Object.keys(pick).forEach(s => {
+    saved[s] = { sl: d.sl[s], sw: d.sw ? d.sw[s] : undefined, got: d.got ? d.got[s] : undefined };
+    d.sl[s] = pick[s]; if (d.sw) delete d.sw[s]; if (d.got) delete d.got[s];
+  });
+  try { return dayCalcCore(k, fc.share[k] || 0, fc); }
+  finally {
+    Object.keys(saved).forEach(s => {
+      const v = saved[s];
+      if (v.sl === undefined) delete d.sl[s]; else d.sl[s] = v.sl;
+      if (v.sw !== undefined) d.sw[s] = v.sw;
+      if (v.got !== undefined) d.got[s] = v.got;
+    });
+  }
+}
+const fitOily = c => SLOTS.some(s => { const o = c.slots[s]; return o.kind === 'recipe' && !o.gone && o.r.oily; }) || c.own.oily.length > 0;
+// what the ticks ask for, against the day's own goals (which may be tighter than usual after earlier days)
+function fitJudge(c, opt, dg, changes) {
+  const over = { sf: c.planSF - dg.satfat.g, fs: c.planFS - dg.sugar.g, na: c.planNa - dg.sodium.g }, oily = fitOily(c), miss = [];
+  if (opt.ferm && !c.fermPlan) miss.push('ferm');
+  if (opt.oily && !oily) miss.push('oily');
+  if (opt.sf && over.sf > 0.5) miss.push('sf');
+  if (opt.fs && over.fs > 1) miss.push('fs');
+  if (opt.na && over.na > 0.05) miss.push('na');
+  let sc = 3 * Math.min(1, c.planP / Math.max(1, dg.protein.g)) + 3 * Math.min(1, c.planF / Math.max(1, dg.fibre.g)) + 0.06 * ptsOf(c.plants);
+  sc -= Math.max(0, c.planK - c.T) / 60 + Math.max(0, c.T - c.planK) / 250 + 0.35 * changes;
+  [['sf', 3], ['fs', 6], ['na', 0.3]].forEach(([x, u]) => { if (over[x] > 0) sc -= (opt[x] ? 2.5 : 0.7) * over[x] / u; });
+  if (c.fermPlan) sc += 0.4;
+  return { sc, miss, over, oily };
+}
+function fitCands(k, s, o, opt, base, need) {
+  const cur = o.kind === 'recipe' ? o.r.id : null;
+  const list = RL.filter(r => r.slots.includes(s) && !S.nope[r.id] && !r.treat && r.id !== cur &&
+    (r.shop ? opt.shop : true) && (!r.mp || (opt.mp && s === 'd')) && (r.mp || r.shop || (r.t || 0) <= 45));
+  const sc = r => {
+    const m = r.shop ? 1 : Math.min(1.8, Math.max(0.5, base / Math.max(1, r.k))), x = { k: r.k * m, p: r.p * m, f: r.f * m, sf: r.sf * m, fs: r.fs * m, na: r.na * m };
+    return x.p / 25 + x.f / 7 - x.sf / (opt.sf ? 4 : 10) - x.fs / (opt.fs ? 8 : 20) - x.na / (opt.na ? 0.6 : 1.5) + (need.ferm && isFerm(r, m) ? 2 : 0) + (need.oily && r.oily ? 2.5 : 0)
+      + 0.05 * (r.pts || 0) + (S.favs[r.id] ? 0.4 : 0) - Math.abs(x.k - base) / 350;
+  };
+  const ranked = list.map(r => ({ r, sc: sc(r) })).sort((a, b) => b.sc - a.sc);
+  const pickN = ranked.slice(0, 5).map(x => x.r.id);
+  // make sure the must-haves have a way in, even if nothing else about them ranks
+  if (need.ferm) ranked.filter(x => isFerm(x.r, 1)).slice(0, 2).forEach(x => { if (!pickN.includes(x.r.id)) pickN.push(x.r.id); });
+  if (need.oily) ranked.filter(x => x.r.oily).slice(0, 2).forEach(x => { if (!pickN.includes(x.r.id)) pickN.push(x.r.id); });
+  return cur ? [cur, ...pickN] : pickN;
+}
+function fitRun(k, opt) {
+  const c0 = dayCalc(k), dg = dayGoals(k), slots = fitSlots(k, c0, opt);
+  if (!slots.length) return { c0, slots, combos: [] };
+  const fc = foodCarry(startOf(k)), need = { ferm: opt.ferm && !c0.fermPlan, oily: opt.oily && !fitOily(c0) };
+  const cur = {}; slots.forEach(s => { const o = c0.slots[s]; cur[s] = o.kind === 'recipe' ? o.r.id : null; });
+  const per = slots.map(s => { const o = c0.slots[s]; return fitCands(k, s, o, opt, o.kind === 'recipe' ? o.k : o.base, need).slice(0, slots.length > 3 ? 5 : 8); });
+  const out = []; let n = 0;
+  const walk = (i, pick, ch) => {
+    if (i === slots.length) {
+      if (n++ > 900) return;
+      const c = fitSim(k, pick, fc), j = fitJudge(c, opt, dg, ch);
+      out.push({ pick: Object.assign({}, pick), c, ch, ...j });
+      return;
+    }
+    const s = slots[i];
+    per[i].forEach(id => { if (!id) return; pick[s] = id; walk(i + 1, pick, ch + (id !== cur[s] ? 1 : 0)); });
+    if (!per[i].length || !cur[s]) { delete pick[s]; if (!per[i].length) walk(i + 1, pick, ch); }
+  };
+  walk(0, {}, 0);
+  out.sort((a, b) => (a.miss.length - b.miss.length) || (b.sc - a.sc));
+  // the same meals in a different order of slots, or no change at all, aren't new options
+  const seen = new Set(), combos = [];
+  for (const x of out) { const key = slots.map(s => x.pick[s] || '').join('|'); if (seen.has(key)) continue; seen.add(key); combos.push(x); if (combos.length >= 6) break; }
+  const keep = out.find(x => x.ch === 0);
+  return { c0, slots, combos, keep, cur, dg };
+}
+function fitKey(k, opt) { return k + JSON.stringify(opt) + JSON.stringify(peekD(k).sl) + JSON.stringify(peekD(k).done); }
+function fitGet() {
+  const k = SH.k, opt = fitOpt(), key = fitKey(k, opt);
+  if (!SH.res || SH.key !== key) { SH.res = fitRun(k, opt); SH.key = key; SH.i = 0; }
+  return SH.res;
+}
+const FIT_MISS = { ferm: 'without anything fermented', oily: 'without oily fish', sf: 'over on sat fat', fs: 'over on added sugar', na: 'over on sodium' };
+function shFit() {
+  const k = SH.k, opt = fitOpt(), res = fitGet(), c0 = res.c0, dg = dayGoals(k);
+  SH.title = 'Fit my day';
+  const left = Math.max(0, c0.T - c0.eatK), still = res.slots.map(s => SLOTNAME[s].toLowerCase());
+  const box = (id, lab, sub) => `<label class="check fitck"><input type="checkbox" data-a="fitopt" data-v="${id}" ${opt[id] ? 'checked' : ''}><span>${lab}${sub ? `<span class="small muted">${sub}</span>` : ''}</span></label>`;
+  const lim = (x, g) => { const v = Math.max(0, g - c0[{ sf: 'eatSF', fs: 'eatFS', na: 'eatNa' }[x]]); return x === 'na' ? `${fmtNa(v)} left` : `${fmtN(v)}g left`; };
+  const ticks = `<div class="fitgrp"><span class="eyebrow">Must have</span>${box('ferm', 'Something fermented', c0.fermEat ? 'already had' : '')}${box('oily', 'Oily fish', fitOily(c0) ? 'already in' : '')}</div>
+    <div class="fitgrp"><span class="eyebrow">Keep under</span>${box('sf', 'Sat fat', lim('sf', dg.satfat.g))}${box('fs', 'Added sugar', lim('fs', dg.sugar.g))}${box('na', 'Sodium', lim('na', dg.sodium.g))}</div>
+    <div class="fitgrp"><span class="eyebrow">Can use</span>${box('shop', 'Shop-bought')}${box('mp', 'Multi-pot meals', 'dinner')}${box('box', 'Prepped boxes', 'kept as leftovers')}</div>`;
+  const head = `<div class="sheethead"><div><span class="eyebrow">Today · ${fmtDay(k)}</span><h2>Fit my day</h2></div>${closeBtn}</div>
+    <p style="margin:0 0 8px">${res.slots.length ? `<b>${fmtN(left)} kcal left</b> · ${esc(joinAnd(still))} still to come.` : 'Nothing left today that can change.'}</p>`;
+  if (!res.slots.length) return `${head}<p class="small muted">Meals you've eaten, packed boxes, leftovers and your own entries stay as they are${opt.box ? '' : '; tick Prepped boxes to let it change those'}.</p>${ticks}`;
+  const x = res.combos[Math.min(SH.i || 0, res.combos.length - 1)];
+  if (!x) return `${head}${ticks}<p class="muted">Nothing fits those ticks with what's left.</p>`;
+  const base = res.keep || { c: c0, miss: fitJudge(c0, opt, dg, 0).miss };
+  const rows = res.slots.map(s => {
+    const was = res.cur[s], now = x.pick[s] || was, o0 = c0.slots[s], o1 = x.c.slots[s];
+    if (now === was) return `<div class="fitrow same"><span class="small muted">${SLOTNAME[s]}</span><span>${was ? esc(R[was].n) : 'Nothing planned'}</span><span class="small muted">Stays: it already fits.</span></div>`;
+    const r = R[now], tags = [];
+    const d1 = o1.kind === 'recipe' ? o1 : null;
+    if (d1) {
+      if (o0.kind === 'recipe') {
+        const sfD = d1.sf * 1 - (o0.sf || 0), fD = d1.f - (o0.f || 0), pD = d1.p - (o0.p || 0);
+        if (sfD <= -1) tags.push(`−${fmtN(-sfD)}g sat fat`); if (fD >= 1) tags.push(`+${fmtN(fD)}g fibre`); if (pD >= 3) tags.push(`+${fmtN(pD)}g protein`);
+      }
+      if (isFerm(d1.r, d1.m)) tags.push('Fermented'); if (d1.r.oily) tags.push('Oily fish');
+      if (r.shop && r.st) tags.push(STORE_N[r.st] || 'Shop'); if (r.mp) tags.push('Multi-pot');
+      if (o0.prepped) tags.push('Box kept as a leftover');
+    }
+    return `<div class="fitrow"><span class="small muted">${SLOTNAME[s]}</span>${was ? `<span class="old">${esc(R[was].n)}</span>` : ''}<span><b>${esc(r.n)}</b>${d1 ? ` <span class="small muted">· ${fmtN(d1.k)} kcal</span>` : ''}</span><span class="wins">${tags.map(t => `<i>${esc(t)}</i>`).join('')}</span></div>`;
+  }).join('');
+  const nCh = res.slots.filter(s => (x.pick[s] || res.cur[s]) !== res.cur[s]).length;
+  const totRow = (lab, a, b, lim2, u, na) => `<div class="row"><span>${lab}</span><span>${na ? fmtNa(a) : `${fmtN(a)}${u}`} → <b>${na ? fmtNa(b) : `${fmtN(b)}${u}`}</b>${lim2 !== null ? ` <span class="muted">of ${na ? fmtNa(lim2) : `${fmtN(lim2)}${u}`}</span>` : ''}</span></div>`;
+  const tot = `<div class="heromore fittot">${totRow('Calories', c0.planK, x.c.planK, x.c.T, '', 0)}${totRow('Protein', c0.planP, x.c.planP, dg.protein.g, 'g', 0)}${totRow('Fibre', c0.planF, x.c.planF, dg.fibre.g, 'g', 0)}${totRow('Sat fat', c0.planSF, x.c.planSF, dg.satfat.g, 'g', 0)}${totRow('Added sugar', c0.planFS, x.c.planFS, dg.sugar.g, 'g', 0)}${totRow('Sodium', c0.planNa, x.c.planNa, dg.sodium.g, '', 1)}
+    <div class="row"><span>Fermented</span><span>${c0.fermPlan ? 'Yes' : 'No'} → <b>${x.c.fermPlan ? 'Yes' : 'No'}</b></span></div><div class="row"><span>Oily fish</span><span>${fitOily(c0) ? 'Yes' : 'No'} → <b>${x.oily ? 'Yes' : 'No'}</b></span></div></div>`;
+  const warn = x.miss.length ? `<div class="callout warn" style="margin-top:8px">${ic('info')}<div>The closest it gets still ends ${esc(joinAnd(x.miss.map(m => FIT_MISS[m])))}. Try untick${x.miss.length > 1 ? 'ing one of those' : 'ing it'}, or letting it use ${!opt.shop ? 'shop-bought' : !opt.box ? 'prepped boxes' : 'more'}.</div></div>` : '';
+  const btns = nCh ? `<div class="btnrow" style="margin-top:10px"><button class="btn primary" data-a="fitgo">${ic('check')}Swap ${nCh === 1 ? 'this one' : `these ${nCh}`}</button>${res.combos.length > 1 ? `<button class="btn" data-a="fitnext">Show another</button>` : ''}</div>`
+    : `<p class="small muted" style="margin-top:8px">Your day already fits these ticks.</p>${res.combos.length > 1 ? `<div class="btnrow"><button class="btn" data-a="fitnext">Show another</button></div>` : ''}`;
+  return `${head}${ticks}<div class="fitres">${rows}</div>${warn}${tot}${btns}<p class="small muted" style="margin:8px 0 0">Changes today only. Anything you've eaten stays put.</p>`;
+}
+// the Today bar: shows what's off as planned, from the default ticks
+function fitBar(k, c) {
+  if (k !== todayKey() || !c.hasPlan) return '';
+  const opt = fitOpt(); if (!fitSlots(k, c, opt).length) return '';
+  const j = fitJudge(c, opt, dayGoals(k), 0);
+  // a day that already fits gets a quiet link, not another card
+  if (!j.miss.length) return `<div class="fitlink"><button class="btn link" data-a="fitopen" data-k="${k}">${ic('wand')}Fit my day</button></div>`;
+  return `<section class="mkbar fitbar"><div><b>As planned, today ends ${esc(joinAnd(j.miss.map(m => FIT_MISS[m])))}</b><small>Swap the meals still to come so the day fits what you tick.</small></div>
+    <div class="btnrow"><button class="btn sm" data-a="fitopen" data-k="${k}">${ic('wand')}Fit my day</button></div></section>`;
+}
+function fitApply() {
+  const k = SH.k, res = fitGet(), x = res.combos[Math.min(SH.i || 0, res.combos.length - 1)]; if (!x) return;
+  const tk = todayKey(); if (k !== tk) return;
+  const changed = [];
+  res.slots.forEach(s => {
+    const now = x.pick[s], was = res.cur[s]; if (!now || now === was) return;
+    const o0 = res.c0.slots[s];
+    // a box already cooked goes to leftovers rather than the bin
+    if (o0.kind === 'recipe' && o0.prepped) { const bc = batchContext(k, s); if (bc && bc.se.date <= tk) { S.spare = S.spare || []; S.spare.push({ id: 'sp' + Date.now().toString(36) + s, r: o0.r.id, m: +o0.m.toFixed(3), sw: Object.assign({}, o0.r.swapped || {}), made: bc.se.date, s, n: 1 }); } }
+    setSlot(k, s, now); changed.push(`${SLOTNAME[s]}: ${R[now].n}`);
+  });
+  save(); closeSheet(); render(); toast(changed.length ? changed.join(' · ') : 'Nothing to change');
+}
+/* the meal picker: home-made (as before), shop-bought by shop and ranked by fit, or multi-pot */
+function pickSrc(s) {
+  const has = { shop: RL.some(r => r.sw && r.shop && r.slots.includes(s)), mp: RL.some(r => r.mp && r.slots.includes(s)) };
+  if (!has.shop && !has.mp) return '';
+  const src = SH.src || 'home', b = (v, l) => `<button class="chip" data-a="pksrc" data-v="${v}" aria-pressed="${src === v}">${l}</button>`;
+  const stores = src === 'shop' && s !== 's' ? `<div class="chips" style="margin-top:6px">${[['', 'All shops'], ...STORE_ORDER.map(x => [x, STORE_N[x]]), ['deal', 'Meal deals']].map(([v, l]) => `<button class="chip" data-a="pkstore" data-v="${v}" aria-pressed="${(SH.store || '') === v}">${esc(l)}</button>`).join('')}</div>` : '';
+  return `<div class="chips pksrc" style="margin-top:10px">${b('home', 'Home-made')}${has.shop ? b('shop', 'Shop-bought') : ''}${has.mp ? b('mp', 'Multi-pot') : ''}</div>${stores}`;
+}
+const pickSrcOk = r => { const src = SH.src || 'home'; if (src === 'mp') return r.mp; if (src === 'shop') return r.shop && (!SH.store || (SH.store === 'deal' ? r.tags.includes('deal') : r.st === SH.store)); return !r.sw; };
+// how well a shop-bought pick fits the rest of the day, for the order and the tags
+function shopFit(r, G) {
+  const x = { k: r.k, p: r.p, f: r.f, sf: r.sf, fs: r.fs, na: r.na }, wins = [], warn = [];
+  let sc = 2 * Math.min(1, x.p / Math.max(10, G.prot)) + (G.fibre > 1 ? 2 * Math.min(1, x.f / G.fibre) : x.f / 10) - Math.abs(x.k - Math.max(150, G.kc)) / 300;
+  if (x.sf > G.sf) { sc -= (x.sf - G.sf) / 3; warn.push(`Sat fat ${fmtN(x.sf)}g`); } else if (x.sf <= 2) wins.push('Low sat fat');
+  if (x.na > G.na) { sc -= (x.na - G.na) / 0.3; warn.push(`Salt ${(x.na * 2.5).toFixed(1)}g`); }
+  if (x.fs > G.fs) { sc -= (x.fs - G.fs) / 6; warn.push(`Sugar ${fmtN(x.fs)}g`); }
+  if (!G.ferm && isFerm(r, 1)) { sc += 1; wins.push('Fermented'); }
+  if (r.oily) { sc += 0.6; wins.push('Oily fish'); }
+  if (x.p >= 25) wins.push(`${fmtN(x.p)}g protein`);
+  if (x.f >= 7) wins.push(`${fmtN(x.f)}g fibre`);
+  return { sc, wins, warn };
+}
+/* multi-pot meals: which pot is on when, from the recipe's own timings */
+function potLine(r) {
+  const P = (r.pots || '').split(';').map(x => { const m = x.trim().match(/^(.+?)\s+(\d+)-(\d+)$/); return m ? { n: m[1], a: +m[2], b: +m[3] } : null; }).filter(Boolean);
+  if (!P.length) return '';
+  const end = Math.max(...P.map(p => p.b), 1);
+  return `<section class="potl" aria-label="How the pots overlap"><span class="eyebrow">How the pots overlap</span>${P.map(p => `<div class="potr"><span>${esc(p.n)}</span><div class="potb"><i style="left:${(p.a / end) * 100}%;width:${Math.max(3, ((p.b - p.a) / end) * 100)}%"></i></div></div>`).join('')}<div class="potr"><span></span><div class="potax"><span>0</span><span>${Math.round(end / 2)}</span><span>${end} min</span></div></div></section>`;
+}
+Object.assign(ACT, {
+  fitopen(d) { openSheet({ type: 'fit', k: d.k || todayKey() }); },
+  fitopt(d, el) { UI.fit = Object.assign({}, UI.fit || {}, { [d.v]: !fitOpt()[d.v] }); if (SH) { SH.i = 0; renderSheet(); } },
+  fitnext() { if (!SH || SH.type !== 'fit' || !SH.res) return; SH.i = ((SH.i || 0) + 1) % Math.max(1, SH.res.combos.length); renderSheet(); },
+  fitgo() { if (!SH || SH.type !== 'fit') return; fitApply(); },
+  pksrc(d) { if (!SH) return; SH.src = d.v === 'home' ? null : d.v; if (d.v !== 'shop') SH.store = null; renderSheet(); },
+  pkstore(d) { if (!SH) return; SH.store = d.v || null; renderSheet(); }
 });
 
 const TABS = [['today', 'Today', 'today'], ['week', 'Week', 'week'], ['out', 'Out', 'glass'], ['prep', 'Prep', 'prep'], ['shop', 'Shop', 'shop']];

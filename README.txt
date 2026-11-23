@@ -1,4 +1,4 @@
-THIRTY PLANTS 3.29.0: putting it on your Android phone
+THIRTY PLANTS 3.30.1: putting it on your Android phone
 
 The app has to be opened from a web address (not as a file) for Chrome to install it.
 Free route with GitHub Pages:
@@ -25,3 +25,11 @@ Dumbbells and bodyweight (3.29): the Train tab has a kit picker for each week (V
 Bodyweight), and each session can have its own. The sets for every muscle stay the same; only the exercises
 change. Dumbbells are logged per dumbbell and go up in 2 kg steps to 24 kg, after which the reps get harder
 instead (slower lowering, a pause, 1½ reps, then a harder exercise). Bodyweight uses the pull-up bar and benches.
+
+Fit my day, shop-bought and multi-pot (3.30): Today has a Fit my day button for the meals still to come. Shop-bought
+lunches and dinners (Sainsbury's, Waitrose, M&S, Caffè Nero, Pret, plus meal deals) and 20 multi-pot dinners are in
+the meal picker under their own buttons. They're only ever swapped in by you; the planner never picks them. Shop figures
+are from each shop's product page in November 2026, so check the pack if a recipe has changed.
+
+Drinks in the wrap-up (3.30.1): the Meals step shows a night's drink calories next to what was drunk, and units
+entered in the Alcohol step now count as calories the same way the morning check-in's units do.
