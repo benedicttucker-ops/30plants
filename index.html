@@ -1581,6 +1581,9 @@ button.flag[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--accent) inset; }
 .pcread small { color: var(--muted); font-size: 13px; }
 .pclist { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 2px; font-size: 13.5px; }
 .pclist li { display: flex; justify-content: space-between; gap: 10px; }
+.pcshop { margin-top: 10px; font-weight: 600; }
+.uxrow { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.uxrow > span { display: grid; gap: 2px; }
 .pclist li span:last-child { color: var(--muted); white-space: nowrap; }
 
 /* 3.16 motion: drawings sit still, then do their own small move every few seconds; screens slide in from the side you picked */
@@ -2203,7 +2206,7 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.30.1';</script>
+<script>window.TP_VERSION = '3.31.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -4012,7 +4015,7 @@ const LOSALT_NA = 13.3; // g sodium per 100g LoSalt (ordinary salt is about 39)
 const TSP_SALT = 6;      // grams in a level teaspoon
 const OILY = new Set(['salmon', 'mackerel', 'smokedmack', 'sardines', 'trout', 'sb_salmoncc', 'sb_misosalmon', 'ms_sriracha', 'ms_hssalmon', 'wt_salmoncc']); // the shop ones carry about 40–50g of salmon
 const BLUEFISH = new Set(['mackerel', 'smokedmack', 'sardines']);
-const RED = new Set(['beefmince', 'steak', 'porkmince']);
+const RED = new Set(['beefmince', 'steak', 'porkmince', 'sb_chbacon']); // 3.30.2: the shop sandwich's bacon counts too
 const ANIMAL = new Set(['chicken', 'thigh', 'turkeymince', 'beefmince', 'steak', 'porkmince', 'salmon', 'mackerel', 'smokedmack', 'sardines', 'trout', 'bream', 'cod', 'prawns', 'tuna', 'pret_chavo', 'pret_avobowl', 'pret_satay', 'pret_shawarma', 'pret_chipotle', 'sb_hpchick', 'sb_chswc', 'sb_tunaswc', 'sb_chbacon', 'sb_salmoncc', 'sb_misosalmon', 'ms_chavo', 'ms_chsalad', 'ms_pestopasta', 'ms_sriracha', 'ms_romesco', 'ms_hssalmon', 'wt_chsalad', 'wt_chavo', 'wt_salmoncc', 'nero_protroll', 'nero_tuna', 'nero_pesto', 'nero_tunamelt']);
 const R = {}, RL = [];
 function isFerm(r, m) { return r.items.some(it => { const g = ING[it.i]; return g.fe && it.g * m >= g.fe * 0.9; }); }
@@ -4422,9 +4425,60 @@ function cleanMyr(m) {
   return out;
 }
 function regMine(m) { Object.entries(m).forEach(([id, e]) => { if (R[id]) return; try { const r = mineRecipe(id, e); R[id] = r; RL.push(r); } catch (err) { /* left out rather than break the app */ } }); }
+/* 3.31: shop items saved from Claude's codes. Each is one pack from a shop, kept in S.shopx and registered as a
+   swap-only shop-bought option (meal picker, Fit my day), never planned on its own. A change of figures saves a new
+   version and retires the old one, so days that already had it keep what they had. */
+const SHOPX_ST = { sains: "Sainsbury's", waitrose: 'Waitrose', ms: 'M&S', tesco: 'Tesco', coop: 'Co-op', nero: 'Caffè Nero', pret: 'Pret' };
+const SHOPX_BAR = { meal: { sf: 5, sa: 1.5, fs: 5, p: 20 }, snack: { sf: 3, sa: 0.5, fs: 5 } };
+const SHOPX_F = ['k', 'p', 'f', 'sa', 'fs', 'sf'];
+const shopxKey = (st, n) => `${st}|${String(n).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()}`;
+const shopxKind = sl => (sl === 's' ? 'snack' : 'meal');
+function shopxHash(s) { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0; return h.toString(36); }
+// a pack against the bar for its kind; null when it passes, otherwise why not
+function shopxWhy(e) {
+  const kind = shopxKind(e.sl), bar = SHOPX_BAR[kind], out = [];
+  if (e.fs === undefined || e.sf === undefined || e.sa === undefined) return 'the code is missing sat fat, salt or added sugar';
+  if (e.sf > bar.sf) out.push(`${fmtN(e.sf)}g sat fat a pack (${bar.sf}g at most for a ${kind})`);
+  if (e.sa > bar.sa) out.push(`${(+e.sa).toFixed(1)}g salt a pack (${bar.sa}g at most)`);
+  if (e.fs > bar.fs) out.push(`${fmtN(e.fs)}g added sugar a pack (${bar.fs}g at most)`);
+  if (bar.p && e.p < bar.p) out.push(`${fmtN(e.p)}g protein a pack (${bar.p}g at least for a meal)`);
+  return out.length ? out.join('; ') : null;
+}
+function cleanShopx(m) {
+  const out = {}; if (!isObj(m)) return out;
+  Object.keys(m).forEach(id => {
+    const e = m[id]; if (!/^ux_[a-z0-9]+$/.test(id) || !isObj(e) || !SHOPX_ST[e.st] || typeof e.n !== 'string' || !e.n.trim()) return;
+    if (!['ld', 'l', 'd', 's'].includes(e.sl) || !(+e.g > 0 && +e.g <= 3000)) return;
+    if (!SHOPX_F.every(f => Number.isFinite(+e[f]) && +e[f] >= 0)) return;
+    const x = { key: shopxKey(e.st, e.n), st: e.st, n: e.n.trim().slice(0, 60), sl: e.sl, g: +e.g, pl: Array.isArray(e.pl) ? e.pl.filter(q => PLANTS[q]) : [], at: DAY_KEY.test(e.at || '') ? e.at : todayKey() };
+    SHOPX_F.forEach(f => { x[f] = +e[f]; });
+    ['fe', 'rm', 'oi', 'an', 'off'].forEach(f => { if (e[f]) x[f] = true; });
+    out[id] = x;
+  });
+  return out;
+}
+const shopxName = e => (e.n.toLowerCase().startsWith(SHOPX_ST[e.st].toLowerCase()) ? e.n : `${SHOPX_ST[e.st]} ${e.n}`);
+function regShopx(m) {
+  Object.entries(m).forEach(([id, e]) => {
+    const rid = `sh_${id}`; if (R[rid]) return;
+    try {
+      const per = f => e[f] * 100 / e.g;
+      ING[id] = { id, n: `${SHOPX_ST[e.st]}: ${e.n}, ${Math.round(e.g)}g pack`, k: per('k'), p: per('p'), f: per('f'), a: 'grab', pl: e.pl.slice(), u: 'pack', uw: e.g, sb: `${SHOPX_ST[e.st]}: ${e.n}`, sa: per('sa'), fs: per('fs'), sf: per('sf'), ux: true };
+      if (e.fe) ING[id].fe = e.g;
+      try { ING_BASE[id] = { n: ING[id].n }; NUTF.forEach(f => { ING_BASE[id][f] = ING[id][f]; }); } catch (err) { /* first load: the figures are copied when ING_BASE is made */ }
+      if (e.oi) OILY.add(id); if (e.rm) RED.add(id); if (e.an || e.rm || e.oi) ANIMAL.add(id);
+      GRAB_WHERE[id] = SHOPX_ST[e.st];
+      const r = finish({ id: rid, n: shopxName(e), slots: e.sl.split(''), c: 'Shop-bought', t: 0, tags: ['quick'], fr: 0, fz: false, prep: false, treat: false, shop: true, sw: true, st: e.st, mp: false, pots: '', note: '', mk: 0, items: [{ i: id, g: e.g }], steps: [`Pick up the ${e.n} at ${SHOPX_ST[e.st]}.`] });
+      r.ux = id; R[rid] = r; RL.push(r);
+    } catch (err) { /* left out rather than break the app */ }
+  });
+}
+// a saved shop item counts as an option only while it's still in your list
+const uxLive = r => !r.ux || !!(S.shopx && S.shopx[r.ux] && !S.shopx[r.ux].off);
 function normalise(s) {
   if (!isObj(s) || s.v !== 1) s = { v: 1, set: {}, days: {}, weeks: {}, favs: {} };
   s.myr = cleanMyr(s.myr); regMine(s.myr);
+  s.shopx = cleanShopx(s.shopx); regShopx(s.shopx);
   s.ramt = isObj(s.ramt) ? s.ramt : {}; // how much of an ingredient, every time you have a recipe: { rid: { ing: { f, from } } }
   Object.keys(s.ramt).forEach(rid => { const m = s.ramt[rid]; if (!isObj(m) || !R[rid]) { delete s.ramt[rid]; return; }
     Object.keys(m).forEach(id => { const x = m[id]; if (!ING[id] || !isObj(x) || !DAY_KEY.test(x.from || '') || !(+x.f >= 0.25 && +x.f <= 4)) delete m[id]; else x.f = +x.f; });
@@ -7719,7 +7773,7 @@ function tagMatch(r, t) {
 const textMatch = (r, q) => !q || r.n.toLowerCase().includes(q) || r.c.toLowerCase().includes(q) || r.items.some(it => ING[it.i].n.toLowerCase().includes(q));
 function rListHtml() {
   const q = UI.rq.trim().toLowerCase();
-  const list = RL.filter(r => (UI.rslot === 'all' || r.slots.includes(UI.rslot)) && tagMatch(r, UI.rtag) && textMatch(r, q) && (!UI.rplant || r.plants.includes(UI.rplant)));
+  const list = RL.filter(r => uxLive(r) && (UI.rslot === 'all' || r.slots.includes(UI.rslot)) && tagMatch(r, UI.rtag) && textMatch(r, q) && (!UI.rplant || r.plants.includes(UI.rplant)));
   return `<p class="small muted" style="margin:10px 0 0">${list.length} recipe${list.length === 1 ? '' : 's'}</p><div class="rgrid">${list.map(r => `<button class="rtile" data-a="open" data-r="${r.id}"><span class="rart">${art(r, 76)}</span><span class="nm">${esc(r.n)}</span><span class="mt">${fmtN(r.k)} kcal · ${fmtN(r.p)}g${r.oily ? ic('fish') : ''}${r.fermBase ? ic('jar') : ''}${S.favs[r.id] ? `<span class="lk">${ic('thup')}</span>` : S.nope[r.id] ? `<span class="nk">${ic('thdown')}</span>` : ''}</span></button>`).join('') || '<div class="empty">No recipes match.</div>'}</div>`;
 }
 function vRecipes() {
@@ -8507,6 +8561,13 @@ function budFit(changed) {
   free.forEach((s, i) => { $(BUD_IDS[s]).value = r[i]; });
   budNote();
 }
+function uxSettings() {
+  const live = Object.entries(S.shopx || {}).filter(([, e]) => !e.off).sort((a, b) => (a[1].st + a[1].n < b[1].st + b[1].n ? -1 : 1));
+  if (!live.length) return '';
+  const SLW = { ld: 'lunch or dinner', l: 'lunch', d: 'dinner', s: 'snack' };
+  return `<section><h4>Your shop items</h4><p class="small muted" style="margin:0 0 4px">Saved from Claude's codes. They're under Shop-bought in the meal picker and in Fit my day. Removing one keeps it on any day it's already planned.</p>
+    <div class="uxlist">${live.map(([id, e]) => `<div class="uxrow"><span><b>${esc(e.n)}</b><small class="muted">${esc(SHOPX_ST[e.st])} · ${SLW[e.sl]} · ${fmtN(e.k)} kcal · ${fmtN(e.p)}g protein · ${fmtN(e.sf)}g sat fat</small></span><button class="btn sm ghost" data-a="uxoff" data-v="${id}">Remove</button></div>`).join('')}</div></section>`;
+}
 function shSettings() {
   SH.title = 'Settings';
   const st = S.set, b = st.bud;
@@ -8537,7 +8598,7 @@ function shSettings() {
     <label class="check"><input type="checkbox" id="s-psn" ${st.prepSnacks ? 'checked' : ''}> Pack homemade workday snacks in the batch</label>
     <label class="check"><input type="checkbox" id="s-adapt" ${st.adapt ? 'checked' : ''}> Adapt portions through the day</label></section>
   <button class="btn primary" style="width:100%;margin-top:14px" data-a="setsave">Save settings</button>
-  <hr class="rule">
+  <hr class="rule">${uxSettings()}
   <details class="more help"><summary>Put it on your Android home screen${ic('chev')}</summary><ol><li>Open this app's web address in Chrome on your phone.</li><li>Tap ⋮, then <b>Add to Home screen</b> (or <b>Install app</b>).</li><li>It opens full screen with its own icon and works offline.</li></ol></details>
   <section><h4>Backup</h4><p class="small muted" style="margin:0 0 8px">Everything lives on this device, in Chrome. Back up once a week: <b>Back up now</b> opens the share menu, so you can save the file to Google Drive or email it to yourself. To restore, use Import and pick that file.</p><p class="bkline ${bkDue() ? 'due' : ''}">${ic(bkDue() ? 'warn' : 'check')}${esc(bkLine())}</p><div class="btnrow"><button class="btn sm primary" data-a="bkshare">Back up now</button><button class="btn sm" data-a="backup" data-v="export">Export</button><button class="btn sm" data-a="backup" data-v="import">Import</button><button class="btn sm" data-a="backup" data-v="hist">Add history</button></div></section>
   <section><h4>Start again</h4><button class="btn sm danger" data-a="resetall">Clear all data</button></section>`;
@@ -11714,6 +11775,53 @@ function pcPlant(x) {
   return ids.find(id => PLANTS[id][0].toLowerCase() === q) || ids.find(id => bare(PLANTS[id][0]) === bare(q))
     || ids.filter(id => plantHit(id, q)).sort((a, b) => PLANTS[a][0].length - PLANTS[b][0].length)[0] || null;
 }
+// an item's shop tag: which shop, the product, the meals it suits, the pack and how much of it the item is
+function pcSh(x, num) {
+  if (!isObj(x)) return null;
+  const st = String(x.st || '').toLowerCase(), n = String(x.n || '').trim().slice(0, 60); if (!SHOPX_ST[st] || !n) return null;
+  let sl = [...new Set(String(x.sl || '').split(''))].filter(c => 'lds'.includes(c)); if (sl.length > 1) sl = sl.filter(c => c !== 's');
+  if (!sl.length) return null;
+  const q = num(x.q, 10); return { st, n, sl: sl.join('') === 'dl' ? 'ld' : sl.join(''), g: num(x.g, 3000), q: q >= 0.1 ? q : 1, an: !!x.an };
+}
+// what saving item i would do: a pack, why it can't be saved, or that it's already there
+function pcShopPlan(it) {
+  const sh = it.sh; if (!sh) return null;
+  const e = { st: sh.st, n: sh.n, sl: sh.sl, g: sh.g || (+it.g > 0 ? it.g / sh.q : 0), pl: it.pl.slice() };
+  SHOPX_F.forEach(f => { if (it[f] !== undefined) e[f] = +(it[f] / sh.q).toFixed(2); });
+  ['fe', 'rm', 'oi'].forEach(f => { if (it[f]) e[f] = true; }); if (sh.an) e.an = true;
+  if (!(e.g > 0)) return { e, why: 'the code has no pack size' };
+  const why = shopxWhy(e); if (why) return { e, why };
+  const key = shopxKey(e.st, e.n), same = Object.entries(S.shopx || {}).filter(([, x]) => x.key === key);
+  const eq = same.find(([, x]) => SHOPX_F.every(f => Math.abs(x[f] - e[f]) < (f === 'k' ? 1 : 0.05)) && x.g === e.g && x.sl === e.sl);
+  return { e, key, same, eq };
+}
+function pcShopBox(pc) {
+  const rows = pc.items.map((it, i) => {
+    const P = pcShopPlan(it); if (!P) return '';
+    const shop = SHOPX_ST[P.e.st], nm = pc.items.length > 1 ? ` <span class="small muted">${esc(P.e.n)}</span>` : '';
+    if (P.why) return `<p class="small muted" style="margin:6px 0 0">Not saved as a shop-bought option${pc.items.length > 1 ? ` (${esc(P.e.n)})` : ''}: ${esc(P.why)}.</p>`;
+    if (P.eq && !P.eq[1].off) return `<p class="small muted" style="margin:6px 0 0">${pc.items.length > 1 ? `${esc(P.e.n)}: a` : 'A'}lready in your ${esc(shop)} shop-bought options.</p>`;
+    const upd = P.same.some(([, x]) => !x.off) && !P.eq;
+    return `<label class="check pcshop"><input type="checkbox" data-a="pcshop" data-v="${i}" ${SH.pcShop && SH.pcShop[i] === false ? '' : 'checked'}><span>${upd ? 'Update' : 'Save as'} a shop-bought option · ${esc(shop)}${nm}${upd ? ' <span class="small muted">new figures</span>' : ''}</span></label>`;
+  }).join('');
+  return rows ? `<div class="pcshops">${rows}</div>` : '';
+}
+// saves the ticked ones; returns what to say
+function pcShopSave() {
+  if (!SH || !SH.pc) return '';
+  S.shopx = S.shopx || {}; const said = [];
+  SH.pc.items.forEach((it, i) => {
+    if (SH.pcShop && SH.pcShop[i] === false) return;
+    const P = pcShopPlan(it); if (!P || P.why) return;
+    const shop = SHOPX_ST[P.e.st];
+    if (P.eq) { if (P.eq[1].off) { delete P.eq[1].off; said.push(`${P.e.n} is back in your ${shop} options`); } return; }
+    const live = P.same.filter(([, x]) => !x.off); live.forEach(([, x]) => { x.off = true; });
+    let id = `ux_${shopxHash(P.key)}`; for (let v = 2; S.shopx[id]; v++) id = `ux_${shopxHash(P.key)}v${v}`;
+    S.shopx[id] = Object.assign(P.e, { key: P.key, at: todayKey() }); regShopx({ [id]: S.shopx[id] });
+    said.push(live.length ? `Updated ${P.e.n} in your ${shop} options` : `Saved ${P.e.n} to your ${shop} options`);
+  });
+  return said.join(' · ');
+}
 function pcDecode(txt) {
   const t = String(txt || '').trim(); let o = null;
   const m = PC_RE.exec(t.replace(/\s+/g, ''));
@@ -11727,7 +11835,8 @@ function pcDecode(txt) {
   o.items.slice(0, 12).forEach(it => {
     if (!isObj(it)) return;
     const pl = []; (Array.isArray(it.pl) ? it.pl : []).forEach(x => { const id = pcPlant(x); if (id) { if (!pl.includes(id)) pl.push(id); } else miss.push(String(x)); });
-    items.push({ n: String(it.n || 'Something').slice(0, 80), k: num(it.k, 5000) || 0, p: num(it.p, 400) || 0, f: num(it.f, 150), sa: num(it.sa, 40), fs: num(it.fs, 300), sf: num(it.sf, 200), g: num(it.g, 5000) || undefined, pl, fe: !!it.fe, rm: !!it.rm, oi: !!it.oi });
+    const sh = pcSh(it.sh, num);
+    items.push({ ...(sh ? { sh } : {}), n: String(it.n || 'Something').slice(0, 80), k: num(it.k, 5000) || 0, p: num(it.p, 400) || 0, f: num(it.f, 150), sa: num(it.sa, 40), fs: num(it.fs, 300), sf: num(it.sf, 200), g: num(it.g, 5000) || undefined, pl, fe: !!it.fe, rm: !!it.rm, oi: !!it.oi });
   });
   if (!items.length) return { err: "That code didn't have any food in it." };
   const d = DAY_KEY.test(o.d || '') && o.d <= todayKey() ? o.d : null, s = SLOTS.includes(o.s) ? o.s : null;
@@ -11752,7 +11861,7 @@ function pcBox() {
   return `${head}<div class="pcread"><b>${esc(one.n)}</b><small>${pc.items.length > 1 ? `${pc.items.length} items · ` : ''}${fmtN(one.k)} kcal · ${fmtN(one.p)}g protein${one.pl.length ? ` · ${one.pl.length} plant${one.pl.length === 1 ? '' : 's'}` : ''}${one.fe ? ' · fermented' : ''}${mfTags(one)} · for ${fmtDay(dk)}</small>
     ${pc.items.length > 1 ? `<ul class="pclist">${pc.items.map(x => `<li><span>${esc(x.n)}</span><span>${fmtN(x.k)} kcal · ${fmtN(x.p)}g</span></li>`).join('')}</ul>` : ''}
     ${pc.miss.length ? `<p class="small muted" style="margin:4px 0 0">Not matched to a plant in the app: ${esc(pc.miss.join(', '))}. Add them below if they count.</p>` : ''}
-    <p class="small muted" style="margin:4px 0 0">Filled in below: check the figures, scale them if the portion was different, then say where it goes.</p></div></section>`;
+    <p class="small muted" style="margin:4px 0 0">Filled in below: check the figures, scale them if the portion was different, then say where it goes.</p>${pcShopBox(pc)}</div></section>`;
 }
 // where it goes: asked each time when a meal is still planned that day
 function pcWhere() {
@@ -11767,24 +11876,32 @@ function pcApply(raw) {
   const r = pcDecode(raw); if (!r) return false;
   if (r.err) { SH.pc = null; SH.pcErr = r.err; renderSheet(); return true; }
   const one = pcOne(r);
-  SH.pc = r; SH.pcErr = null; SH.pcWhere = null; if (r.d) SH.dk = r.d;
+  SH.pc = r; SH.pcErr = null; SH.pcWhere = null; SH.pcShop = {}; if (r.d) SH.dk = r.d;
   Object.assign(SH, { n: one.n, k: one.k, p: one.p, sa: one.sa, fs: one.fs, sf: one.sf, f: one.f, g: one.g || '', pl: one.pl.slice(), fe: one.fe, rm: one.rm, oi: one.oi, lk: null, lq: '', off: null, xk0: 0 });
   renderSheet(); XK0 = one.k || null; toast(r.items.length > 1 ? `Read ${r.items.length} items from the code` : 'Read the code');
   return true;
 }
 Object.assign(ACT, {
   pcwhere(d) { SH.pcWhere = d.v; keepAddFields(); renderSheet(); },
+  pcshop(d) { if (!SH || !SH.pc) return; SH.pcShop = SH.pcShop || {}; SH.pcShop[d.v] = SH.pcShop[d.v] === false; keepAddFields(); renderSheet(); },
+  uxoff(d, el) {
+    const e = S.shopx && S.shopx[d.v]; if (!e) return;
+    e.off = true; save(); const row = el && el.closest('.uxrow'); if (row) row.remove();
+    const box = document.querySelector('.uxlist'); if (box && !box.querySelector('.uxrow')) box.innerHTML = '<p class="small muted" style="margin:0">None left.</p>';
+    toast(`Removed ${e.n}`);
+  },
   pcsave() {
     keepAddFields(); if (!SH.pc) return ACT.xsave();
     const dk = SH.dk || UI.day, sl = pcSlots(dk);
     if (sl.length && !SH.pcWhere) { toast('Say where it goes first'); const el = document.querySelector('.pcwhere'); if (el) el.scrollIntoView({ block: 'center' }); return; }
-    if (!SH.pcWhere || SH.pcWhere === 'x') return ACT.xsave();
+    const shopMsg = pcShopSave();
+    if (!SH.pcWhere || SH.pcWhere === 'x') { ACT.xsave(); if (shopMsg) toast(shopMsg, 3200); return; }
     const s = SH.pcWhere, day = D(dk), was = R[day.sl[s]] ? R[day.sl[s]].n : day.cu[s] ? day.cu[s].n : '';
     const e = Object.assign({ n: SH.n || 'Something else', k: +SH.k || 0, p: +SH.p || 0, at: todayKey() }, labelOut(SH));
     if (SH.pl.length) e.pl = SH.pl.slice(); if (SH.fe) e.fe = true; Object.assign(e, mfOut(SH)); if (+SH.g > 0 && +SH.g < 10000) e.g = Math.round(+SH.g * 10) / 10;
     setSlot(dk, s, '@c'); day.cu[s] = e; day.done[s] = { c: 1 };
     foodPut(S, e, dk); save(); closeSheet(); render();
-    toast(`${SLOTNAME[s]} on ${DOW[dayIndex(dk)]}: ${e.n}${was ? `, instead of ${was}` : ''}`);
+    toast(`${SLOTNAME[s]} on ${DOW[dayIndex(dk)]}: ${e.n}${was ? `, instead of ${was}` : ''}${shopMsg ? ` · ${shopMsg}` : ''}`, shopMsg ? 3200 : undefined);
   }
 });
 // pasting (or typing) a code reads it straight away
@@ -13853,8 +13970,9 @@ Object.assign(ACT, {
 });
 
 /* ───────────── 3.30: Fit my day, shop-bought swaps and multi-pot meals ───────────── */
-const STORE_N = {"sains": "Sainsbury's", "waitrose": "Waitrose", "ms": "M&S", "nero": "Caff\u00e8 Nero", "pret": "Pret"};
+const STORE_N = {"sains": "Sainsbury's", "waitrose": "Waitrose", "ms": "M&S", "nero": "Caff\u00e8 Nero", "pret": "Pret", "tesco": "Tesco", "coop": "Co-op"};
 const STORE_ORDER = ['sains', 'waitrose', 'ms', 'nero', 'pret'];
+const STORE_MORE = ['tesco', 'coop']; // 3.31: shown once a saved item comes from them
 /* Fit my day: today only. Ticks say what has to be true by the end of the day; it swaps the meals still to come
    (never anything eaten, packed or your own entry) and keeps as many as it can. Each option is tried on the real day,
    portions and all, so the totals are what Today would show after the swap. */
@@ -13905,7 +14023,7 @@ function fitJudge(c, opt, dg, changes) {
 }
 function fitCands(k, s, o, opt, base, need) {
   const cur = o.kind === 'recipe' ? o.r.id : null;
-  const list = RL.filter(r => r.slots.includes(s) && !S.nope[r.id] && !r.treat && r.id !== cur &&
+  const list = RL.filter(r => r.slots.includes(s) && !S.nope[r.id] && !r.treat && r.id !== cur && uxLive(r) &&
     (r.shop ? opt.shop : true) && (!r.mp || (opt.mp && s === 'd')) && (r.mp || r.shop || (r.t || 0) <= 45));
   const sc = r => {
     const m = r.shop ? 1 : Math.min(1.8, Math.max(0.5, base / Math.max(1, r.k))), x = { k: r.k * m, p: r.p * m, f: r.f * m, sf: r.sf * m, fs: r.fs * m, na: r.na * m };
@@ -14017,13 +14135,13 @@ function fitApply() {
 }
 /* the meal picker: home-made (as before), shop-bought by shop and ranked by fit, or multi-pot */
 function pickSrc(s) {
-  const has = { shop: RL.some(r => r.sw && r.shop && r.slots.includes(s)), mp: RL.some(r => r.mp && r.slots.includes(s)) };
+  const has = { shop: RL.some(r => r.sw && r.shop && r.slots.includes(s) && uxLive(r)), mp: RL.some(r => r.mp && r.slots.includes(s)) };
   if (!has.shop && !has.mp) return '';
   const src = SH.src || 'home', b = (v, l) => `<button class="chip" data-a="pksrc" data-v="${v}" aria-pressed="${src === v}">${l}</button>`;
-  const stores = src === 'shop' && s !== 's' ? `<div class="chips" style="margin-top:6px">${[['', 'All shops'], ...STORE_ORDER.map(x => [x, STORE_N[x]]), ['deal', 'Meal deals']].map(([v, l]) => `<button class="chip" data-a="pkstore" data-v="${v}" aria-pressed="${(SH.store || '') === v}">${esc(l)}</button>`).join('')}</div>` : '';
+  const stores = src === 'shop' && s !== 's' ? `<div class="chips" style="margin-top:6px">${[['', 'All shops'], ...STORE_ORDER.concat(STORE_MORE.filter(x => RL.some(r => r.ux && r.st === x && r.slots.includes(s) && uxLive(r)))).map(x => [x, STORE_N[x]]), ['deal', 'Meal deals']].map(([v, l]) => `<button class="chip" data-a="pkstore" data-v="${v}" aria-pressed="${(SH.store || '') === v}">${esc(l)}</button>`).join('')}</div>` : '';
   return `<div class="chips pksrc" style="margin-top:10px">${b('home', 'Home-made')}${has.shop ? b('shop', 'Shop-bought') : ''}${has.mp ? b('mp', 'Multi-pot') : ''}</div>${stores}`;
 }
-const pickSrcOk = r => { const src = SH.src || 'home'; if (src === 'mp') return r.mp; if (src === 'shop') return r.shop && (!SH.store || (SH.store === 'deal' ? r.tags.includes('deal') : r.st === SH.store)); return !r.sw; };
+const pickSrcOk = r => { if (!uxLive(r)) return false; const src = SH.src || 'home'; if (src === 'mp') return r.mp; if (src === 'shop') return r.shop && (!SH.store || (SH.store === 'deal' ? r.tags.includes('deal') : r.st === SH.store)); return !r.sw; };
 // how well a shop-bought pick fits the rest of the day, for the order and the tags
 function shopFit(r, G) {
   const x = { k: r.k, p: r.p, f: r.f, sf: r.sf, fs: r.fs, na: r.na }, wins = [], warn = [];
