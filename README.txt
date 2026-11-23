@@ -1,4 +1,4 @@
-THIRTY PLANTS 3.31.0: putting it on your Android phone
+THIRTY PLANTS 3.31.1: putting it on your Android phone
 
 The app has to be opened from a web address (not as a file) for Chrome to install it.
 Free route with GitHub Pages:
@@ -37,7 +37,7 @@ entered in the Alcohol step now count as calories the same way the morning check
 Red meat fix (3.30.2): the Sainsbury's Chicken & Bacon sandwich now counts as a red meat meal.
 
 Shop items from Claude's codes (3.31.0): when a code from Claude carries a shop-bought product that passes the bar
-(meals: sat fat 5g or less, salt 1.5g or less, added sugar 5g or less, protein 20g or more, per pack; snacks: sat fat
+(meals: sat fat 5g or less, salt 1.5g or less, added sugar 5g or less, per pack, with no protein floor since 3.31.1; snacks: sat fat
 3g, salt 0.5g, added sugar 5g at most), the paste box offers to save it, ticked. Saved items show under Shop-bought in
 the meal picker (with Tesco and Co-op chips once there's one from them) and in Fit my day, and are never planned on
 their own. Settings > Your shop items lists them, with Remove. The same product with new figures replaces the old one;

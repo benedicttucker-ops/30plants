@@ -2206,7 +2206,7 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.31.0';</script>
+<script>window.TP_VERSION = '3.31.1';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -4429,7 +4429,8 @@ function regMine(m) { Object.entries(m).forEach(([id, e]) => { if (R[id]) return
    swap-only shop-bought option (meal picker, Fit my day), never planned on its own. A change of figures saves a new
    version and retires the old one, so days that already had it keep what they had. */
 const SHOPX_ST = { sains: "Sainsbury's", waitrose: 'Waitrose', ms: 'M&S', tesco: 'Tesco', coop: 'Co-op', nero: 'Caffè Nero', pret: 'Pret' };
-const SHOPX_BAR = { meal: { sf: 5, sa: 1.5, fs: 5, p: 20 }, snack: { sf: 3, sa: 0.5, fs: 5 } };
+const SHOPX_BAR = { meal: { sf: 5, sa: 1.5, fs: 5 }, // 3.31.1: no protein floor; Fit my day still ranks by it
+  snack: { sf: 3, sa: 0.5, fs: 5 } };
 const SHOPX_F = ['k', 'p', 'f', 'sa', 'fs', 'sf'];
 const shopxKey = (st, n) => `${st}|${String(n).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()}`;
 const shopxKind = sl => (sl === 's' ? 'snack' : 'meal');
