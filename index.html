@@ -2160,6 +2160,20 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 .chips.ladrow { margin: 6px 0 2px; gap: 6px; }
 .chips.ladrow .chip { font-size: 12px; padding: 4px 9px; }
 .wchead.tvkit { margin: 6px 0 2px 60px; }
+/* 3.32: items in a logged food, maintenance tiles, bodyweight ranges */
+.itsl { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.itsr { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-top: 1px solid var(--line); }
+.itsr:first-child { border-top: 0; }
+.itsr .n { flex: 1; min-width: 0; font-size: 14px; font-weight: 700; }
+.itsr .n small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+.itsr .itsg { width: 74px; min-height: 40px; text-align: right; }
+.itsr .u { font-size: 13px; color: var(--muted); min-width: 14px; }
+.mtiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 6px; }
+.mtiles > div { background: var(--surface-2); border-radius: 12px; padding: 8px 10px; }
+.mtiles b { display: block; font-size: 18px; }
+.mtiles span { font-size: 12px; color: var(--muted); }
+ul.bwr { margin: 0 0 10px; padding-left: 18px; font-size: 14px; }
+ul.bwr li { margin: 2px 0; }
 /* 3.30: Fit my day, shop swaps, multi-pot */
 .fitgrp { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 10px; row-gap: 2px; margin: 0 0 10px; }
 .fitgrp .eyebrow { grid-column: 1 / -1; }
@@ -2206,7 +2220,7 @@ button.samt.tap svg { width: 13px; height: 13px; margin-right: 3px; vertical-ali
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.31.1';</script>
+<script>window.TP_VERSION = '3.32.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -4370,7 +4384,54 @@ const isObj = x => !!x && typeof x === 'object' && !Array.isArray(x);
 const WPD_HIST = '2025-11-17|04222242222-24242422622224-22242-4242444-266444442624424422444624442262242642424222824222044424244222062446226446624244426422624224262-2442462222064-26-44226446242222242224422-64082842428464222624442404464444628464646343543272260422424246424444646244444234426242424212242244424444222002----2-2244-4-2a2224444422422642424444224222';
 const DAY_KEY = /^\d{4}-\d{2}-\d{2}$/;
 // an amount logged with a food: grams (or ml), kept so it comes back the same next time
-function amtOk(x) { if (x.g !== undefined && !(+x.g > 0 && +x.g < 10000)) delete x.g; else if (x.g !== undefined) x.g = Math.round(+x.g * 10) / 10; if (x.u !== undefined && x.u !== 'ml') delete x.u; if (x.g === undefined) delete x.u; }
+function amtOk(x) { if (x.g !== undefined && !(+x.g > 0 && +x.g < 10000)) delete x.g; else if (x.g !== undefined) x.g = Math.round(+x.g * 10) / 10; if (x.u !== undefined && x.u !== 'ml') delete x.u; if (x.g === undefined) delete x.u; itsOk(x); }
+/* 3.32: a food logged from a code with several items keeps each item (its) with its own grams, so the breakdown and the
+   weights stay on the logged food and on the saved one. An item whose grams have been changed keeps w, the figures at the
+   weight it was first given, so it can be rescaled any number of times (even back from 0). */
+const ITS_NUM = [['k', 1], ['p', 1], ['f', 1], ['sa', 2], ['fs', 1], ['sf', 1]];
+function itsItem(o) {
+  if (!isObj(o) || typeof o.n !== 'string' || !o.n.trim() || !Number.isFinite(+o.k)) return null;
+  const x = { n: o.n.trim(), k: +o.k };
+  ITS_NUM.forEach(([f]) => { if (f !== 'k' && o[f] !== undefined && o[f] !== null && Number.isFinite(+o[f])) x[f] = +o[f]; });
+  if (o.g !== undefined && Number.isFinite(+o.g) && +o.g >= 0 && +o.g < 10000) x.g = Math.round(+o.g * 10) / 10;
+  if (Array.isArray(o.pl) && o.pl.length) x.pl = o.pl.filter(q => PLANTS[q]);
+  ['fe', 'rm', 'oi'].forEach(f => { if (o[f]) x[f] = true; });
+  if (isObj(o.w) && +o.w.g > 0) { const w = { g: +o.w.g }; ITS_NUM.forEach(([f]) => { if (Number.isFinite(+o.w[f]) && o.w[f] !== undefined && o.w[f] !== null) w[f] = +o.w[f]; }); x.w = w; }
+  return x;
+}
+const itsClean = its => (Array.isArray(its) ? its.map(itsItem).filter(Boolean) : []);
+function itsOk(x) { if (x.its === undefined) return; const c = itsClean(x.its); if (c.length > 1) x.its = c; else delete x.its; }
+// the totals of a list of items: figures summed where any item has them, grams only when every item has a weight
+function itsTot(its) {
+  const o = {}, n = f => its.filter(x => x[f] !== undefined).length;
+  ITS_NUM.forEach(([f, dp]) => { if (f === 'k' || n(f)) o[f] = +its.reduce((a, x) => a + (+x[f] || 0), 0).toFixed(f === 'k' ? 0 : dp); });
+  o.g = its.length && its.every(x => +x.g >= 0 && x.g !== undefined) && its.some(x => +x.g > 0) ? Math.round(its.reduce((a, x) => a + (+x.g || 0), 0) * 10) / 10 : 0;
+  return o;
+}
+// set one item's grams: everything on it moves in proportion, from the figures at its first weight
+function itsSet(o, g) {
+  if (!o.w) { if (!(+o.g > 0)) return false; o.w = { g: +o.g }; ITS_NUM.forEach(([f]) => { if (o[f] !== undefined) o.w[f] = +o[f]; }); }
+  const r = Math.max(0, +g || 0) / o.w.g;
+  o.g = Math.round(Math.max(0, +g || 0) * 10) / 10;
+  ITS_NUM.forEach(([f, dp]) => { if (o.w[f] !== undefined) o[f] = +(o.w[f] * r).toFixed(dp); });
+  return true;
+}
+// an item with no weight just scales its figures
+function itsScale(o, f) { if (+o.g > 0 || (o.w && o.w.g > 0)) { itsSet(o, (+o.g || 0) * f); return; } ITS_NUM.forEach(([k, dp]) => { if (o[k] !== undefined) o[k] = +(o[k] * f).toFixed(dp); }); }
+// the sheet's totals from its items
+function itsApply() {
+  const tt = itsTot(SH.its);
+  SH.k = tt.k; SH.p = tt.p !== undefined ? tt.p : SH.p;
+  ['f', 'sa', 'fs', 'sf'].forEach(f => { if (tt[f] !== undefined) SH[f] = tt[f]; });
+  SH.g = tt.g || ''; XK0 = +SH.k || null;
+}
+function itsBox() {
+  const tt = itsTot(SH.its);
+  return `<div class="field itsbox"><label>In this <span class="muted">· ${SH.its.length} items${tt.g ? `, ${fmtN(tt.g)}g in all` : ''}</span></label>
+    <div class="itsl">${SH.its.map((o, i) => `<div class="itsr"><span class="n">${esc(o.n)}<small>${fmtN(o.k)} kcal${o.p ? ` · ${fmtN(o.p)}g protein` : ''}</small></span>${o.g !== undefined || o.w ? `<input class="itsg" type="number" inputmode="decimal" min="0" data-its="${i}" value="${o.g !== undefined ? o.g : ''}" aria-label="Grams of ${esc(o.n)}"><span class="u">g</span>` : '<span class="u muted">no weight</span>'}</div>`).join('')}</div>
+    <p class="small muted" style="margin:4px 0 0">Change the grams of any item and the totals follow. 0 leaves it out.</p></div>`;
+}
+const itsCopy = its => (Array.isArray(its) && its.length > 1 ? JSON.parse(JSON.stringify(its)) : null);
 // a saved day with anything missing or the wrong shape is mended rather than crashing the app
 function mendDay(d) {
   if (!isObj(d)) return null;
@@ -4401,13 +4462,14 @@ function foodPut(st, x, day) {
   if (Array.isArray(x.pl) && x.pl.length) e.pl = x.pl.filter(q => PLANTS[q]);
   ['na', 'sa', 'fs', 'sf', 'f'].forEach(f => { if (x[f] !== undefined && x[f] !== null && Number.isFinite(+x[f])) e[f] = +x[f]; });
   if (+x.g > 0) { e.g = +x.g; if (x.u === 'ml') e.u = 'ml'; }
+  if (Array.isArray(x.its) && x.its.length > 1) e.its = itsClean(x.its);
   e.used = (prev.used || 0) + 1; e.last = day && (!prev.last || day >= prev.last) ? day : prev.last || day || todayKey();
   st.foods[key] = e;
 }
-const foodCopy = e => { const x = Object.assign({ n: e.n, k: e.k, p: e.p, pl: (e.pl || []).slice() }, mfOut(e)); if (e.fe) x.fe = true; ['na', 'sa', 'fs', 'sf', 'f', 'g', 'u'].forEach(f => { if (e[f] !== undefined) x[f] = e[f]; }); return x; };
+const foodCopy = e => { const x = Object.assign({ n: e.n, k: e.k, p: e.p, pl: (e.pl || []).slice() }, mfOut(e)); if (e.fe) x.fe = true; ['na', 'sa', 'fs', 'sf', 'f', 'g', 'u'].forEach(f => { if (e[f] !== undefined) x[f] = e[f]; }); const it = itsCopy(e.its); if (it) x.its = it; return x; };
 // a saved food or logged entry with its amount, as a lookup the grams box can scale
 function amtItem(e) {
-  if (!(+e.g > 0)) return null;
+  if (!(+e.g > 0) || (Array.isArray(e.its) && e.its.length > 1)) return null;
   const g = +e.g, sa = e.sa !== undefined ? e.sa : e.na !== undefined ? e.na * 2.5 : undefined, per = { k: (+e.k || 0) * 100 / g, p: (+e.p || 0) * 100 / g };
   [['sa', sa], ['fs', e.fs], ['sf', e.sf], ['f', e.f]].forEach(([f, v]) => { if (v !== undefined && v !== null) per[f] = +v * 100 / g; });
   return { n: e.n, per, g, serv: g, pl: (e.pl || []).slice(), fe: !!e.fe, rm: !!e.rm, oi: !!e.oi, ml: e.u === 'ml', src: 'saved' };
@@ -5627,7 +5689,7 @@ function vToday() {
     else { const bn = batchName(k, s, o.r) || (o.r.shop ? 'Shop' : ''); rows.push(mealRow({ tick: s, on: o.done, done: o.done, slot: `${SLOTNAME[s]}${bn ? ` <span class="tape">${bn}</span>` : ''}`, nm: esc(o.r.n), kc: `${fmtN(o.k)}<small>kcal</small>`, art: art(o.r, 42), open: `data-a="open" data-r="${o.r.id}" data-k="${k}" data-s="${s}"`, have: haveChip(k, s, o) })); }
   }
   if (c.night) rows.push(mealRow({ tick: 'out', on: !!c.night.done, done: !!c.night.done, slot: `Night out${c.night.note ? ` · ${esc(c.night.note)}` : ''}`, nm: esc(drinkSummary(c.night)), kc: `${fmtN(c.dK)}<small>kcal</small>`, art: nightArt(c.night, 42), open: `data-a="night" data-k="${k}"` }));
-  const extras = d.x.map((x, i) => `<div class="xrow"><button class="nm" data-a="xedit" data-i="${i}">${esc(x.n)}<span class="mt">${fmtN(x.k)} kcal · ${fmtN(x.p || 0)}g protein${(x.pl || []).length ? ` · ${x.pl.length} plant${x.pl.length > 1 ? 's' : ''}` : ''}${x.fe ? ' · fermented' : ''}${mfTags(x)}</span></button><button class="iconbtn" data-a="xedit" data-i="${i}" aria-label="Edit ${esc(x.n)}">${ic('edit')}</button><button class="iconbtn" data-a="xdel" data-i="${i}" aria-label="Remove ${esc(x.n)}">${ic('trash')}</button></div>`).join('');
+  const extras = d.x.map((x, i) => `<div class="xrow"><button class="nm" data-a="xedit" data-i="${i}">${esc(x.n)}<span class="mt">${fmtN(x.k)} kcal${+x.g > 0 ? ` · ${fmtN(x.g)}${x.u === 'ml' ? 'ml' : 'g'}` : ''}${x.its && x.its.length > 1 ? ` · ${x.its.length} items` : ''} · ${fmtN(x.p || 0)}g protein${(x.pl || []).length ? ` · ${x.pl.length} plant${x.pl.length > 1 ? 's' : ''}` : ''}${x.fe ? ' · fermented' : ''}${mfTags(x)}</span></button><button class="iconbtn" data-a="xedit" data-i="${i}" aria-label="Edit ${esc(x.n)}">${ic('edit')}</button><button class="iconbtn" data-a="xdel" data-i="${i}" aria-label="Remove ${esc(x.n)}">${ic('trash')}</button></div>`).join('');
   const g = set.plantGoal;
   const tiles = `<div class="tiles"><button class="tile ${wc.ptsEat >= g ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${fmtPts(wc.ptsEat)}<small>/${g}</small></span><span class="l">Plants eaten</span></button>
     <button class="tile ${wc.oilyE >= set.oilyGoal ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${wc.oilyE}<small>/${set.oilyGoal}</small></span><span class="l">Oily fish</span></button>
@@ -6672,6 +6734,25 @@ function waistTrend() {
   const last = ks[ks.length - 1], near4 = ks.filter(k => { const d = daysBetween(k, last); return d >= 21 && d <= 35; }), from = near4.length ? near4[near4.length - 1] : ks[0];
   return { d: WT().waist[last] - WT().waist[from], wks: Math.round(daysBetween(from, last) / 7), last, v: WT().waist[last] };
 }
+/* 3.32: maintenance over a stretch of days: the weight trend over those days against what the plan and ticks say was
+   eaten. The advice uses three weeks (quick to show a change, but swung by water, salt and a few big days); the long-term
+   figure uses up to twelve weeks and appears once there are five weeks of food and weigh-ins */
+function wMaint(days) {
+  const tk = todayKey(), from = WT().from || '0000', span = Math.max(1, Math.min(days, daysBetween(from, tk) + 1));
+  const slope = wSlope(tk, span); if (slope === null) return null;
+  let tot = 0, n = 0;
+  for (let i = 1; i <= span; i++) { const k = addDays(tk, -i); if (k < from) break; const c = dayCalc(k); if (c.hasPlan) { tot += c.planK; n++; } }
+  if (n < 7) return null;
+  return { maint: tot / n - slope * KCAL_KG, intake: tot / n, span, wks: Math.round(span / 7) };
+}
+function wMaintBox(adv) {
+  const lt = wMaint(84), r50 = v => fmtN(Math.round(v / 50) * 50);
+  const st = `<div><b>${r50(adv.maint)} kcal</b><span>Short term · 3 weeks</span></div>`;
+  if (!lt || lt.span < 35) return `<div class="mtiles">${st}<div><b>–</b><span>Long term · after 5 weeks of data</span></div></div>`;
+  const gap = Math.round((adv.maint - lt.maint) / 50) * 50;
+  const note = Math.abs(gap) >= 150 ? `<p class="small muted" style="margin:6px 0 0">The short-term figure is ${fmtN(Math.abs(gap))} kcal ${gap > 0 ? 'higher' : 'lower'}. It moves with water, salt and a few big days; the long-term one is steadier but slower to show a real change in what you burn. If the gap holds for a few weeks, it's real.</p>` : `<p class="small muted" style="margin:6px 0 0">The two agree, so the estimate is a fair one.</p>`;
+  return `<div class="mtiles">${st}<div><b>${r50(lt.maint)} kcal</b><span>Long term · ${lt.wks} weeks</span></div></div>${note}`;
+}
 // Advice: estimate maintenance from the trend and what the plan says was eaten, then the target that fits the goal pace.
 function wAdvice() {
   // food and weight over the same days: the last three weeks, or since food started being counted if that's sooner
@@ -6926,7 +7007,7 @@ function vWeight() {
   const chart = `<section class="wsum hist"><div class="wchead"><div class="eyebrow">Weight</div><div class="seg mini3" role="group" aria-label="Range">${[[28, '4 wk'], [84, '12 wk'], [0, 'All']].map(([v, l]) => `<button data-a="wrange" data-v="${v}" aria-pressed="${UI.wrange === v}">${l}</button>`).join('')}</div></div>
     ${hero}<div class="wlegend"><span><i class="ldot"></i>Daily</span><span><i class="lline"></i>7-day average</span></div>${wChart(UI.wrange)}<p class="small" style="margin:0">${selP}</p></section>`;
   const adv = wAdvice();
-  const advice = `<section class="wsum wadvice"><div class="eyebrow">Calories</div>${adv.need ? `<p style="margin:0">${adv.need}</p>` : `<h3>${adv.head}</h3><p style="margin:0">${esc(adv.body)}</p>${adv.act ? `<button class="btn primary" data-a="wtarget" data-v="${adv.act}">Set daily target to ${fmtN(adv.act)} kcal</button>` : ''}<p class="small muted" style="margin:0">${esc(adv.basis)} Current target ${fmtN(setAt(todayKey()).target)} kcal${setNext() && S.set.target !== setAt(todayKey()).target ? `; ${fmtN(S.set.target)} from ${fmtDay(setNext())}` : ''}.</p>`}</section>`;
+  const advice = `<section class="wsum wadvice"><div class="eyebrow">Calories</div>${adv.need ? `<p style="margin:0">${adv.need}</p>` : `<h3>${adv.head}</h3><p style="margin:0">${esc(adv.body)}</p>${adv.act ? `<button class="btn primary" data-a="wtarget" data-v="${adv.act}">Set daily target to ${fmtN(adv.act)} kcal</button>` : ''}<div class="eyebrow" style="margin-top:10px">Maintenance</div>${wMaintBox(adv)}<p class="small muted" style="margin:0">${esc(adv.basis)} Current target ${fmtN(setAt(todayKey()).target)} kcal${setNext() && S.set.target !== setAt(todayKey()).target ? `; ${fmtN(S.set.target)} from ${fmtDay(setNext())}` : ''}.</p>`}</section>`;
   return `${card}${chart}${advice}${sleepCard()}${checksCard()}${wWaistCard()}${wGoalCard()}${list}`;
 }
 function wWaistCard() {
@@ -7178,7 +7259,9 @@ const cookState = (k, s) => { const d = D(k); d.ck = d.ck || {}; return d.ck[s] 
 function cookModel(k, s) {
   const o = dayCalc(k).slots[s];
   if (!o || o.kind !== 'recipe') return null;
-  const r = o.r, gr = { r, s, entries: [{ k, m: o.m, store: 'fridge' }], n: 1, sumM: o.m };
+  // 3.31.2: cooks the number of portions set on the recipe (1 unless you changed it there)
+  const n = Math.max(1, Math.min(12, Math.round(+peekCook(k, s).n || 1)));
+  const r = o.r, gr = { r, s, entries: [{ k, m: o.m * n, store: 'fridge' }], n, sumM: o.m * n };
   const steps = [], L = setupLines([gr], true), ovenT = (r.steps.join(' ').match(/(\d{3})\s*°C/) || [])[1];
   if (L.length) steps.push({ id: 'setup', kind: 'setup', lines: L });
   steps.push({ id: 'get', gr, kind: 'get' });
@@ -7188,7 +7271,7 @@ function cookModel(k, s) {
     if (t) steps.push({ id: `${i}`, gr, kind: 'do', text: t, tm: stepTimers(t, r) });
   });
   const ps = peekCook(k, s), done = steps.filter(x => ps.done[x.id]).length, left = steps.length - done;
-  return { st: k, key: 'c' + s, cook: true, k, s, o, groups: [gr], steps, all: steps, laterG: [], ps, done, left, aDone: done, aLeft: left, fin: !left, mins: r.t, remMins: Math.max(5, Math.ceil(r.t * left / steps.length / 5) * 5) };
+  return { st: k, key: 'c' + s, cook: true, n, k, s, o, groups: [gr], steps, all: steps, laterG: [], ps, done, left, aDone: done, aLeft: left, fin: !left, mins: r.t, remMins: Math.max(5, Math.ceil(r.t * left / steps.length / 5) * 5) };
 }
 const modelFor = (st, key) => key[0] === 'c' ? cookModel(st, key.slice(1)) : prepModel(st, key);
 function prepCta(M) {
@@ -7233,7 +7316,7 @@ function stepHtml(M, s, i, cur) {
     const tot = {}, from = {}; s.gr.entries.forEach(e => s.gr.r.items.forEach(it => { tot[it.i] = (tot[it.i] || 0) + it.g * e.m; if (it.from) from[it.i] = it.from; }));
     const sw = swapList(s.gr.r);
     title = 'Get the ingredients out';
-    body = `<p class="psub">${M.cook ? `${M.k === todayKey() ? "Today's" : `The ${fmtDay(M.k)}`} portion, ${fmtN(M.o.k)} kcal` : `For ${s.gr.n} portion${s.gr.n > 1 ? 's' : ''}`}</p>${sw.length ? `<p class="swapin">${ic('swap')}<span>Swapped this week: ${esc(sw.map(x => x.text).join('; '))}.</span></p>` : ''}<ul class="ilist ik pings">${ingRows(Object.entries(tot).map(([id, g]) => [id, g, from[id] ? ` <span class="muted for">for ${esc(shortN(from[id]))}</span>` : '']), M.cook ? 'Total' : `Total for ${s.gr.n} portion${s.gr.n > 1 ? 's' : ''}`, false, ING, null, outLeft(s.gr.r, s.gr.entries[0].k, s.gr.s, s.gr.sumM), s.gr.r.id)}</ul>`;
+    body = `<p class="psub">${M.cook ? (M.n > 1 ? `${M.n} portions, ${fmtN(M.o.k)} kcal each` : `${M.k === todayKey() ? "Today's" : `The ${fmtDay(M.k)}`} portion, ${fmtN(M.o.k)} kcal`) : `For ${s.gr.n} portion${s.gr.n > 1 ? 's' : ''}`}</p>${sw.length ? `<p class="swapin">${ic('swap')}<span>Swapped this week: ${esc(sw.map(x => x.text).join('; '))}.</span></p>` : ''}<ul class="ilist ik pings">${ingRows(Object.entries(tot).map(([id, g]) => [id, g, from[id] ? ` <span class="muted for">for ${esc(shortN(from[id]))}</span>` : '']), M.cook ? 'Total' : `Total for ${s.gr.n} portion${s.gr.n > 1 ? 's' : ''}`, false, ING, null, outLeft(s.gr.r, s.gr.entries[0].k, s.gr.s, s.gr.sumM), s.gr.r.id)}</ul>`;
   } else if (s.kind === 'do') {
     title = s.text;
     const mine = M.all.filter(x => x.kind === 'do' && x.gr === s.gr), plan = amtPlan(s.gr.r, mine.map(x => x.text)), tot = {};
@@ -8297,13 +8380,13 @@ function labelFields(px, o) {
   return `<div class="lblf"><div class="lblh">From the label, if you have it</div><div class="fieldrow four">${f('sa', 'Salt (g)', o.sa)}${f('fs', 'Sugar (g)', o.fs)}${f('sf', 'Sat fat (g)', o.sf)}${f('f', 'Fibre (g)', o.f)}</div><p class="small muted" style="margin:4px 0 0">Salt as printed on the pack; the app turns it into sodium. For sugar, count only added sugar.</p></div>`;
 }
 function readLabel(px) { const g = id => { const el = $(`${px}-${id}`), v = el ? el.value.trim() : ''; return v === '' ? undefined : Math.max(0, +v || 0); }; const sa = g('sa'); return { sa, fs: g('fs'), sf: g('sf'), f: g('f') }; }
-const X_FIELDS = ['n', 'k', 'p', 'fe', 'rm', 'oi', 'pl', 'na', 'sa', 'fs', 'sf', 'f', 'g', 'u']; // what the log sheet edits; anything else on an entry is kept
+const X_FIELDS = ['n', 'k', 'p', 'fe', 'rm', 'oi', 'pl', 'na', 'sa', 'fs', 'sf', 'f', 'g', 'u', 'its']; // what the log sheet edits; anything else on an entry is kept
 function foodRows(forMeal) {
   const q = foodKey(SH && SH.fq), all = Object.entries(S.foods || {}).sort((a, b) => (b[1].last || '').localeCompare(a[1].last || '') || (b[1].used || 0) - (a[1].used || 0));
   const hits = (q ? all.filter(([k]) => k.includes(q)) : all).slice(0, q ? 30 : 6);
   if (!all.length) return '<p class="small muted" style="margin:6px 0 0">Anything you log is saved here, so next time it\'s one tap.</p>';
   if (!hits.length) return '<p class="small muted" style="margin:6px 0 0">Nothing saved by that name.</p>';
-  return `<div class="foodlist">${hits.map(([key, e]) => `<div class="frow"><button class="nm" data-a="${forMeal ? 'fuse' : 'fadd'}" data-v="${esc(key)}">${esc(e.n)}<span class="mt">${fmtN(e.k)} kcal · ${fmtN(e.p || 0)}g protein${(e.pl || []).length ? ` · ${e.pl.length} plant${e.pl.length > 1 ? 's' : ''}` : ''}${e.fe ? ' · fermented' : ''}${mfTags(e)}</span></button>${forMeal ? '' : `<button class="iconbtn" data-a="fedit" data-v="${esc(key)}" aria-label="Change ${esc(e.n)} before adding">${ic('edit')}</button>`}<button class="iconbtn" data-a="fforget" data-v="${esc(key)}" aria-label="Forget ${esc(e.n)}">${ic('x')}</button></div>`).join('')}</div>${!q && all.length > hits.length ? `<p class="small muted" style="margin:4px 0 0">${all.length} saved in all. Search to find the rest.</p>` : ''}`;
+  return `<div class="foodlist">${hits.map(([key, e]) => `<div class="frow"><button class="nm" data-a="${forMeal ? 'fuse' : 'fadd'}" data-v="${esc(key)}">${esc(e.n)}<span class="mt">${fmtN(e.k)} kcal${+e.g > 0 ? ` · ${fmtN(e.g)}${e.u === 'ml' ? 'ml' : 'g'}` : ''} · ${fmtN(e.p || 0)}g protein${(e.pl || []).length ? ` · ${e.pl.length} plant${e.pl.length > 1 ? 's' : ''}` : ''}${e.fe ? ' · fermented' : ''}${mfTags(e)}</span></button>${forMeal ? '' : `<button class="iconbtn" data-a="fedit" data-v="${esc(key)}" aria-label="Change ${esc(e.n)} before adding">${ic('edit')}</button><button class="iconbtn" data-a="fdup" data-v="${esc(key)}" aria-label="Duplicate ${esc(e.n)} to make a version of it">${ic('copy')}</button>`}<button class="iconbtn" data-a="fforget" data-v="${esc(key)}" aria-label="Forget ${esc(e.n)}">${ic('x')}</button></div>`).join('')}</div>${!q && all.length > hits.length ? `<p class="small muted" style="margin:4px 0 0">${all.length} saved in all. Search to find the rest.</p>` : ''}`;
 }
 const foodBox = forMeal => (Object.keys(S.foods || {}).length ? `<section class="foodbox"><div class="field" style="margin:0"><label for="fq">${forMeal ? 'Something you\'ve had before?' : 'Saved foods'}</label><input id="fq" type="search" placeholder="Search what you've logged before" value="${esc(SH.fq || '')}"></div><div id="fq-list">${foodRows(forMeal)}</div></section>` : '');
 // red meat and oily fish on a meal of your own or something logged: two switches, kept on the entry as rm and oi
@@ -8456,16 +8539,19 @@ function xMatchBtn() {
   const r = XK0 > 0 && k > 0 ? k / XK0 : 1;
   el.innerHTML = others && Math.abs(r - 1) > 0.02 ? `<button class="btn sm" data-a="xmatch">${ic('wand')}Scale the rest to match: ×${+r.toFixed(2)}</button>` : '';
 }
+// 3.32: duplicating a saved food, to make a version of it under its own name
+function dupBox() { const e = S.foods && S.foods[SH.dup]; return `<section class="pcbox dupbox"><p class="small" style="margin:0"><b>A copy of ${esc(e ? e.n : 'that food')}.</b> Change what you need and give it its own name. The original stays as it is.</p><button class="btn sm ghost" data-a="fdupx" style="margin-top:8px">Cancel the copy</button></section>`; }
+const X_BLANK = () => ({ n: '', k: '', p: '', g: '', its: null, pl: [], fe: false, rm: false, oi: false, sa: undefined, fs: undefined, sf: undefined, f: undefined, lk: null, plq: '' });
 function shAdd() {
   const ed = SH.ei !== undefined, dk = SH.dk || UI.day; if (!SH.xk0) { SH.xk0 = 1; XK0 = +SH.k || null; }
   SH.title = ed ? 'Edit' : 'Log something else'; SH.pl = SH.pl || [];
   return `<div class="sheethead"><div><span class="eyebrow">${fmtDay(dk)}</span><h2>${ed ? 'Edit what you logged' : 'Log something else'}</h2></div>${closeBtn}</div>
-    ${ed ? (SH.lk ? `<div id="lk-box">${lkBox()}</div>` : '') : `${pcBox()}${SH.pc ? '' : foodBox(false)}<section class="lookup" ${SH.pc ? 'hidden' : ''}><div class="field" style="margin:${Object.keys(S.foods || {}).length ? '14px' : '0'} 0 0"><label for="lq">Look it up</label><div class="lqrow"><input id="lq" type="search" placeholder="e.g. Fage 0%, oat milk, banana" value="${esc(SH.lq || '')}" autocomplete="off"><button class="btn sm" data-a="scanstart" aria-label="Scan a barcode">${ic('scan')}Scan</button></div></div>
+    ${ed ? (SH.lk ? `<div id="lk-box">${lkBox()}</div>` : '') : `${SH.dup ? dupBox() : pcBox()}${SH.pc || SH.dup ? '' : foodBox(false)}<section class="lookup" ${SH.pc || SH.dup ? 'hidden' : ''}><div class="field" style="margin:${Object.keys(S.foods || {}).length ? '14px' : '0'} 0 0"><label for="lq">Look it up</label><div class="lqrow"><input id="lq" type="search" placeholder="e.g. Fage 0%, oat milk, banana" value="${esc(SH.lq || '')}" autocomplete="off"><button class="btn sm" data-a="scanstart" aria-label="Scan a barcode">${ic('scan')}Scan</button></div></div>
       ${SH.noscan ? `<div class="fieldrow"><div class="field"><label for="lq-code">This phone can't scan here; type the barcode</label><input id="lq-code" inputmode="numeric" placeholder="e.g. 5201054017364"></div><div class="field"><label>&nbsp;</label><button class="btn sm" data-a="offcode">Look up</button></div></div>` : ''}
-      <div id="lk-box">${lkBox()}</div></section><div class="lblh" style="margin-top:14px">${SH.lk || SH.pc ? 'Check the figures' : 'Or type it in'}</div>`}
+      <div id="lk-box">${lkBox()}</div></section><div class="lblh" style="margin-top:14px">${SH.dup ? 'Change what you need' : SH.lk || SH.pc ? 'Check the figures' : 'Or type it in'}</div>`}
     <div class="field"><label for="x-n">What was it?</label><input id="x-n" ${Object.keys(S.foods || {}).length && !ed ? '' : 'autofocus'} value="${esc(SH.n || '')}" placeholder="e.g. Office cake"></div>
     <div class="fieldrow"><div class="field"><label for="x-k">Calories</label><input id="x-k" type="number" inputmode="numeric" value="${esc(SH.k || '')}"></div><div class="field"><label for="x-p">Protein (g)</label><input id="x-p" type="number" inputmode="numeric" value="${esc(SH.p || '')}"></div></div>
-    ${SH.lk ? '' : `<div class="field"><label for="x-g">How much, in grams <span class="muted">(optional: kept for next time)</span></label><input id="x-g" type="number" inputmode="decimal" value="${esc(SH.g || '')}" placeholder="e.g. 80"></div>`}
+    ${SH.lk ? '' : SH.its && SH.its.length > 1 ? itsBox() : `<div class="field"><label for="x-g">How much, in grams <span class="muted">(optional: kept for next time)</span></label><input id="x-g" type="number" inputmode="decimal" value="${esc(SH.g || '')}" placeholder="e.g. 80"></div>`}
     <div class="xscale"><span class="small muted">Scale it all</span><div class="chips">${[0.5, 0.75, 1.25, 1.5, 2].map(f => `<button class="chip" data-a="xscale" data-v="${f}">${frac(f, 0.25)}×</button>`).join('')}</div></div>
     <div id="x-match"></div>
     ${labelFields('x', SH)}
@@ -8474,6 +8560,7 @@ function shAdd() {
     <div class="field"><label for="plq">Plants in it (optional)</label><input id="plq" type="search" placeholder="Type to find a plant" value="${esc(SH.plq || '')}"></div>
     <div class="plantgrid" id="pl-grid">${plantGrid()}</div>
     ${ed ? `<div class="btnrow" style="margin-top:16px"><button class="btn primary" data-a="xsave">Save changes</button><button class="btn ghost" data-a="xrm">${ic('trash')}Remove</button></div>`
+      : SH.dup ? `<div class="btnrow" style="margin-top:16px"><button class="btn primary" data-a="fdupsave">Save to your foods</button><button class="btn" data-a="xsave">Save and add to ${fmtDay(dk)}</button></div>`
       : `${pcWhere()}<button class="btn primary" style="width:100%;margin-top:16px" data-a="${SH.pc ? 'pcsave' : 'xsave'}">Add to ${fmtDay(dk)}</button>`}`;
 }
 // My cupboard: things always kept in, which drop off the shopping list
@@ -9025,6 +9112,7 @@ const ACT = {
   xscale(d) {
     const f = +d.v; if (!(f > 0)) return;
     const g = $('lk-g');
+    if (SH && !SH.lk && SH.its && SH.its.length > 1) { keepAddFields(); SH.its.forEach(o => itsScale(o, f)); itsApply(); renderSheet(); toast(`Everything ×${frac(f, 0.25)}`); return; }
     if (SH && SH.lk && g && +g.value > 0) { g.value = Math.round(+g.value * f); lkFill(+g.value); } else xScale(f);
     XK0 = +($('x-k') || {}).value || null; xMatchBtn();
     toast(`Everything ×${frac(f, 0.25)}`);
@@ -9071,6 +9159,8 @@ const ACT = {
     keepAddFields(); if (!SH.n && !SH.k) { toast('Add a name or calories'); return; }
     const xs = D(SH.dk || UI.day).x, nw = Object.assign({ n: SH.n || 'Extra', k: +SH.k || 0, p: +SH.p || 0, fe: !!SH.fe, pl: SH.pl.slice(), at: todayKey() }, labelOut(SH), mfOut(SH)), old = SH.ei !== undefined && xs[SH.ei];
     const gAmt = SH.lk ? +SH.lk.g : +SH.g; if (gAmt > 0 && gAmt < 10000) { nw.g = Math.round(gAmt * 10) / 10; if (SH.lk && (SH.lk.ml || (ING[SH.lk.id] && ING[SH.lk.id].ml))) nw.u = 'ml'; }
+    if (!SH.lk && SH.its && SH.its.length > 1) { nw.its = itsClean(SH.its); const tg = itsTot(nw.its).g; if (tg > 0) nw.g = tg; else delete nw.g; }
+    if (SH.dup && foodKey(nw.n) === SH.dup) { toast('Give the copy its own name, so the original stays as it is'); const el = $('x-n'); if (el) el.focus(); return; }
     if (old) { const keep = {}; Object.keys(old).forEach(f => { if (!X_FIELDS.includes(f)) keep[f] = old[f]; }); xs[SH.ei] = Object.assign(keep, nw); toast('Updated'); }
     else xs.push(nw);
     if (!(old && old.rv)) foodPut(S, nw, SH.dk || UI.day);
@@ -9081,12 +9171,30 @@ const ACT = {
     const dk = SH.dk || UI.day, x = foodCopy(e); x.at = todayKey(); D(dk).x.push(x); foodPut(S, x, dk);
     save(); closeSheet(); render(); toast(`Added ${e.n}`);
   },
-  fedit(d) { const e = S.foods && S.foods[d.v]; if (!e) return; const it = amtItem(e); if (it) { lkPick(it); return; } Object.assign(SH, { n: e.n, k: e.k || '', p: e.p || '', fe: !!e.fe, rm: !!e.rm, oi: !!e.oi, pl: (e.pl || []).slice(), sa: e.sa !== undefined ? e.sa : e.na !== undefined ? +(e.na * 2.5).toFixed(2) : undefined, fs: e.fs, sf: e.sf, f: e.f }); renderSheet(); },
+  fdup(d) {
+    const e = S.foods && S.foods[d.v]; if (!e || !SH) return;
+    Object.assign(SH, X_BLANK(), { dup: d.v, n: `${e.n} (copy)`, k: e.k || '', p: e.p || '', g: e.g || '', its: itsCopy(e.its), fe: !!e.fe, rm: !!e.rm, oi: !!e.oi, pl: (e.pl || []).slice(), sa: e.sa !== undefined ? e.sa : e.na !== undefined ? +(e.na * 2.5).toFixed(2) : undefined, fs: e.fs, sf: e.sf, f: e.f, u: e.u });
+    XK0 = +e.k || null; renderSheet();
+    const el = $('x-n'); if (el) { el.scrollIntoView({ block: 'center' }); el.focus(); el.select(); }
+  },
+  fdupx() { if (!SH) return; Object.assign(SH, X_BLANK(), { dup: null }); XK0 = null; renderSheet(); },
+  fdupsave() {
+    if (!SH || !SH.dup) return; keepAddFields();
+    const n = (SH.n || '').trim(), key = foodKey(n);
+    if (!key || !(+SH.k >= 0) || SH.k === '') { toast('Add a name and calories'); return; }
+    if (key === SH.dup || (S.foods && S.foods[key])) { toast(key === SH.dup ? 'Give the copy its own name, so the original stays as it is' : `There's already a saved food called ${n}`); const el = $('x-n'); if (el) el.focus(); return; }
+    const nw = Object.assign({ n, k: +SH.k || 0, p: +SH.p || 0, fe: !!SH.fe, pl: SH.pl.slice() }, labelOut(SH), mfOut(SH));
+    if (SH.its && SH.its.length > 1) { nw.its = itsClean(SH.its); const tg = itsTot(nw.its).g; if (tg > 0) nw.g = tg; }
+    else if (+SH.g > 0 && +SH.g < 10000) { nw.g = Math.round(+SH.g * 10) / 10; if (SH.u === 'ml') nw.u = 'ml'; }
+    foodPut(S, nw, todayKey()); S.foods[key].used = 0;
+    save(); Object.assign(SH, X_BLANK(), { dup: null }); XK0 = null; renderSheet(); toast(`Saved ${n} to your foods`);
+  },
+  fedit(d) { const e = S.foods && S.foods[d.v]; if (!e) return; const it = amtItem(e); if (it) { lkPick(it); return; } Object.assign(SH, { n: e.n, k: e.k || '', p: e.p || '', g: e.g || '', its: itsCopy(e.its), fe: !!e.fe, rm: !!e.rm, oi: !!e.oi, pl: (e.pl || []).slice(), sa: e.sa !== undefined ? e.sa : e.na !== undefined ? +(e.na * 2.5).toFixed(2) : undefined, fs: e.fs, sf: e.sf, f: e.f }); XK0 = +e.k || null; renderSheet(); },
   fuse(d) { const e = S.foods && S.foods[d.v]; if (!e) return; SH.pre = { n: e.n, k: e.k, p: e.p, rm: e.rm, oi: e.oi, fe: e.fe, pl: (e.pl || []).slice(), sa: e.sa !== undefined ? e.sa : e.na !== undefined ? +(e.na * 2.5).toFixed(2) : undefined, fs: e.fs, sf: e.sf, f: e.f }; renderSheet(); },
   fforget(d) { const e = S.foods && S.foods[d.v]; if (!e) return; delete S.foods[d.v]; save(); renderSheet(); toast(`Forgot ${e.n}`); },
   xedit(d) {
     const dk = d.k || UI.day, x = peekD(dk).x[+d.i]; if (!x) return;
-    openSheet({ type: 'xadd', dk, ei: +d.i, n: x.n, k: x.k || '', p: x.p || '', g: x.g || '', fe: !!x.fe, rm: !!x.rm, oi: !!x.oi, pl: (x.pl || []).slice(), sa: x.sa !== undefined ? x.sa : x.na !== undefined ? +(x.na * 2.5).toFixed(2) : undefined, fs: x.fs, sf: x.sf, f: x.f });
+    openSheet({ type: 'xadd', dk, ei: +d.i, n: x.n, k: x.k || '', p: x.p || '', g: x.g || '', its: itsCopy(x.its), fe: !!x.fe, rm: !!x.rm, oi: !!x.oi, pl: (x.pl || []).slice(), sa: x.sa !== undefined ? x.sa : x.na !== undefined ? +(x.na * 2.5).toFixed(2) : undefined, fs: x.fs, sf: x.sf, f: x.f });
     const it = amtItem(x); if (it) { SH.lk = it; renderSheet(); lkFill(it.g); }
   },
   xrm() { const xs = D(SH.dk || UI.day).x, x = xs[SH.ei]; if (x) { xs.splice(SH.ei, 1); toast(`Removed ${x.n}`); } save(); closeSheet(); render(); },
@@ -9404,7 +9512,11 @@ const ACT = {
     if (o.kind === 'recipe' && !day.done[s]) day.done[s] = { m: +o.m.toFixed(3), sw: Object.assign({}, o.r.swapped || {}) };
     save(); closePrep(); toast(`${SLOTNAME[s]} ticked off`);
   },
-  cookopen(d) { openPrep(d.k, 'c' + d.s); },
+  cookopen(d) {
+    // from the recipe, the portions set there carry into the cooking steps
+    if (SH && SH.type === 'recipe') { const ps = cookState(d.k, d.s), n = Math.max(1, Math.min(12, +SH.n || 1)); if (n > 1) ps.n = n; else delete ps.n; save(); }
+    openPrep(d.k, 'c' + d.s);
+  },
   tmr(d) {
     audio();
     const now = Date.now(); let t = TM.find(x => x.id === d.id);
@@ -10260,6 +10372,21 @@ function trPlanCard(phase, dose, split) {
     <p class="small muted" style="margin:0">${dose === 'min' ? 'The minimal dose is about keeping what you have: four or more hard sets a muscle each week holds on to muscle and strength while the weights stay heavy.' : phase === 'bulk' ? 'For growing, around 10 to 20 hard sets a muscle each week; the returns shrink the higher you go.' : 'On a cut, around 6 to 12 hard sets a muscle each week, kept heavy, holds on to muscle while the deficit does its work.'} Sets aimed at a muscle count in full, helping ones as half.</p>
     ${nope.length ? `<div class="eyebrow" style="margin-top:4px">Ruled out</div><div class="chips">${nope.map(id => `<button class="chip" data-a="trunnope" data-v="${id}">${esc(EX[id].n)} ${ic('x', false, 'inl')}</button>`).join('')}</div><p class="small muted" style="margin:0">Tap one to bring it back.</p>` : ''}</section>`;
 }
+/* 3.32: the bodyweight rep ranges by body half, from the exercises themselves, with why each sits where it does */
+const BW_UP = new Set(['chest', 'back', 'delts', 'rear', 'biceps', 'triceps']);
+function bwRangesHtml() {
+  const ph = trPhase(), seen = new Set(), up = [], lo = [];
+  Object.entries(KIT_SL).forEach(([sl, o]) => (o.bw || []).forEach(id => {
+    if (seen.has(id) || !EX[id] || EX[id].p[0] === 'core') return; seen.add(id);
+    const r = slotReps(sl, ph, id), x = EX[id], rir = x.rir || roleOf(sl).rir;
+    (BW_UP.has(x.p[0]) ? up : lo).push(`<li><b>${esc(x.n)}</b> ${r[0]}–${r[1]} reps${x.per ? ` a ${x.per}` : ''}, ${rir} short of failure</li>`);
+  }));
+  return `<p><b>Bodyweight rep ranges.</b> Muscle grows about as well from any load from roughly 30% of your max up, as long as the set ends close to failure, so the ranges are wide and the sets stop 0 to 1 short. Past about 25 to 30 reps the load is too light to do much, so a move that gets that easy is swapped for a harder one.</p>
+    <p><b>Upper body.</b> Push-ups matched to a bench press load built the chest and triceps as much as the bench, and gave the same strength gains. Pushes and rows sit at 6 to 25 depending on how hard the version is. Pull-ups and chin-ups are heavy for most people, so they use the session's lower range, with slow negatives until full reps come. Arms and shoulders are small muscles that a backpack loads lightly, so they go higher, 8 to 25.</p>
+    <ul class="bwr">${up.join('')}</ul>
+    <p><b>Lower body.</b> One leg carries close to your whole bodyweight, which is heavy enough to keep single-leg squats and hinges at 6 to 20; single-leg squat training matched back squats for strength gains. Nordic curls are very heavy for the hamstrings, so they stay at 3 to 8 lowerings, and low-volume Nordic programmes lengthened the hamstring muscle fibres as much as high-volume ones. Hip thrusts and calf raises load less, so they go to 10 to 25, with a full stretch and a pause at the bottom.</p>
+    <ul class="bwr">${lo.join('')}</ul>`;
+}
 function trWhyCard() {
   return `<details class="more aisle"><summary>Why it's built like this${ic('chev')}</summary><div class="why">
     <p><b>Minimal or effective.</b> Strength and muscle hold for months on as little as one hard set per exercise in one or two sessions a week, as long as the weights stay heavy. More sets build more, with diminishing returns, so the effective dose sits where most of the gain is.</p>
@@ -10269,8 +10396,9 @@ function trWhyCard() {
     <p><b>Exercise picks.</b> Moves that load the muscle at full stretch grow it more: overhead triceps work over pushdowns, standing calf raises over seated, deep presses and rows.</p>
     <p><b>Rearranging.</b> With the weekly sets the same, training a muscle once or three times a week builds about the same, so a missed session can be made up on the days left. Returns from extra sets shrink within a session as well as across the week, so the planner gives a muscle no more than 8 sets in one session, keeps each session to about an hour, and doesn't repeat a heavy leg lift on consecutive days.</p>
     <p><b>Dumbbells and bodyweight.</b> Each session keeps its sets with any kit; only the exercises change. Lighter weights taken close to failure build about as much muscle as heavy ones, though heavy ones build more top-end strength, so the reps go up and the sets stop 0 to 1 short. Once sets pass about 30 reps the load is too light to do much, so the reps get harder instead: slower lowering, a pause, 1½ reps, then a harder exercise. Push-ups matched to a bench press load grew the chest and triceps just as much.</p>
+    ${bwRangesHtml()}
     <p><b>Deloads.</b> Coaches agree on a lighter week every so often, cutting sets and how close you go to failure. Here that's suggested after five hard weeks.</p>
-    <p class="small muted">Schoenfeld et al. 2017 and Lopez et al. 2021 (low vs high loads); Lasevicius et al. 2018 (how light is too light); Kikuchi &amp; Nakazato 2017 (push-ups vs bench press); Spiering et al. 2021 (Journal of Strength and Conditioning Research); Iversen et al. 2021 (Sports Medicine); Pelland et al. 2024 (SportRxiv); Robinson et al. 2024 (Sports Medicine); Murphy &amp; Koehler 2022 (Scand J Med Sci Sports); Schoenfeld et al. 2016 (JSCR); Maeo et al. 2022 (Eur J Sport Sci); Kinoshita et al. 2023 (Frontiers in Physiology); Helms et al. 2015 (J Sports Med Phys Fitness); Bell et al. 2023 (Sports Medicine Open); Schoenfeld, Grgic &amp; Krieger 2019 (Journal of Sports Sciences).</p></div></details>`;
+    <p class="small muted">Schoenfeld et al. 2017 and Lopez et al. 2021 (low vs high loads); Lasevicius et al. 2018 (how light is too light); Kikuchi &amp; Nakazato 2017 (push-ups vs bench press); Calatayud et al. 2015 (JSCR, push-ups vs bench press strength); Speirs et al. 2016 (JSCR, single-leg vs back squats); Presland et al. 2018 (Scand J Med Sci Sports, Nordic curl volume); Spiering et al. 2021 (Journal of Strength and Conditioning Research); Iversen et al. 2021 (Sports Medicine); Pelland et al. 2024 (SportRxiv); Robinson et al. 2024 (Sports Medicine); Murphy &amp; Koehler 2022 (Scand J Med Sci Sports); Schoenfeld et al. 2016 (JSCR); Maeo et al. 2022 (Eur J Sport Sci); Kinoshita et al. 2023 (Frontiers in Physiology); Helms et al. 2015 (J Sports Med Phys Fitness); Bell et al. 2023 (Sports Medicine Open); Schoenfeld, Grgic &amp; Krieger 2019 (Journal of Sports Sciences).</p></div></details>`;
 }
 
 /* ── one lift: chart and history ── */
@@ -11846,7 +11974,7 @@ function pcDecode(txt) {
 // several items as one entry: figures summed, plants pooled, fermented, red meat or oily fish if any part is
 function pcOne(pc) {
   const its = pc.items, sum = f => { const v = its.map(x => x[f]).filter(x => x !== undefined); return v.length ? +v.reduce((a, b) => a + b, 0).toFixed(f === 'k' ? 0 : 1) : undefined; };
-  return { n: pc.n || joinAnd(its.map(x => x.n)), k: Math.round(sum('k') || 0), p: sum('p') || 0, f: sum('f'), sa: sum('sa'), fs: sum('fs'), sf: sum('sf'), pl: [...new Set(its.flatMap(x => x.pl))], fe: its.some(x => x.fe), rm: its.some(x => x.rm), oi: its.some(x => x.oi), g: its.length === 1 ? its[0].g : undefined };
+  return { n: pc.n || joinAnd(its.map(x => x.n)), k: Math.round(sum('k') || 0), p: sum('p') || 0, f: sum('f'), sa: sum('sa'), fs: sum('fs'), sf: sum('sf'), pl: [...new Set(its.flatMap(x => x.pl))], fe: its.some(x => x.fe), rm: its.some(x => x.rm), oi: its.some(x => x.oi), g: its.length === 1 ? its[0].g : itsTot(itsClean(its)).g || undefined, its: its.length > 1 ? itsClean(its) : null };
 }
 // the meals still to come on a day, any of which a pasted meal could stand in for
 function pcSlots(dk) {
@@ -11878,7 +12006,7 @@ function pcApply(raw) {
   if (r.err) { SH.pc = null; SH.pcErr = r.err; renderSheet(); return true; }
   const one = pcOne(r);
   SH.pc = r; SH.pcErr = null; SH.pcWhere = null; SH.pcShop = {}; if (r.d) SH.dk = r.d;
-  Object.assign(SH, { n: one.n, k: one.k, p: one.p, sa: one.sa, fs: one.fs, sf: one.sf, f: one.f, g: one.g || '', pl: one.pl.slice(), fe: one.fe, rm: one.rm, oi: one.oi, lk: null, lq: '', off: null, xk0: 0 });
+  Object.assign(SH, { n: one.n, k: one.k, p: one.p, sa: one.sa, fs: one.fs, sf: one.sf, f: one.f, g: one.g || '', its: itsCopy(one.its), pl: one.pl.slice(), fe: one.fe, rm: one.rm, oi: one.oi, lk: null, lq: '', off: null, xk0: 0 });
   renderSheet(); XK0 = one.k || null; toast(r.items.length > 1 ? `Read ${r.items.length} items from the code` : 'Read the code');
   return true;
 }
@@ -11900,10 +12028,20 @@ Object.assign(ACT, {
     const s = SH.pcWhere, day = D(dk), was = R[day.sl[s]] ? R[day.sl[s]].n : day.cu[s] ? day.cu[s].n : '';
     const e = Object.assign({ n: SH.n || 'Something else', k: +SH.k || 0, p: +SH.p || 0, at: todayKey() }, labelOut(SH));
     if (SH.pl.length) e.pl = SH.pl.slice(); if (SH.fe) e.fe = true; Object.assign(e, mfOut(SH)); if (+SH.g > 0 && +SH.g < 10000) e.g = Math.round(+SH.g * 10) / 10;
+    if (SH.its && SH.its.length > 1) { e.its = itsClean(SH.its); const tg = itsTot(e.its).g; if (tg > 0) e.g = tg; else delete e.g; }
     setSlot(dk, s, '@c'); day.cu[s] = e; day.done[s] = { c: 1 };
     foodPut(S, e, dk); save(); closeSheet(); render();
     toast(`${SLOTNAME[s]} on ${DOW[dayIndex(dk)]}: ${e.n}${was ? `, instead of ${was}` : ''}${shopMsg ? ` · ${shopMsg}` : ''}`, shopMsg ? 3200 : undefined);
   }
+});
+// 3.32: an item's grams changed in the log sheet
+document.addEventListener('change', e => {
+  const el = e.target; if (!el.classList || !el.classList.contains('itsg') || !SH || SH.type !== 'xadd' || !SH.its) return;
+  const o = SH.its[+el.dataset.its]; if (!o) return;
+  if (el.value.trim() === '' || +el.value === +o.g) return; // unchanged, or the same change arriving again as the box is replaced
+  keepAddFields();
+  if (!itsSet(o, el.value)) return;
+  itsApply(); renderSheet(); toast(`${o.n}: ${fmtN(o.g)}g`);
 });
 // pasting (or typing) a code reads it straight away
 document.addEventListener('input', e => { if (e.target.id === 'pc-in' && SH && SH.type === 'xadd') pcApply(e.target.value); });
@@ -13635,14 +13773,15 @@ function gmWeekLine(k) {
 /* ── on Today: the small aims strip, and the Day's done card ── */
 function gmStrip(k) {
   if (k !== todayKey() || !gmOn(k)) return '';
-  const x = gmDay(k), L = gmDay(k, true); if (x.empty) return '';
+  // 3.31.3: once the day's closed the strip shows the final result (ticks, misses, points), not the running one
+  const done = gmClosed(k), x = gmDay(k), L = done ? x : gmDay(k, true); if (x.empty) return '';
   const T = gmTotal(), sk = gmStreak();
   const ids = ['satfat', 'sugar', 'sodium', 'plants', 'fish', 'lift', 'protein', 'fibre', 'ferm'];
   const chip = i => { const v = L.items.find(y => y.id === i.id) || i, cls = v.st === 'ok' ? 'ok' : v.st === 'bad' || v.st === 'off' ? 'off' : (v.id === 'satfat' || v.id === 'sugar' || v.id === 'sodium') && v.plan > v.lim + 0.05 ? 'mid' : '';
     return `<span class="gmc ${cls}">${v.st === 'ok' ? ic('check') : `<i></i>`}${esc(v.prog)}</span>`; };
   const shown = ids.map(id => x.items.find(i => i.id === id)).filter(Boolean).filter(i => !['sugar', 'sodium'].includes(i.id) || i.plan > i.lim * 0.8 || (L.items.find(y => y.id === i.id) || {}).st === 'off');
-  const banked = Math.max(0, L.items.reduce((a, i) => a + (i.st === 'ok' || i.got < 0 ? i.got : 0), 0));
-  return `<button class="gmstrip" data-a="gmaims" aria-label="Today's aims: ${banked} of ${x.max} points so far. Level ${T.lv}, ${sk}-day streak. Open"><span class="gmsh"><span class="eyebrow">Today's aims · ${banked} of ${x.max} pts</span><span class="gmlv">${ic('star', true)}${T.lv}${sk ? ` · ${ic('flame', true)}${sk}` : ''}</span></span><span class="gmcs">${shown.map(chip).join('')}</span></button>`;
+  const banked = done ? Math.max(0, x.got) : Math.max(0, L.items.reduce((a, i) => a + (i.st === 'ok' || i.got < 0 ? i.got : 0), 0));
+  return `<button class="gmstrip" data-a="gmaims" aria-label="Today's aims: ${banked} of ${x.max} points${done ? ', day closed' : ' so far'}. Level ${T.lv}, ${sk}-day streak. Open"><span class="gmsh"><span class="eyebrow">${done ? 'Day closed' : "Today's aims"} · ${banked} of ${x.max} pts</span><span class="gmlv">${ic('star', true)}${T.lv}${sk ? ` · ${ic('flame', true)}${sk}` : ''}</span></span><span class="gmcs">${shown.map(chip).join('')}</span></button>`;
 }
 function gmDoneCard(k) {
   if (!gmOn(k) || k > todayKey()) return '';

@@ -1,4 +1,4 @@
-THIRTY PLANTS 3.31.1: putting it on your Android phone
+THIRTY PLANTS 3.32.0: putting it on your Android phone
 
 The app has to be opened from a web address (not as a file) for Chrome to install it.
 Free route with GitHub Pages:
@@ -42,3 +42,24 @@ Shop items from Claude's codes (3.31.0): when a code from Claude carries a shop-
 the meal picker (with Tesco and Co-op chips once there's one from them) and in Fit my day, and are never planned on
 their own. Settings > Your shop items lists them, with Remove. The same product with new figures replaces the old one;
 days that already had the old one keep it.
+
+Cooking for more (3.31.2): the portions set on a recipe (the - / + by Ingredients) now carry into 'Cook it step
+by step', so the ingredient list and the amounts in each step are for that many portions.
+
+Aims strip after closing (3.31.3): once the day is closed, the strip at the top of Today shows the final result,
+with ticks for limits you stayed under and the closed day's points, instead of the running 'so far' view.
+
+Items and grams kept (3.32.0): a code from Claude with several items (a meal of several ingredients, say) now keeps
+each item and its grams on the logged food and on the saved one. Edit it and each item has its own grams box; the
+totals follow. Scale it all moves every item. Today's logged rows and the saved foods list show the grams.
+
+Duplicate a saved food (3.32.0): in Log something else, each saved food has a copy button. It opens a copy with
+everything filled in (grams and items too), named "(copy)". Change what you need, give it its own name, then
+Save to your foods, or Save and add to the day. The original isn't touched.
+
+Maintenance, short and long term (3.32.0): the Calories card in Check-in shows maintenance over the last three
+weeks (what the advice uses) and over up to twelve weeks, once there are five weeks of food and weigh-ins.
+
+Bodyweight rep ranges (3.32.0): Train > Why it's built like this has the bodyweight ranges for upper and lower
+body, every exercise listed with its range, and the studies behind them.
+
