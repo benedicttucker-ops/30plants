@@ -2220,7 +2220,7 @@ ul.bwr li { margin: 2px 0; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.32.0';</script>
+<script>window.TP_VERSION = '3.32.1';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -5689,7 +5689,7 @@ function vToday() {
     else { const bn = batchName(k, s, o.r) || (o.r.shop ? 'Shop' : ''); rows.push(mealRow({ tick: s, on: o.done, done: o.done, slot: `${SLOTNAME[s]}${bn ? ` <span class="tape">${bn}</span>` : ''}`, nm: esc(o.r.n), kc: `${fmtN(o.k)}<small>kcal</small>`, art: art(o.r, 42), open: `data-a="open" data-r="${o.r.id}" data-k="${k}" data-s="${s}"`, have: haveChip(k, s, o) })); }
   }
   if (c.night) rows.push(mealRow({ tick: 'out', on: !!c.night.done, done: !!c.night.done, slot: `Night out${c.night.note ? ` · ${esc(c.night.note)}` : ''}`, nm: esc(drinkSummary(c.night)), kc: `${fmtN(c.dK)}<small>kcal</small>`, art: nightArt(c.night, 42), open: `data-a="night" data-k="${k}"` }));
-  const extras = d.x.map((x, i) => `<div class="xrow"><button class="nm" data-a="xedit" data-i="${i}">${esc(x.n)}<span class="mt">${fmtN(x.k)} kcal${+x.g > 0 ? ` · ${fmtN(x.g)}${x.u === 'ml' ? 'ml' : 'g'}` : ''}${x.its && x.its.length > 1 ? ` · ${x.its.length} items` : ''} · ${fmtN(x.p || 0)}g protein${(x.pl || []).length ? ` · ${x.pl.length} plant${x.pl.length > 1 ? 's' : ''}` : ''}${x.fe ? ' · fermented' : ''}${mfTags(x)}</span></button><button class="iconbtn" data-a="xedit" data-i="${i}" aria-label="Edit ${esc(x.n)}">${ic('edit')}</button><button class="iconbtn" data-a="xdel" data-i="${i}" aria-label="Remove ${esc(x.n)}">${ic('trash')}</button></div>`).join('');
+  const extras = d.x.map((x, i) => `<div class="xrow"><button class="nm" data-a="xedit" data-i="${i}">${esc(x.n)}<span class="mt">${fmtN(x.k)} kcal${+x.g > 0 ? ` · ${fmtN(x.g)}${x.u === 'ml' ? 'ml' : 'g'}` : ''}${x.its && x.its.length > 1 ? ` · ${x.its.length} items` : ''} · ${fmtN(x.p || 0)}g protein${(x.pl || []).length ? ` · ${x.pl.length} plant${x.pl.length > 1 ? 's' : ''}` : ''}${x.fe ? ' · fermented' : ''}${mfTags(x)}</span></button><button class="iconbtn" data-a="xcopy" data-i="${i}" aria-label="Have another ${esc(x.n)}">${ic('copy')}</button><button class="iconbtn" data-a="xedit" data-i="${i}" aria-label="Edit ${esc(x.n)}">${ic('edit')}</button><button class="iconbtn" data-a="xdel" data-i="${i}" aria-label="Remove ${esc(x.n)}">${ic('trash')}</button></div>`).join('');
   const g = set.plantGoal;
   const tiles = `<div class="tiles"><button class="tile ${wc.ptsEat >= g ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${fmtPts(wc.ptsEat)}<small>/${g}</small></span><span class="l">Plants eaten</span></button>
     <button class="tile ${wc.oilyE >= set.oilyGoal ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${wc.oilyE}<small>/${set.oilyGoal}</small></span><span class="l">Oily fish</span></button>
@@ -8600,7 +8600,8 @@ function shCustom() {
   <div class="fieldrow"><div class="field"><label for="c-k">Calories (estimate)</label><input id="c-k" type="number" inputmode="numeric" value="${esc(c.k || '')}"></div><div class="field"><label for="c-p">Protein (g)</label><input id="c-p" type="number" inputmode="numeric" value="${esc(c.p || '')}"></div></div>
   ${labelFields('c', c)}
   ${meatFish('c', c)}
-  <div class="btnrow" style="margin-top:14px"><button class="btn primary" data-a="csave">Save</button><button class="btn ghost" data-a="pick" data-k="${SH.k}" data-s="${SH.s}">Pick a recipe instead</button></div>`;
+  <div class="btnrow" style="margin-top:14px"><button class="btn primary" data-a="csave">Save</button><button class="btn ghost" data-a="pick" data-k="${SH.k}" data-s="${SH.s}">Pick a recipe instead</button></div>
+  ${!SH.pre && peekD(SH.k).cu[SH.s] ? `<button class="btn" style="width:100%;margin-top:8px" data-a="cagain">${ic('copy')}Have another, added on top</button>` : ''}`;
 }
 function shTarget() {
   SH.title = 'Calorie target';
@@ -9196,6 +9197,17 @@ const ACT = {
     const dk = d.k || UI.day, x = peekD(dk).x[+d.i]; if (!x) return;
     openSheet({ type: 'xadd', dk, ei: +d.i, n: x.n, k: x.k || '', p: x.p || '', g: x.g || '', its: itsCopy(x.its), fe: !!x.fe, rm: !!x.rm, oi: !!x.oi, pl: (x.pl || []).slice(), sa: x.sa !== undefined ? x.sa : x.na !== undefined ? +(x.na * 2.5).toFixed(2) : undefined, fs: x.fs, sf: x.sf, f: x.f });
     const it = amtItem(x); if (it) { SH.lk = it; renderSheet(); lkFill(it.g); }
+  },
+  // 3.32.1: the same again (a second cup of tea), as a copy logged on the same day
+  xcopy(d) {
+    const dk = UI.day, xs = D(dk).x, x = xs[+d.i]; if (!x) return;
+    const c = Object.assign(foodCopy(x), { at: todayKey() }); xs.push(c); foodPut(S, c, dk);
+    save(); render(); toast(`Another ${x.n} added`);
+  },
+  cagain() {
+    if (!SH || SH.type !== 'custom') return; const dk = SH.k, c0 = peekD(dk).cu[SH.s]; if (!c0) return;
+    const c = Object.assign(foodCopy(c0), { at: todayKey() }); D(dk).x.push(c); foodPut(S, c, dk);
+    save(); closeSheet(); render(); toast(`Another ${c0.n} added`);
   },
   xrm() { const xs = D(SH.dk || UI.day).x, x = xs[SH.ei]; if (x) { xs.splice(SH.ei, 1); toast(`Removed ${x.n}`); } save(); closeSheet(); render(); },
   xdel(d) { D(UI.day).x.splice(+d.i, 1); save(); render(); },

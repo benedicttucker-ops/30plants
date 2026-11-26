@@ -1,4 +1,4 @@
-THIRTY PLANTS 3.32.0: putting it on your Android phone
+THIRTY PLANTS 3.32.1: putting it on your Android phone
 
 The app has to be opened from a web address (not as a file) for Chrome to install it.
 Free route with GitHub Pages:
@@ -63,3 +63,6 @@ weeks (what the advice uses) and over up to twelve weeks, once there are five we
 Bodyweight rep ranges (3.32.0): Train > Why it's built like this has the bodyweight ranges for upper and lower
 body, every exercise listed with its range, and the studies behind them.
 
+Have another (3.32.1): each food logged on Today has a copy button that adds the same again to that day (a second
+cup of tea, say), grams and items included. A meal you logged in place of a planned one has "Have another, added on
+top" in its sheet.
