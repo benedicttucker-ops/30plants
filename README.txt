@@ -1,4 +1,4 @@
-THIRTY PLANTS 3.32.1: putting it on your Android phone
+THIRTY PLANTS 3.33.0: putting it on your Android phone
 
 The app has to be opened from a web address (not as a file) for Chrome to install it.
 Free route with GitHub Pages:
@@ -66,3 +66,11 @@ body, every exercise listed with its range, and the studies behind them.
 Have another (3.32.1): each food logged on Today has a copy button that adds the same again to that day (a second
 cup of tea, say), grams and items included. A meal you logged in place of a planned one has "Have another, added on
 top" in its sheet.
+
+New layout (3.33.0): one bar along the bottom: Today, Week, Shop, Train and Progress. Nothing has gone; things have
+moved. Week has Plan, Prep and Nights out as tabs at the top, and a Recipes button in its header. Progress is what was
+Trends (the plant pill still opens it), with your weight, sleep and check-in charts and calorie advice in it too. The
+morning check-in opens from a card at the top of Today (Progress has a Check in button as well). Today puts the meals
+first, then how the day's going, the day's training and a switch for tonight; Log in its header logs food. Each section has
+its own colour; Today keeps your own accent. Set up a week (the old wand) is the Set up week button on Week.
+

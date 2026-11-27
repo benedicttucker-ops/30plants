@@ -2195,14 +2195,85 @@ ul.bwr li { margin: 2px 0; }
 .potb { position: relative; height: 12px; border-radius: 6px; background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
 .potb i { position: absolute; top: 0; bottom: 0; border-radius: 6px; background: var(--accent); }
 .potax { display: flex; justify-content: space-between; font-size: 11px; }
+
+/* ───────────── 3.33: the cleaner layout ───────────── */
+/* section colours: Today keeps your own accent, the rest have theirs */
+body.sec-week { --accent: #3C7A2C; --accent-soft: #E1EEDA; }
+body.sec-shop { --accent: #8A4E14; --accent-soft: #F6E7D6; }
+body.sec-train { --accent: #2F5670; --accent-soft: #E1EAF1; }
+body.sec-progress { --accent: #5B2E78; --accent-soft: #EEE3F4; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body.sec-week { --accent: #8BC870; --accent-soft: #1F3019; }
+  :root:not([data-theme="light"]) body.sec-shop { --accent: #E6A866; --accent-soft: #36271A; }
+  :root:not([data-theme="light"]) body.sec-train { --accent: #8FB2CC; --accent-soft: #1A2833; }
+  :root:not([data-theme="light"]) body.sec-progress { --accent: #C29BE0; --accent-soft: #2B1F36; }
+}
+:root[data-theme="dark"] body.sec-week { --accent: #8BC870; --accent-soft: #1F3019; }
+:root[data-theme="dark"] body.sec-shop { --accent: #E6A866; --accent-soft: #36271A; }
+:root[data-theme="dark"] body.sec-train { --accent: #8FB2CC; --accent-soft: #1A2833; }
+:root[data-theme="dark"] body.sec-progress { --accent: #C29BE0; --accent-soft: #2B1F36; }
+/* the page header: a tinted band with the section's name */
+.top { background: color-mix(in srgb, var(--accent) 10%, var(--bg)); border-bottom: 0; border-radius: 0 0 22px 22px; padding: 12px 12px 12px 18px; gap: 8px; margin-bottom: 6px; }
+#modesw, #wandbtn { display: none !important; }
+.ptitle { flex: 1; min-width: 0; display: flex; align-items: center; gap: 2px; }
+.ptitle > div { min-width: 0; }
+.ptitle h1 { margin: 0; font-family: var(--f-display); font-weight: 800; font-size: 31px; line-height: .95; text-transform: uppercase; letter-spacing: .02em; color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ptitle small { display: block; margin-top: 3px; font-size: 12.5px; font-weight: 700; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ptitle .hback { margin-left: -10px; flex: none; }
+.hbtn { flex: none; background: var(--surface); }
+.hbtn svg { width: 16px; height: 16px; }
+.top .plantpill { flex: none; }
+.top #gear { background: var(--surface); border-radius: 12px; }
+/* one bar everywhere, coloured by section */
+body.wmode .nav { display: block; }
+body.wmode .app { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+.app { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+body.wmode .tdock { bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
+body.wmode .toast, .toast { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+.nav button[aria-current="page"] { color: var(--accent); }
+.nav-in { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.nav button { font-size: 11px; }
+/* the week's own tabs */
+.seg.wkseg { margin: 2px 0 10px; background: var(--surface); border: 1px solid var(--line); }
+.seg.wkseg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: none; }
+/* Log on Today's header */
+.hbtn.hlog { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.hbtn.hlog svg { stroke-width: 2.6; }
+/* Today: section title, check-in, training and tonight */
+.secttl { margin: 22px 2px 8px; font-family: var(--f-display); font-weight: 800; font-size: 20px; text-transform: uppercase; letter-spacing: .03em; }
+.ckday { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 11px 14px; margin: 10px 0 0; color: var(--ink); }
+.ckday > svg { width: 24px; height: 24px; color: var(--accent); flex: none; }
+.ckday.done > svg { color: var(--leaf); }
+.ckday .t { flex: 1; min-width: 0; display: grid; }
+.ckday .t small, .trow .t span { color: var(--muted); font-size: 12.5px; }
+.ckday .go, .trow .go { display: inline-flex; align-items: center; gap: 2px; font-weight: 700; font-size: 14px; color: var(--accent); flex: none; }
+.ckday .go svg, .trow .go svg { width: 16px; height: 16px; }
+.trows { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; margin: 12px 0; overflow: hidden; }
+.trow { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; background: none; border: 0; border-top: 1px solid var(--line); padding: 11px 14px; color: var(--ink); min-height: 56px; }
+.trow:first-child { border-top: 0; }
+.trow > svg { width: 22px; height: 22px; flex: none; color: var(--muted); }
+.trow .t { flex: 1; min-width: 0; display: grid; }
+.trow .t small { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.trow .switch { flex: none; pointer-events: auto; }
+.meals { margin-top: 12px; }
+/* Progress: its buttons, and the body section */
+.rhead.prhead { justify-content: space-between; }
+.prbody { margin-top: 18px; }
+.ckmore { display: flex; margin: 12px auto 0; text-align: center; }
+/* Prep: ingredients, method and swap side by side until one opens */
+.bacts { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }
+.bacts > details.more { margin: 0; }
+.bacts > details.more[open] { flex-basis: 100%; order: -1; }
+.bacts > details.more:not([open]) > summary { border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; font-size: 13.5px; background: var(--surface); }
+.bacts > div .btn { margin: 0; }
 </style>
 </head>
 <body>
 <div class="app">
   <header class="top">
-    <h1 class="sr-only">Thirty Plants</h1>
     <div class="modesw" id="modesw" role="tablist" aria-label="Section"></div>
-    <span class="tspacer"></span>
+    <div class="ptitle" id="ptitle"><h1>Thirty Plants</h1></div>
+    <span id="hextra"></span>
     <button class="plantpill" id="pill" data-a="trends" aria-label="Trends"></button>
     <button class="iconbtn wand" id="wandbtn" data-a="wizard" aria-label="Set up a week"></button>
     <button class="iconbtn" data-a="settings" aria-label="Settings" id="gear"></button>
@@ -2210,6 +2281,7 @@ ul.bwr li { margin: 2px 0; }
   <main id="main"></main>
 </div>
 <nav class="nav" aria-label="Sections"><div class="nav-in" id="nav"></div></nav>
+
 <div id="sheet-root"></div>
 <div id="wz-root"></div>
 <div id="rv-root"></div>
@@ -2220,7 +2292,7 @@ ul.bwr li { margin: 2px 0; }
 <div id="fx" aria-hidden="true"></div>
 <div id="toast-root" aria-live="polite"></div>
 
-<script>window.TP_VERSION = '3.32.1';</script>
+<script>window.TP_VERSION = '3.33.0';</script>
 <script>
 /* Thirty Plants: ingredient, plant and recipe data.
    Nutrition is per 100g (dry weight for pasta, rice and grains; drained weight for tinned pulses).
@@ -5694,7 +5766,28 @@ function vToday() {
   const tiles = `<div class="tiles"><button class="tile ${wc.ptsEat >= g ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${fmtPts(wc.ptsEat)}<small>/${g}</small></span><span class="l">Plants eaten</span></button>
     <button class="tile ${wc.oilyE >= set.oilyGoal ? 'good' : ''}" data-a="tab" data-v="week"><span class="v">${wc.oilyE}<small>/${set.oilyGoal}</small></span><span class="l">Oily fish</span></button>
     <button class="tile ${wc.fermEatDays >= 6 ? 'good' : wc.fermEatDays >= 4 ? 'mid' : ''}" data-a="tab" data-v="week"><span class="v">${wc.fermEatDays}<small>/7</small></span><span class="l">Fermented days</span></button></div>`;
-  return `${weekNav(st)}<div class="strip">${strip}</div>${gmStrip(k)}${k === tk ? mrCard() : ''}${fxCard(k)}${spareCard(k)}${hero}${k === tk ? todayPrompts() : ''}<div class="meals">${rows.join('')}</div>${fitBar(k, c)}${mkupBar(k, c)}<div class="extras">${extras}<button class="btn link" data-a="xadd">${ic('plus')}Log something else</button></div>${tiles}${gmDoneCard(k)}${wrap}`;
+  return `${weekNav(st)}<div class="strip">${strip}</div>${k === tk ? ckToday(tk) + mrCard() + todayPrompts() : ''}<div class="meals">${rows.join('')}</div>${fitBar(k, c)}${mkupBar(k, c)}<div class="extras">${extras}<button class="btn link" data-a="xadd">${ic('plus')}Log something else</button></div>
+    <h2 class="secttl">${k === tk ? 'Today so far' : `${DOWL[dayIndex(k)]} so far`}</h2>${hero}${gmStrip(k)}${todayRows(k, c)}${fxCard(k)}${spareCard(k)}${tiles}${gmDoneCard(k)}${wrap}`;
+}
+/* 3.33: the morning check-in, from Today: done, or a nudge to do it */
+function ckToday(tk) {
+  const w = WT(), c = S.ck[tk] || {}, done = ckSaved(tk);
+  const bits = [w.log[tk] ? fmtW(w.log[tk]) : '', c.sl ? `slept ${fmtH(c.sl)}` : ''].filter(Boolean).join(' · ');
+  return `<button class="ckday ${done ? 'done' : ''}" data-a="appmode" data-v="weight">${ic(done ? 'check' : 'ckin')}<span class="t"><b>${done ? 'Check-in done' : 'Morning check-in'}</b><small>${done ? bits || 'Saved' : 'Weight, sleep, yesterday and your nose'}</small></span><span class="go">${done ? 'Edit' : 'Start'}${ic('chev')}</span></button>`;
+}
+// 3.33: on Today, the day's training and tonight, each a tap from its own page
+function todayRows(k, c) {
+  const rows = [];
+  try {
+    const st = startOf(k), r = trPlan(st).rows.find(x => x.k === k && (x.sess || x.log));
+    if (r) {
+      const l = r.log, inf = trSesInfo(l ? l.sess : r.sess, trPhase(), trDose(st), l, l ? l.kit : undefined), fin = l && l.fin;
+      rows.push(`<button class="trow" data-a="sec" data-v="train">${ic('lift')}<span class="t"><small>${k === todayKey() ? 'Training today' : 'Training'}</small><b>${esc(inf.n)}${fin ? ' · done' : ''}</b><span>${inf.nEx} exercises${inf.mins ? ` · about ${inf.mins} min` : ''}</span></span><span class="go">${fin ? ic('check') : l ? 'Carry on' : 'Open'}</span></button>`);
+    }
+  } catch (e) { /* no training planned */ }
+  const o = c.night;
+  rows.push(`<div class="trow">${ic('glass')}<span class="t"><small>${k === todayKey() ? 'Tonight' : 'Night'}</small><b>${o ? esc(drinkSummary(o)) : 'Staying in'}</b>${o ? `<span>${fmtN(c.dK)} kcal of drinks</span>` : ''}</span><button class="switch" role="switch" aria-checked="${!!o}" data-a="outtoggle" data-k="${k}" aria-label="Night out ${fmtDay(k)}"><span></span></button></div>`);
+  return `<section class="trows">${rows.join('')}</section>`;
 }
 /* making up the gap: from 4pm, a meal still to come can be swapped for one that fixes what today is short of
    (fibre, fermented) without going over on sat fat, sugar or salt, within the calories left; new plants come next */
@@ -6595,7 +6688,7 @@ function trInsight(rows, win) {
 }
 function vTrends() {
   const L = MCACHE || (MCACHE = metrics()), win = UI.twin || 'wk';
-  const head = `<div class="rhead"><button class="btn sm ghost" data-a="trback">${ic('left')}Back</button><h2>Trends</h2><button class="btn sm rvbtn" data-a="review">${ic('week')}Review a week</button></div>`;
+  const head = `<div class="rhead prhead"><button class="btn sm ghost" data-a="appmode" data-v="weight">${ic('ckin')}Check in</button><button class="btn sm rvbtn" data-a="review">${ic('week')}Review a week</button></div>`;
   const tabs = `<div class="seg trwin" role="group" aria-label="Time frame">${TWINS.map(([v, l]) => `<button data-a="twin" data-v="${v}" aria-pressed="${win === v}">${l}</button>`).join('')}</div>`;
   let rows, story;
   if (win === 'wk') {
@@ -6641,7 +6734,7 @@ function vTrends() {
   also.push(['nose', 'Nose care guide', 'The routine and the reference from the nose app', 0, noseGuide]);
   if (missing.length) also.push(['miss', 'Not on your plan for four weeks', `${missing.length} plant${missing.length > 1 ? 's' : ''}, ${esc(PLANTS[missing[0]][0].toLowerCase())} to ${esc(PLANTS[missing[missing.length - 1]][0].toLowerCase())}`, 0, () => `<div class="alsobody">${missHtml}</div>`]);
   const alsoHtml = also.length ? `<section class="trsec"><h3 class="eyebrow">Also here</h3><div class="trlist">${also.map(([k, n, sub, badge, body]) => { const open = !!(UI.tAlso || {})[k]; return `<div class="also ${open ? 'open' : ''}"><button class="alsohead" data-a="talso" data-v="${k}" aria-expanded="${open}"><span class="trn"><b>${n}</b><small>${sub}</small></span>${badge ? `<span class="abadge">${badge}</span>` : ''}${ic('chev', false, 'chev')}</button>${open ? body() : ''}</div>`; }).join('')}</div></section>` : '';
-  return `${head}${tabs}${summary}${win === 'wk' ? fxBenefits() : ''}${legend}${body}${noseTrends()}${alsoHtml}`;
+  return `${head}${tabs}${summary}${win === 'wk' ? fxBenefits() : ''}${legend}${body}<section class="trsec prbody" id="pr-body"><h3 class="eyebrow">Weight, sleep and checks</h3>${vWeight('body')}</section>${noseTrends()}${alsoHtml}`;
 }
 /* weeks with something still to fill in, from where each record starts to the end of last week */
 const GAPNAME = { plants: 'Plant points', cols: 'Colour groups', food: 'Food', alc: 'Alcohol', run: 'Cardio', ck: 'Check-ins' };
@@ -6994,12 +7087,14 @@ function checksCard() {
   }).join('');
   return `<section class="wsum"><div class="wchead"><div class="eyebrow">Daily checks</div><button class="btn sm ghost" data-a="ckitems">${ic('edit')}Edit</button></div>${rows}<p class="small muted" style="margin:0">Last 7 days, oldest first. Filled is yes, outlined is no.</p></section>`;
 }
-function vWeight() {
+function vWeight(part) {
   const tk = todayKey(), w = WT(), ks = wDays();
   const card = rvBanner() + ckCard();
   const all = [...new Set([...ks, ...Object.keys(S.ck), ...Object.keys(w.waist)])].filter(ckSaved).sort().reverse();
   const list = all.length ? `<details class="more aisle"><summary>All check-ins · ${all.length}${ic('chev')}</summary><div class="shoplist" style="margin-top:6px">${all.slice(0, 90).map(k => { const c = S.ck[k] || {}, yes = S.ckItems.filter(it => c.c && c.c[it.id] === 1).length; return `<button class="crow ckline" data-a="ckopen" data-k="${k}"><span class="n">${fmtDay(k)}<span class="h">${[w.log[k] ? fmtW(w.log[k]) : '', c.sl ? fmtH(c.sl) + ' sleep' : '', w.waist[k] ? `${w.waist[k]} in waist` : ''].filter(Boolean).join(' · ') || 'Checks only'}</span></span><span class="wlr">${S.ckItems.length && c.c ? `<b>${yes}/${S.ckItems.length}</b>` : ''}${ic('chev')}</span></button>`; }).join('')}</div></details>` : '';
-  if (!ks.length) return `${card}${sleepCard()}${checksCard()}<div class="empty">${art({ type: 'calendar', main: 'green' }, 90)}<p>Check in a few mornings and your weight trend and calorie advice appear here.</p></div>${wGoalCard()}${wWaistCard()}${list}`;
+  const more = `<button class="btn link ckmore" data-a="sec" data-v="progress">${ic('chart')}Charts, calorie advice and past check-ins: Progress</button>`;
+  if (part === 'form') return `${card}${more}`;
+  if (!ks.length) return `${sleepCard()}${checksCard()}<div class="empty">${art({ type: 'calendar', main: 'green' }, 90)}<p>Check in a few mornings and your weight trend and calorie advice appear here.</p></div>${wGoalCard()}${wWaistCard()}${list}`;
   const a = wAvg(tk), aPrev = wAvg(addDays(tk, -7)), slope = wSlope(tk, 21);
   const hero = a ? `<div class="whero"><div><div class="small muted" style="font-weight:700">7-day average</div><div class="big">${toU(a.v).toFixed(1)}<small> ${w.unit}</small></div></div>
     <div class="wtiles"><div class="mini"><b>${aPrev ? fmtDW(a.v - aPrev.v) : '–'}</b><span>vs last week</span></div><div class="mini"><b>${slope !== null ? fmtDW(slope * 7) : '–'}</b><span>a week, 3-wk trend</span></div>${w.target ? `<div class="mini"><b>${fmtW(Math.abs(a.v - w.target)).replace(' ' + w.unit, '')}</b><span>${w.unit} to goal</span></div>` : ''}</div></div>` : '';
@@ -7008,7 +7103,7 @@ function vWeight() {
     ${hero}<div class="wlegend"><span><i class="ldot"></i>Daily</span><span><i class="lline"></i>7-day average</span></div>${wChart(UI.wrange)}<p class="small" style="margin:0">${selP}</p></section>`;
   const adv = wAdvice();
   const advice = `<section class="wsum wadvice"><div class="eyebrow">Calories</div>${adv.need ? `<p style="margin:0">${adv.need}</p>` : `<h3>${adv.head}</h3><p style="margin:0">${esc(adv.body)}</p>${adv.act ? `<button class="btn primary" data-a="wtarget" data-v="${adv.act}">Set daily target to ${fmtN(adv.act)} kcal</button>` : ''}<div class="eyebrow" style="margin-top:10px">Maintenance</div>${wMaintBox(adv)}<p class="small muted" style="margin:0">${esc(adv.basis)} Current target ${fmtN(setAt(todayKey()).target)} kcal${setNext() && S.set.target !== setAt(todayKey()).target ? `; ${fmtN(S.set.target)} from ${fmtDay(setNext())}` : ''}.</p>`}</section>`;
-  return `${card}${chart}${advice}${sleepCard()}${checksCard()}${wWaistCard()}${wGoalCard()}${list}`;
+  return `${chart}${advice}${sleepCard()}${checksCard()}${wWaistCard()}${wGoalCard()}${list}`;
 }
 function wWaistCard() {
   const w = WT(), tk = todayKey(), ks = Object.keys(w.waist).sort(), last = ks[ks.length - 1];
@@ -7121,9 +7216,9 @@ function vPrep() {
         <div class="labels">${boxLabels(gr)}</div>
         ${sw.length ? `<p class="swapin">${ic('swap')}<span>Swapped this week: ${esc(sw.map(x => x.text).join('; '))}.</span></p>` : ''}
         ${gr.r.rice ? '<div class="small muted">Cool the rice within an hour, keep it in the fridge no more than a day, and freeze the rest. Reheat once, until piping hot.</div>' : ''}
-        <details class="more" ${UI.pgOpen && UI.pgOpen[`${se.key}${gr.s}${gr.r.id}`] ? 'open' : ''} data-pgo="${se.key}${gr.s}${gr.r.id}"><summary>Ingredients for ${n} portion${n > 1 ? 's' : ''}${ic('chev')}</summary>${prepIngs(st, se.key, gr, tot, from)}</details>
+        <div class="bacts"><details class="more" ${UI.pgOpen && UI.pgOpen[`${se.key}${gr.s}${gr.r.id}`] ? 'open' : ''} data-pgo="${se.key}${gr.s}${gr.r.id}"><summary>Ingredients for ${n} portion${n > 1 ? 's' : ''}${ic('chev')}</summary>${prepIngs(st, se.key, gr, tot, from)}</details>
         <details class="more"><summary>${gr.s === 's' ? 'Packing' : 'Method'}${ic('chev')}</summary><ol class="steps">${(() => { const st2 = prepSteps(gr), plan = amtPlan(gr.r, st2); return st2.map((x, i) => `<li>${esc(x)}${amtChips(plan[i], id => tot[id], gr.r.id)}${swapNotes(gr.r, x)}</li>`).join(''); })()}</ol>${gr.r.note && gr.s !== 's' ? `<p class="small muted">${esc(gr.r.note)}</p>` : ''}</details>
-        <div><button class="btn sm" data-a="bswap" data-key="${se.key}" data-s="${gr.s}" ${gr.s === 's' ? `data-ks="${gr.entries.map(e => e.k).join(',')}"` : ''}>${ic('edit')}Swap ${sl}</button></div></div>`;
+        <div><button class="btn sm" data-a="bswap" data-key="${se.key}" data-s="${gr.s}" ${gr.s === 's' ? `data-ks="${gr.entries.map(e => e.k).join(',')}"` : ''}>${ic('edit')}Swap ${sl}</button></div></div></div>`;
     }).join('') : M.ps.fin ? `<div class="batch"><p class="muted" style="margin:0">Everything from this batch has been eaten.</p></div>`
       : `<div class="batch"><p class="muted" style="margin:0">Nothing to batch-cook in this session.</p><div class="btnrow"><button class="btn sm" data-a="bswap" data-key="${se.key}" data-s="l">Choose a lunch</button><button class="btn sm" data-a="bswap" data-key="${se.key}" data-s="b">Choose a breakfast</button></div></div>`;
     return `<section class="session"><header><span class="eyebrow">${se.key === 'A' ? 'Before the week' : 'After work'}</span><span class="d">${fmtDay(se.date)}</span><span class="small muted">${covers}${mins ? ` · about ${fmtMins(mins)}` : ''}</span>${prepCta(M)}</header>${inner}</section>`;
@@ -7578,7 +7673,7 @@ function leftBox(st) {
     return `<div class="lrow"><span class="n">${esc(ING[i].n)}<span class="h">about ${fmtQ(i, ci.g[i])} · ${when}${mine}</span>${PACK[i] ? `<button class="ichip" data-a="packopen" data-i="${i}">pack ${packTxt(i)}</button>` : ''}</span>
       <span class="lbtns"><button class="iconbtn" data-a="leftadj" data-i="${i}" data-v="-1" aria-label="Less ${esc(ING[i].n)}">−</button><button class="iconbtn" data-a="leftadj" data-i="${i}" data-v="1" aria-label="More ${esc(ING[i].n)}">+</button><button class="btn sm ghost" data-a="leftgone" data-i="${i}">Gone</button></span></div>`;
   };
-  return `<details class="more aisle leftbox" ${ids.length ? 'open' : ''}><summary>Leftovers to use · ${ids.length || 'none'}${ic('chev')}</summary>
+  return `<details class="more aisle leftbox" ${UI.leftOpen ? 'open' : ''}><summary>Leftovers to use · ${ids.length || 'none'}${ic('chev')}</summary>
     <p class="small muted" style="margin:4px 0 6px">Worked out from last week's plan and the packs it would have bought. Put it right if it's wrong: the shopping list, the swap suggestions and the next plan all go by this.</p>
     <div class="shoplist">${ids.map(row).join('')}</div>
     ${gone.length ? `<p class="small muted" style="margin:6px 0 0">Marked as gone: ${gone.map(i => `<button class="link" data-a="leftreset" data-i="${i}">${esc(shortN(i).toLowerCase())}</button>`).join(', ')}. Tap one to bring it back.</p>` : ''}
@@ -7791,7 +7886,7 @@ function vShop() {
   const nextSt = addDays(st, 7), keepTxt = i => (FREEZE.has(i) ? 'freeze it' : sp.until[i] >= nextSt ? `keeps till ${fmtDay(sp.until[i])}` : `use or bin by ${fmtDay(sp.until[i])}`);
   const spare = left.length ? `<details class="more aisle"><summary>Likely spare after this week · ${left.length}${ic('chev')}</summary><p class="small muted" style="margin:4px 0 6px">Packs this plan won't finish. Next week's plan uses up whatever will still be good, the soonest to go off first.</p><div class="shoplist">${left.sort((a, b) => ING[a[0]].n.localeCompare(ING[b[0]].n)).map(([i, g]) => `<div class="crow"><span class="n">${esc(ING[i].n)}<button class="ichip" data-a="packopen" data-i="${i}">pack ${packTxt(i)}</button></span><span class="small muted">about ${fmtQ(i, g)}, ${keepTxt(i)}</span></div>`).join('')}</div></details>` : '';
   const lb = st >= startOf(todayKey()) && (trip === 0 || trip === 1) ? leftBox(st) : '';
-  return `${weekNav(st)}${seg}${progress}${useUp}${lb}${swapBox}${aisles}${grab}${cup}${have}${spare}
+  return `${weekNav(st)}${seg}${progress}${useUp}${swapBox}${aisles}${grab}${lb}${cup}${have}${spare}
     <div class="btnrow" style="margin-top:16px"><button class="btn" data-a="copyshop">${ic('copy')}Copy list</button><button class="btn" data-a="cupboard">${ic('home')}My cupboard</button><button class="btn ghost" data-a="untick">Untick all</button></div>`;
 }
 
@@ -9050,7 +9145,7 @@ function nudgeWeek(v) {
   // from the second prep day on, the Shop tab opens on the second shop
   if (v === 'shop' && weekMode(UI.week) === 'two') UI.trip = tk >= sessions(UI.week, 'two')[1].date ? 2 : 1;
 }
-function setTab(v) { if (UI.trends) { UI.trends = false; syncHistory(); } if (v === 'recipes' && UI.tab !== 'recipes') UI.back = UI.tab; UI.anim = slideDir(TABS.map(t => t[0]), UI.tab, v); if (UI.tab !== v) UI.navPop = 'nav'; UI.tab = v; try { sessionStorage.setItem('tp.tab', v); } catch (e) { /* ignore */ } if (v === 'today') UI.week = startOf(UI.day); nudgeWeek(v); }
+function setTab(v) { if (WK_SUB.includes(v)) UI.wkSub = v; if (UI.trends) { UI.trends = false; syncHistory(); } if (v === 'recipes' && UI.tab !== 'recipes') UI.back = UI.tab; UI.anim = slideDir(TABS.map(t => t[0]), UI.tab, v); if (UI.tab !== v) UI.navPop = 'nav'; UI.tab = v; try { sessionStorage.setItem('tp.tab', v); } catch (e) { /* ignore */ } if (v === 'today') UI.week = startOf(UI.day); nudgeWeek(v); }
 function ckReset() { UI.ckDraft = null; UI.ckSkip = true; }
 // keep what's typed in the check-in when something else redraws the page
 function keepCk() {
@@ -9350,7 +9445,20 @@ const ACT = {
     render();
   },
   stocklow(d) { const w = W(UI.week); w.low = w.low || {}; w.low[d.i] = 1; save(); render(); toast(`${shortN(d.i)} is back on this week's list`); },
-  trends() { closeSheet(); if (UI.trends) { window.scrollTo(0, 0); return; } UI.trends = true; UI.anim = 'enter'; render(); window.scrollTo(0, 0); syncHistory(); },
+  trends() { ACT.sec({ v: 'progress' }); },
+  // 3.33: the bottom bar
+  sec(d) {
+    const v = d.v, was = secOf(); closeSheet();
+    const mode = m => { if (UI.mode !== m) { UI.mode = m; try { localStorage.setItem('tp.mode', m); } catch (e) { /* ignore */ } } };
+    if (v === 'progress') { mode('meals'); if (!UI.trends) { UI.trends = true; syncHistory(); } }
+    else {
+      if (UI.trends) { UI.trends = false; syncHistory(); }
+      if (v === 'train') mode('train');
+      else { mode('meals'); const tab = v === 'week' ? (WK_SUB.includes(UI.tab) ? UI.tab : UI.wkSub || 'week') : v; if (UI.tab !== tab) setTab(tab); nudgeWeek(tab); }
+    }
+    UI.anim = was === v ? null : slideDir(SECS.map(s => s[0]), was, v); if (was !== v) UI.navPop = 'nav';
+    render(); window.scrollTo(0, 0);
+  },
   trback() { UI.trends = false; UI.anim = 'enter'; render(); window.scrollTo(0, 0); syncHistory(); },
   alwk(d, el) { const det = el.closest('details'); UI.alWk = det ? !det.open : true; },
   allim(d, el) { const det = el.closest('details'); UI.alLim = det ? !det.open : true; },
@@ -12055,6 +12163,8 @@ document.addEventListener('change', e => {
   if (!itsSet(o, el.value)) return;
   itsApply(); renderSheet(); toast(`${o.n}: ${fmtN(o.g)}g`);
 });
+// 3.33: the leftovers list on Shop stays open or shut as you leave it
+document.addEventListener('toggle', e => { const el = e.target; if (el && el.classList && el.classList.contains('leftbox')) UI.leftOpen = el.open; }, true);
 // pasting (or typing) a code reads it straight away
 document.addEventListener('input', e => { if (e.target.id === 'pc-in' && SH && SH.type === 'xadd') pcApply(e.target.value); });
 
@@ -14324,6 +14434,33 @@ Object.assign(ACT, {
 });
 
 const TABS = [['today', 'Today', 'today'], ['week', 'Week', 'week'], ['out', 'Out', 'glass'], ['prep', 'Prep', 'prep'], ['shop', 'Shop', 'shop']];
+/* 3.33: one bar along the bottom. Week holds the plan, prep and nights out as tabs of its own; Train and Progress
+   (what used to be Trends, behind the plant pill) are sections of their own; the check-in opens from Today. Each section
+   has its own colour, set on the body; Today keeps your own accent colour */
+const SECS = [['today', 'Today', 'today'], ['week', 'Week', 'week'], ['shop', 'Shop', 'shop'], ['train', 'Train', 'lift'], ['progress', 'Progress', 'chart']];
+const WK_SUB = ['week', 'prep', 'out'];
+function secOf() {
+  if (UI.trends) return 'progress';
+  if (UI.mode === 'train') return 'train';
+  if (UI.mode === 'weight') return 'today';
+  return UI.tab === 'shop' ? 'shop' : UI.tab === 'today' ? 'today' : 'week';
+}
+function wkSeg() {
+  return `<div class="seg wkseg" role="group" aria-label="Week">${[['week', 'Plan'], ['prep', 'Prep'], ['out', 'Nights out']].map(([v, l]) => `<button data-a="tab" data-v="${v}" aria-pressed="${UI.tab === v}">${l}</button>`).join('')}</div>`;
+}
+function pageHead(sec, wm, tm) {
+  const el = $('ptitle'), ex = $('hextra'); if (!el) return;
+  const tk = todayKey(), H = (h, sub, back) => `${back ? `<button class="iconbtn hback" data-a="sec" data-v="${back}" aria-label="Back to ${back === 'today' ? 'Today' : back}">${ic('left')}</button>` : ''}<div><h1>${esc(h)}</h1>${sub ? `<small>${esc(sub)}</small>` : ''}</div>`;
+  let html, extra = '';
+  const rel = () => { const d = daysBetween(startOf(tk), UI.week) / 7; return d === 0 ? 'This week' : d === 1 ? 'Next week' : d === -1 ? 'Last week' : d > 0 ? `${d} weeks ahead` : `${-d} weeks back`; };
+  if (wm) html = H('Check-in', fmtDay(UI.ckDate || tk), 'today');
+  else if (sec === 'today') { const k = UI.day; html = H(k === tk ? 'Today' : DOWL[dayIndex(k)], k === tk ? `${DOWL[dayIndex(k)]} ${fmtDay(k).replace(/^\w+ /, '')}` : fmtDay(k)); if (dayCalc(k).hasPlan) extra = `<button class="btn sm hbtn hlog" data-a="xadd" aria-label="Log food">${ic('plus')}Log</button>`; }
+  else if (sec === 'week') { html = H(UI.tab === 'recipes' ? 'Recipes' : 'Week', UI.tab === 'recipes' ? 'All of them, with search and filters' : rel()); if (UI.tab !== 'recipes') extra = `<button class="btn sm hbtn" data-a="recipes">${ic('book')}Recipes</button>`; }
+  else if (sec === 'shop') html = H('Shop', rel());
+  else if (sec === 'train') html = H('Train', 'Sessions, lifts and progress');
+  else html = H('Progress', 'Food, body, sleep and habits');
+  el.innerHTML = html; if (ex) ex.innerHTML = extra;
+}
 let RENDERED = false;
 function render() {
   lockMode(startOf(todayKey())); if (UI.week !== startOf(todayKey())) lockMode(UI.week);
@@ -14340,9 +14477,12 @@ function render() {
   document.body.classList.toggle('wmode', wm || tm);
   fitTop();
   $('gear').setAttribute('aria-label', wm ? 'Check-in settings' : tm ? 'Training settings' : 'Settings');
-  $('nav').innerHTML = TABS.map(([v, l, i]) => `<button data-a="tab" data-v="${v}" ${UI.tab === v && !UI.trends ? 'aria-current="page"' : ''}>${ic(i)}<span>${l}</span></button>`).join('');
+  const sec = secOf();
+  $('nav').innerHTML = SECS.map(([v, l, i]) => `<button data-a="sec" data-v="${v}" ${sec === v ? 'aria-current="page"' : ''}>${ic(i)}<span>${l}</span></button>`).join('');
+  SECS.forEach(([v]) => document.body.classList.toggle(`sec-${v}`, sec === v));
+  pageHead(sec, wm, tm);
   const main = $('main');
-  main.innerHTML = UI.trends ? vTrends() : wm ? vWeight() : tm ? vTrain() : ({ today: vToday, week: vWeek, out: vOut, prep: vPrep, shop: vShop, recipes: vRecipes }[UI.tab] || vToday)();
+  main.innerHTML = UI.trends ? vTrends() : wm ? vWeight('form') : tm ? vTrain() : `${WK_SUB.includes(UI.tab) ? wkSeg() : ''}${({ today: vToday, week: vWeek, out: vOut, prep: vPrep, shop: vShop, recipes: vRecipes }[UI.tab] || vToday)()}`;
   const opening = !!UI.anim || !!UI.dayDir || !RENDERED; RENDERED = true;
   main.classList.remove('enter', 'in-r', 'in-l'); $('nav').classList.remove('justtab'); $('modesw').classList.remove('justtab');
   if (UI.anim === 'enter' || UI.anim === 'r' || UI.anim === 'l') { void main.offsetWidth; main.classList.add('enter'); if (UI.anim !== 'enter') main.classList.add(`in-${UI.anim}`); }
